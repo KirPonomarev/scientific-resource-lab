@@ -65,6 +65,7 @@ _SCHEMA_NAME_TO_FILE: Final[dict[str, str]] = {
     "ScienceLabRunRequest": "science-lab-run-request.json",
     "ScienceLabPlan": "science-lab-plan.json",
     "PilotSpec": "pilot-spec.json",
+    "LabExportPacket": "lab-export-packet.json",
 }
 
 # Typed fail reason for schema-level failures (meta-validation + instance
