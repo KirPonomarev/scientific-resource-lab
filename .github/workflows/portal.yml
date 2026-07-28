@@ -1,0 +1,47 @@
+# Scientific Resource Lab portal gate (WP-F52).
+# Actions are pinned to full commit SHAs for reproducibility and supply-chain
+# integrity. Bump by resolving the new tag's commit SHA via the GitHub API and
+# replacing the SHA here (keeping the comment with the human-readable tag).
+#
+# Resolved SHAs (re-resolve on update):
+#   actions/checkout  v5.1.0 -> fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+#   astral-sh/setup-uv v9.0.0 -> c771a70e6277c0a99b617c7a806ffedaca235ff9
+name: portal
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  merge_group:
+
+permissions:
+  contents: read
+
+jobs:
+  portal-gate:
+    name: portal-gate (WP-F52)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Setup uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9  # v9.0.0
+        with:
+          enable-cache: true
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+      - name: Install dependencies (locked)
+        run: uv sync --locked
+      - name: Ruff check
+        run: uv run ruff check .
+      - name: Ruff format check
+        run: uv run ruff format --check .
+      - name: Mypy strict
+        run: uv run mypy
+      - name: Pytest
+        run: uv run pytest -q
+      - name: WP-F52 portal gate
+        run: uv run python scripts/checks/wp52-gate.py
