@@ -1,0 +1,7 @@
+{
+  "validator": "pilot_spec",
+  "exception": "PilotSpecError",
+  "fail_reason": "CONTRACT_INVALID",
+  "invariant": "pilot_safety_const",
+  "reason": "A PilotSpec with status_promotion_allowed=true violates the pilot_safety_const invariant (a pilot cannot authorize promoting a claim's status). Rejected by the schema's const:false keyword and by srl.pilot.spec._validate_const_false in Python (defense in depth) with CONTRACT_INVALID."
+}
