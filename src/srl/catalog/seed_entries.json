@@ -1,0 +1,171 @@
+{
+  "schema_version": "CapabilityRegistrySeed/v1",
+  "description": "Default seed entries for the SRL capability registry (WP-C24). Derived from the B14 capability catalog (catalog_data.json) and honest C22/C23 metadata: every entry is admission_stage='not_admitted' because no real pack has been admitted yet. Registry presence does not imply readiness or availability.",
+  "entries": [
+    {
+      "capability_id": "cap.algebra_exact",
+      "profile": "algebra_exact",
+      "adapter_id": null,
+      "pack_manifest_digest": null,
+      "platforms": [],
+      "measured_resources": null,
+      "license_spdx": "NOASSERTION",
+      "provenance": {"source_url": null, "source_sha256": null},
+      "admission_stage": "not_admitted"
+    },
+    {
+      "capability_id": "cap.symbolic_law",
+      "profile": "symbolic_law",
+      "adapter_id": null,
+      "pack_manifest_digest": null,
+      "platforms": [],
+      "measured_resources": null,
+      "license_spdx": "NOASSERTION",
+      "provenance": {"source_url": null, "source_sha256": null},
+      "admission_stage": "not_admitted"
+    },
+    {
+      "capability_id": "cap.dynamics",
+      "profile": "dynamics",
+      "adapter_id": null,
+      "pack_manifest_digest": null,
+      "platforms": [],
+      "measured_resources": null,
+      "license_spdx": "NOASSERTION",
+      "provenance": {"source_url": null, "source_sha256": null},
+      "admission_stage": "not_admitted"
+    },
+    {
+      "capability_id": "cap.geometry_tda",
+      "profile": "geometry_tda",
+      "adapter_id": "ripser",
+      "pack_manifest_digest": null,
+      "platforms": [],
+      "measured_resources": null,
+      "license_spdx": "NOASSERTION",
+      "provenance": {"source_url": null, "source_sha256": null},
+      "admission_stage": "not_admitted"
+    },
+    {
+      "capability_id": "cap.causal_time_series",
+      "profile": "causal_time_series",
+      "adapter_id": null,
+      "pack_manifest_digest": null,
+      "platforms": [],
+      "measured_resources": null,
+      "license_spdx": "NOASSERTION",
+      "provenance": {"source_url": null, "source_sha256": null},
+      "admission_stage": "not_admitted"
+    },
+    {
+      "capability_id": "cap.uncertainty",
+      "profile": "uncertainty",
+      "adapter_id": null,
+      "pack_manifest_digest": null,
+      "platforms": [],
+      "measured_resources": null,
+      "license_spdx": "NOASSERTION",
+      "provenance": {"source_url": null, "source_sha256": null},
+      "admission_stage": "not_admitted"
+    },
+    {
+      "capability_id": "cap.optimization",
+      "profile": "optimization",
+      "adapter_id": null,
+      "pack_manifest_digest": null,
+      "platforms": [],
+      "measured_resources": null,
+      "license_spdx": "NOASSERTION",
+      "provenance": {"source_url": null, "source_sha256": null},
+      "admission_stage": "not_admitted"
+    },
+    {
+      "capability_id": "cap.formal_protocol",
+      "profile": "formal_protocol",
+      "adapter_id": null,
+      "pack_manifest_digest": null,
+      "platforms": [],
+      "measured_resources": null,
+      "license_spdx": "NOASSERTION",
+      "provenance": {"source_url": null, "source_sha256": null},
+      "admission_stage": "not_admitted"
+    },
+    {
+      "capability_id": "cap.literature",
+      "profile": "literature",
+      "adapter_id": null,
+      "pack_manifest_digest": null,
+      "platforms": [],
+      "measured_resources": null,
+      "license_spdx": "NOASSERTION",
+      "provenance": {"source_url": null, "source_sha256": null},
+      "admission_stage": "not_admitted"
+    },
+    {
+      "capability_id": "cap.theorem_or_proof_obligation",
+      "profile": "theorem_or_proof_obligation",
+      "adapter_id": null,
+      "pack_manifest_digest": null,
+      "platforms": [],
+      "measured_resources": null,
+      "license_spdx": "NOASSERTION",
+      "provenance": {"source_url": null, "source_sha256": null},
+      "admission_stage": "not_admitted"
+    },
+    {
+      "capability_id": "cap.nonlinear_continuous_or_hybrid_constraint",
+      "profile": "nonlinear_continuous_or_hybrid_constraint",
+      "adapter_id": "z3",
+      "pack_manifest_digest": null,
+      "platforms": [],
+      "measured_resources": null,
+      "license_spdx": "NOASSERTION",
+      "provenance": {"source_url": null, "source_sha256": null},
+      "admission_stage": "not_admitted"
+    },
+    {
+      "capability_id": "cap.executable_ode_dae_sde_model",
+      "profile": "executable_ode_dae_sde_model",
+      "adapter_id": null,
+      "pack_manifest_digest": null,
+      "platforms": [],
+      "measured_resources": null,
+      "license_spdx": "NOASSERTION",
+      "provenance": {"source_url": null, "source_sha256": null},
+      "admission_stage": "not_admitted"
+    },
+    {
+      "capability_id": "cap.pde_variational_model",
+      "profile": "pde_variational_model",
+      "adapter_id": null,
+      "pack_manifest_digest": null,
+      "platforms": [],
+      "measured_resources": null,
+      "license_spdx": "NOASSERTION",
+      "provenance": {"source_url": null, "source_sha256": null},
+      "admission_stage": "not_admitted"
+    },
+    {
+      "capability_id": "cap.model_composition",
+      "profile": "model_composition",
+      "adapter_id": null,
+      "pack_manifest_digest": null,
+      "platforms": [],
+      "measured_resources": null,
+      "license_spdx": "NOASSERTION",
+      "provenance": {"source_url": null, "source_sha256": null},
+      "admission_stage": "not_admitted"
+    },
+    {
+      "capability_id": "cap.literature_extraction",
+      "profile": "literature_extraction",
+      "adapter_id": null,
+      "pack_manifest_digest": null,
+      "platforms": [],
+      "measured_resources": null,
+      "license_spdx": "NOASSERTION",
+      "provenance": {"source_url": null, "source_sha256": null},
+      "admission_stage": "not_admitted"
+    }
+  ]
+}
