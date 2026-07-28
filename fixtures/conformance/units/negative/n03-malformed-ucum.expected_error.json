@@ -1,0 +1,4 @@
+{
+  "fail_reason": "CONTRACT_INVALID",
+  "detail": "parse_unit('kg*m/') raises UnitError; a dangling operator is not a valid unit"
+}

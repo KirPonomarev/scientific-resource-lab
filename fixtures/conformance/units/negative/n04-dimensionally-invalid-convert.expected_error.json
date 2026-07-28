@@ -1,0 +1,4 @@
+{
+  "fail_reason": "CONTRACT_INVALID",
+  "detail": "convert('1','kg','m') raises UnitError; mass cannot convert to length"
+}

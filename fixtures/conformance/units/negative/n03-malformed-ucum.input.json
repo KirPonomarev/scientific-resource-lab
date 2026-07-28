@@ -1,0 +1,7 @@
+{
+  "vector_id": "wp40-n03-malformed-ucum",
+  "description": "A structurally malformed unit string (dangling operator) must be rejected before any compute.",
+  "expected": "reject",
+  "operation": "parse_unit",
+  "unit": "kg*m/"
+}

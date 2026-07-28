@@ -1,0 +1,15 @@
+{
+  "vector_id": "wp40-p06-conversion-identity",
+  "description": "Coherent conversions render as exact decimal identities (no float artefact).",
+  "expected": "accept",
+  "cases": [
+    {"value": "1", "from": "kg*m/s^2", "to": "N", "result": "1"},
+    {"value": "1", "from": "N", "to": "kg*m/s^2", "result": "1"},
+    {"value": "2", "from": "N", "to": "kg*m/s^2", "result": "2"},
+    {"value": "1", "from": "J", "to": "N*m", "result": "1"},
+    {"value": "1", "from": "Pa", "to": "N/m^2", "result": "1"},
+    {"value": "1", "from": "W", "to": "J/s", "result": "1"},
+    {"value": "1", "from": "V", "to": "J/C", "result": "1"},
+    {"value": "1", "from": "Hz", "to": "1/s", "result": "1"}
+  ]
+}
