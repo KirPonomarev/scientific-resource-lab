@@ -1,0 +1,15 @@
+{
+  "schema_version": "TaskSpec/v1",
+  "task_id": "task-09",
+  "title": "Integer overflow-free factorial bound (100!)",
+  "category": "exact-arithmetic",
+  "input": {
+    "ir": {
+      "const": "933262154439441526816992388562667004907159682643816214685929638952175999932299156089414639761565182862536979208272237582511852109168640000000000000000000000000"
+    }
+  },
+  "expected": {
+    "outcome": "PASS",
+    "detail": "big-int const validates as a decimal string -> PASS"
+  }
+}

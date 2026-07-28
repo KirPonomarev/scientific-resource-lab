@@ -1,0 +1,20 @@
+{
+  "schema_version": "TaskSpec/v1",
+  "task_id": "task-20",
+  "title": "Identified backdoor adjustment",
+  "category": "causal-assumptions",
+  "input": {
+    "claim": {
+      "statement": "A backdoor adjustment set identifies the causal effect via do-calculus and a time series analysis."
+    },
+    "request": {
+      "requested_profiles": [
+        "causal_time_series"
+      ]
+    }
+  },
+  "expected": {
+    "outcome": "WAIT_CAPABILITY",
+    "detail": "causal_time_series auto-classifies; no adapter -> WAIT_CAPABILITY"
+  }
+}

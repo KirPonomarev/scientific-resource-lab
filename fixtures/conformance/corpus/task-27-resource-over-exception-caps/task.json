@@ -1,0 +1,50 @@
+{
+  "schema_version": "TaskSpec/v1",
+  "task_id": "task-27",
+  "title": "Estimate over exception caps",
+  "category": "resource-rejection",
+  "input": {
+    "catalog": {
+      "schema_version": "CapabilityCatalog/v1",
+      "capabilities": [
+        {
+          "capability_id": "cap.pde_variational_model",
+          "profile": "pde_variational_model",
+          "adapter_id": "adapter-pde_variational_model",
+          "availability": "available"
+        },
+        {
+          "capability_id": "cap.geometry_tda",
+          "profile": "geometry_tda",
+          "adapter_id": "adapter-geometry_tda",
+          "availability": "available"
+        },
+        {
+          "capability_id": "cap.nonlinear_continuous_or_hybrid_constraint",
+          "profile": "nonlinear_continuous_or_hybrid_constraint",
+          "adapter_id": "adapter-nonlinear_continuous_or_hybrid_constraint",
+          "availability": "available"
+        },
+        {
+          "capability_id": "cap.executable_ode_dae_sde_model",
+          "profile": "executable_ode_dae_sde_model",
+          "adapter_id": "adapter-executable_ode_dae_sde_model",
+          "availability": "available"
+        }
+      ]
+    },
+    "request": {
+      "requested_profiles": [
+        "pde_variational_model",
+        "geometry_tda",
+        "nonlinear_continuous_or_hybrid_constraint",
+        "executable_ode_dae_sde_model"
+      ],
+      "resource_class": "exception"
+    }
+  },
+  "expected": {
+    "outcome": "REJECT_RESOURCE",
+    "detail": "synthetic available catalog makes 4 heavy profiles SELECTED; summed rss_bytes > exception cap -> WAIT_REMOTE_EXECUTOR"
+  }
+}

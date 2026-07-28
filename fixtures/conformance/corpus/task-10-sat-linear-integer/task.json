@@ -1,0 +1,20 @@
+{
+  "schema_version": "TaskSpec/v1",
+  "task_id": "task-10",
+  "title": "Linear integer SAT (x + y = 5, x > 0, y > 0)",
+  "category": "sat-unsat-unknown",
+  "input": {
+    "claim": {
+      "statement": "Decide satisfiability of a linear integer constraint system with nonlinear constraint solving and SMT."
+    },
+    "request": {
+      "requested_profiles": [
+        "nonlinear_continuous_or_hybrid_constraint"
+      ]
+    }
+  },
+  "expected": {
+    "outcome": "WAIT_CAPABILITY",
+    "detail": "nonlinear_continuous_or_hybrid_constraint auto-classifies; z3 adapter future -> WAIT_CAPABILITY"
+  }
+}

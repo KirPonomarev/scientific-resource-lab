@@ -13,6 +13,39 @@ is supported. See `README.md` and `GOVERNANCE.md` for the evidence rules.
 
 ### Added
 
+- Thirty-task public conformance corpus under `srl.planning` (WP-B15):
+  `srl.planning.corpus` — a pure, no-I/O corpus runner (`load_corpus`,
+  `run_task`, `verdict`, `run_corpus`) that executes each `TaskSpec/v1`
+  against the real science-lab pipeline (classifier → router → planner) and
+  the real contract validators (the MathIR allowlist, the artifact-ref
+  contract, the schema consts), resolving each task to one of seven typed
+  outcomes (`PASS` / `WAIT_CAPABILITY` / `REJECT_CONTRACT` / `REJECT_IR` /
+  `REJECT_RESOURCE` / `REJECT_LICENSE` / `REJECT_AUTHORITY`; `MISMATCH` is
+  the internal verdict sentinel). The runner NEVER writes outside memory and
+  maps every pipeline exception to the matching typed rejection outcome. The
+  honesty model is load-bearing: because no scientific backend ships in this
+  codebase, the dominant outcome is `WAIT_CAPABILITY` (an applicable profile
+  with no available adapter waits honestly rather than fabricating one); the
+  two exact-arithmetic tasks are the only `PASS` outcomes (clean IR constants
+  with no capability engaged); `REJECT_IR` is a real `UnsupportedOperatorError`
+  from the closed allowlist (`arith1.sqrt` / `arith1.log` for the domain
+  violations); `REJECT_RESOURCE` is a real `ResourceAdmissionError`
+  (`WAIT_REMOTE_EXECUTOR`); `REJECT_CONTRACT` is a real artifact-ref /
+  structural rejection (incl. the public-boundary refusal of a packet
+  smuggling a local path); `REJECT_AUTHORITY` is the real `grants_authority=
+  false` schema const; `REJECT_LICENSE` is the documented corpus copyleft-
+  refusal policy (GPL/AGPL/LGPL/SSPL/BUSL). `fixtures/conformance/corpus/`
+  — exactly 30 public synthetic tasks (`task-NN-<slug>/task.json` +
+  `README.md`) across 18 declared categories (algebraic identities, units
+  and dimensions, domain violations, exact arithmetic, SAT/UNSAT/UNKNOWN,
+  symbolic-law false positives, topology, SPD geometry, causal assumptions,
+  uncertainty, ODE/PDE interface, model composition, literature extraction,
+  proof obligations, resource/license/path/authority rejection), each with a
+  category-coverage map (`manifest.json`); `scripts/checks/wp15-corpus.py`
+  — the `CorpusReceipt/v1` check (30 outcomes, zero mismatches, category
+  coverage vs manifest, byte-identical across runs); `make corpus` target;
+  `public_conformance_corpus` CI job in `contracts.yml`;
+  `tests/planning/test_corpus.py`; `docs/contracts/conformance-corpus.md`.
 - Evidence assessment and science-lab run receipt model under `srl.semantic`
   (WP-B13): `EvidenceAssessment/v1` (`evidence-assessment.json`) — a typed
   assessment of the evidence behind a `ScientificClaim` on **11 orthogonal**

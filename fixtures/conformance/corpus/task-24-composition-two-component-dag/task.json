@@ -1,0 +1,22 @@
+{
+  "schema_version": "TaskSpec/v1",
+  "task_id": "task-24",
+  "title": "Two-component composition DAG",
+  "category": "model-composition",
+  "input": {
+    "claim": {
+      "statement": "Build a composition of coupled subsystems: a hierarchical model composed of an ODE and an algebraic component."
+    },
+    "request": {
+      "requested_profiles": [
+        "model_composition",
+        "executable_ode_dae_sde_model",
+        "algebra_exact"
+      ]
+    }
+  },
+  "expected": {
+    "outcome": "WAIT_CAPABILITY",
+    "detail": "model_composition (+component profiles) auto-classify; no adapter -> WAIT_CAPABILITY"
+  }
+}

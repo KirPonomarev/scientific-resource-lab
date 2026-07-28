@@ -1,0 +1,20 @@
+{
+  "schema_version": "TaskSpec/v1",
+  "task_id": "task-26",
+  "title": "Unproven obligation stays CHECKED-not-PROVEN",
+  "category": "proof-obligations",
+  "input": {
+    "claim": {
+      "statement": "A theorem proof obligation without a verified certificate must stay checked, not proven."
+    },
+    "request": {
+      "requested_profiles": [
+        "theorem_or_proof_obligation"
+      ]
+    }
+  },
+  "expected": {
+    "outcome": "WAIT_CAPABILITY",
+    "detail": "theorem_or_proof_obligation auto-classifies; no adapter -> WAIT_CAPABILITY"
+  }
+}
