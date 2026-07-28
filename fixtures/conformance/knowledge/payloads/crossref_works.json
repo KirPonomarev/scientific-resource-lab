@@ -1,0 +1,14 @@
+{
+  "status": "ok",
+  "message-type": "work-list",
+  "message-version": "1.0.0",
+  "message": {
+    "items": [
+      {
+        "DOI": "10.0000/synthetic.123456",
+        "title": ["Synthetic Crossref Work for WP-D33 Conformance"]
+      }
+    ],
+    "total-results": 1
+  }
+}
