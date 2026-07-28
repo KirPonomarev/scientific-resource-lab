@@ -1,0 +1,9 @@
+{
+  "results": [
+    {
+      "name": "A000045 Fibonacci numbers",
+      "data": [0, 1, 1, 2, 3, 5, 8, 13, 21, 34],
+      "comment": "Synthetic OEIS payload for WP-D33 conformance."
+    }
+  ]
+}
