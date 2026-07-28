@@ -1,0 +1,15 @@
+{
+  "case_id": "u03-linear-arithmetic",
+  "category": "unsat",
+  "description": "A linear-arithmetic infeasible system x >= 1 and x + y <= 0 and y >= 0 is unsatisfiable.",
+  "formula_spec": [
+    "and",
+    [">=", ["int-var", "x"], ["int-const", 1]],
+    ["<=", ["+", ["int-var", "x"], ["int-var", "y"]], ["int-const", 0]],
+    [">=", ["int-var", "y"], ["int-const", 0]]
+  ],
+  "expected_result": "unsat",
+  "solver": "z3",
+  "timeout_seconds": 5,
+  "notes": "A three-constraint infeasible system: x >= 1, y >= 0, x + y <= 0 cannot all hold. Exercises the simplex/Farkas path."
+}
