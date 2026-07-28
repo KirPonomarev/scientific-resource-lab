@@ -44,6 +44,8 @@ HTTP today, but it must be unique and must not change for a given shape.
 | `condition-set.json`              | `ConditionSet/v1`             | A set of assumptions (domain/positivity/...) attached to a model. |
 | `constant-ref.json`               | `ConstantRef/v1`              | A reference to a physical/mathematical constant from a named source. |
 | `model-interface.json`            | `ModelInterface/v1`           | A typed interface to a scientific model (ode/dae/...). |
+| `adapter-semantic-profile.json`   | `AdapterSemanticProfile/v1`   | A typed semantic profile for a backend adapter (supported_cds subset of MATH_IR_ALLOWLIST, unsupported-feature behavior, determinism, network posture, SPDX license). |
+| `transformation-receipt.json`     | `TransformationReceipt/v1`    | A receipt binding source->target by a named transform, carrying the honest cost (LOSSLESS / LOSSY_EXPLICIT / LOSSY_IMPLICIT_DETECTED) and lineage. |
 
 ## Naming and compatibility policy
 

@@ -1,0 +1,165 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srlab.dev/v1/TransformationReceipt.json",
+  "title": "TransformationReceipt/v1",
+  "description": "A receipt proving one scientific object was derived from another by a named transformation, carrying the honest cost of the step. The receipt is the unit of lineage: it binds a source_object_id to a target_object_id, names the transform_kind and the conversion_class (LOSSLESS / LOSSY_EXPLICIT / LOSSY_IMPLICIT_DETECTED), lists the assumptions it introduced and the features it dropped, and (for a backend projection) binds the adapter profile and pack hash. CRITICAL INVARIANT (schema + python): conversion_class=LOSSLESS REQUIRES introduced_assumptions=[] AND dropped_features=[]; a lossy transformation that claims LOSSLESS is a dishonest upgrade and is rejected. LOSSY_IMPLICIT_DETECTED may ONLY be produced by a detector (a lineage auditor comparing two trees), never claimed by a producer — the producer API (record_transformation) does not expose it. The receipt carries the two safety consts (canonical_writes=0, grants_authority=false). Canonical JSON contract: sorted keys, compact separators, UTF-8, no NaN/Infinity, trailing newline.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "receipt_id",
+    "source_object_id",
+    "target_object_id",
+    "transform_kind",
+    "conversion_class",
+    "introduced_assumptions",
+    "dropped_features",
+    "adapter_profile_ref",
+    "pack_hash",
+    "created_utc",
+    "canonical_writes",
+    "grants_authority"
+  ],
+  "allOf": [
+    {
+      "$comment": "LOSSLESS => no introduced assumptions and no dropped features. A lossy step (one that introduces an assumption or drops a feature) must declare itself LOSSY_EXPLICIT; it cannot claim LOSSLESS. LOSSY_IMPLICIT_DETECTED is detector-only (enforced by constructor separation in python), so no producer allOf rule produces it.",
+      "if": {
+        "properties": {
+          "conversion_class": {
+            "const": "LOSSLESS"
+          }
+        },
+        "required": [
+          "conversion_class"
+        ]
+      },
+      "then": {
+        "properties": {
+          "introduced_assumptions": {
+            "maxItems": 0
+          },
+          "dropped_features": {
+            "maxItems": 0
+          }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Identity anchor; const for TransformationReceipt/v1.",
+      "type": "string",
+      "const": "TransformationReceipt/v1"
+    },
+    "receipt_id": {
+      "description": "Content-addressed identity: sha256 over the canonical encoding of the receipt (without this field), prefixed 'sha256:'. Computed by srl.semantic.transforms.receipt_id.",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "source_object_id": {
+      "description": "The object_id of the input object (the source of the transformation step). For a projection, this is the input MathIR/v1 ir_id; for a lineage chain, a downstream receipt's source_object_id MUST equal the upstream receipt's target_object_id.",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "target_object_id": {
+      "description": "The object_id of the output object (the target of the transformation step). For a projection, this is the projected (restricted) MathIR/v1 ir_id.",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "transform_kind": {
+      "description": "The class of transformation performed.",
+      "type": "string",
+      "enum": [
+        "normalize",
+        "project",
+        "convert_units",
+        "restrict_domain",
+        "serialize",
+        "deserialize",
+        "approximate"
+      ]
+    },
+    "conversion_class": {
+      "description": "The honest cost classification of the step. LOSSLESS: no information is lost (the target is a faithful re-expression of the source; introduced_assumptions and dropped_features must be empty). LOSSY_EXPLICIT: the producer declares a loss (an introduced assumption or a dropped feature). LOSSY_IMPLICIT_DETECTED: a detector comparing two trees found a loss the producer did not declare; producers may NEVER set this value (enforced by constructor separation in srl.semantic.transforms), only the detector constructor may.",
+      "type": "string",
+      "enum": [
+        "LOSSLESS",
+        "LOSSY_EXPLICIT",
+        "LOSSY_IMPLICIT_DETECTED"
+      ]
+    },
+    "introduced_assumptions": {
+      "description": "Assumptions the transformation step introduced (each a named assumption with a justification). Empty for a LOSSLESS step. An introduced assumption travels with the object FOREVER via the lineage chain (the honesty rules: a lossy step never upgrades evidence).",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "assumption",
+          "justification"
+        ],
+        "properties": {
+          "assumption": {
+            "description": "A concise statement of the assumption introduced (e.g. 'calculus1.diff is approximated by finite differences').",
+            "type": "string",
+            "minLength": 1
+          },
+          "justification": {
+            "description": "Why the assumption is acceptable for this step (e.g. 'the solver backend lacks symbolic differentiation').",
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "uniqueItems": true
+    },
+    "dropped_features": {
+      "description": "Features (operators / sub-expressions) the step dropped or replaced with an approximation, each a '<cd>.<name>' pair. Empty for a LOSSLESS step. A dropped feature is the mechanism by which a lossy projection downgrades the evidence carried by an object.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9_]+\\.[a-z0-9_]+$"
+      },
+      "uniqueItems": true
+    },
+    "adapter_profile_ref": {
+      "description": "For a backend projection (transform_kind=project), the profile_id of the AdapterSemanticProfile/v1 governing the projection, or null for a transformation not bound to a backend adapter. A projection receipt MUST carry a non-null adapter_profile_ref (validated at the Python layer by project_to_backend).",
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "pack_hash": {
+      "description": "For a backend projection, the sha256 content hash of the adapter pack bytes (the ArtifactRef digest the profile's pack_ref points at), or null for a transformation not bound to a backend adapter. A projection receipt MUST carry a non-null pack_hash (validated at the Python layer by project_to_backend).",
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "created_utc": {
+      "description": "RFC 3339 UTC timestamp at seconds precision (YYYY-MM-DDTHH:MM:SSZ). No offset, no fractional seconds.",
+      "type": "string",
+      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]Z$"
+    },
+    "canonical_writes": {
+      "description": "Safety const: a receipt is immutable once authored. Always 0; a non-zero value is a contract violation.",
+      "type": "integer",
+      "const": 0
+    },
+    "grants_authority": {
+      "description": "Safety const: a receipt never grants authority on its own. Always false; a true value is a contract violation. A LOSSLESS receipt is still an admission of well-formed lineage, not an authorization to act on the target.",
+      "type": "boolean",
+      "const": false
+    }
+  }
+}

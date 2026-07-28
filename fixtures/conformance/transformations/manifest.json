@@ -1,0 +1,38 @@
+{
+  "schema_version": "TransformationVectorManifest/v1",
+  "description": "Conformance vectors for the SRL transformation receipts and adapter semantic profiles (WP-B12): two TransformationReceipt conversion classes (LOSSLESS unit-annotate, LOSSY_EXPLICIT backend projection), an AdapterSemanticProfile for a solver backend that lacks calculus1, and the three prohibited collapses the honesty rules prevent (a lossy step claiming LOSSLESS, an unsupported op hitting behavior=reject, a profile claiming an op outside the MathIR allowlist). Each positive vector is a valid object that must validate against its schema (and pass the Python validator); each negative vector names the validator, exception, and fail reason its input must be rejected with.",
+  "positive": [
+    {
+      "name": "p01-receipt-lossless",
+      "schema": "TransformationReceipt",
+      "description": "A LOSSLESS TransformationReceipt binding a Newton's-second-law MathIR object to itself under a normalize step (no introduced assumptions, no dropped features). source_object_id == target_object_id because a lossless step yields a byte-equal tree."
+    },
+    {
+      "name": "p02-profile-solver-no-calculus",
+      "schema": "AdapterSemanticProfile",
+      "description": "An AdapterSemanticProfile for a deterministic, offline, Apache-2.0 solver backend that supports arith1.plus/minus/times and relation1.eq and declares behavior=drop for calculus1.diff (no symbolic differentiation). supported_cds is a subset of MATH_IR_ALLOWLIST."
+    },
+    {
+      "name": "p03-receipt-lossy-projection",
+      "schema": "TransformationReceipt",
+      "description": "A LOSSY_EXPLICIT TransformationReceipt produced by projecting calculus1.diff(x) onto the p02 solver profile (which drops calculus1.diff). The receipt binds the adapter_profile_ref (the p02 profile_id) and the pack_hash (the p02 pack_ref digest), drops calculus1.diff, and introduces the matching assumption. The lineage link is honest: a lossy step never upgrades evidence."
+    }
+  ],
+  "negative": [
+    {
+      "name": "n01-lossless-claims-dropped",
+      "validator": "transformation",
+      "reason": "A receipt claiming conversion_class=LOSSLESS while dropping calculus1.diff violates the lossless_requires_no_loss invariant. Rejected by the schema allOf/if-then and by srl.semantic.transforms.validate in Python (defense in depth) with CONTRACT_INVALID."
+    },
+    {
+      "name": "n02-projection-reject",
+      "validator": "project_to_backend",
+      "reason": "Projecting a tree carrying calculus1.diff onto a profile that declares behavior=reject for calculus1.diff halts the projection with UnsupportedFeatureError (fail reason IR_UNSUPPORTED). The op and its cd are named on the error."
+    },
+    {
+      "name": "n03-profile-op-outside-allowlist",
+      "validator": "adapter_profile",
+      "reason": "A profile claiming support for transc1.exp (outside MATH_IR_ALLOWLIST) violates the supported_op_outside_allowlist invariant: the allowlist is closed, a profile may only claim support for operators the IR admits. Rejected by validate_profile with CONTRACT_INVALID."
+    }
+  ]
+}

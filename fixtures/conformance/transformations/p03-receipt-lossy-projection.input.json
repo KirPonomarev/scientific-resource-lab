@@ -1,0 +1,22 @@
+{
+  "schema_version": "TransformationReceipt/v1",
+  "receipt_id": "sha256:3d759a3408a718abf4c2f49221687c23a51d2a2d41570b85725f92268f35849e",
+  "source_object_id": "sha256:8f37d07fc1e756477742fcea290ecd1b47683b9aeb82e3893d1b14e48270af48",
+  "target_object_id": "sha256:8f37d07fc1e756477742fcea290ecd1b47683b9aeb82e3893d1b14e48270af48",
+  "transform_kind": "project",
+  "conversion_class": "LOSSY_EXPLICIT",
+  "introduced_assumptions": [
+    {
+      "assumption": "calculus1.diff dropped by the backend adapter",
+      "justification": "adapter profile declares behavior=drop for calculus1.diff"
+    }
+  ],
+  "dropped_features": [
+    "calculus1.diff"
+  ],
+  "adapter_profile_ref": "sha256:8459c9534b46ea9da5d33021d673d1776d6c7d488bce3f0750e82a0ddff3ea33",
+  "pack_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "created_utc": "2026-07-28T00:00:00Z",
+  "canonical_writes": 0,
+  "grants_authority": false
+}

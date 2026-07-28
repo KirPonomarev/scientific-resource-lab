@@ -1,0 +1,7 @@
+{
+  "validator": "transformation",
+  "exception": "TransformationInvariantError",
+  "fail_reason": "CONTRACT_INVALID",
+  "invariant": "lossless_requires_no_loss",
+  "reason": "A LOSSLESS conversion_class REQUIRES introduced_assumptions=[] AND dropped_features=[] (schema allOf/if-then + python defense-in-depth). This receipt claims LOSSLESS while dropping calculus1.diff, which is a dishonest upgrade of evidence; record_transformation rejects it with the lossless_requires_no_loss invariant."
+}

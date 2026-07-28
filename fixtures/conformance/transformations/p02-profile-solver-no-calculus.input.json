@@ -1,0 +1,31 @@
+{
+  "schema_version": "AdapterSemanticProfile/v1",
+  "profile_id": "sha256:8459c9534b46ea9da5d33021d673d1776d6c7d488bce3f0750e82a0ddff3ea33",
+  "adapter_id": "solver-no-calculus",
+  "pack_ref": {
+    "schema_version": "ArtifactRef/v1",
+    "media_type": "application/vnd.srlab.adapter-pack+json",
+    "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "size_bytes": 4096
+  },
+  "supported_cds": [
+    "arith1.plus",
+    "arith1.minus",
+    "arith1.times",
+    "relation1.eq"
+  ],
+  "unsupported_features": [
+    {
+      "feature": "calculus1.diff",
+      "behavior": "drop",
+      "note": "solver backend has no symbolic differentiation; calculus1.diff is dropped on projection"
+    }
+  ],
+  "input_contract": "MathIR",
+  "output_contract": "MathIR",
+  "deterministic": true,
+  "network_access": "none",
+  "license_spdx": "Apache-2.0",
+  "canonical_writes": 0,
+  "grants_authority": false
+}

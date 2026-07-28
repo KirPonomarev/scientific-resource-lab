@@ -1,0 +1,161 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srlab.dev/v1/AdapterSemanticProfile.json",
+  "title": "AdapterSemanticProfile/v1",
+  "description": "A typed semantic profile for a backend adapter: the contract between an SRL MathIR/v1 expression and a concrete computational backend (a solver, a CAS shim, a numeric kernel). The profile declares the subset of the MathIR allowlist it supports (supported_cds, each a '<cd>.<name>' drawn from MATH_IR_ALLOWLIST), how it behaves on each unsupported operator (unsupported_features: reject / approximate / drop), the input/output schema contracts, whether it is deterministic, its network posture, and its SPDX license. CRITICAL: supported_cds MUST be a subset of MATH_IR_ALLOWLIST; an op outside the allowlist fails profile validation (CONTRACT_INVALID) at the Python layer (srl.semantic.adapter_profiles.validate_profile). The profile carries the two safety consts (canonical_writes=0, grants_authority=false). Canonical JSON contract: sorted keys, compact separators, UTF-8, no NaN/Infinity, trailing newline.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "profile_id",
+    "adapter_id",
+    "pack_ref",
+    "supported_cds",
+    "unsupported_features",
+    "input_contract",
+    "output_contract",
+    "deterministic",
+    "network_access",
+    "license_spdx",
+    "canonical_writes",
+    "grants_authority"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Identity anchor; const for AdapterSemanticProfile/v1.",
+      "type": "string",
+      "const": "AdapterSemanticProfile/v1"
+    },
+    "profile_id": {
+      "description": "Content-addressed identity: sha256 over the canonical encoding of the profile (without this field), prefixed 'sha256:'. Computed by srl.semantic.adapter_profiles.profile_id.",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "adapter_id": {
+      "description": "Stable logical identifier of the backend adapter this profile describes (e.g. 'z3-smt-shim', 'numpy-linear-algebra'). Not a content hash; identity of a profile object is its profile_id.",
+      "type": "string",
+      "minLength": 1
+    },
+    "pack_ref": {
+      "description": "An ArtifactRef/v1 pointing at the versioned, content-addressed adapter pack (the executable bytes this profile governs). Carried inline as a structural object (schema_version const ArtifactRef/v1, media_type, digest, size_bytes, optional path); the digest is authoritative, the path is a portable hint. The full ArtifactRef/v1 field contract (portable-path rejection etc.) is enforced at the Python layer by srl.semantic.adapter_profiles.validate_profile via validate_artifact_ref (the repo schema convention is inline structural shapes + python defense-in-depth, not cross-schema $ref, so validation works offline).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "media_type",
+        "digest",
+        "size_bytes"
+      ],
+      "properties": {
+        "schema_version": {
+          "description": "Identity anchor; const for ArtifactRef/v1.",
+          "type": "string",
+          "const": "ArtifactRef/v1"
+        },
+        "media_type": {
+          "description": "IANA-style media type of the referenced pack payload (e.g. application/vnd.srlab.adapter-pack+json).",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9!#$&^_.+-]+/[A-Za-z0-9!#$&^_.+-]+$"
+        },
+        "digest": {
+          "description": "Content digest of the pack bytes: sha256 + 64 lowercase hex digits. The pack_hash a projection receipt binds is this digest.",
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "size_bytes": {
+          "description": "Non-negative integer byte count of the referenced pack payload.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "path": {
+          "description": "Optional portable repo-relative path to the pack bytes. Validated for portability at the Python layer (no '..', no drive letter, no leading '/', no backslash); the digest remains authoritative.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[^/].*$"
+        }
+      }
+    },
+    "supported_cds": {
+      "description": "The subset of MATH_IR_ALLOWLIST this adapter accepts, each a '<cd>.<name>' pair. MUST be a subset of MATH_IR_ALLOWLIST; an entry outside it is rejected at profile-validation time (CONTRACT_INVALID). A subset (not the whole allowlist) is normal and expected: a solver need not support calculus1, for example. Empty is allowed only for a profile that rejects every operator (degenerate but well-formed).",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9_]+\\.[a-z0-9_]+$"
+      },
+      "uniqueItems": true
+    },
+    "unsupported_features": {
+      "description": "Per-operator behavior declarations for operators the profile does NOT support. Each entry names a 'feature' (a '<cd>.<name>' or a cd-level wildcard like 'calculus1.*') and the 'behavior' the adapter takes when the operator is encountered during projection: 'reject' (hard stop, IR_UNSUPPORTED), 'approximate' (recorded as a lossy assumption), or 'drop' (silently elided, recorded as a dropped feature). An operator present here should not also be in supported_cds (validated at the Python layer).",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "feature",
+          "behavior"
+        ],
+        "properties": {
+          "feature": {
+            "description": "The operator or operator-group the declaration covers: a '<cd>.<name>' pair or a cd-level wildcard '<cd>.*'.",
+            "type": "string",
+            "minLength": 1
+          },
+          "behavior": {
+            "description": "The adapter behavior on encountering the feature during projection.",
+            "type": "string",
+            "enum": [
+              "reject",
+              "approximate",
+              "drop"
+            ]
+          },
+          "note": {
+            "description": "Optional human-readable note explaining the behavior (e.g. why an operator is approximated).",
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "uniqueItems": true
+    },
+    "input_contract": {
+      "description": "The schema reference (a logical name or $id) governing the adapter's input shape. A non-empty string; resolved against the schema loader at runtime.",
+      "type": "string",
+      "minLength": 1
+    },
+    "output_contract": {
+      "description": "The schema reference (a logical name or $id) governing the adapter's output shape. A non-empty string; resolved against the schema loader at runtime.",
+      "type": "string",
+      "minLength": 1
+    },
+    "deterministic": {
+      "description": "Whether the adapter's output is a pure function of its input (no RNG seed dependence, no wall-clock dependence, no nondeterministic hardware intrinsics). A lossy projection through a non-deterministic adapter is a stronger claim of evidence; the honesty rules in docs/contracts/transformations.md require this to be carried into the receipt.",
+      "type": "boolean"
+    },
+    "network_access": {
+      "description": "The adapter's network posture: 'none' (fully offline), 'allowlisted' (calls a fixed, named set of endpoints), or 'required' (cannot run without network). A projection through a network-required adapter cannot be claimed as a closed-form derivation.",
+      "type": "string",
+      "enum": [
+        "none",
+        "allowlisted",
+        "required"
+      ]
+    },
+    "license_spdx": {
+      "description": "The SPDX license identifier of the adapter pack (e.g. 'Apache-2.0', 'MIT', 'BSD-3-Clause'). Carried so a downstream agent can refuse a projection whose pack license is incompatible with its policy. NOT a claim that this profile is licensed to run; that is a governance decision.",
+      "type": "string",
+      "minLength": 1
+    },
+    "canonical_writes": {
+      "description": "Safety const: a profile is immutable once authored. Always 0; a non-zero value is a contract violation.",
+      "type": "integer",
+      "const": 0
+    },
+    "grants_authority": {
+      "description": "Safety const: a profile never grants authority to run its adapter. Always false; a true value is a contract violation. Whether the adapter may run is a governance decision, not a profile property.",
+      "type": "boolean",
+      "const": false
+    }
+  }
+}
