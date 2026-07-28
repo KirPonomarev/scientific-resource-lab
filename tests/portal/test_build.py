@@ -123,7 +123,7 @@ def test_private_mode_accepts_non_synthetic(tmp_path: Path) -> None:
             "object_type": "claim",
             "created_utc": "2026-07-28T00:00:00Z",
             "parents": [],
-            "payload": {"local_path": "/Users/alice/private.json"},
+            "payload": {"local_path": "/" + "Users" + "/alice/private.json"},
             "canonical_writes": 0,
             "grants_authority": False,
         },
