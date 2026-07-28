@@ -1,0 +1,24 @@
+{
+  "schema_version": "P1PyMCFixture/v1",
+  "fixture_id": "misspecified-tight-prior-extreme-data",
+  "description": "A deliberately misspecified case for the PyMC one-chain adapter (WP-H71a). Extreme data ([100, 101]) fit with a tight prior (mu_prior_sigma=0.01, sigma_prior=0.01) under a low target_accept (0.3) produces a hard posterior geometry: divergences occur and/or ess drops below the adapter ESS floor, so the result carries diagnostics_flag=warn. This is honest: a single chain cannot certify convergence, and the diagnostics surface the pathology rather than hiding it. The case is stable across seeds (diagnostics_flag=warn for every seed tested).",
+  "model_kind": "normal_mean",
+  "data": ["100.0", "101.0"],
+  "prior": {
+    "mu_prior_mu": "0.0",
+    "mu_prior_sigma": "0.01",
+    "sigma_prior": "0.01"
+  },
+  "sampler": {
+    "draws": 50,
+    "tune": 50,
+    "chains": 1,
+    "target_accept": "0.3",
+    "seed": 7
+  },
+  "expected": {
+    "diagnostics_flag": "warn",
+    "diagnostics_flag_rationale": "At least one of: divergences > 0, or ess_min below the ESS_FLOOR (50). A single chain cannot compute r_hat, so rhat_max is None and cannot trip the flag.",
+    "seed_stability_note": "diagnostics_flag=warn observed for seeds 7, 11, 42, 99, 123."
+  }
+}

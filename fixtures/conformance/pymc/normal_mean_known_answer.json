@@ -1,0 +1,15 @@
+{
+  "comparison": {
+    "adapter_field": "parameters[mu].mean",
+    "note": "The one-chain posterior mean must agree with the analytic reference within 0.15 absolute.",
+    "parameter": "mu",
+    "tolerance_abs": "0.15"
+  },
+  "description": "Analytic normal-normal conjugate posterior reference for the seeded dataset. The data sigma is estimated from the sample (ddof=1, plug-in); the posterior over mu is compared to the PyMC sample within tolerance.",
+  "fixture_id": "normal-mean-seed42",
+  "method": "normal-normal conjugate (sigma plug-in from sample sd)",
+  "model_kind": "normal_mean",
+  "posterior_mu_mean": "2.449291024414514",
+  "posterior_mu_sd": "0.06987075577787179",
+  "schema_version": "P1PyMCKnownAnswer/v1"
+}

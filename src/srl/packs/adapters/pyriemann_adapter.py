@@ -29,7 +29,7 @@ See ``docs/architecture/pyriemann-pack.md`` for the train-only discipline and
 from __future__ import annotations
 
 from enum import StrEnum
-from typing import Any, Final, cast
+from typing import Any, Final
 
 import numpy as np
 import pyriemann  # type: ignore[import-untyped]
@@ -234,7 +234,7 @@ def riemannian_mean(mats: Any, weights: Any | None = None) -> np.ndarray:
     if arr.ndim == MATRIX_NDIM:
         return arr.copy()
     w = _validate_weights(weights, arr.shape[0], context="riemannian_mean")
-    return cast(np.ndarray, np.asarray(mean_riemann(arr, sample_weight=w), dtype=float))
+    return np.asarray(mean_riemann(arr, sample_weight=w), dtype=float)
 
 
 def log_euclidean_mean(mats: Any, weights: Any | None = None) -> np.ndarray:
@@ -264,7 +264,7 @@ def log_euclidean_mean(mats: Any, weights: Any | None = None) -> np.ndarray:
     if arr.ndim == MATRIX_NDIM:
         return arr.copy()
     w = _validate_weights(weights, arr.shape[0], context="log_euclidean_mean")
-    return cast(np.ndarray, np.asarray(mean_logeuclid(arr, sample_weight=w), dtype=float))
+    return np.asarray(mean_logeuclid(arr, sample_weight=w), dtype=float)
 
 
 def distance(a: Any, b: Any, metric: Metric) -> float:
