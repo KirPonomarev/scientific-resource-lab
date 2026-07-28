@@ -54,10 +54,11 @@ is supported. See `README.md` and `GOVERNANCE.md` for the evidence rules.
   consistency `kg.m.s-2`≡`N` accepted and `kg` vs `m` rejected; candidate
   claim cannot be typed as established law at both layers; all schemas
   meta-valid and positive fixtures validate) and emitting a `GateReceipt/v1`;
-  a `schema-compat` job in `.github/workflows/contracts.yml` verifying every
-  `schemas/v1/*.json` meta-validates and the loader registry is complete (no
-  on-disk orphans); an `object-fabric-gate (WP-B11)` job in
-  `.github/workflows/ci.yml`; a `Makefile` `gate-wp11` target.
+  a `schema-compat` job in `.github/workflows/contracts.yml` (backed by
+  `scripts/checks/schema-compat.py`) verifying every `schemas/v1/*.json`
+  meta-validates and the loader registry is complete (no on-disk orphans,
+  registry count == disk count, unique `$id`s); an `object-fabric-gate
+  (WP-B11)` job in `.github/workflows/ci.yml`; a `Makefile` `gate-wp11` target.
 - Unit and property tests under `tests/semantic/` (`test_math_ir.py`,
   `test_claims.py`, `test_fabric.py`) pinning the allowlist, the two failure
   modes, the resource guards, identity determinism, the claim invariants, and

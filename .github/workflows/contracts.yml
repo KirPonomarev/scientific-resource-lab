@@ -58,19 +58,7 @@ jobs:
       - name: Install dependencies (locked)
         run: uv sync --locked
       - name: Schema compatibility (all schemas meta-valid + loader registry complete)
-        run: |
-          uv run python -c "import sys; sys.path.insert(0,'src'); \
-          from pathlib import Path; \
-          from srl.contracts.schema import list_schemas, load_schema, meta_validate_all, schema_file_map; \
-          meta_validate_all(); \
-          disk = sorted(p.name for p in Path('src/srl/contracts/schemas/v1').glob('*.json')); \
-          known = set(schema_file_map().values()); \
-          orphans = [f for f in disk if f not in known]; \
-          missing = [n for n in list_schemas() if load_schema(n).get('$id','')=='']; \
-          assert not orphans, f'on-disk schemas with no loader entry: {orphans}'; \
-          assert not missing, f'schemas missing $id: {missing}'; \
-          assert len(list_schemas()) == len(disk), f'registry {len(list_schemas())} != disk {len(disk)}'; \
-          print(f'schema-compat OK: {len(list_schemas())} schemas, registry complete')"
+        run: uv run python scripts/checks/schema-compat.py
 
   canonical_json_vectors:
     name: canonical-json-vectors
