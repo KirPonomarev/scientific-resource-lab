@@ -234,3 +234,18 @@ The typed fail reasons, their classes, hard-stop flags, and retriable flags
 are recorded in `automation/fail-reasons.json` (`FailReasonRegistry/v1`).
 Only `GITHUB_RATE_LIMITED` and `CI_INFRA_FAILURE` are marked retriable; every
 other reason is terminal within its loop.
+
+## Lane ledger
+
+Under `AutonomyPolicy/v2` the repository may run up to
+`max_parallel_implementation_lanes` implementation lanes concurrently
+(currently `6`). Concurrency is coordinated through a machine-enforced
+**active-lane ledger** (`automation/lanes.json`, `ActiveLaneLedger/v1`):
+every lane acquires an entry before it mutates anything, and `acquire_lane`
+enforces the policy cap, owned-path disjointness, and worktree uniqueness. Each
+lane holds a **lease** with a heartbeat and TTL (default 900s); a lane that
+stops heartbeating past its TTL is stopped with fail reason
+`ORPHAN_PROCESS_DETECTED`. The policy file is the single source of the lane cap;
+the governance gate (`scripts/checks/gov-lanes-gate.py`) proves the cap agrees
+across the policy, the state schema, and the enforcement. See
+`docs/architecture/lane-management.md` for the full contract.
