@@ -1,0 +1,7 @@
+{
+  "validator": "update_assessment",
+  "exception": "EvidenceAxisError",
+  "fail_reason": "CONTRACT_INVALID",
+  "invariant": "formal_not_empirical",
+  "reason": "An update_assessment delta that moves a formal axis (formal_check) and an empirical axis (statistical_support) in the same step violates the formal_not_empirical orthogonality (formal proof is not empirical truth; a formal-axis update must never modify statistical_support or causal_identification). Rejected by srl.semantic.evidence.update_assessment in Python with CONTRACT_INVALID."
+}

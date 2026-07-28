@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srlab.dev/v1/ScienceLabRunReceipt.json",
+  "title": "ScienceLabRunReceipt/v1",
+  "description": "A receipt tying together an engine run and its (optional) validation into a single terminal run outcome, carrying the honest terminal status and the aggregate resource usage. The receipt binds a run_request_id to an engine_receipt_id and an optional validation_receipt_id (null when no validation ran), names the terminal_status (completed / failed / wait_capability / wait_resource / inconclusive), and records the aggregate resource_usage (wall_seconds, rss_bytes, output_bytes). A run with terminal_status=completed SHOULD carry a non-null validation_receipt_id (a completed run is one whose output was checked); a run without validation is at best inconclusive. The receipt carries the two safety consts (canonical_writes=0, grants_authority=false). Canonical JSON contract: sorted keys, compact separators, UTF-8, no NaN/Infinity, trailing newline.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "receipt_id",
+    "run_request_id",
+    "engine_receipt_id",
+    "validation_receipt_id",
+    "terminal_status",
+    "resource_usage",
+    "created_utc",
+    "canonical_writes",
+    "grants_authority"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Identity anchor; const for ScienceLabRunReceipt/v1.",
+      "type": "string",
+      "const": "ScienceLabRunReceipt/v1"
+    },
+    "receipt_id": {
+      "description": "Content-addressed identity: sha256 over the canonical encoding of the receipt (without this field), prefixed 'sha256:'. Computed by the python receipt builder.",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "run_request_id": {
+      "description": "The object_id of the run request this run receipt closes out. Ties the engine run and the validation back to the request that originated the computation.",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "engine_receipt_id": {
+      "description": "The receipt_id of the ScienceLabEngineReceipt/v1 this run receipt wraps. The engine run is the compute half of the run.",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "validation_receipt_id": {
+      "description": "The receipt_id of the ScienceLabValidationReceipt/v1 that checked the engine output, or null when no validation ran. A terminal_status=completed run SHOULD carry a non-null validation_receipt_id (a completed run is one whose output was checked).",
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "terminal_status": {
+      "description": "The terminal outcome of the run: completed (engine ran and output checked), failed (engine ran and failed), wait_capability (blocked on a missing capability — capability_state not ready), wait_resource (blocked on a resource), inconclusive (ran but no definitive scientific verdict). NOT a validation verdict — completed only means the run closed out, not that the claim is supported.",
+      "type": "string",
+      "enum": [
+        "completed",
+        "failed",
+        "wait_capability",
+        "wait_resource",
+        "inconclusive"
+      ]
+    },
+    "resource_usage": {
+      "description": "Aggregate resource usage of the run (engine + validation). All fields are non-negative integers.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "wall_seconds",
+        "rss_bytes",
+        "output_bytes"
+      ],
+      "properties": {
+        "wall_seconds": {
+          "description": "Aggregate wall-clock seconds (engine + validation), >= 0.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "rss_bytes": {
+          "description": "Peak resident set size in bytes across the run, >= 0.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "output_bytes": {
+          "description": "Total output bytes produced (the serialized output objects), >= 0.",
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "created_utc": {
+      "description": "RFC 3339 UTC timestamp at seconds precision (YYYY-MM-DDTHH:MM:SSZ). No offset, no fractional seconds.",
+      "type": "string",
+      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]Z$"
+    },
+    "canonical_writes": {
+      "description": "Safety const: a receipt is immutable once authored. Always 0; a non-zero value is a contract violation.",
+      "type": "integer",
+      "const": 0
+    },
+    "grants_authority": {
+      "description": "Safety const: a receipt never grants authority on its own. Always false; a true value is a contract violation. A completed run is still an admission of a closed-out run, not an authorization to act on the claim.",
+      "type": "boolean",
+      "const": false
+    }
+  }
+}

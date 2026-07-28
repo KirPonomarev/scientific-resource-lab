@@ -119,8 +119,10 @@ def test_mint_object_carries_parents() -> None:
 def test_supported_object_types_cover_payload_kinds() -> None:
     """SUPPORTED_OBJECT_TYPES enumerates the payload-bearing kinds.
 
-    The six WP-B11 object types plus the two WP-B12 transformation objects
-    (adapter_profile, transformation_receipt), each with a v1 payload schema.
+    The six WP-B11 object types, the two WP-B12 transformation objects
+    (adapter_profile, transformation_receipt), and the four WP-B13
+    evidence/run-receipt objects (evidence_assessment, engine_receipt,
+    validation_receipt, run_receipt), each with a v1 payload schema.
     """
     assert SUPPORTED_OBJECT_TYPES == frozenset(
         {
@@ -132,6 +134,10 @@ def test_supported_object_types_cover_payload_kinds() -> None:
             "model_interface",
             "adapter_profile",
             "transformation_receipt",
+            "evidence_assessment",
+            "engine_receipt",
+            "validation_receipt",
+            "run_receipt",
         }
     )
 

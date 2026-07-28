@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srlab.dev/v1/ScienceLabEngineReceipt.json",
+  "title": "ScienceLabEngineReceipt/v1",
+  "description": "A receipt proving a backend engine ran (or failed to run) for a run request, carrying the honest exercise level and execution outcome. The receipt is the unit of compute lineage: it binds a run_request_id to an adapter_id and a pack_ref, names the exercise_level (how far the computation was actually taken) and the engine_execution outcome (failed / completed), and records the resource cost and any output objects produced. CRITICAL INVARIANT (schema + python): an import_probe CANNOT yield engine_execution=completed-and-computed semantics — a receipt whose exercise_level=import_probe MUST carry an empty output_object_ids (maxItems 0), because an import probe only checks the object imports/loads and produces no scientific output. This is the probe-is-not-compute honesty rule (see docs/contracts/evidence-model.md): a probe is not actual compute, and a probe receipt cannot claim output objects. The receipt carries the two safety consts (canonical_writes=0, grants_authority=false). Canonical JSON contract: sorted keys, compact separators, UTF-8, no NaN/Infinity, trailing newline.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "receipt_id",
+    "run_request_id",
+    "adapter_id",
+    "pack_ref",
+    "engine_execution",
+    "wall_seconds",
+    "rss_bytes",
+    "output_object_ids",
+    "exercise_level",
+    "created_utc",
+    "canonical_writes",
+    "grants_authority"
+  ],
+  "allOf": [
+    {
+      "$comment": "Probe is not compute: exercise_level=import_probe REQUIRES output_object_ids to be empty (maxItems 0). An import probe only checks the object imports/loads; it cannot have produced scientific output objects. Encoding the probe-is-not-compute rule at the schema layer.",
+      "if": {
+        "properties": {
+          "exercise_level": {
+            "const": "import_probe"
+          }
+        },
+        "required": [
+          "exercise_level"
+        ]
+      },
+      "then": {
+        "properties": {
+          "output_object_ids": {
+            "maxItems": 0
+          }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Identity anchor; const for ScienceLabEngineReceipt/v1.",
+      "type": "string",
+      "const": "ScienceLabEngineReceipt/v1"
+    },
+    "receipt_id": {
+      "description": "Content-addressed identity: sha256 over the canonical encoding of the receipt (without this field), prefixed 'sha256:'. Computed by the python receipt builder.",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "run_request_id": {
+      "description": "The object_id of the run request this engine run satisfies. A run request is the unit a lab issues to ask an engine to compute; the engine receipt binds back to it so a run receipt can tie the two together.",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "adapter_id": {
+      "description": "The logical adapter identifier (mirrors AdapterSemanticProfile/v1 adapter_id) of the backend that ran. Names which engine produced the receipt.",
+      "type": "string",
+      "minLength": 1
+    },
+    "pack_ref": {
+      "description": "An ArtifactRef/v1 pointing at the versioned, content-addressed adapter pack (the executable bytes this engine run used). Carried inline as a structural object (schema_version const ArtifactRef/v1, media_type, digest, size_bytes, optional path); the digest is authoritative. The full ArtifactRef/v1 field contract is enforced at the python layer (the repo schema convention is inline structural shapes + python defense-in-depth, not cross-schema $ref, so validation works offline).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "media_type",
+        "digest",
+        "size_bytes"
+      ],
+      "properties": {
+        "schema_version": {
+          "description": "Identity anchor; const for ArtifactRef/v1.",
+          "type": "string",
+          "const": "ArtifactRef/v1"
+        },
+        "media_type": {
+          "description": "IANA-style media type of the referenced pack payload (e.g. application/vnd.srlab.adapter-pack+json).",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9!#$&^_.+-]+/[A-Za-z0-9!#$&^_.+-]+$"
+        },
+        "digest": {
+          "description": "Content digest of the pack bytes: sha256 + 64 lowercase hex digits.",
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "size_bytes": {
+          "description": "Non-negative integer byte count of the referenced pack payload.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "path": {
+          "description": "Optional portable repo-relative path to the pack bytes. Validated for portability at the python layer; the digest remains authoritative.",
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[^/].*$"
+        }
+      }
+    },
+    "engine_execution": {
+      "description": "Whether the engine run reached completion. failed: the engine ran and failed (no scientific output). completed: the engine ran to completion (output objects, if any, are in output_object_ids). NOT a validation outcome — completed only means the engine finished, not that the output was checked.",
+      "type": "string",
+      "enum": [
+        "failed",
+        "completed"
+      ]
+    },
+    "wall_seconds": {
+      "description": "Wall-clock seconds the engine run consumed (>= 0). An integer at seconds precision; sub-second runs record 0. A probe records its (typically small) probe wall time.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "rss_bytes": {
+      "description": "Peak resident set size in bytes the engine run consumed (>= 0).",
+      "type": "integer",
+      "minimum": 0
+    },
+    "output_object_ids": {
+      "description": "The object_ids of the scientific output objects the engine run produced. MUST be empty for exercise_level=import_probe (a probe produces no scientific output; encoded by the allOf/if-then above). Populated for a completed runtime_probe / actual_compute run that produced output.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      },
+      "uniqueItems": true
+    },
+    "exercise_level": {
+      "description": "How far the computation was actually taken: import_probe (it imports/loads but does not run — produces no output), runtime_probe (it runs to a probe point), actual_compute (it ran the real computation). An import_probe receipt CANNOT pair with engine_execution=completed-and-computed semantics: it must carry an empty output_object_ids.",
+      "type": "string",
+      "enum": [
+        "import_probe",
+        "runtime_probe",
+        "actual_compute"
+      ]
+    },
+    "created_utc": {
+      "description": "RFC 3339 UTC timestamp at seconds precision (YYYY-MM-DDTHH:MM:SSZ). No offset, no fractional seconds.",
+      "type": "string",
+      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]Z$"
+    },
+    "canonical_writes": {
+      "description": "Safety const: a receipt is immutable once authored. Always 0; a non-zero value is a contract violation.",
+      "type": "integer",
+      "const": 0
+    },
+    "grants_authority": {
+      "description": "Safety const: a receipt never grants authority on its own. Always false; a true value is a contract violation. A completed engine run is still an admission of compute lineage, not an authorization to act on the output.",
+      "type": "boolean",
+      "const": false
+    }
+  }
+}

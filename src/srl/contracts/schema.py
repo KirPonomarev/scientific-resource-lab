@@ -58,6 +58,10 @@ _SCHEMA_NAME_TO_FILE: Final[dict[str, str]] = {
     "ModelInterface": "model-interface.json",
     "AdapterSemanticProfile": "adapter-semantic-profile.json",
     "TransformationReceipt": "transformation-receipt.json",
+    "EvidenceAssessment": "evidence-assessment.json",
+    "ScienceLabEngineReceipt": "science-lab-engine-receipt.json",
+    "ScienceLabValidationReceipt": "science-lab-validation-receipt.json",
+    "ScienceLabRunReceipt": "science-lab-run-receipt.json",
 }
 
 # Typed fail reason for schema-level failures (meta-validation + instance

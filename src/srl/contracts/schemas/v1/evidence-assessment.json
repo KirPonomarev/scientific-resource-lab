@@ -1,0 +1,281 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srlab.dev/v1/EvidenceAssessment.json",
+  "title": "EvidenceAssessment/v1",
+  "description": "A typed assessment of the evidence supporting a ScientificClaim, placing the claim on 11 ORTHOGONAL evidence axes. The axes are independent by construction: a movement on one axis never grants a movement on another. This is the load-bearing honesty property of the evidence model (see docs/contracts/evidence-model.md): READY is not COMPUTED (capability_state=ready does not imply the engine ran), COMPUTED is not VALIDATED (engine_execution=completed does not imply scientific_check=checked), a SAT/UNSAT-style answer yields at most scientific_check=checked (formal_check=proven REQUIRES a non-null formal_certificate_ref), formal proof is not empirical truth (formal_check never updates statistical_support or causal_identification), algorithmic cross-engine reproduction is not independent empirical replication (setting one never sets the other), and exportable evidence (integration_authority=proposal_only) is not admitted authority (admitted_a1_sandbox / admitted_a2 are reserved; SRL has no authority path). The assessment carries the two safety consts (canonical_writes=0, grants_authority=false). Canonical JSON contract: sorted keys, compact separators, UTF-8, no NaN/Infinity, trailing newline.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "assessment_id",
+    "subject_claim_id",
+    "axes",
+    "evidence_refs",
+    "assessor",
+    "created_utc",
+    "parents",
+    "canonical_writes",
+    "grants_authority"
+  ],
+  "allOf": [
+    {
+      "$comment": "Probe is not compute: an import_probe exercise_level forbids engine_execution=completed in the same assessment. An import probe only checks the object imports / loads; it cannot have actually run the computation. This is encoded at schema AND python layer (orthogonality: probe_not_compute).",
+      "if": {
+        "properties": {
+          "axes": {
+            "properties": {
+              "exercise_level": {
+                "const": "import_probe"
+              }
+            },
+            "required": [
+              "exercise_level"
+            ]
+          }
+        },
+        "required": [
+          "axes"
+        ]
+      },
+      "then": {
+        "properties": {
+          "axes": {
+            "properties": {
+              "engine_execution": {
+                "enum": [
+                  "not_run",
+                  "failed"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "$comment": "A failed engine run cannot have produced a checked scientific result: engine_execution=failed forbids scientific_check=checked (the engine did not complete, so no scientific output exists to check).",
+      "if": {
+        "properties": {
+          "axes": {
+            "properties": {
+              "engine_execution": {
+                "const": "failed"
+              }
+            },
+            "required": [
+              "engine_execution"
+            ]
+          }
+        },
+        "required": [
+          "axes"
+        ]
+      },
+      "then": {
+        "properties": {
+          "axes": {
+            "properties": {
+              "scientific_check": {
+                "enum": [
+                  "not_applicable",
+                  "unchecked",
+                  "contradicted"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Identity anchor; const for EvidenceAssessment/v1.",
+      "type": "string",
+      "const": "EvidenceAssessment/v1"
+    },
+    "assessment_id": {
+      "description": "Content-addressed identity: sha256 over the canonical encoding of the assessment (without this field), prefixed 'sha256:'. Computed by srl.semantic.evidence.assessment_id. An assessment whose parents carry a prior assessment id forms a lineage chain (update_assessment threads the prior id).",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "subject_claim_id": {
+      "description": "The claim_id of the ScientificClaim/v1 this assessment evaluates. The assessment is about exactly one claim; the axes collectively describe the evidence standing behind that claim.",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "axes": {
+      "description": "The 11 ORTHOGONAL evidence axes. Each axis is an independent dimension of evidence; a movement on one axis never grants a movement on another (the orthogonality invariant enforced by srl.semantic.evidence).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capability_state",
+        "exercise_level",
+        "engine_execution",
+        "scientific_check",
+        "formal_check",
+        "formal_scope",
+        "statistical_support",
+        "causal_identification",
+        "algorithmic_cross_engine_reproduction",
+        "independent_empirical_replication",
+        "integration_authority"
+      ],
+      "properties": {
+        "capability_state": {
+          "description": "The claimed capability of the claim's backing software: unknown (not assessed), declared (the adapter/claim asserts it), profiled (an AdapterSemanticProfile admits it), ready (the operator asserts the capability is ready to run). ready is NOT compute — it only means the capability is asserted, not that the engine ran.",
+          "type": "string",
+          "enum": [
+            "unknown",
+            "declared",
+            "profiled",
+            "ready"
+          ]
+        },
+        "exercise_level": {
+          "description": "How far the claim's backing was actually exercised: none (not exercised), import_probe (it imports/loads but does not run), runtime_probe (it runs to a probe point), actual_compute (it ran the real computation). import_probe CANNOT yield engine_execution=completed (probe is not compute).",
+          "type": "string",
+          "enum": [
+            "none",
+            "import_probe",
+            "runtime_probe",
+            "actual_compute"
+          ]
+        },
+        "engine_execution": {
+          "description": "Whether the backing engine actually ran: not_run (never run), failed (ran and failed — no scientific output exists), completed (ran to completion). completed is NOT validated — it only means the engine finished, not that the scientific output was checked.",
+          "type": "string",
+          "enum": [
+            "not_run",
+            "failed",
+            "completed"
+          ]
+        },
+        "scientific_check": {
+          "description": "Whether the scientific output was independently checked against the claim: not_applicable (no scientific output to check), unchecked (output exists, not yet checked), checked (checked and consistent), contradicted (checked and the output contradicts the claim).",
+          "type": "string",
+          "enum": [
+            "not_applicable",
+            "unchecked",
+            "checked",
+            "contradicted"
+          ]
+        },
+        "formal_check": {
+          "description": "The level of formal (machine-checkable) verification: not_applicable (no formal statement to check), unchecked (a formal statement exists, not yet checked), checked (a solver returned SAT/UNSAT or a checked certificate), proven (a verified, independently-checkable certificate exists — REQUIRES a non-null formal_certificate_ref). proven is NOT empirical truth; it only means the formal statement was discharged.",
+          "type": "string",
+          "enum": [
+            "not_applicable",
+            "unchecked",
+            "checked",
+            "proven"
+          ]
+        },
+        "formal_scope": {
+          "description": "The scope of the formal statement relative to the claim: none (no formal statement), exact_statement (the formal statement is exactly the claim), restricted_model (the formal statement covers a restricted sub-model), full_model (the formal statement covers the full model). A proven statement over a restricted_model is honest about its scope.",
+          "type": "string",
+          "enum": [
+            "none",
+            "exact_statement",
+            "restricted_model",
+            "full_model"
+          ]
+        },
+        "statistical_support": {
+          "description": "The strength of statistical support for the claim: not_applicable, none, weak, moderate, strong. This axis is INDEPENDENT of the formal axes: a formal proof never updates statistical support (formal proof is not empirical truth).",
+          "type": "string",
+          "enum": [
+            "not_applicable",
+            "none",
+            "weak",
+            "moderate",
+            "strong"
+          ]
+        },
+        "causal_identification": {
+          "description": "The degree to which a causal effect is identified: not_applicable, assumed (a causal structure is assumed, not established), partially_identified, identified. This axis is INDEPENDENT of the formal axes: a formal proof never updates causal identification.",
+          "type": "string",
+          "enum": [
+            "not_applicable",
+            "assumed",
+            "partially_identified",
+            "identified"
+          ]
+        },
+        "algorithmic_cross_engine_reproduction": {
+          "description": "Whether the computation reproduced across an independent engine: not_applicable, none, reproduced (a second engine agreed), divergent (a second engine disagreed). This axis is INDEPENDENT of independent_empirical_replication: algorithmic agreement is NOT independent empirical replication (setting one never sets the other).",
+          "type": "string",
+          "enum": [
+            "not_applicable",
+            "none",
+            "reproduced",
+            "divergent"
+          ]
+        },
+        "independent_empirical_replication": {
+          "description": "Whether the empirical result was independently replicated: not_applicable, none, replicated (an independent empirical study confirmed it), contradicted (an independent study contradicted it). This axis is set ONLY by its own evidence_refs (with a distinct assessor); algorithmic reproduction never sets it.",
+          "type": "string",
+          "enum": [
+            "not_applicable",
+            "none",
+            "replicated",
+            "contradicted"
+          ]
+        },
+        "integration_authority": {
+          "description": "The authority an assessment confers to integrate the claim into downstream artifacts: none (no integration authority), proposal_only (the claim may be cited as a proposal only), admitted_a1_sandbox (RESERVED — admitted to a sandbox integration tier; SRL has no authority path to set this), admitted_a2 (RESERVED — admitted to a full integration tier; SRL has no authority path to set this). In this codebase integration_authority defaults to none and can only be raised to proposal_only; admitted_* is rejected by the python builder.",
+          "type": "string",
+          "enum": [
+            "none",
+            "proposal_only",
+            "admitted_a1_sandbox",
+            "admitted_a2"
+          ]
+        }
+      }
+    },
+    "evidence_refs": {
+      "description": "The object_ids of the evidence objects backing the axis movements (engine receipts, validation receipts, run receipts, formal certificates, independent studies). Each axis movement SHOULD be backed by an evidence_ref; an update_assessment call carries the evidence_ref that justifies the delta.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      },
+      "uniqueItems": true
+    },
+    "assessor": {
+      "description": "Who produced the assessment: adapter (the backend adapter self-assessed), validator (an independent validator assessed), operator (the operator asserted), bridge (a cross-system bridge assessed). Distinct assessors back distinct axes (e.g. algorithmic reproduction vs independent empirical replication are set only by their own evidence with a distinct assessor).",
+      "type": "string",
+      "enum": [
+        "adapter",
+        "validator",
+        "operator",
+        "bridge"
+      ]
+    },
+    "created_utc": {
+      "description": "RFC 3339 UTC timestamp at seconds precision (YYYY-MM-DDTHH:MM:SSZ). No offset, no fractional seconds.",
+      "type": "string",
+      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]Z$"
+    },
+    "parents": {
+      "description": "The assessment_ids of prior assessments in the lineage chain. update_assessment threads the prior assessment id here so the full prior state is carried. An assessment with empty parents is a root assessment (the first assessment of a claim).",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      },
+      "uniqueItems": true
+    },
+    "canonical_writes": {
+      "description": "Safety const: an assessment is immutable once authored. Always 0; a non-zero value is a contract violation.",
+      "type": "integer",
+      "const": 0
+    },
+    "grants_authority": {
+      "description": "Safety const: an assessment never grants authority on its own. Always false; a true value is a contract violation. integration_authority=proposal_only is an admission, not an authorization.",
+      "type": "boolean",
+      "const": false
+    }
+  }
+}

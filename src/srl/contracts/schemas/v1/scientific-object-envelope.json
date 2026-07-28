@@ -39,6 +39,8 @@
         "adapter_profile",
         "transformation_receipt",
         "evidence_assessment",
+        "engine_receipt",
+        "validation_receipt",
         "run_receipt",
         "catalog_snapshot",
         "knowledge_snapshot",

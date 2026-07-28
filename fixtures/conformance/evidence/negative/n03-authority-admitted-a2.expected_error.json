@@ -1,0 +1,7 @@
+{
+  "validator": "evidence_assessment",
+  "exception": "EvidenceAxisError",
+  "fail_reason": "CONTRACT_INVALID",
+  "invariant": "authority_path_none",
+  "reason": "An EvidenceAssessment with integration_authority=admitted_a2 violates the authority_path_none invariant: the admitted_* tiers are reserved and SRL has no authority path to set them (there is no admission route in this codebase). Rejected by srl.semantic.evidence.validate in Python (defense in depth) with CONTRACT_INVALID."
+}

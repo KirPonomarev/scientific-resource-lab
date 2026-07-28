@@ -1,0 +1,7 @@
+{
+  "validator": "engine_receipt",
+  "exception": "EvidenceAxisError",
+  "fail_reason": "CONTRACT_INVALID",
+  "invariant": "probe_not_compute",
+  "reason": "A ScienceLabEngineReceipt with exercise_level=import_probe and a non-empty output_object_ids violates the probe_not_compute invariant (an import probe cannot have produced scientific output). Rejected by the schema allOf/if-then and by srl.semantic.evidence.build_engine_receipt in Python (defense in depth) with CONTRACT_INVALID."
+}

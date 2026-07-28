@@ -54,6 +54,56 @@ from srl.semantic.claims import (
 from srl.semantic.claims import (
     validate as validate_claim,
 )
+from srl.semantic.evidence import (
+    ALGORITHMIC_REPRODUCTIONS,
+    ASSESSORS,
+    AXIS_NAMES,
+    CAPABILITY_STATES,
+    CAUSAL_IDENTIFICATIONS,
+    DEFAULT_AXES,
+    ENGINE_EXECUTIONS,
+    EVIDENCE_AXIS_FAIL_REASON,
+    EXERCISE_LEVELS,
+    FORMAL_CHECKS,
+    FORMAL_SCOPES,
+    INDEPENDENT_REPLICATIONS,
+    INTEGRATION_AUTHORITIES,
+    SCIENTIFIC_CHECKS,
+    STATISTICAL_SUPPORTS,
+    TERMINAL_STATUSES,
+    EvidenceAssertionError,
+    EvidenceAxisError,
+)
+from srl.semantic.evidence import (
+    assert_algorithmic_not_independent as evidence_assert_algorithmic_not_independent,
+)
+from srl.semantic.evidence import (
+    assert_formal_not_empirical as evidence_assert_formal_not_empirical,
+)
+from srl.semantic.evidence import (
+    assert_probe_not_compute as evidence_assert_probe_not_compute,
+)
+from srl.semantic.evidence import (
+    assessment_id as evidence_assessment_id,
+)
+from srl.semantic.evidence import (
+    build_assessment as build_evidence_assessment,
+)
+from srl.semantic.evidence import (
+    build_engine_receipt as build_science_lab_engine_receipt,
+)
+from srl.semantic.evidence import (
+    build_run_receipt as build_science_lab_run_receipt,
+)
+from srl.semantic.evidence import (
+    build_validation_receipt as build_science_lab_validation_receipt,
+)
+from srl.semantic.evidence import (
+    update_assessment as update_evidence_assessment,
+)
+from srl.semantic.evidence import (
+    validate as validate_evidence_assessment,
+)
 from srl.semantic.fabric import (
     SUPPORTED_OBJECT_TYPES,
     mint_object,
@@ -106,10 +156,23 @@ from srl.semantic.transforms import (
 )
 
 __all__ = [
+    "ALGORITHMIC_REPRODUCTIONS",
+    "ASSESSORS",
+    "AXIS_NAMES",
     "BEHAVIOR_APPROXIMATE",
     "BEHAVIOR_DROP",
     "BEHAVIOR_REJECT",
+    "CAPABILITY_STATES",
+    "CAUSAL_IDENTIFICATIONS",
     "CLAIM_INVARIANT_FAIL_REASON",
+    "DEFAULT_AXES",
+    "ENGINE_EXECUTIONS",
+    "EVIDENCE_AXIS_FAIL_REASON",
+    "EXERCISE_LEVELS",
+    "FORMAL_CHECKS",
+    "FORMAL_SCOPES",
+    "INDEPENDENT_REPLICATIONS",
+    "INTEGRATION_AUTHORITIES",
     "IR_RESOURCE_FAIL_REASON",
     "IR_UNSUPPORTED_FAIL_REASON",
     "LOSSLESS",
@@ -119,12 +182,17 @@ __all__ = [
     "MAX_DEPTH",
     "MAX_NODES",
     "PROFILE_INVARIANT_FAIL_REASON",
+    "SCIENTIFIC_CHECKS",
+    "STATISTICAL_SUPPORTS",
     "SUPPORTED_OBJECT_TYPES",
+    "TERMINAL_STATUSES",
     "TRANSFORMATION_INVARIANT_FAIL_REASON",
     "TRANSFORM_KINDS",
     "Application",
     "ClaimInvariantError",
     "Const",
+    "EvidenceAssertionError",
+    "EvidenceAxisError",
     "Expr",
     "IRResourceLimitError",
     "MathIR",
@@ -135,16 +203,26 @@ __all__ = [
     "Var",
     "adapter_profile_id",
     "assert_no_raw_eval_route",
+    "build_evidence_assessment",
     "build_math_ir",
+    "build_science_lab_engine_receipt",
+    "build_science_lab_run_receipt",
+    "build_science_lab_validation_receipt",
     "claim_object_id",
+    "evidence_assert_algorithmic_not_independent",
+    "evidence_assert_formal_not_empirical",
+    "evidence_assert_probe_not_compute",
+    "evidence_assessment_id",
     "math_ir_id",
     "mint_object",
     "project_to_backend",
     "record_detected_loss",
     "record_transformation",
     "transformation_receipt_id",
+    "update_evidence_assessment",
     "validate_adapter_profile",
     "validate_claim",
+    "validate_evidence_assessment",
     "validate_expression",
     "validate_math_ir",
     "validate_transformation",
