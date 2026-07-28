@@ -100,8 +100,8 @@ def test_bad_value_is_rejected(tmp_path: Path) -> None:
 def test_int_value_out_of_allowed_set_is_rejected(tmp_path: Path) -> None:
     """An int key with a value outside its allowed set raises PolicyError."""
     policy = _load_canonical_policy_dict()
-    # max_parallel_implementation_lanes must be 4.
-    policy["max_parallel_implementation_lanes"] = 8
+    # max_parallel_implementation_lanes must stay within the allowed set.
+    policy["max_parallel_implementation_lanes"] = 9
     bad = tmp_path / "policy.json"
     bad.write_text(json.dumps(policy), encoding="utf-8")
     with pytest.raises(PolicyError) as exc_info:
@@ -143,6 +143,35 @@ def test_v1_policy_with_four_lanes_is_accepted(tmp_path: Path) -> None:
     good.write_text(json.dumps(policy), encoding="utf-8")
     loaded = load_policy(good)
     assert loaded["schema_version"] == "AutonomyPolicy/v1"
+
+
+def test_v2_policy_with_six_lanes_is_accepted(tmp_path: Path) -> None:
+    """AutonomyPolicy/v2 with lanes=6 remains valid after the v3 bump."""
+    policy = _load_canonical_policy_dict()
+    policy["schema_version"] = "AutonomyPolicy/v2"
+    policy["max_parallel_implementation_lanes"] = 6
+    good = tmp_path / "policy.json"
+    good.write_text(json.dumps(policy), encoding="utf-8")
+    loaded = load_policy(good)
+    assert loaded["schema_version"] == "AutonomyPolicy/v2"
+
+
+def test_v3_policy_with_eight_lanes_is_accepted() -> None:
+    """The committed AutonomyPolicy/v3 (lanes=8) validates."""
+    policy = load_policy(_POLICY_PATH)
+    assert policy["schema_version"] == "AutonomyPolicy/v3"
+    assert policy["max_parallel_implementation_lanes"] == 8
+
+
+def test_lanes_above_eight_are_rejected(tmp_path: Path) -> None:
+    """A lanes value outside the allowed set raises PolicyError."""
+    policy = _load_canonical_policy_dict()
+    policy["max_parallel_implementation_lanes"] = 9
+    bad = tmp_path / "policy.json"
+    bad.write_text(json.dumps(policy), encoding="utf-8")
+    with pytest.raises(PolicyError) as exc_info:
+        load_policy(bad)
+    assert exc_info.value.reason == "bad_value"
 
 
 def test_bool_is_not_treated_as_int(tmp_path: Path) -> None:

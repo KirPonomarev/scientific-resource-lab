@@ -6,7 +6,7 @@ the persistence contract (atomic, canonical, byte-stable). They also pin
 that the ``automation/state.schema.json`` extension is backward compatible.
 
 All tests are hermetic (``tmp_path``). The policy cap is read from the
-committed ``automation/policy.json`` (currently 6) so the cap test tracks
+committed ``automation/policy.json`` (currently 8) so the cap test tracks
 the real policy rather than a hardcoded copy.
 """
 
@@ -82,9 +82,9 @@ def _acquire(  # noqa: PLR0913 (test helper; kw-only mirrors acquire_lane's cont
 
 
 def test_policy_lane_cap_reads_committed_policy() -> None:
-    """policy_lane_cap returns the policy's value (6), not a hardcoded copy."""
+    """policy_lane_cap returns the policy's value (8), not a hardcoded copy."""
     cap = _cap()
-    assert cap == 6
+    assert cap == 8
 
 
 def test_acquire_up_to_cap_then_reject(tmp_path: Path) -> None:
