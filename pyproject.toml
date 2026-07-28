@@ -17,10 +17,16 @@ license = "Apache-2.0"
 # contracts layer (WP-B10) adds `jsonschema` for meta-validation of shipped
 # 2020-12 schema documents (docs/adr/0002-jsonschema-library.md). The units
 # core pack (WP-E40) adds `pint` for dimensional analysis and unit conversion,
-# isolated behind the units adapter (docs/adr/0003-pint-dependency.md).
+# isolated behind the units adapter (docs/adr/0003-pint-dependency.md). The
+# SMT pack (WP-E41) adds `z3-solver` for satisfiability checking over a
+# restricted S-expression formula spec, isolated behind the SMT adapter
+# (docs/adr/0004-smt-solvers.md). cvc5 is NOT a dependency: its wheels bundle
+# GPLv3/LGPLv3 components and ship no resolvable license expression, so it is
+# excluded on license grounds and marked WAIT_LICENSE (see ADR-0004).
 dependencies = [
     "jsonschema>=4.23",
     "pint>=0.25.3",
+    "z3-solver>=4.13.0",
 ]
 authors = [{ name = "Scientific Resource Lab contributors" }]
 keywords = ["scientific-computing", "reproducibility", "agents", "evidence"]
@@ -124,6 +130,14 @@ indent-style = "space"
 [[tool.mypy.overrides]]
 module = "srl.*"
 strict = true
+
+# z3 (z3-solver) ships no py.typed marker, so mypy cannot find library stubs.
+# The SMT adapter (the sole z3 import site) treats all z3 objects as opaque
+# Any by design (ADR-0004: z3 is isolated behind the adapter's typed surface),
+# so missing stubs are expected and ignored here. See ADR-0004.
+[[tool.mypy.overrides]]
+module = "z3"
+ignore_missing_imports = true
 
 [tool.mypy]
 python_version = "3.12"
