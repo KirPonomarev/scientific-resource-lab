@@ -1,0 +1,1 @@
+{"constructed_as":"A = L * L^T","generator_version":"wp-a05-1.0.0","license":"CC0-1.0","lower_triangular_l":[[5,0,0],[-3,4,0],[2,-1,4]],"matrix":[[25,-15,10],[-15,25,-10],[10,-10,21]],"seed":20260728,"size":3,"synthetic":true,"type":"SyntheticSPDMatrix/v1"}
