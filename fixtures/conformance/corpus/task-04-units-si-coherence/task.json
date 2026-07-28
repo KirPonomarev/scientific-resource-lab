@@ -1,0 +1,21 @@
+{
+  "schema_version": "TaskSpec/v1",
+  "task_id": "task-04",
+  "title": "SI coherence of F = m*a",
+  "category": "units-and-dimensions",
+  "input": {
+    "claim": {
+      "statement": "Verify SI coherence: one newton equals one kilogram metre per second squared for the force law."
+    },
+    "request": {
+      "requested_profiles": [
+        "algebra_exact",
+        "uncertainty"
+      ]
+    }
+  },
+  "expected": {
+    "outcome": "WAIT_CAPABILITY",
+    "detail": "algebra_exact + uncertainty auto-classify; no available adapter -> WAIT_CAPABILITY"
+  }
+}

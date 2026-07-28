@@ -1,0 +1,21 @@
+{
+  "schema_version": "TaskSpec/v1",
+  "task_id": "task-22",
+  "title": "Harmonic oscillator interface",
+  "category": "ode-pde-interface",
+  "input": {
+    "claim": {
+      "statement": "Integrate the harmonic oscillator as an ordinary differential equation initial value problem."
+    },
+    "request": {
+      "requested_profiles": [
+        "executable_ode_dae_sde_model",
+        "dynamics"
+      ]
+    }
+  },
+  "expected": {
+    "outcome": "WAIT_CAPABILITY",
+    "detail": "executable_ode_dae_sde_model (remote_required) + dynamics auto-classify -> WAIT_CAPABILITY"
+  }
+}

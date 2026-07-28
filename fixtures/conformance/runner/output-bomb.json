@@ -1,0 +1,19 @@
+{
+  "schema_version": "RunnerFixture/v1",
+  "fixture_id": "output-bomb",
+  "purpose": "A descriptor for the output-cap enforcement check. The child writes more than the per-stream byte cap to stdout. The capped reader truncates the stream at the cap, the runner kills the child, and the run is classified as resource_limit with no receipt written. The cap is enforced identically on every platform (it is a reader-side byte count, not a kernel limit).",
+  "expected_behavior": {
+    "outcome": "resource_limit",
+    "status": "resource_limit",
+    "receipt_written": false,
+    "fail_reason": "RESOURCE_LIMIT",
+    "detail_contains": "output exceeded the",
+    "platform_independence": "The output cap is enforced by the runner's capped reader, not by the kernel, so it is identical on macOS and Linux."
+  },
+  "adapter_id": "chatter.v1",
+  "input_payload": {
+    "bytes": 4194304
+  },
+  "input_payload_bytes_intended": 4194304,
+  "notes": "chatter.v1 is a test-only adapter (loaded only under SRL_RUNNER_TEST_ADAPTERS=1). It writes 4 MiB to stdout; the runner caps stdout at output_cap_bytes (default 1 MiB, reduced in the gate) and kills the child."
+}

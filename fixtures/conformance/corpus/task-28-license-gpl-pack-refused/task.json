@@ -1,0 +1,15 @@
+{
+  "schema_version": "TaskSpec/v1",
+  "task_id": "task-28",
+  "title": "GPL-marked pack refused",
+  "category": "license-rejection",
+  "input": {
+    "adapter_profile": {
+      "license_spdx": "GPL-3.0-or-later"
+    }
+  },
+  "expected": {
+    "outcome": "REJECT_LICENSE",
+    "detail": "license_spdx GPL-3.0-or-later is in the copyleft set -> refused at admission"
+  }
+}

@@ -39,6 +39,17 @@ from srl.planning.catalog import (
     load_default_catalog,
 )
 from srl.planning.classifier import classify
+from srl.planning.corpus import (
+    CORPUS_OUTCOMES,
+    TaskOutcome,
+    TaskSpec,
+    Verdict,
+    load_corpus,
+    load_task,
+    run_corpus,
+    run_task,
+    verdict,
+)
 from srl.planning.planner import (
     DEFAULT_CAPS,
     DEFAULT_POLICY,
@@ -70,6 +81,7 @@ from srl.planning.router import (
 
 __all__ = [
     "AVAILABILITY_STATES",
+    "CORPUS_OUTCOMES",
     "DEFAULT_CAPS",
     "DEFAULT_POLICY",
     "EXCEPTION_CAPS",
@@ -88,15 +100,23 @@ __all__ = [
     "ProfileRouting",
     "ResourceAdmissionError",
     "RoutingDecision",
+    "TaskOutcome",
+    "TaskSpec",
+    "Verdict",
     "build_plan",
     "build_request",
     "classify",
     "default_policy",
     "load_catalog",
+    "load_corpus",
     "load_default_catalog",
+    "load_task",
     "plan_digest",
     "plan_id",
     "request_id",
     "route",
+    "run_corpus",
+    "run_task",
     "topological_order",
+    "verdict",
 ]

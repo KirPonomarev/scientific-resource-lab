@@ -1,0 +1,20 @@
+{
+  "schema_version": "TaskSpec/v1",
+  "task_id": "task-16",
+  "title": "Two-component H0",
+  "category": "topology",
+  "input": {
+    "claim": {
+      "statement": "Compute persistent homology and the zeroth Betti number of a two-component point cloud; H0 is two."
+    },
+    "request": {
+      "requested_profiles": [
+        "geometry_tda"
+      ]
+    }
+  },
+  "expected": {
+    "outcome": "WAIT_CAPABILITY",
+    "detail": "geometry_tda auto-classifies; ripser adapter future -> WAIT_CAPABILITY"
+  }
+}

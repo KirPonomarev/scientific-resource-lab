@@ -1,0 +1,20 @@
+{
+  "schema_version": "TaskSpec/v1",
+  "task_id": "task-21",
+  "title": "Posterior interval sanity",
+  "category": "uncertainty",
+  "input": {
+    "claim": {
+      "statement": "Compute a Bayesian posterior credible interval and check its sanity via uncertainty quantification."
+    },
+    "request": {
+      "requested_profiles": [
+        "uncertainty"
+      ]
+    }
+  },
+  "expected": {
+    "outcome": "WAIT_CAPABILITY",
+    "detail": "uncertainty auto-classifies; no adapter -> WAIT_CAPABILITY"
+  }
+}

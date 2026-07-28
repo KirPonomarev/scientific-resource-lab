@@ -1,0 +1,21 @@
+{
+  "schema_version": "TaskSpec/v1",
+  "task_id": "task-23",
+  "title": "PDE variational stub",
+  "category": "ode-pde-interface",
+  "input": {
+    "claim": {
+      "statement": "Assemble the weak form of a partial differential equation via a variational finite element method."
+    },
+    "request": {
+      "requested_profiles": [
+        "pde_variational_model",
+        "dynamics"
+      ]
+    }
+  },
+  "expected": {
+    "outcome": "WAIT_CAPABILITY",
+    "detail": "pde_variational_model + dynamics auto-classify; no adapter -> WAIT_CAPABILITY"
+  }
+}

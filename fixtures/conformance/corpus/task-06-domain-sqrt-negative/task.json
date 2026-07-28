@@ -1,0 +1,20 @@
+{
+  "schema_version": "TaskSpec/v1",
+  "task_id": "task-06",
+  "title": "Square root of a negative in the reals",
+  "category": "domain-violations",
+  "input": {
+    "ir": {
+      "op": "arith1.sqrt",
+      "args": [
+        {
+          "const": "-1"
+        }
+      ]
+    }
+  },
+  "expected": {
+    "outcome": "REJECT_IR",
+    "detail": "arith1.sqrt outside MATH_IR_ALLOWLIST -> UnsupportedOperatorError"
+  }
+}
