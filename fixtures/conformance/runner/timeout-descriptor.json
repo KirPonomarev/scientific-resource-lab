@@ -1,0 +1,21 @@
+{
+  "schema_version": "RunnerFixture/v1",
+  "fixture_id": "timeout-descriptor",
+  "purpose": "A descriptor for the wall-timeout enforcement and no-orphan check. The child sleeps beyond the wall cap. The watchdog terminates -> grace -> kills the process group, then verify_no_orphan confirms no survivor. The run is classified as timeout, no receipt is written, and the elapsed wall is approximately the cap (within the kill grace).",
+  "expected_behavior": {
+    "outcome": "timeout",
+    "status": "timeout",
+    "receipt_written": false,
+    "fail_reason": "RESOURCE_LIMIT",
+    "orphan_detected": false,
+    "elapsed_wall_approx_seconds": 1,
+    "notes": "The wall cap is enforced by the process-group watchdog on every POSIX platform. verify_no_orphan walks the process table (ps on macOS/BSD, /proc on Linux) and raises ORPHAN_PROCESS_DETECTED if any process in the child's group survives the kill."
+  },
+  "adapter_id": "sleeper.v1",
+  "input_payload": {
+    "seconds": 10
+  },
+  "input_payload_seconds_intended": 10,
+  "wall_seconds": 1,
+  "notes": "sleeper.v1 is a test-only adapter (loaded only under SRL_RUNNER_TEST_ADAPTERS=1). It sleeps for 10s; the runner's wall cap is set to 1s, so the watchdog fires ~1s in and kills the group. The 10s sleep never completes."
+}

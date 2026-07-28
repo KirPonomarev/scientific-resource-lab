@@ -1,0 +1,22 @@
+{
+  "schema_version": "RunnerFixture/v1",
+  "fixture_id": "fork-bomb-descriptor",
+  "purpose": "A descriptor for the fork-bomb / RLIMIT_NPROC enforcement check. The child forks repeatedly, keeping children alive so the live-process count climbs. RLIMIT_NPROC (fixed at 256) stops the fan-out: os.fork() raises OSError(EAGAIN) at the cap. The run is bounded and no orphan survives the watchdog kill.",
+  "expected_behavior": {
+    "outcome": "bounded",
+    "forked_leq": 256,
+    "orphan_detected": false,
+    "receipt_written_any": true,
+    "platform_notes": {
+      "linux": "RLIMIT_NPROC=256 is enforced; the child forks up to ~256 times then hits EAGAIN. The handler catches it and exits cleanly.",
+      "macos": "RLIMIT_NPROC=256 is so strict relative to the Python runtime's thread count that fork() hits EAGAIN immediately (forked=0). The bomb is fully contained; the handler exits cleanly."
+    },
+    "invariant": "Regardless of platform, the number of live children NEVER exceeds RLIMIT_NPROC (256), and the watchdog's verify_no_orphan confirms no survivor. The fan-out is bounded by construction."
+  },
+  "adapter_id": "forker.v1",
+  "input_payload": {
+    "count": 1024
+  },
+  "wall_seconds": 10,
+  "notes": "forker.v1 is a test-only adapter. The handler reaps its children before returning so the orphan check is not polluted. The gate asserts forked <= 256 and no orphan."
+}
