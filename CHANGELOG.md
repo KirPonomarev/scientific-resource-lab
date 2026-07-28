@@ -11,6 +11,22 @@ is supported. See `README.md` and `GOVERNANCE.md` for the evidence rules.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-07-28
+
+P0 capability packs and knowledge adapters: units core (Pint, CODATA),
+SMT (z3; cvc5 excluded on GPL grounds), ripser TDA (topology goldens,
+surrogate controls), pyRiemann SPD geometry (train-only discipline),
+OpenAlex/Crossref/arXiv/OEIS source adapters, and the P0 integration
+release with a measured actual-compute corpus (20 runs) and sealed catalog.
+
+## [0.3.0] - 2026-07-28
+
+Bounded runner and security suite: fixed-entrypoint runner with sandbox
+(rlimits, process groups, receipt-last), materializer and sealer, M1
+resource policy, adversarial suite (14 case kinds, 50-run orphan-free
+gate), secret scan / license inventory / public boundary / docs workflows.
+
+
 ### Added
 
 - **P0 integration release (WP-E45)** — the Phase E capstone that proves the
