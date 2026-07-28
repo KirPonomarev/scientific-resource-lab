@@ -1,0 +1,9 @@
+{
+  "description": "A request for a GPL-family solver must be rejected with LICENSE_INCOMPATIBLE before any CVXPY solve is attempted.",
+  "problem_spec": {
+    "problem_type": "lp",
+    "c": [1]
+  },
+  "solver": "glpk",
+  "expected_fail_reason": "LICENSE_INCOMPATIBLE"
+}
