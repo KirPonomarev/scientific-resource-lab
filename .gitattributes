@@ -1,0 +1,59 @@
+# Scientific Resource Lab Git attributes.
+# Normalize line endings and classify generated/vendored content for diffs.
+
+# Default: text with LF on checkout, normalized on commit.
+* text=auto eol=lf
+
+# Lock files are large, machine-managed, and noise in diffs; keep them text
+# but suppress line-level diffing.
+*.lock text=auto eol=lf -diff
+uv.lock text=auto eol=lf -diff linguist-generated=true
+poetry.lock text=auto eol=lf -diff linguist-generated=true
+package-lock.json text=auto eol=lf -diff linguist-generated=true
+pnpm-lock.yaml text=auto eol=lf -diff linguist-generated=true
+yarn.lock text=auto eol=lf -diff linguist-generated=true
+
+# Markdown should render cleanly with LF.
+*.md text=auto eol=lf working-tree-encoding=UTF-8
+
+# Shell and config files.
+*.sh text=auto eol=lf
+*.bash text=auto eol=lf
+
+# Python sources.
+*.py text=auto eol=lf
+*.pyi text=auto eol=lf
+
+# Notebooks are JSON but not source code; treat as text, expandable on demand.
+*.ipynb text=auto eol=lf
+
+# Binary artifacts that must never be normalized.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.tar binary
+*.tar.gz binary
+*.tgz binary
+*.gz binary
+*.zst binary
+
+# Receipts and manifests are small JSON; keep as text for reviewability.
+automation/receipts/** text=auto eol=lf
+
+# Export generated receipts and evidence as non-diff in the future once the
+# runner produces them; for now they are hand-authored and reviewed.
+
+# Mark the Apache LICENSE as unchanging in review noise.
+LICENSE text=auto eol=lf
+
+# CFF citation file.
+*.cff text=auto eol=lf
+
+# Export-ignore developer-only files from GitHub release archives.
+.github export-ignore
+.editorconfig export-ignore
+.pre-commit-config.yaml export-ignore

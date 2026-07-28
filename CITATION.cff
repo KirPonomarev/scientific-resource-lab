@@ -1,0 +1,38 @@
+cff-version: 1.2.0
+message: >-
+  If you use Scientific Resource Lab in your work, please cite it using the
+  metadata in this file.
+title: Scientific Resource Lab
+abstract: >-
+  Reproducible, bounded and evidence-first scientific computation fabric for
+  autonomous research agents. Provides typed scientific contracts over
+  canonical JSON, an immutable content-addressed artifact store with verified
+  ingest, reviewed hash-locked capability packs, a bounded fixed-entrypoint
+  local runner with hard resource limits, a deterministic claim router and
+  planner, a JSON-first CLI, a read-only MCP interface, a static evidence
+  portal, and a disclosure-sanitized LabExportPacket/v1 proposal-only bridge.
+keywords:
+  - reproducibility
+  - scientific-computing
+  - content-addressed-storage
+  - autonomous-research
+  - contracts
+  - evidence
+  - bounded-execution
+type: software
+license: Apache-2.0
+version: 0.1.0
+date-released: '2026-07-28'
+repository-code: https://github.com/KirPonomarev/scientific-resource-lab
+url: https://github.com/KirPonomarev/scientific-resource-lab
+preferred-citation:
+  type: software
+  title: Scientific Resource Lab
+  authors:
+    - name: Scientific Resource Lab contributors
+  date-released: '2026-07-28'
+  repository-code: https://github.com/KirPonomarev/scientific-resource-lab
+  url: https://github.com/KirPonomarev/scientific-resource-lab
+  license: Apache-2.0
+authors:
+  - name: Scientific Resource Lab contributors
