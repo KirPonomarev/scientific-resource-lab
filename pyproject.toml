@@ -35,7 +35,29 @@ license = "Apache-2.0"
 #   (docs/adr/0006-pyriemann.md). numpy and scipy are declared explicitly so the
 #   SRL surface can validate arrays and eigenvalues without relying only on
 #   transitive dependency versions.
+# - pymc + arviz (WP-H71a): bounded one-chain Bayesian posterior fitting for the
+#   ``uncertainty`` capability profile, isolated behind the pymc adapter
+#   (docs/adr/0008-pymc.md). Both are Apache-2.0, BUT pytensor (pymc's backend)
+#   unconditionally imports ``cons`` (LGPL-3.0-only) at import time. The SRL
+#   pack policy denies the ``LGPL-`` prefix, so pymc/arviz are declared as an
+#   OPTIONAL extra (``[project.optional-dependencies].bayesian``), NOT a default
+#   runtime dependency. This keeps the LGPL package out of the default install
+#   closure (so ``license_inventory`` passes on the default closure) while
+#   leaving the adapter fully buildable and testable when the extra is opted
+#   into (``uv sync --extra bayesian``). ADR-0008 records this honestly: the
+#   ``pymc_arviz`` candidate's P1 verdict is WAIT_LICENSE-class because ``cons``
+#   is LGPL-3.0; the adapter is proposal-only evidence until that is resolved.
+#   The adapter always runs a single chain, requires an explicit seed, and
+#   bounds draws/tune/wall time so the profile stays within the CI budget; a
+#   fitted posterior is selection-aware evidence (not causal identification, not
+#   convergence certification).
+#   Bound notes: pymc 6.x and arviz 1.x require Python>=3.12, but the project
+#   floor is >=3.11 (see ``requires-python``). To keep the lock satisfiable on
+#   both 3.11 and 3.12 without a cross-cutting floor bump, the bounds stay inside
+#   the 3.11-compatible family (pymc 5.x, arviz 0.23.x). The adapter uses only
+#   the stable ``pm.sample`` / ``az.summary`` surface common to both families.
 dependencies = [
+    "arviz>=0.23.4",
     "clarabel>=0.11.1",
     "cvxpy>=1.9.2",
     "jsonschema>=4.23",
@@ -70,6 +92,18 @@ srlab = "srl.cli:main"
 Homepage = "https://github.com/KirPonomarev/scientific-resource-lab"
 Repository = "https://github.com/KirPonomarev/scientific-resource-lab"
 Changelog = "https://github.com/KirPonomarev/scientific-resource-lab/blob/main/CHANGELOG.md"
+
+# Optional extras. The ``bayesian`` extra (WP-H71a) pulls pymc + arviz for the
+# bounded one-chain posterior adapter. These are NOT default runtime deps: their
+# transitive closure includes ``cons`` (LGPL-3.0-only, a hard import of
+# pytensor), which the SRL pack policy denies. Keeping them in an opt-in extra
+# keeps the default install closure (and ``license_inventory``) clean. Install
+# with ``uv sync --extra bayesian`` to build/test the adapter. See ADR-0008.
+[project.optional-dependencies]
+bayesian = [
+    "arviz>=0.20,<1",
+    "pymc>=5.20,<6",
+]
 
 # Hatchling build targets. The import package (srl) differs from the
 # distribution name (srlab), so the wheel target is declared explicitly to map
@@ -173,6 +207,25 @@ ignore_missing_imports = true
 module = "cvxpy.*"
 follow_imports = "skip"
 ignore_missing_imports = true
+
+# pymc, arviz, and pytensor (WP-H71a) live behind the optional ``bayesian``
+# extra. They are isolated behind the pymc adapter (the sole import site),
+# which treats all upstream objects as opaque Any by design (ADR-0008). To keep
+# mypy's view identical whether or not the extra is installed: pymc/pytensor
+# ship no py.typed marker, so ``ignore_missing_imports`` makes them Any when
+# absent and they resolve the same way when present; arviz DOES ship a py.typed
+# marker, so ``follow_imports = skip`` is needed to treat it as Any even when
+# the extra is installed (otherwise ``az.rhat``/``az.ess`` are typed calls that
+# flip the ``no-untyped-call`` ignore between the two install states). The
+# adapter body remains strict.
+[[tool.mypy.overrides]]
+module = ["pymc.*", "pytensor.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["arviz.*"]
+ignore_missing_imports = true
+follow_imports = "skip"
 
 [tool.mypy]
 python_version = "3.12"
