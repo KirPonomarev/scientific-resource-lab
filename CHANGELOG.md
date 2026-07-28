@@ -11,6 +11,18 @@ is supported. See `README.md` and `GOVERNANCE.md` for the evidence rules.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-07-28
+
+Standalone Scientific Resource Lab with stable LabExportPacket/v1:
+refuse-not-strip exporter (structural path detection, case-insensitive
+credential patterns, recursive payload sanitization), export adversarial
+corpus (12 valid + 44 malformed), read-only stdio MCP, static portal with
+synthetic demo, P1 admission framework, bounded PyMC+ArviZ and CVXPY P1
+candidates, P2 discovery registry, semantic future profiles, machine-
+enforced lane ledger, and a sealed private retrospective pilot executed
+through the SRL fabric (99 null/surrogate runs; null/inconclusive honored).
+
+
 ## [0.4.0] - 2026-07-28
 
 P0 capability packs and knowledge adapters: units core (Pint, CODATA),
