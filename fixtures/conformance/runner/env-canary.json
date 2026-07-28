@@ -1,0 +1,23 @@
+{
+  "schema_version": "RunnerFixture/v1",
+  "fixture_id": "env-canary",
+  "purpose": "A descriptor for the environment-secret-isolation check. The parent process sets a canary env var (SRL_TEST_CANARY) holding a sentinel value. The child must NEVER see it: build_child_env constructs the environment from scratch (only PATH, HOME, TMPDIR, LANG, PYTHONHASHSEED, and optionally PYTHONPATH + the test gate), and never inherits os.environ. After a run, the child's environment (captured via echo.v1 echoing a probe, or via ps -E) must not contain the canary.",
+  "expected_behavior": {
+    "outcome": "canary_absent_in_child",
+    "parent_only_var": "SRL_TEST_CANARY",
+    "child_env_keys_allowed": [
+      "PATH",
+      "HOME",
+      "TMPDIR",
+      "LANG",
+      "PYTHONHASHSEED",
+      "PYTHONPATH",
+      "SRL_RUNNER_TEST_ADAPTERS"
+    ],
+    "notes": "On macOS, the CFoundation layer injects __CF_USER_TEXT_ENCODING automatically (derived from the UID, not parent environ); it is not a leak of a parent secret and is explicitly not asserted against."
+  },
+  "canary": {
+    "name": "SRL_TEST_CANARY",
+    "value": "PARENT-ONLY-SECRET-DO-NOT-LEAK"
+  }
+}
