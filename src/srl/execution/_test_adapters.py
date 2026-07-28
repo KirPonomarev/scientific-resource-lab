@@ -36,6 +36,11 @@ The adapters here exist to exercise the sandbox's enforcement paths:
     lingers briefly. Used by the WP-D34 setsid-evasion detector: a final
     process-group sweep by name must observe no survivor after the watchdog
     kills the leader. The lingering child exits quickly so no real orphan leaks.
+``invalidout.v1``
+    A deliberately schema-invalid output adapter. It returns a dict with an extra
+    field that is not allowed by its declared output schema, so the runner's
+    output validation rejects it and writes no receipt. Used by the WP-D34
+    schema-invalid-output case.
 
 None of these perform network I/O against a real target (``netcanary.v1`` aims
 only at RFC 5737 reserved space). They are standard library only.
@@ -86,40 +91,40 @@ def _bomb_handler(payload: dict[str, Any]) -> dict[str, Any]:
 def _forker_handler(payload: dict[str, Any]) -> dict[str, Any]:
     """Fork repeatedly until ``RLIMIT_NPROC`` stops the fan-out.
 
-    Children sleep briefly so they stay live and the live-process count climbs
-    to the ``RLIMIT_NPROC`` cap, at which point :func:`os.fork` raises
-    ``OSError`` (``EAGAIN``). The handler is the fork-bomb vehicle: it does NOT
-    reap mid-loop, so the cap is genuinely exercised. After the loop it reaps
-    what it can so the watchdog's orphan check stays clean.
+    The fan-out is bounded by the sandbox ``RLIMIT_NPROC=256`` cap. Once the
+    cap fires (``os.fork`` raises ``OSError`` / ``EAGAIN``), the parent stays
+    alive and does NOT return a clean output -- it sleeps in a tight loop so
+    the runner's wall watchdog kills the whole process group. The runner then
+    classifies the run as ``timeout`` with ``fail_reason=RESOURCE_LIMIT`` and
+    writes no receipt.
+
+    Children stay alive long enough to keep the live process count at the cap,
+    so the cap is genuinely exercised. The runner reaps the parent; any children
+    that were not reaped before the group kill are cleaned up by the watchdog's
+    ``killpg``.
     """
-    target = payload.get("count", 1024)
+    target = payload.get("count", 8192)
     if not isinstance(target, int) or target < 0:
-        target = 1024
+        target = 8192
     pids: list[int] = []
     for _ in range(target):
         try:
             pid = os.fork()
         except OSError:
-            # RLIMIT_NPROC hit (EAGAIN) — the expected stop. Break and report.
-            break
+            # RLIMIT_NPROC hit (EAGAIN). Keep the parent alive so the runner
+            # wall-times out the group; do not return a clean output.
+            while True:
+                time.sleep(0.2)
         if pid == 0:
-            # Child: stay alive briefly so the live count climbs to the cap.
-            time.sleep(2)
+            # Child: stay alive long enough to consume the NPROC budget until
+            # the watchdog kills the group.
+            time.sleep(30)
             os._exit(0)
         else:
             pids.append(pid)
-    # Reap what we can before returning so the orphan check is not polluted by
-    # our own intentional short-lived children.
-    for pid in pids:
-        try:
-            os.kill(pid, 15)
-        except OSError:
-            pass
-        try:
-            os.waitpid(pid, 0)
-        except OSError:
-            pass
-    return {"forked": len(pids)}
+    # Reached target without hitting the cap: still do not return a clean run.
+    while True:
+        time.sleep(0.2)
 
 
 def _chatter_handler(payload: dict[str, Any]) -> dict[str, Any]:
@@ -239,6 +244,20 @@ def _setsiddler_handler(payload: dict[str, Any]) -> dict[str, Any]:
     return {"spawned_grandchild": spawned, "setsid_attempted": True, "setsid_ok": setsid_ok}
 
 
+def _invalidout_handler(payload: dict[str, Any]) -> dict[str, Any]:
+    """Return a schema-invalid output dict (the WP-D34 invalid-output vehicle).
+
+    The input is a valid string under ``text``. The output contains the same
+    string plus an extra ``invalid`` boolean field that is not declared in the
+    adapter's output schema, so the runner's output validation rejects it and
+    classifies the run as ``failed`` with no receipt written.
+    """
+    text = payload.get("text", "ok")
+    if not isinstance(text, str):
+        text = "ok"
+    return {"text": text, "invalid": True}
+
+
 _SLEEPER_V1: Final[AdapterDescriptor] = AdapterDescriptor(
     adapter_id="sleeper.v1",
     version="v1",
@@ -298,6 +317,14 @@ _SETSIDDLER_V1: Final[AdapterDescriptor] = AdapterDescriptor(
     },
     deterministic=True,
 )
+_INVALIDOUT_V1: Final[AdapterDescriptor] = AdapterDescriptor(
+    adapter_id="invalidout.v1",
+    version="v1",
+    handler=_invalidout_handler,
+    input_schema={"required": ["text"], "optional": [], "types": {"text": "str"}},
+    output_schema={"required": ["text"], "optional": [], "types": {"text": "str"}},
+    deterministic=True,
+)
 
 ADAPTERS.update(
     {
@@ -308,5 +335,6 @@ ADAPTERS.update(
         _NETCANARY_V1.adapter_id: _NETCANARY_V1,
         _CWDPROBE_V1.adapter_id: _CWDPROBE_V1,
         _SETSIDDLER_V1.adapter_id: _SETSIDDLER_V1,
+        _INVALIDOUT_V1.adapter_id: _INVALIDOUT_V1,
     }
 )

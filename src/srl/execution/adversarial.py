@@ -26,23 +26,29 @@ The four expected outcomes:
 
 - ``rejected`` — the case is refused *before* any process runs (registry or
   materialization rejects it; ``receipt_written`` must be ``False``);
-- ``resource_limit`` — a hard cap fired (memory/cpu/files/forks/output); the run
-  is bounded and produces no receipt;
-- ``timeout`` — the wall watchdog killed the child; no receipt;
+- ``resource_limit`` — a hard cap fired (memory/cpu/files/forks/output) and the
+  run was bounded; ``receipt_written`` must be ``False``;
+- ``timeout`` — the wall watchdog killed the child; ``receipt_written`` must be
+  ``False``;
 - ``no_receipt`` — the run completed-or-failed but no valid receipt was written
-  (used by the credential_canary, schema_invalid_output, and partial_receipt
-  cases where the point is the receipt-last invariant itself).
+  (for non-control kinds; the two documented ``CONTROL_KINDS`` are observational
+  probes that may complete).
+
+Control kinds
+-------------
+Two of the 14 kinds are observational controls that may complete and write a
+receipt: ``credential_canary`` and ``network_canary``. Every other kind must end
+with ``receipt_written=False``. The gate asserts at least 12/14 kinds are
+receipt-free.
 
 Receipt-last oracle
 -------------------
 :func:`run_case` returns a :class:`CaseOutcome` carrying the runner outcome plus
-the harness-level assertions. The invariant asserted for *every* case is:
-
-    if the observed status is not ``completed`` then ``receipt_written`` is False,
-    AND a sweep of the scratch dir finds no ``receipt-*.json`` file.
-
-A violation that produced a receipt fails the case outright. This is the
-single load-bearing property of the adversarial suite.
+harness-level assertions. Matching is strict (no superset semantics): each
+expected outcome maps to exactly the allowed runner statuses, and a
+non-completed run must write no receipt. A violation that produced a receipt
+fails the case outright. This is the single load-bearing property of the
+adversarial suite.
 
 Orphan-free sequence
 --------------------
@@ -81,6 +87,7 @@ from srl.execution import (
     build_child_env,
     prepare_scratch,
     run_adapter,
+    sandbox,
 )
 from srl.execution.entrypoints import UnknownAdapterError, get_adapter
 from srl.execution.policy import ResourcePolicy
@@ -121,6 +128,14 @@ class AdversarialKind(StrEnum):
     CORRUPTED_INPUT = "corrupted_input"
     SCHEMA_INVALID_OUTPUT = "schema_invalid_output"
     PARTIAL_RECEIPT = "partial_receipt"
+
+
+# Control kinds: observational probes that are allowed to complete and write a
+# run receipt. They are documented in docs/security/adversarial-runner.md. Every
+# other adversarial kind must end with receipt_written=False.
+CONTROL_KINDS: Final[frozenset[AdversarialKind]] = frozenset(
+    {AdversarialKind.CREDENTIAL_CANARY, AdversarialKind.NETWORK_CANARY}
+)
 
 
 class ExpectedOutcome(StrEnum):
@@ -329,36 +344,48 @@ def _receipts_in(scratch: Path) -> int:
     return len(list(scratch.glob("receipt-*.json")))
 
 
-def _status_matches_expected(status: RunStatus | None, expected: ExpectedOutcome) -> bool:
-    """Return True iff the runner ``status`` satisfies ``expected``.
+def _outcome_matches_expected(
+    case: AdversarialCase,
+    outcome: RunOutcome,
+    receipts_in_scratch: int,
+) -> tuple[bool, str]:
+    """Return True iff the runner outcome satisfies the case's expectation.
 
-    The mapping is deliberately a superset per expectation so the oracle is
-    robust to platform differences (e.g. a memory bomb may be RESOURCE_LIMIT on
-    Linux and TIMEOUT on macOS; a fork bomb may be caught-and-exit-cleanly on
-    macOS where RLIMIT_NPROC is very strict):
+    Matching is strict: no superset semantics. The receipt-last invariant is
+    enforced for every non-control kind:
 
-    - ``rejected``: the case never reached a run (status is None);
-    - ``resource_limit``: status is RESOURCE_LIMIT, FAILED, POLICY_VIOLATION, or
-      COMPLETED (a bomb whose handler caught the cap and exited cleanly still
-      proves the cap fired — the receipt-last oracle is the load-bearing check);
-    - ``timeout``: status is TIMEOUT;
-    - ``no_receipt``: any outcome provided no receipt was written.
+    - ``rejected``: the case was refused before any process ran (handled by
+      :func:`_run_rejected_case`); a spawned run with this expectation is a
+      mismatch;
+    - ``resource_limit``: status is RESOURCE_LIMIT, or a wall TIMEOUT whose
+      fail_reason is RESOURCE_LIMIT; no receipt;
+    - ``timeout``: status is TIMEOUT; no receipt;
+    - ``no_receipt``: the run happened. For non-control kinds no receipt was
+      written. Control kinds are observational probes and may complete.
     """
+    expected = case.expected
+    status = outcome.status
+    is_control = case.kind in CONTROL_KINDS
+    receipt_ok = outcome.receipt_written is False and receipts_in_scratch == 0
+
+    # Any non-completed run must write zero receipts (the receipt-last oracle).
+    if status is not RunStatus.COMPLETED and not receipt_ok:
+        return False, "non-completed run wrote a receipt (receipt-last violated)"
+
     if expected is ExpectedOutcome.REJECTED:
-        return status is None
-    if expected is ExpectedOutcome.RESOURCE_LIMIT:
-        return status in {
-            RunStatus.RESOURCE_LIMIT,
-            RunStatus.FAILED,
-            RunStatus.POLICY_VIOLATION,
-            RunStatus.COMPLETED,
-            RunStatus.TIMEOUT,
-        }
+        return False, "expected rejected before spawn"
     if expected is ExpectedOutcome.TIMEOUT:
-        return status is RunStatus.TIMEOUT
-    # no_receipt: any non-None status is acceptable; the receipt_last assertion
-    # is made separately and is the real check for this expectation.
-    return status is not None
+        return status is RunStatus.TIMEOUT and receipt_ok, "expected wall timeout"
+    if expected is ExpectedOutcome.RESOURCE_LIMIT:
+        return (
+            status in {RunStatus.RESOURCE_LIMIT, RunStatus.TIMEOUT}
+            and outcome.fail_reason == sandbox.RESOURCE_LIMIT_FAIL_REASON
+            and receipt_ok
+        ), "expected resource limit"
+    # ExpectedOutcome.NO_RECEIPT
+    if is_control:
+        return True, "control no_receipt case"
+    return receipt_ok, "expected no receipt"
 
 
 def _run_rejected_case(case: AdversarialCase) -> CaseOutcome:
@@ -417,17 +444,11 @@ def _run_spawned_case(case: AdversarialCase, policy: ResourcePolicy, scratch: Pa
         kwargs["wall_seconds"] = wall
     outcome = run_adapter(adapter_id, input_payload, policy, scratch, **kwargs)
     receipts = _receipts_in(scratch)
-    matched = _status_matches_expected(outcome.status, case.expected)
-    # The receipt-last oracle: a non-completed run must write NO receipt, and
-    # the scratch dir must contain no receipt-*.json file.
-    receipt_last_ok = (
-        outcome.receipt_written is False and receipts == 0
-    ) or outcome.status is RunStatus.COMPLETED
-    if not receipt_last_ok:
-        matched = False
+    matched, match_detail = _outcome_matches_expected(case, outcome, receipts)
     detail = (
         f"status={outcome.status.value}; receipt_written={outcome.receipt_written}; "
-        f"receipts_in_scratch={receipts}; fail_reason={outcome.fail_reason}"
+        f"receipts_in_scratch={receipts}; fail_reason={outcome.fail_reason}; "
+        f"match_detail={match_detail}"
     )
     return CaseOutcome(
         case=case,
@@ -751,6 +772,7 @@ def cwd_isolation_check(policy: ResourcePolicy, repo_root: Path) -> dict[str, An
 __all__ = [
     "ADVERSARIAL_FIXTURE_SCHEMA_VERSION",
     "CONFORMANCE_FLOOR",
+    "CONTROL_KINDS",
     "AdversarialCase",
     "AdversarialKind",
     "CaseOutcome",

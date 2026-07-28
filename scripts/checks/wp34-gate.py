@@ -73,6 +73,7 @@ from srl.execution import (  # noqa: E402
 )
 from srl.execution.adversarial import (  # noqa: E402
     CONFORMANCE_FLOOR,
+    CONTROL_KINDS,
     AdversarialKind,
     conformance_sequence,
     cwd_isolation_check,
@@ -93,6 +94,11 @@ _FIXTURES: Final[Path] = _REPO_ROOT / "fixtures" / "conformance" / "adversarial"
 
 # The expected number of distinct adversarial kinds (one fixture per kind).
 _EXPECTED_KINDS: Final[int] = 14
+
+# The minimum number of kinds that must end with receipt_written=False. Only the
+# documented control kinds (and golden runs in the conformance sequence) may
+# write a receipt.
+_MIN_RECEIPT_FREE_KINDS: Final[int] = 12
 
 # The gate runtime ceiling (seconds). The 50-run sequence dominates; on a warm
 # machine it completes well under this. Documented for CI timeout budgeting.
@@ -153,6 +159,16 @@ def _check_d34_01() -> dict[str, Any]:
         if co.observed_status != "completed" and (co.receipt_written or co.receipts_in_scratch != 0)
     ]
 
+    # (d) hardening: at least 12 of the 14 kinds must end with no receipt, and
+    # only the documented control kinds are permitted to write one. A receipt
+    # written by any non-control kind is a strict matcher failure.
+    non_control_receipts = [
+        co.to_dict()
+        for co in case_outcomes
+        if co.receipt_written and co.case.kind not in CONTROL_KINDS
+    ]
+    receipt_free_count = sum(1 for co in case_outcomes if not co.receipt_written)
+
     failures: list[str] = []
     if not kinds_complete:
         failures.append(
@@ -164,6 +180,17 @@ def _check_d34_01() -> dict[str, Any]:
         failures.append(
             f"{len(receipt_violations)} violation case(s) produced a receipt (receipt-last broken)"
         )
+    if non_control_receipts:
+        failures.append(
+            f"{len(non_control_receipts)} non-control kind(s) wrote a receipt: "
+            f"{[co['case_id'] for co in non_control_receipts]}"
+        )
+    if receipt_free_count < _MIN_RECEIPT_FREE_KINDS:
+        failures.append(
+            f"only {receipt_free_count}/{_EXPECTED_KINDS} kinds ended receipt-free; "
+            f"expected at least {_MIN_RECEIPT_FREE_KINDS} "
+            "(only control/golden cases may write receipts)"
+        )
 
     if failures:
         return {
@@ -173,15 +200,21 @@ def _check_d34_01() -> dict[str, Any]:
             "all_kinds": all_kinds,
             "unmatched": unmatched,
             "receipt_violations": receipt_violations,
+            "non_control_receipts": non_control_receipts,
+            "receipt_free_count": receipt_free_count,
+            "control_kinds": sorted(k.value for k in CONTROL_KINDS),
             "cases": [co.to_dict() for co in case_outcomes],
         }
     return {
         "status": "PASS",
         "detail": (
             f"all {_EXPECTED_KINDS} adversarial kinds produced their expected outcome; "
-            "every policy/limit violation wrote zero receipts (receipt-last holds)"
+            f"{receipt_free_count}/{_EXPECTED_KINDS} kinds ended receipt-free; "
+            "only the documented control kinds wrote receipts"
         ),
         "kinds_seen": kinds_seen,
+        "receipt_free_count": receipt_free_count,
+        "control_kinds": sorted(k.value for k in CONTROL_KINDS),
         "cases": [co.to_dict() for co in case_outcomes],
     }
 
