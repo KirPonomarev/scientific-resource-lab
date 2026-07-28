@@ -1,0 +1,9 @@
+{
+  "vector_id": "wp40-n04-dimensionally-invalid-convert",
+  "description": "Converting 1 kg to m must be rejected as a dimensional mismatch before any arithmetic.",
+  "expected": "reject",
+  "operation": "convert",
+  "value": "1",
+  "from": "kg",
+  "to": "m"
+}

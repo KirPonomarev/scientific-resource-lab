@@ -1,0 +1,10 @@
+{
+  "schema_version": "ConstantRef/v1",
+  "constant_id": "codata2018.speed-of-light",
+  "source": "CODATA2018",
+  "symbol": "c",
+  "value": "299792458",
+  "uncertainty": null,
+  "unit": "m/s",
+  "vintage": "CODATA-2018"
+}

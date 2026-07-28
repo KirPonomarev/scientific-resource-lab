@@ -11,6 +11,20 @@ is supported. See `README.md` and `GOVERNANCE.md` for the evidence rules.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-07-28
+
+Release contents: transactional CAS ingest engine with dedup, fsck and
+receipt-last crash matrix (C21); T7 volume identity guard and storage
+abstraction (C20); pack manifest, safe extraction and materialization (C22);
+eight-stage pack builder and admission pipeline with machine-enforced stage
+adjacency (C23); deterministic capability catalog snapshot with merkle root
+(C24); M1 resource policy (D30); API retriever with budgets and query
+receipts (D33); JSON-first CLI surface (F50); units semantic core with Pint
+adapter and CODATA fixtures (E40); security/public-boundary/docs workflows
+(A04); weekly-deep scheduled verification (A06); machine-enforced lane
+ledger with leases and path ownership (governance).
+
+
 
 ### Added
 

@@ -1,0 +1,15 @@
+{
+  "vector_id": "wp40-p03-si-coherence-identity",
+  "description": "Dimensional equivalence: factored forms reduce to the same dimension as their named derived units.",
+  "expected": "accept",
+  "cases": [
+    {"left": "kg*m/s^2", "right": "N", "equivalent": true},
+    {"left": "N", "right": "kg*m/s^2", "equivalent": true},
+    {"left": "J", "right": "N*m", "equivalent": true},
+    {"left": "Pa", "right": "N/m^2", "equivalent": true},
+    {"left": "W", "right": "J/s", "equivalent": true},
+    {"left": "V", "right": "J/C", "equivalent": true},
+    {"left": "Hz", "right": "1/s", "equivalent": true},
+    {"left": "m/s", "right": "m/s", "equivalent": true}
+  ]
+}
