@@ -45,6 +45,9 @@ _ALLOWED_LICENSES: Final[frozenset[str]] = frozenset(
         "MIT",
         "BSD-2-CLAUSE",
         "BSD-3-CLAUSE",
+        "0BSD",
+        "ZLIB",
+        "MIT-CMU",
         "APACHE-2.0",
         "ISC",
         "PSF-2.0",
@@ -52,8 +55,6 @@ _ALLOWED_LICENSES: Final[frozenset[str]] = frozenset(
         "MPL-2.0",
         "PYTHON-2.0",
         "CC0-1.0",
-        "0BSD",
-        "ZLIB",
     }
 )
 
@@ -74,6 +75,7 @@ _LICENSE_NORMALIZATIONS: Final[dict[str, str]] = {
     "MIT": "MIT",
     "BSD": "BSD-3-CLAUSE",
     "BSD LICENSE": "BSD-3-CLAUSE",
+    "BSD (3-CLAUSE)": "BSD-3-CLAUSE",
     "BSD-2-CLAUSE": "BSD-2-CLAUSE",
     "BSD-3-CLAUSE": "BSD-3-CLAUSE",
     "SIMPLIFIED BSD": "BSD-2-CLAUSE",
@@ -199,6 +201,11 @@ def _evaluate_license(expression: str) -> str:
     return "unknown"
 
 
+def _is_spdx_expression(value: str) -> bool:
+    """Return True if ``value`` looks like an SPDX license expression."""
+    return bool(re.match(r"^[A-Za-z0-9_.\-]+(\s+(?:OR|AND)\s+[A-Za-z0-9_.\-]+)*$", value))
+
+
 def _extract_package_license(dist: Distribution) -> tuple[str, str]:
     """Extract the best available license string and source for a distribution."""
     metadata = dist.metadata
@@ -208,7 +215,15 @@ def _extract_package_license(dist: Distribution) -> tuple[str, str]:
 
     direct = metadata.get("License", "").strip()
     if direct and direct.upper() != "UNKNOWN":
-        return direct, "License"
+        normalized_direct = _normalize_license(direct)
+        recognized = _evaluate_license(normalized_direct) != "unknown"
+        if _is_spdx_expression(direct) or recognized:
+            return direct, "License"
+        # Full-text license strings are not self-describing. Prefer a recognised
+        # Trove classifier when one is present.
+        classifier_lic = _classifier_license(list(metadata.get_all("Classifier", [])))
+        if classifier_lic:
+            return classifier_lic, "Classifier"
 
     classifier_lic = _classifier_license(list(metadata.get_all("Classifier", [])))
     if classifier_lic:

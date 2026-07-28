@@ -1,0 +1,27 @@
+{
+  "schema_version": "ConformanceVectors/v1",
+  "pack": "geometry-pyriemann",
+  "description": "Non-SPD inputs that must be rejected with CONTRACT_INVALID before any geometry compute.",
+  "cases": [
+    {
+      "id": "n01-non-symmetric",
+      "matrix": [[1.0, 2.0], [3.0, 4.0]],
+      "reason": "not symmetric"
+    },
+    {
+      "id": "n02-negative-eigenvalue",
+      "matrix": [[1.0, 2.0], [2.0, -3.0]],
+      "reason": "not positive definite"
+    },
+    {
+      "id": "n03-singular",
+      "matrix": [[1.0, 1.0], [1.0, 1.0]],
+      "reason": "singular"
+    },
+    {
+      "id": "n04-non-square",
+      "matrix": [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]],
+      "reason": "not square"
+    }
+  ]
+}
