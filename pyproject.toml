@@ -138,6 +138,8 @@ strict = true
 # body while admitting the untyped dependency.
 [[tool.mypy.overrides]]
 module = "ripser"
+ignore_missing_imports = true
+
 # z3 (z3-solver) ships no py.typed marker, so mypy cannot find library stubs.
 # The SMT adapter (the sole z3 import site) treats all z3 objects as opaque
 # Any by design (ADR-0004: z3 is isolated behind the adapter's typed surface),
