@@ -59,9 +59,8 @@ representative at an online or offline event.
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported to the community leaders responsible for enforcement at
-opensci@kirillponomarev.github or through a private vulnerability report on
-the repository's Security tab if the report involves sensitive information.
+reported to the community leaders responsible for enforcement through a
+private vulnerability report on the repository's Security tab.
 
 All complaints will be reviewed and investigated promptly and fairly.
 
