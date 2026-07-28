@@ -45,11 +45,14 @@ class CurrentPlatform:
 
 def _normalize_os() -> str:
     """Return the SRL-normalized OS name for ``sys.platform``."""
-    if sys.platform.startswith("linux"):
+    # Bind to a local annotated ``str`` so mypy does not narrow reachability
+    # per the CI platform (``sys.platform`` comparisons are special-cased).
+    interpreter_os: str = sys.platform
+    if interpreter_os.startswith("linux"):
         return OS_LINUX
-    if sys.platform == "darwin":
+    if interpreter_os == "darwin":
         return OS_MACOS
-    msg = f"unsupported interpreter OS: {sys.platform!r}"  # type: ignore[unreachable]
+    msg = f"unsupported interpreter OS: {interpreter_os!r}"
     raise PlatformError(msg)
 
 
