@@ -1,0 +1,96 @@
+{
+  "schema_version": "ConformanceVectorManifest/v1",
+  "description": "Canonical JSON conformance vectors for srl.contracts.canonical (WP-B10). Each positive vector pairs an input (non-canonical key order where applicable) with exact expected canonical bytes. Each negative vector names the contract reason its input must be rejected with.",
+  "positive": [
+    {
+      "name": "v01-key-order",
+      "description": "Same object in a non-canonical key order canonicalizes to sorted-key bytes. Proves key-order independence."
+    },
+    {
+      "name": "v02-unicode-nfc",
+      "description": "Non-ASCII (NFC) characters pass through as UTF-8 bytes, not \\uXXXX escapes."
+    },
+    {
+      "name": "v03-nested-empty",
+      "description": "Nested empty objects and arrays canonicalize compactly."
+    },
+    {
+      "name": "v04-decimal-string",
+      "description": "A precision-sensitive value carried as a JSON string is preserved verbatim."
+    },
+    {
+      "name": "v05-integer-bytes",
+      "description": "A non-negative integer byte count encodes as a bare integer."
+    },
+    {
+      "name": "v06-deep-sorted",
+      "description": "Deeply nested object keys are sorted at every level."
+    },
+    {
+      "name": "v07-array-order",
+      "description": "Array element order is preserved (sequences are NOT reordered)."
+    },
+    {
+      "name": "v08-null-bool-int",
+      "description": "null, bool, and int encode as distinct JSON tokens."
+    },
+    {
+      "name": "v09-unicode-supplementary",
+      "description": "Supplementary-plane and multi-byte code points survive as UTF-8."
+    },
+    {
+      "name": "v10-negative-decimal",
+      "description": "A negative decimal string is preserved verbatim."
+    },
+    {
+      "name": "v11-empty-root",
+      "description": "An empty object root canonicalizes to '{}' plus newline."
+    },
+    {
+      "name": "v12-safe-large-int",
+      "description": "A safe-range (2^53-1) large integer encodes exactly."
+    }
+  ],
+  "negative": [
+    {
+      "name": "n01-nan",
+      "validator": "loads",
+      "reason": "NaN must be rejected by canonical JSON parsing."
+    },
+    {
+      "name": "n02-infinity",
+      "validator": "loads",
+      "reason": "Infinity must be rejected by canonical JSON parsing."
+    },
+    {
+      "name": "n03-bool-as-int",
+      "validator": "integer_byte_count",
+      "reason": "A bool where an integer byte count is expected must be rejected."
+    },
+    {
+      "name": "n04-self-hash",
+      "validator": "object_id",
+      "reason": "An object carrying its own object_id must be rejected as a self-hash."
+    },
+    {
+      "name": "n05-absolute-path",
+      "validator": "portable_path",
+      "reason": "An absolute path in a portable artifact ref must be rejected."
+    },
+    {
+      "name": "n06-traversal-path",
+      "validator": "portable_path",
+      "reason": "A '..' traversal path in a portable artifact ref must be rejected."
+    },
+    {
+      "name": "n07-fractional-timestamp",
+      "validator": "timestamp",
+      "reason": "A fractional-seconds timestamp must be rejected."
+    },
+    {
+      "name": "n08-offset-timestamp",
+      "validator": "timestamp",
+      "reason": "A non-UTC offset timestamp must be rejected."
+    }
+  ]
+}

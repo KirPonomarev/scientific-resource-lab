@@ -1,17 +1,24 @@
-"""Canonical JSON helpers for SRL.
+"""Canonical JSON helpers for SRL (Phase A compatibility shim).
 
-SRL reports are JSON-first. A canonical encoding makes two independent agents
-produce byte-identical output for equal data, which is a prerequisite for
-content-addressed receipts and reproducible comparison.
+Historical note
+---------------
+This module was the Phase-A canonical JSON helper: an ASCII-only, ``str``
+return encoding used by the autonomy receipts emitted in WP-A01..WP-A03. It
+remains the wire format for those receipts and for the CLI dispatcher.
 
-The canonical form is intentionally restrictive:
+The scientific contracts layer (WP-B10) introduced a stricter canonical form
+in :mod:`srl.contracts.canonical`: UTF-8 bytes, ``allow_nan=False``, and a
+decimal-string policy. That module is the canonical form for new scientific
+artifacts and new receipts.
 
-- sorted object keys (deterministic ordering),
-- compact separators (no insignificant whitespace),
-- ASCII-only output via ``ensure_ascii=True`` (stable across locales),
-- a single trailing newline (the SRL line contract).
-
-This module is pure standard library and performs no I/O of its own.
+This file is now a thin re-export so existing imports
+(``from srl.canonical import canonical_json``) and the WP-A03 tests keep
+working unchanged. The two public names ``canonical_json`` and
+``canonical_json_line`` retain their original semantics exactly: sorted keys,
+compact separators, ASCII-only, ``str`` return, and (for the line form) a
+single trailing newline. They do **not** enforce ``allow_nan=False`` — that
+refusal is the contracts-layer policy; the legacy helper must stay
+behavior-identical so Phase-A receipts encode the same way they always did.
 """
 
 from __future__ import annotations
@@ -33,6 +40,11 @@ class CanonicalJSONError(ValueError):
     Canonical JSON only supports JSON-native structures produced by
     :func:`json.dumps`. Subclasses of :class:`ValueError` keep the failure in
     the expected family for callers that already handle malformed input.
+
+    Note: this is the legacy ``ValueError``-based error, distinct from
+    :class:`srl.contracts.canonical.CanonicalJSONError` (a
+    :class:`srl.contracts.errors.ContractError`). Both subclass
+    :class:`ValueError`, so ``except ValueError`` catches either.
     """
 
 
@@ -79,3 +91,6 @@ def canonical_json_line(value: Any) -> str:
     This is the SRL line contract: one canonical record terminated by ``\\n``.
     """
     return canonical_json(value) + _TRAILING_NEWLINE
+
+
+__all__ = ["CanonicalJSONError", "canonical_json", "canonical_json_line"]

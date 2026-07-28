@@ -2,7 +2,7 @@
 # Portable: no absolute paths or usernames. Uses uv for everything.
 # Targets run via `uv run` so contributors only need uv installed.
 
-.PHONY: bootstrap lint format typecheck test build verify repro-check gate-wp03 clean help
+.PHONY: bootstrap lint format typecheck test build verify repro-check gate-wp03 gate-wp10 clean help
 
 help: ## Show this help.
 	@awk 'BEGIN {FS = ":.*##"; printf "Usage:\n  make <target>\n\nTargets:\n"} \
@@ -41,6 +41,13 @@ verify: lint typecheck test build ## Run lint, typecheck, tests, and build.
 # in-repo srl package, so it runs under `python3` without a prior install.
 gate-wp03: ## Run the WP-A03 autonomy-contracts acceptance gate.
 	uv run python scripts/checks/wp03-gate.py
+
+# WP-B10 canonical JSON and identifiers gate. Runs the four acceptance checks
+# (B10-01..B10-04) and prints a GateReceipt/v1 JSON receipt; non-zero exit on
+# any FAIL. Uses the contracts layer (which depends on jsonschema), so it runs
+# under `uv run python`.
+gate-wp10: ## Run the WP-B10 canonical-JSON acceptance gate.
+	uv run python scripts/checks/wp10-gate.py
 
 clean: ## Remove build artifacts and caches.
 	rm -rf dist build .pytest_cache .mypy_cache .ruff_cache
