@@ -37,6 +37,7 @@ from typing import Any, Final
 from srl.contracts.errors import CONTRACT_INVALID_FAIL_REASON, ContractError
 from srl.planning.catalog import CapabilityCatalog
 from srl.planning.classifier import classify
+from srl.planning.future_profiles import FUTURE_PROFILE_IDS
 from srl.planning.profiles import SCIENCE_LAB_PROFILES
 
 # The four typed selection states a profile can be routed to.
@@ -52,6 +53,10 @@ SELECTION_STATES: Final[frozenset[str]] = frozenset(
         SELECTION_WAIT_CAPABILITY,
     }
 )
+
+# Profiles the router can legally emit a decision for: the 15 shipped profiles
+# plus the semantic future profiles registered in srl.planning.future_profiles.
+_KNOWN_PROFILES: Final[frozenset[str]] = frozenset(SCIENCE_LAB_PROFILES) | FUTURE_PROFILE_IDS
 
 # The typed fail reason for a router-structural violation.
 ROUTER_FAIL_REASON: Final[str] = CONTRACT_INVALID_FAIL_REASON
@@ -99,7 +104,7 @@ class ProfileRouting:
         availability: str,
         exclusion_reason: str | None,
     ) -> None:
-        if profile not in frozenset(SCIENCE_LAB_PROFILES):
+        if profile not in _KNOWN_PROFILES:
             msg = f"unknown profile {profile!r}"
             raise ContractError(msg)
         if selection not in SELECTION_STATES:
@@ -164,7 +169,7 @@ class RoutingDecision:
         if missing:
             msg = f"RoutingDecision missing profiles: {missing}"
             raise ContractError(msg)
-        extra = sorted(set(profiles) - set(SCIENCE_LAB_PROFILES))
+        extra = sorted(set(profiles) - set(SCIENCE_LAB_PROFILES) - FUTURE_PROFILE_IDS)
         if extra:
             msg = f"RoutingDecision has unexpected profiles: {extra}"
             raise ContractError(msg)
@@ -261,6 +266,23 @@ def _route_one(
     )
 
 
+def _route_future_profiles(
+    applicable_set: set[str],
+    catalog: CapabilityCatalog,
+) -> dict[str, ProfileRouting]:
+    """Route any explicitly-requested semantic future profiles.
+
+    Future profiles are not part of the 15 shipped capability profiles, so the
+    catalog has no entry for them. They are covered by the router's existing
+    unknown/future capability path and always produce WAIT_CAPABILITY with no
+    adapter.
+    """
+    decisions: dict[str, ProfileRouting] = {}
+    for profile in sorted(applicable_set & FUTURE_PROFILE_IDS):
+        decisions[profile] = _route_one(profile, applicable=True, catalog=catalog)
+    return decisions
+
+
 def route(
     request: Any,
     claim: Any,
@@ -309,7 +331,7 @@ def route(
         msg = "request 'requested_profiles' must be an array"
         raise ContractError(msg)
     for p in requested:
-        if not isinstance(p, str) or p not in frozenset(SCIENCE_LAB_PROFILES):
+        if not isinstance(p, str) or p not in _KNOWN_PROFILES:
             msg = f"requested_profiles entry {p!r} is not a known profile"
             raise ContractError(msg)
 
@@ -372,6 +394,10 @@ def route(
                     availability=availability,
                     exclusion_reason=None,
                 )
+
+    # Cover any explicitly-requested semantic future profiles through the
+    # unknown/future capability path (no local adapter, no silent fallback).
+    decisions.update(_route_future_profiles(applicable_set, catalog))
 
     return RoutingDecision(profiles=decisions, classifier_trace=trace)
 
