@@ -221,7 +221,11 @@ def _normalize_rss(ru_maxrss: int) -> int:
     """
     if ru_maxrss <= 0:
         return 0
-    if sys.platform == "linux":
+    # Compare against a runtime str (not the literal sys.platform, which mypy
+    # narrows to a single value under --platform and would flag the else branch
+    # as unreachable on Linux CI).
+    platform_name: str = sys.platform
+    if platform_name == "linux":
         return ru_maxrss * 1024
     return ru_maxrss
 
