@@ -1,0 +1,42 @@
+{
+  "schema_version": "CasVectorManifest/v1",
+  "description": "Conformance documentation for the SRL CAS transaction engine (WP-C21). This directory ships NO binary fixture files: every test blob is generated inline as a deterministic Python byte string by the gate (scripts/checks/wp21-gate.py) and the unit tests (tests/cas/test_engine*.py, tests/cas/test_fsck.py). The six acceptance checks (C21-01 no-overwrite, C21-02 typed corruption, C21-03 interrupted ingest, C21-04 1,000 deduplicating ingests, C21-05 crash at every publish boundary, C21-06 read-back corruption injection) all use short human-readable ASCII payloads so a reviewer can see exactly what bytes are exercised. Corruption and crash injection mutate these inline bytes (flip one byte, patch os.replace) rather than shipping pre-corrupted binaries.",
+  "vectors": [
+    {
+      "name": "c21-01-no-overwrite",
+      "kind": "inline_blob",
+      "case": "no_overwrite",
+      "description": "Two ingests of identical bytes produce a single object and a deduplicated receipt (no overwrite). Generated inline; no fixture file."
+    },
+    {
+      "name": "c21-02-typed-corruption",
+      "kind": "inline_blob",
+      "case": "typed_corruption",
+      "description": "Flipping one byte in a published object is detected by fsck as CAS_INTEGRITY_FAILURE. The corruption is applied out-of-band at run time; no pre-corrupted binary ships."
+    },
+    {
+      "name": "c21-03-interrupted",
+      "kind": "inline_blob",
+      "case": "interrupted_ingest",
+      "description": "An ingest interrupted at publish (os.replace patched to raise) publishes no object, descriptor, or receipt; the partial is reported by recover_partials. Generated inline."
+    },
+    {
+      "name": "c21-04-thousand-dedup",
+      "kind": "inline_blob",
+      "case": "thousand_dedup",
+      "description": "1,000 repeated deduplicating ingests of a 256-byte inline payload produce exactly one object file and zero overwrites."
+    },
+    {
+      "name": "c21-05-crash-boundary",
+      "kind": "inline_blob",
+      "case": "crash_boundary",
+      "description": "Crash injection at four publish boundaries (after tmp write, after fsync, after replace, after descriptor) leaves old-or-new valid state, never a partial visible object."
+    },
+    {
+      "name": "c21-06-readback-injection",
+      "kind": "inline_blob",
+      "case": "readback_injection",
+      "description": "Patching the first read-back to return wrong bytes makes the ingest fail with CAS_INTEGRITY_FAILURE and publish nothing."
+    }
+  ]
+}

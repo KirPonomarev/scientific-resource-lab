@@ -11,6 +11,7 @@ is supported. See `README.md` and `GOVERNANCE.md` for the evidence rules.
 
 ## [Unreleased]
 
+
 ### Added
 
 - Thirty-task public conformance corpus under `srl.planning` (WP-B15):
@@ -539,7 +540,17 @@ is supported. See `README.md` and `GOVERNANCE.md` for the evidence rules.
 - Documented the public repository boundary and the prohibition on committing
   secrets, real datasets, operator identity, and absolute local paths.
 
-## [0.1.0] - Unreleased
+## [0.1.0] - 2026-07-28
+
+
+Release contents: public repository with protected main and 22 required
+checks; canonical JSON and SHA-256 object identity; Scientific IR
+(restricted OpenMath allowlist); object fabric; transformation receipts
+with explicit lossiness; 11-axis orthogonal evidence model; deterministic
+claim router and plan builder; thirty-task public conformance corpus
+(30/30 expected outcomes matched); AutonomyPolicy/v2 governance; M1
+resource policy; T7 storage identity guard; fixed-entrypoint bounded
+runner with sandbox; weekly-deep scheduled verification.
 
 The first milestone target (`v0.1.0`) covers the repository, contracts, the
 Scientific IR, and conformance. It is tracked as a GitHub milestone and is
