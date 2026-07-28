@@ -1,0 +1,59 @@
+{
+  "schema_version": "BridgeFixtureDoc/v1",
+  "description": "Two synthetic, disclosure-safe LabExportPacket/v1 build cases for the WP-I80 gate. Every object here is SYNTHETIC: synthetic sha256 digests, disclosure-safe summaries describing the science (not the environment). No real private data, no local paths, no credentials. The digests are 64-hex placeholders (a*64, b*64, ...); the gate rebuilds the packet via srl.bridge.exporter.build_packet and asserts it validates, is under 1 MiB, and carries the four safety consts.",
+  "cases": [
+    {
+      "case_id": "valid-single-claim",
+      "policy": {
+        "private_identities": "digest_replaced",
+        "summary_max_bytes": 512
+      },
+      "created_utc": "2026-07-28T00:00:00Z",
+      "source_snapshot_digest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "objects": [
+        {
+          "object_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "object_type": "claim",
+          "sanitized_summary": "A claim that the iterative solver converges quadratically near the fixed point.",
+          "provenance_refs": [
+            "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "valid-mixed-types",
+      "policy": {
+        "private_identities": "digest_replaced",
+        "summary_max_bytes": 1024
+      },
+      "created_utc": "2026-07-28T12:34:56Z",
+      "source_snapshot_digest": null,
+      "objects": [
+        {
+          "object_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "object_type": "claim",
+          "sanitized_summary": "The estimator is consistent under the stated identification assumptions.",
+          "provenance_refs": []
+        },
+        {
+          "object_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "object_type": "evidence_assessment",
+          "sanitized_summary": "Weak statistical support; not yet independently replicated.",
+          "provenance_refs": [
+            "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+          ]
+        },
+        {
+          "object_digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+          "object_type": "engine_receipt",
+          "sanitized_summary": "Engine completed actual compute in bounded wall time.",
+          "provenance_refs": [
+            "sha256:3333333333333333333333333333333333333333333333333333333333333333"
+          ]
+        }
+      ]
+    }
+  ]
+}
