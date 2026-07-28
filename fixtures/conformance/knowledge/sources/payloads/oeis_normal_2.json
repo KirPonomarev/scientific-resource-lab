@@ -1,0 +1,11 @@
+{
+  "synthetic": true,
+  "redistribution": "clear",
+  "results": [
+    {
+      "number": "A000027",
+      "name": "A000027 The natural numbers",
+      "data": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    }
+  ]
+}

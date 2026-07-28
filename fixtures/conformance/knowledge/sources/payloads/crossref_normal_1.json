@@ -1,0 +1,18 @@
+{
+  "status": "ok",
+  "message-type": "work-list",
+  "message-version": "1.0.0-synthetic",
+  "message": {
+    "items": [
+      {
+        "DOI": "10.1234/synthetic.crossref.1",
+        "title": ["Synthetic Crossref Work One for WP-E44"],
+        "publisher": "Synthetic Press",
+        "published-print": {"date-parts": [[2024, 1]]}
+      }
+    ],
+    "total-results": 1,
+    "synthetic": true,
+    "redistribution": "clear"
+  }
+}
