@@ -1,0 +1,114 @@
+# Weekly deep verification.
+#
+# Runs every Monday at 04:00 UTC (schedule) and on demand (workflow_dispatch).
+# This workflow is intentionally read-only: no deploy, no secrets, no private
+# data, no live API calls. It exercises longer deterministic property tests and
+# reproducibility checks that are too slow or redundant for per-PR CI.
+#
+# Actions are pinned to the same full commit SHAs used in ci.yml for supply-chain
+# integrity. Bump by re-resolving the new tag's SHA and replacing it here.
+# Resolved SHAs (re-resolve on update):
+#   actions/checkout  v5.1.0 -> fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+#   astral-sh/setup-uv v9.0.0 -> c771a70e6277c0a99b617c7a806ffedaca235ff9
+name: weekly-deep
+
+on:
+  schedule:
+    - cron: '0 4 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  property-deep:
+    name: property-deep (deterministic Hypothesis)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Setup uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9  # v9.0.0
+        with:
+          enable-cache: true
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+      - name: Install dependencies (locked)
+        run: uv sync --locked
+      - name: Run property and contracts suites with two deterministic seeds
+        # The repository does not register a Hypothesis "deep" profile, so
+        # HYPOTHESIS_PROFILE=deep would raise.  We instead run the same suites
+        # twice with fixed seeds.  This doubles example coverage while keeping
+        # runs reproducible for debugging.  See docs/operations/weekly-deep.md.
+        run: |
+          uv run pytest tests/property tests/contracts -q --hypothesis-seed=0
+          uv run pytest tests/property tests/contracts -q --hypothesis-seed=1
+
+  deterministic-replay:
+    name: deterministic-replay
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Setup uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9  # v9.0.0
+        with:
+          enable-cache: true
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+      - name: Install dependencies (locked)
+        run: uv sync --locked
+      - name: Run weekly replay script
+        run: uv run python3 scripts/checks/weekly_replay.py
+
+  clean-clone-build:
+    name: clean-clone-build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Setup uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9  # v9.0.0
+        with:
+          enable-cache: true
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+      - name: Build from a clean archive copy
+        run: |
+          set -euo pipefail
+          workdir="${RUNNER_TEMP}/srl-clean-build"
+          rm -rf "${workdir}"
+          mkdir -p "${workdir}"
+          git archive HEAD | tar -x -C "${workdir}"
+          cd "${workdir}"
+          uv sync --locked
+          uv build
+
+  dependency-audit-weekly:
+    name: dependency-audit-weekly
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Setup uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9  # v9.0.0
+        with:
+          enable-cache: true
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+      - name: Export locked requirements and audit with pip-audit
+        run: |
+          uv export --locked --format requirements-txt --no-editable -o requirements.txt
+          uvx pip-audit -r requirements.txt
