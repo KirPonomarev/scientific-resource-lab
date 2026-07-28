@@ -34,6 +34,7 @@ from __future__ import annotations
 
 import abc
 import hashlib
+import json as _json
 import os
 import re
 import tempfile
@@ -46,6 +47,19 @@ from srl.cas.capacity import (
     ObjectClass,
     check_capacity,
 )
+from srl.cas.engine import (
+    CasIntegrityError,
+    IngestOutcome,
+    PartialEntry,
+    QuotaExceededError,
+)
+from srl.cas.engine import (
+    ingest as engine_ingest,
+)
+from srl.cas.engine import (
+    recover_partials as engine_recover_partials,
+)
+from srl.cas.fsck import CasFsckReport, run_fsck
 from srl.cas.privacy import redact_store_path
 from srl.cas.t7_identity import (
     WAIT_STORAGE_FAIL_REASON,
@@ -370,6 +384,120 @@ class LocalArtifactStore(ArtifactStore):
             failed_digests=failed,
         )
 
+    # ------------------------------------------------------------------
+    # WP-C21 transaction engine integration.
+    # ------------------------------------------------------------------
+    # The methods below layer the transaction engine (see :mod:`srl.cas.engine`)
+    # on top of the simple ``put`` path. ``ingest_bytes`` is the receipt-last,
+    # crash-safe ingest; ``fsck_full`` is the rich sweep (corruption, descriptor,
+    # size, receipt checks); ``recover_partials`` reports stale partials. The
+    # plain ``put``/``fsck`` methods are preserved unchanged for backward
+    # compatibility with WP-C20 callers and tests.
+
+    def ingest_bytes(
+        self,
+        source_bytes: bytes,
+        media_type: str,
+        *,
+        capacity_hook: object | None = None,
+        used_bytes: int = 0,
+        created_utc: str | None = None,
+    ) -> IngestOutcome:
+        """Ingest ``source_bytes`` as a transactional, receipt-last publish.
+
+        Delegates to :func:`srl.cas.engine.ingest`, rooting the transaction at
+        this store's root. Returns an :class:`~srl.cas.engine.IngestOutcome`
+        carrying the published digest, the descriptor, and the commit-marker
+        receipt. On dedup (the object already exists) the outcome is returned
+        with ``deduplicated=True`` and no bytes are written.
+
+        Parameters
+        ----------
+        source_bytes:
+            The bytes to ingest.
+        media_type:
+            IANA-style media type recorded on the descriptor.
+        capacity_hook:
+            Optional callable ``(used_bytes, size_bytes) -> None`` consulted
+            before any byte is written; raises
+            :class:`~srl.cas.engine.QuotaExceededError` to refuse the ingest.
+        used_bytes:
+            Current aggregate usage in bytes, forwarded to ``capacity_hook``.
+        created_utc:
+            Optional canonical timestamp override (tests pin it for determinism).
+
+        Returns
+        -------
+        IngestOutcome
+            The result of the ingest (descriptor, receipt, digest, dedup flag).
+
+        Raises
+        ------
+        QuotaExceededError
+            If the capacity hook refuses the ingest (before any byte is written).
+        CasIntegrityError
+            If the read-back re-hash disagrees with the source hash.
+        StoreError
+            If ``media_type`` is malformed or a path-safety check fails.
+        """
+        try:
+            return engine_ingest(
+                root=self._root,
+                source_bytes=source_bytes,
+                media_type=media_type,
+                capacity_hook=capacity_hook,  # type: ignore[arg-type]
+                used_bytes=used_bytes,
+                created_utc=created_utc,
+            )
+        except (QuotaExceededError, CasIntegrityError):
+            # These are typed CAS failures; let them propagate unchanged so a
+            # caller's ``except QuotaExceededError`` / ``except CasIntegrityError``
+            # still catches them.
+            raise
+        except ContractError as exc:
+            # Structural failures (bad media_type, path-safety) are surfaced as
+            # StoreError so the store family stays uniform for callers.
+            raise StoreError(str(exc)) from exc
+
+    def fsck_full(self) -> CasFsckReport:
+        """Run the rich integrity sweep (corruption, descriptor, size, receipt).
+
+        Delegates to :func:`srl.cas.fsck.run_fsck`. Unlike :meth:`fsck` (which
+        reports only per-object hash pass/fail), this sweep cross-checks
+        descriptor and receipt presence and size consistency, and returns typed
+        issue entries. Read-only.
+        """
+        return run_fsck(self._root)
+
+    def recover_partials(self) -> list[PartialEntry]:
+        """List stale partial files in ``<root>/incoming/``.
+
+        Delegates to :func:`srl.cas.engine.recover_partials`. The engine never
+        auto-deletes partials; this method reports them so an operator (or the
+        autonomy layer) can decide whether to resume or delete.
+        """
+        return engine_recover_partials(self._root)
+
+    def read_descriptor(self, digest: str) -> dict[str, object] | None:
+        """Return the stored ``ObjectDescriptor/v1`` for ``digest``, or ``None``.
+
+        Reads ``descriptors/<digest>.json`` if present. Returns ``None`` if the
+        descriptor is absent (the object may still be published but its
+        descriptor write was interrupted). Does not validate; callers that need
+        a validated record use :func:`srl.cas.fsck.run_fsck`.
+        """
+        _validate_digest_argument(digest)
+        path = self._root / "descriptors" / f"{digest}.json"
+        if not path.is_file():
+            return None
+        try:
+            parsed: object = _json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return None
+        if isinstance(parsed, dict):
+            return parsed
+        return None
+
 
 class T7ArtifactStore(ArtifactStore):
     """A T7-volume content-addressed store — **stub, refuses all operations**.
@@ -488,8 +616,13 @@ __all__ = [
     "STORE_FAIL_REASON",
     "ArtifactDescriptor",
     "ArtifactStore",
+    "CasFsckReport",
+    "CasIntegrityError",
     "FsckReport",
+    "IngestOutcome",
     "LocalArtifactStore",
+    "PartialEntry",
+    "QuotaExceededError",
     "StoreError",
     "StoreIntegrityError",
     "StoreWaitError",
