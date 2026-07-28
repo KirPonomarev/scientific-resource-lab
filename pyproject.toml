@@ -15,8 +15,13 @@ requires-python = ">=3.11"
 license = "Apache-2.0"
 # Runtime dependencies. The package was stdlib-only through Phase A; the
 # contracts layer (WP-B10) adds `jsonschema` for meta-validation of shipped
-# 2020-12 schema documents. See docs/adr/0002-jsonschema-library.md.
-dependencies = ["jsonschema>=4.23"]
+# 2020-12 schema documents (docs/adr/0002-jsonschema-library.md). The units
+# core pack (WP-E40) adds `pint` for dimensional analysis and unit conversion,
+# isolated behind the units adapter (docs/adr/0003-pint-dependency.md).
+dependencies = [
+    "jsonschema>=4.23",
+    "pint>=0.25.3",
+]
 authors = [{ name = "Scientific Resource Lab contributors" }]
 keywords = ["scientific-computing", "reproducibility", "agents", "evidence"]
 classifiers = [
