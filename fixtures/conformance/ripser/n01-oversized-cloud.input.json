@@ -1,0 +1,1 @@
+{"ambient_dim":2,"description":"A point cloud with more than MAX_POINTS (500) points is rejected with RESOURCE_LIMIT before any compute. The adapter never silently truncates or samples.","expected":"reject","maxdim":0,"n_points":501,"operation":"compute_persistence","vector_id":"wp42-n01-oversized-cloud"}

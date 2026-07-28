@@ -1,0 +1,217 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srlab.dev/v1/PilotSpec.json",
+  "title": "PilotSpec/v1",
+  "description": "A retrospective pilot specification (WP-G60): the public, content-addressed description of a retrospective analysis over ALREADY-EXTANT artifacts. It carries ONLY sha256 digests of source artifacts (never paths), the retrospective window, the preprocessing scope, the features, the metrics with their tolerances, the null generators, the seed policy, and digests of the catalog / policy / packs / output schemas it was authored against. It is honest by construction: status_promotion_allowed is pinned to false (a pilot cannot promote a claim's status), prospective_holdout_materialization_allowed is pinned to false (a pilot cannot authorize materializing prospective holdout data), and grants_authority is pinned to false (a pilot is a description, not an authority). A null or inconclusive outcome is a VALID pilot outcome; execution conformance is NOT statistical power. Canonical JSON contract: sorted keys, compact separators, UTF-8, no NaN/Infinity, trailing newline.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "pilot_id",
+    "source_artifact_digests",
+    "retrospective_window",
+    "preprocessing_scope",
+    "features",
+    "metrics",
+    "null_generators",
+    "seed_policy",
+    "pack_digests",
+    "catalog_digest",
+    "policy_digest",
+    "output_schemas",
+    "status_promotion_allowed",
+    "prospective_holdout_materialization_allowed",
+    "created_utc",
+    "canonical_writes",
+    "grants_authority"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Identity anchor; const for PilotSpec/v1.",
+      "type": "string",
+      "const": "PilotSpec/v1"
+    },
+    "pilot_id": {
+      "description": "Content-addressed identity: sha256 over the canonical encoding of the spec WITHOUT this field, prefixed 'sha256:'. Computed by srl.pilot.spec.freeze_spec. Two independent agents that author the same pilot compute the same pilot_id (content-addressed determinism).",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "source_artifact_digests": {
+      "description": "The sha256 digests of the ALREADY-EXTANT source artifacts the retrospective analysis reads. Hashes ONLY: a public spec never carries a local or remote path, only the content-addressed digest of each source artifact. A reader resolves the digests through its OWN private artifact store (see srl.pilot.overlay); the public repo only ever sees the digests. uniqueItems so two equal digests do not double-count a source.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "retrospective_window": {
+      "description": "The retrospective window: the [start_utc, end_utc] interval the analysis covers, and the split_rule that defines how the window is divided (e.g. 'chronological_80_20', 'expanding_window'). The window is RETROSPECTIVE: it bounds an analysis over already-extant data; it does not authorize collecting or materializing future/prospective data.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "start_utc",
+        "end_utc",
+        "split_rule"
+      ],
+      "properties": {
+        "start_utc": {
+          "description": "RFC 3339 UTC timestamp at seconds precision (inclusive window start). No offset, no fractional seconds.",
+          "type": "string",
+          "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]Z$"
+        },
+        "end_utc": {
+          "description": "RFC 3339 UTC timestamp at seconds precision (inclusive window end). No offset, no fractional seconds. MUST be >= start_utc (enforced by srl.pilot.spec).",
+          "type": "string",
+          "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]Z$"
+        },
+        "split_rule": {
+          "description": "A named, deterministic rule that divides the window into (fit, evaluate) partitions. The rule is a pure function of the window; the same window + rule yields the same partition on any machine. Honest about scope: a split_rule operates WITHIN the retrospective window only.",
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "preprocessing_scope": {
+      "description": "A human- and machine-readable description of the preprocessing applied WITHIN the retrospective window before feature extraction (e.g. 'demean', 'first_difference', 'winsorize_p1p99'). A free-form string so the spec can name arbitrary deterministic transforms; the determinism comes from the seed_policy and the named null generators, not from this string's shape. May be empty for a raw (no-preprocessing) pilot.",
+      "type": "string"
+    },
+    "features": {
+      "description": "The ordered list of feature names the retrospective analysis extracts from the preprocessed window. Each entry is a non-empty string. May be empty for a pilot that computes no features (e.g. a pure null-distribution characterization). uniqueItems so a feature is not double-counted.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "metrics": {
+      "description": "The metrics the retrospective analysis reports, each with a tolerance_decimal: the comparison tolerance as a decimal policy string (matches ^-?[0-9]+(\\.[0-9]+)?$, no exponent). Two metric values whose absolute difference is <= tolerance_decimal are reported as equal-within-tolerance, not as distinct. An empty metrics array means the pilot characterizes a null distribution and reports no point metric.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "tolerance_decimal"
+        ],
+        "properties": {
+          "name": {
+            "description": "The metric name (non-empty string).",
+            "type": "string",
+            "minLength": 1
+          },
+          "tolerance_decimal": {
+            "description": "The comparison tolerance as a decimal policy string matching ^-?[0-9]+(\\.[0-9]+)?$ (no exponent). A non-negative value; two metric values within this absolute tolerance are equal-within-tolerance.",
+            "type": "string",
+            "pattern": "^-?[0-9]+(\\.[0-9]+)?$"
+          }
+        }
+      },
+      "uniqueItems": true
+    },
+    "null_generators": {
+      "description": "The null-distribution generators the retrospective analysis uses to produce a reference distribution under the null hypothesis. Each entry is a typed generator (phase_randomized, block_bootstrap, or permutation) with a non-negative integer seed. The generators are deterministic given the seed_policy; the SAME spec + seed yields the SAME null distribution on any machine. May be empty if the pilot computes no null distribution.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "seed"
+        ],
+        "properties": {
+          "kind": {
+            "description": "The null generator kind: phase_randomized (phase-randomized Fourier surrogates), block_bootstrap (block bootstrap resampling), or permutation (label permutation). Each is a well-defined null model; the seed pins the exact draws.",
+            "type": "string",
+            "enum": [
+              "phase_randomized",
+              "block_bootstrap",
+              "permutation"
+            ]
+          },
+          "seed": {
+            "description": "A non-negative integer seed for this null generator. Engines consume this verbatim; two pilots byte-identical except in a null-generator seed produce DIFFERENT null distributions.",
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "seed_policy": {
+      "description": "Determinism policy: a non-negative seed integer (the PRNG seed the analysis MUST use) and a positive threads integer (the thread budget the analysis MUST NOT exceed). Two specs byte-identical except in seed_policy produce DIFFERENT results; two specs byte-identical INCLUDING seed_policy produce byte-identical results (analysis determinism).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "seed",
+        "threads"
+      ],
+      "properties": {
+        "seed": {
+          "description": "A non-negative integer PRNG seed. The analysis consumes this verbatim.",
+          "type": "integer",
+          "minimum": 0
+        },
+        "threads": {
+          "description": "A positive integer thread budget (>=1). The analysis MUST NOT exceed this.",
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "pack_digests": {
+      "description": "The sha256 digests of the adapter packs the retrospective analysis was authored against. Hashes ONLY (never paths). A change in a pack changes its digest, so a stored spec's pack_digests let an executor detect a stale spec. May be empty for a pilot that uses no adapter pack.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      },
+      "uniqueItems": true
+    },
+    "catalog_digest": {
+      "description": "The sha256 digest of the canonical encoding of the capability catalog the pilot was authored against. A change in catalog changes this digest, so an executor can detect a stale pilot. Hash ONLY (never a path).",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "policy_digest": {
+      "description": "The sha256 digest of the canonical encoding of the admission policy the pilot was authored against. A change in policy changes this digest. Hash ONLY (never a path).",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "output_schemas": {
+      "description": "The schema names the pilot's results are expected to conform to (e.g. ['EvidenceAssessment']). Carried so a reader knows what the pilot emits. May be empty.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "status_promotion_allowed": {
+      "description": "Safety const: a pilot CANNOT authorize promoting a claim's status (e.g. from under_investigation to supported). Pinned to false. A pilot is an analysis description; status promotion is a governance decision this codebase does not perform. A true value is a contract violation.",
+      "type": "boolean",
+      "const": false
+    },
+    "prospective_holdout_materialization_allowed": {
+      "description": "Safety const: a pilot CANNOT authorize the materialization of a prospective holdout (data held out for out-of-sample validation that does not yet exist at authoring time). Pinned to false. A retrospective pilot reads ALREADY-EXTANT data; materializing prospective holdout data is a separate authority path this codebase does not provide. A true value is a contract violation.",
+      "type": "boolean",
+      "const": false
+    },
+    "created_utc": {
+      "description": "RFC 3339 UTC timestamp at seconds precision (YYYY-MM-DDTHH:MM:SSZ). No offset, no fractional seconds.",
+      "type": "string",
+      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]Z$"
+    },
+    "canonical_writes": {
+      "description": "Safety const: a pilot spec is immutable once authored. Always 0; a non-zero value is a contract violation.",
+      "type": "integer",
+      "const": 0
+    },
+    "grants_authority": {
+      "description": "Safety const: a pilot spec never grants authority on its own. Always false; a true value is a contract violation. A pilot is a description, not an authority.",
+      "type": "boolean",
+      "const": false
+    }
+  }
+}
