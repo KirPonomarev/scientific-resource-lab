@@ -1,0 +1,35 @@
+{
+  "scenario_id": "p03-explicit-exclusion-typed",
+  "description": "A request that explicitly names a single profile (algebra_exact) produces EXCLUDED_TYPED for the other 14 profiles (reason 'not_requested'), not NOT_APPLICABLE. This is the typed-exclusion path: the operator asked for exactly one profile, so the others are explicitly excluded with a reason, never silently dropped. With the shipped catalog, algebra_exact is WAIT_CAPABILITY (adapter future); the 14 others are EXCLUDED_TYPED. The decision still covers all 15 profiles (no silent drops).",
+  "claim": {
+    "schema_version": "ScientificClaim/v1",
+    "claim_id": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "statement": "A bare claim with no matching classifier keywords; the operator explicitly requests algebra_exact.",
+    "claim_class": "candidate_hypothesis",
+    "claim_status": "proposed",
+    "epistemic_source": "operator",
+    "support_refs": [],
+    "created_utc": "2026-07-28T00:00:00Z",
+    "canonical_writes": 0,
+    "grants_authority": false
+  },
+  "request": {
+    "claim_id": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "requested_profiles": ["algebra_exact"],
+    "resource_class": "default",
+    "seed": 0,
+    "threads": 1,
+    "output_schemas": []
+  },
+  "expected": {
+    "selections": {
+      "algebra_exact": "WAIT_CAPABILITY"
+    },
+    "selected_profiles": [],
+    "waiting_profiles": ["algebra_exact"],
+    "excluded_typed_count": 14,
+    "excluded_typed_reason": "not_requested",
+    "not_applicable_count": 0,
+    "plan_step_count": 15
+  }
+}

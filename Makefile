@@ -2,7 +2,7 @@
 # Portable: no absolute paths or usernames. Uses uv for everything.
 # Targets run via `uv run` so contributors only need uv installed.
 
-.PHONY: bootstrap lint format typecheck test build verify repro-check gate-wp03 gate-wp10 gate-wp11 gate-wp12 gate-wp13 clean help
+.PHONY: bootstrap lint format typecheck test build verify repro-check gate-wp03 gate-wp10 gate-wp11 gate-wp12 gate-wp13 gate-wp14 router-determinism clean help
 
 help: ## Show this help.
 	@awk 'BEGIN {FS = ":.*##"; printf "Usage:\n  make <target>\n\nTargets:\n"} \
@@ -78,6 +78,24 @@ gate-wp12: ## Run the WP-B12 transformations acceptance gate.
 # (which depend on jsonschema), so it runs under `uv run python`.
 gate-wp13: ## Run the WP-B13 evidence-model acceptance gate.
 	uv run python scripts/checks/wp13-gate.py
+
+# WP-B14 router and planner gate. Runs the four acceptance checks
+# (B14-01..B14-04) — determinism (same inputs -> byte-identical plan across 3
+# rebuilds incl. shuffled input keys), decision coverage (all 15 profiles, no
+# silent drops), no silent fallback (remote_required never runs local), and
+# unknown capability -> WAIT_CAPABILITY (plus cyclic-dependency + resource
+# overflow negatives) — and prints a GateReceipt/v1 JSON receipt; non-zero
+# exit on any FAIL. Uses the contracts + planning layer (which depend on
+# jsonschema), so it runs under `uv run python`.
+gate-wp14: ## Run the WP-B14 router-planner acceptance gate.
+	uv run python scripts/checks/wp14-gate.py
+
+# Router/planner determinism proof: rebuild the golden plan twice and compare
+# bytes. Fails closed the moment the planner's output becomes input-order-
+# dependent (a regression that would break content-addressed identity). Prints
+# a RouterDeterminismReceipt/v1 JSON receipt; non-zero exit on failure.
+router-determinism: ## Run the router/planner determinism check.
+	uv run python scripts/checks/router-determinism.py
 
 clean: ## Remove build artifacts and caches.
 	rm -rf dist build .pytest_cache .mypy_cache .ruff_cache
