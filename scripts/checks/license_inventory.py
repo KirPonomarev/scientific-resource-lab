@@ -102,6 +102,7 @@ _CLASSIFIER_LICENSES: Final[dict[str, str]] = {
 # Data structures
 # ---------------------------------------------------------------------------
 
+
 @dataclass(frozen=True)
 class PackageLicense:
     name: str
@@ -123,6 +124,7 @@ class Report:
 # ---------------------------------------------------------------------------
 # License extraction and classification
 # ---------------------------------------------------------------------------
+
 
 def _classifier_license(classifiers: list[str]) -> str | None:
     """Return the first recognized license from Trove classifiers."""
@@ -188,6 +190,7 @@ def _extract_package_license(dist: Distribution) -> tuple[str, str]:
 # Locked package discovery from uv.lock
 # ---------------------------------------------------------------------------
 
+
 def _locked_package_names(lock_path: Path) -> list[str]:
     """Return the list of package names from a uv.lock file."""
     with lock_path.open("rb") as handle:
@@ -208,6 +211,7 @@ def _normalise_name(name: str) -> str:
 # ---------------------------------------------------------------------------
 # Scanning
 # ---------------------------------------------------------------------------
+
 
 def scan() -> Report:
     """Build the license inventory from the locked dependency closure.
@@ -270,6 +274,7 @@ def scan() -> Report:
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
+
 
 def main() -> int:
     """Entry point: print JSON inventory and exit 1 on denied/unknown licenses."""

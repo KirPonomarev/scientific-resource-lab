@@ -62,6 +62,7 @@ _URL_RE: Final[re.Pattern[str]] = re.compile(r"https?://[^\s\)\]\>\"]+")
 # Data structures
 # ---------------------------------------------------------------------------
 
+
 @dataclass(frozen=True)
 class LinkIssue:
     file: str
@@ -82,6 +83,7 @@ class Report:
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _strip_inline_code(line: str) -> str:
     """Remove inline Markdown code spans so URLs inside backticks are not scanned."""
@@ -126,6 +128,7 @@ def _tracked_markdown_files() -> list[str]:
 # ---------------------------------------------------------------------------
 # Scanning
 # ---------------------------------------------------------------------------
+
 
 def scan() -> Report:
     """Scan all tracked Markdown files and check their link domains."""
@@ -191,6 +194,7 @@ def scan() -> Report:
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
+
 
 def main() -> int:
     """Entry point: print JSON report and exit 1 if any link is outside the allowlist."""

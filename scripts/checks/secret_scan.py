@@ -80,9 +80,7 @@ _LONG_HEX_SKIP_FILES: Final[frozenset[str]] = frozenset({"uv.lock"})
 
 # Path prefixes of files whose long-hex content is a content-hash manifest
 # rather than a secret (e.g. public synthetic fixture manifests).
-_LONG_HEX_SKIP_PREFIXES: Final[tuple[str, ...]] = (
-    "fixtures/public/",
-)
+_LONG_HEX_SKIP_PREFIXES: Final[tuple[str, ...]] = ("fixtures/public/",)
 
 # Snippet sanitization constants.
 _SNIPPET_CONTEXT_CHARS: Final[int] = 12
@@ -93,6 +91,7 @@ _SNIPPET_MAX_CHARS: Final[int] = 80
 # ---------------------------------------------------------------------------
 # Data structures
 # ---------------------------------------------------------------------------
+
 
 @dataclass(frozen=True)
 class Finding:
@@ -118,6 +117,7 @@ class Report:
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _shannon_entropy(value: str) -> float:
     """Return the Shannon entropy of *value* in bits per character."""
@@ -196,6 +196,7 @@ def _load_allowlist(path: Path) -> set[str]:
 # ---------------------------------------------------------------------------
 # Scanning
 # ---------------------------------------------------------------------------
+
 
 def _scan_credential_patterns(
     line: str,
@@ -322,6 +323,7 @@ def scan(repo_root: Path | None = None) -> Report:
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
+
 
 def main() -> int:
     """Entry point: scan, print JSON, exit 1 if findings exist."""

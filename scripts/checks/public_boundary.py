@@ -127,6 +127,7 @@ _GIT_EXECUTABLE: Final[str] = shutil.which("git") or "git"
 # Data structures
 # ---------------------------------------------------------------------------
 
+
 @dataclass(frozen=True)
 class Violation:
     """A single public-boundary violation."""
@@ -149,6 +150,7 @@ class Report:
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _tracked_files() -> list[str]:
     """Return tracked file paths relative to the repository root."""
@@ -234,6 +236,7 @@ def _collect_sensitive_json_keys(obj: object, path: str = "") -> list[str]:
 # ---------------------------------------------------------------------------
 # Scanning
 # ---------------------------------------------------------------------------
+
 
 def _scan_text_patterns(
     line: str,
@@ -371,6 +374,7 @@ def scan() -> Report:
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
+
 
 def main() -> int:
     """Entry point: scan, print JSON, exit 1 if violations exist."""
