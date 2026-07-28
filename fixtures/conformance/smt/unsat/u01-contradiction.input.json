@@ -1,0 +1,14 @@
+{
+  "case_id": "u01-contradiction",
+  "category": "unsat",
+  "description": "A direct contradiction (x > 0) and (x < 0) is unsatisfiable over the integers.",
+  "formula_spec": [
+    "and",
+    [">", ["int-var", "x"], ["int-const", 0]],
+    ["<", ["int-var", "x"], ["int-const", 0]]
+  ],
+  "expected_result": "unsat",
+  "solver": "z3",
+  "timeout_seconds": 5,
+  "notes": "The simplest UNSAT case: two strict bounds on one integer that share no integer."
+}
