@@ -51,10 +51,15 @@ jobs:
       # dependency set as a requirements file so pip-audit can scan it;
       # process substitution is avoided for shell portability. The local project
       # package is excluded because pip-audit cannot audit an editable source
-      # tree and its wheel hash is not available in the export.
+      # tree and its wheel hash is not available in the export. The export omits
+      # hashes (--no-hashes) because uv's dependency overrides (e.g. dropping
+      # persim from ripser's closure) remove packages from the resolved tree
+      # that pip would otherwise re-resolve transitively from ripser's wheel
+      # metadata, causing a --require-hashes mismatch that is not a real
+      # vulnerability. The committed uv.lock remains the source of truth.
       - name: Dependency audit
         run: |
-          uv export --locked --format requirements-txt --no-emit-project > /tmp/requirements.txt
+          uv export --locked --format requirements-txt --no-emit-project --no-hashes > /tmp/requirements.txt
           uv run --with pip-audit==2.8.0 pip-audit --requirement /tmp/requirements.txt
 
   license-inventory:
