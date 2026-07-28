@@ -1,0 +1,1 @@
+{"case_id":"timeout","expected":"timeout","kind":"timeout","notes":"sleeper.v1 sleeps 30s with a 1s wall cap. The process-group watchdog SIGTERM->grace->SIGKILLs the child; outcome is timeout, no receipt, no orphan.","payload":{"adapter_id":"sleeper.v1","input":{"seconds":30},"wall_seconds":1},"schema_version":"AdversarialCase/v1"}

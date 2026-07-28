@@ -1,0 +1,1 @@
+{"case_id":"symlink-device","expected":"rejected","kind":"symlink_device","notes":"A device path as an adapter id. The registry is a string-keyed dict, not a path resolver; /dev/null is not a key and is rejected before spawn.","payload":{"adapter_id":"/dev/null"},"schema_version":"AdversarialCase/v1"}

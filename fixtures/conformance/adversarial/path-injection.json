@@ -1,0 +1,1 @@
+{"case_id":"path-injection","expected":"rejected","kind":"path_injection","notes":"Path-traversal string as an adapter id. The registry is not a filesystem; the id is an unknown key and is rejected before spawn. There is no path the id resolves against.","payload":{"adapter_id":"../../etc/passwd"},"schema_version":"AdversarialCase/v1"}

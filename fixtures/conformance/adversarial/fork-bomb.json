@@ -1,0 +1,1 @@
+{"case_id":"fork-bomb","expected":"resource_limit","kind":"fork_bomb","notes":"forker.v1 forks repeatedly; RLIMIT_NPROC=256 stops the fan-out with EAGAIN. The number of forks is <= 256 and no orphan survives the watchdog kill.","payload":{"adapter_id":"forker.v1","input":{"count":1024},"wall_seconds":10},"schema_version":"AdversarialCase/v1"}

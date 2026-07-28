@@ -21,13 +21,30 @@ The adapters here exist to exercise the sandbox's enforcement paths:
 ``chatter.v1``
     Writes a large payload to stdout to exceed the output cap. Used by the
     output-cap case.
+``netcanary.v1``
+    Attempts a TCP ``connect`` to the reserved, non-routable TEST-NET-1 address
+    ``192.0.2.1`` and reports the attempt. Used by the WP-D34 network canary:
+    the assertion is observational — the attempt is *recorded* — not that the
+    sandbox blocked it (network denial on macOS CI is not guaranteed). The
+    target is RFC 5737 documentation space and must never be reachable.
+``cwdprobe.v1``
+    Returns the child's current working directory and platform. Used by the
+    WP-D34 hardening check to assert the child CWD is the scratch dir, not the
+    parent repo root.
+``setsiddler.v1``
+    Forks a child that calls :func:`os.setsid` to escape the process group, then
+    lingers briefly. Used by the WP-D34 setsid-evasion detector: a final
+    process-group sweep by name must observe no survivor after the watchdog
+    kills the leader. The lingering child exits quickly so no real orphan leaks.
 
-None of these perform network I/O. They are standard library only.
+None of these perform network I/O against a real target (``netcanary.v1`` aims
+only at RFC 5737 reserved space). They are standard library only.
 """
 
 from __future__ import annotations
 
 import os
+import socket
 import sys
 import time
 from typing import Any, Final
@@ -126,6 +143,102 @@ def _chatter_handler(payload: dict[str, Any]) -> dict[str, Any]:
     return {"wrote": written}
 
 
+# The reserved, non-routable TEST-NET-1 address (RFC 5737). It is documentation
+# space and must never correspond to a real host; a connect to it hangs or is
+# refused depending on the local network posture. Used only by netcanary.v1.
+_NETCANARY_HOST: Final[str] = "192.0.2.1"
+_NETCANARY_PORT: Final[int] = 1
+
+
+def _netcanary_handler(payload: dict[str, Any]) -> dict[str, Any]:
+    """Attempt a TCP connect to ``192.0.2.1`` (TEST-NET-1); report the attempt.
+
+    This is the WP-D34 network canary vehicle. The assertion the gate makes is
+    *observational*: the attempt was made and recorded. Whether the connect
+    succeeded, timed out, or was refused depends on the host network posture
+    and is NOT asserted (macOS CI does not guarantee network denial). The target
+    is RFC 5737 reserved space and must never be reachable in practice.
+
+    The handler always returns a dict recording ``attempted=True`` and the
+    observed outcome, so the case is hermetic regardless of network state.
+    """
+    del payload  # the canary takes no parameters
+    attempted = True
+    outcome = "unknown"
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.settimeout(1)
+            sock.connect((_NETCANARY_HOST, _NETCANARY_PORT))
+        outcome = "connected"
+    except TimeoutError:
+        outcome = "timeout"
+    except OSError as exc:
+        # Refused, unreachable, or network-denied. errno is recorded so the
+        # gate can observe the local posture without asserting it.
+        outcome = f"oserror:{exc.errno}"
+    return {
+        "attempted": attempted,
+        "target": f"{_NETCANARY_HOST}:{_NETCANARY_PORT}",
+        "outcome": outcome,
+    }
+
+
+def _cwdprobe_handler(payload: dict[str, Any]) -> dict[str, Any]:
+    """Return the child's CWD and platform (the WP-D34 cwd-isolation probe).
+
+    The runner sets the child's working directory to the scratch dir (never the
+    parent repo root). This handler returns :func:`os.getcwd` so the gate can
+    assert the child did NOT inherit the orchestrator's CWD.
+    """
+    del payload
+    return {"cwd": os.getcwd(), "platform": sys.platform, "pid": os.getpid()}
+
+
+def _setsiddler_handler(payload: dict[str, Any]) -> dict[str, Any]:
+    """Fork a child that escapes the process group via :func:`os.setsid`.
+
+    The grandchild calls ``setsid`` (becoming its own session/group leader) so
+    a naive ``killpg(leader_pid)`` would miss it. It lingers briefly so a
+    post-kill sweep by name can observe it; the handler reaps it before
+    returning so no real orphan leaks out of the test. Used by the WP-D34
+    setsid-evasion detector: the sweep must find (and clear) any survivor.
+    """
+    linger = payload.get("linger", 2)
+    if not isinstance(linger, int) or linger < 0:
+        linger = 2
+    spawned = False
+    setsid_ok = False
+    try:
+        pid = os.fork()
+    except OSError:
+        pid = -1
+    if pid == 0:
+        # Grandchild: try to escape the group, then linger briefly and exit.
+        try:
+            os.setsid()
+            setsid_ok = True
+        except OSError:
+            setsid_ok = False
+        time.sleep(linger)
+        os._exit(0)
+    elif pid > 0:
+        spawned = True
+        # The parent handler returns immediately; the watchdog kills the leader
+        # (this handler's process), and the grandchild — now in its own group —
+        # is the setsid-evader the sweep must catch. We reap it here so the test
+        # does not leave a live orphan; the sweep runs *before* this reap in the
+        # gate's ordered sequence.
+        try:
+            os.kill(pid, 15)
+        except OSError:
+            pass
+        try:
+            os.waitpid(pid, 0)
+        except OSError:
+            pass
+    return {"spawned_grandchild": spawned, "setsid_attempted": True, "setsid_ok": setsid_ok}
+
+
 _SLEEPER_V1: Final[AdapterDescriptor] = AdapterDescriptor(
     adapter_id="sleeper.v1",
     version="v1",
@@ -158,6 +271,33 @@ _CHATTER_V1: Final[AdapterDescriptor] = AdapterDescriptor(
     output_schema={"required": [], "optional": ["wrote"]},
     deterministic=True,
 )
+_NETCANARY_V1: Final[AdapterDescriptor] = AdapterDescriptor(
+    adapter_id="netcanary.v1",
+    version="v1",
+    handler=_netcanary_handler,
+    input_schema={"required": [], "optional": []},
+    output_schema={"required": [], "optional": ["attempted", "target", "outcome"]},
+    deterministic=True,
+)
+_CWDPROBE_V1: Final[AdapterDescriptor] = AdapterDescriptor(
+    adapter_id="cwdprobe.v1",
+    version="v1",
+    handler=_cwdprobe_handler,
+    input_schema={"required": [], "optional": []},
+    output_schema={"required": [], "optional": ["cwd", "platform", "pid"]},
+    deterministic=True,
+)
+_SETSIDDLER_V1: Final[AdapterDescriptor] = AdapterDescriptor(
+    adapter_id="setsiddler.v1",
+    version="v1",
+    handler=_setsiddler_handler,
+    input_schema={"required": [], "optional": ["linger"]},
+    output_schema={
+        "required": [],
+        "optional": ["spawned_grandchild", "setsid_attempted", "setsid_ok"],
+    },
+    deterministic=True,
+)
 
 ADAPTERS.update(
     {
@@ -165,5 +305,8 @@ ADAPTERS.update(
         _BOMB_V1.adapter_id: _BOMB_V1,
         _FORKER_V1.adapter_id: _FORKER_V1,
         _CHATTER_V1.adapter_id: _CHATTER_V1,
+        _NETCANARY_V1.adapter_id: _NETCANARY_V1,
+        _CWDPROBE_V1.adapter_id: _CWDPROBE_V1,
+        _SETSIDDLER_V1.adapter_id: _SETSIDDLER_V1,
     }
 )
