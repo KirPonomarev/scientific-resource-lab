@@ -1,0 +1,52 @@
+{
+  "scenario_id": "p02-multi-profile-3step-dag",
+  "description": "A multi-profile claim (composition of coupled ODE subsystems) auto-classifies to dynamics, executable_ode_dae_sde_model, and model_composition. The plan is a 3-step DAG among the applicable profiles: model_composition depends on dynamics and executable_ode_dae_sde_model (its inputs come from their outputs), in topological order. With the shipped catalog (all adapters future/remote_required), all three are WAIT_CAPABILITY (adapterless -> honest wait); the DAG structure (depends_on edges) is still threaded so a future WP that lands adapters produces a runnable topological order.",
+  "claim": {
+    "schema_version": "ScientificClaim/v1",
+    "claim_id": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "statement": "We study the composition of coupled ODE subsystems forming a hierarchical model.",
+    "claim_class": "candidate_hypothesis",
+    "claim_status": "proposed",
+    "epistemic_source": "operator",
+    "support_refs": [],
+    "created_utc": "2026-07-28T00:00:00Z",
+    "canonical_writes": 0,
+    "grants_authority": false
+  },
+  "request": {
+    "claim_id": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "requested_profiles": [],
+    "resource_class": "default",
+    "seed": 1,
+    "threads": 2,
+    "output_schemas": []
+  },
+  "expected": {
+    "classifier_profiles": [
+      "dynamics",
+      "executable_ode_dae_sde_model",
+      "model_composition"
+    ],
+    "classifier_trace": ["R-ODE", "R-MODEL-COMPOSITION"],
+    "applicable_profiles": [
+      "dynamics",
+      "executable_ode_dae_sde_model",
+      "model_composition"
+    ],
+    "dag_edges": {
+      "model_composition": [
+        "dynamics",
+        "executable_ode_dae_sde_model"
+      ],
+      "dynamics": [],
+      "executable_ode_dae_sde_model": []
+    },
+    "selected_profiles": [],
+    "waiting_profiles": [
+      "dynamics",
+      "executable_ode_dae_sde_model",
+      "model_composition"
+    ],
+    "plan_step_count": 15
+  }
+}

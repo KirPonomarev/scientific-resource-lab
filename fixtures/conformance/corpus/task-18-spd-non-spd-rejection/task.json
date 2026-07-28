@@ -1,0 +1,21 @@
+{
+  "schema_version": "TaskSpec/v1",
+  "task_id": "task-18",
+  "title": "Non-SPD matrix rejection",
+  "category": "spd-geometry",
+  "input": {
+    "claim": {
+      "statement": "Detect that an input matrix is not symmetric positive definite; the SPD distance is undefined. Check the geometry and exact arithmetic."
+    },
+    "request": {
+      "requested_profiles": [
+        "geometry_tda",
+        "algebra_exact"
+      ]
+    }
+  },
+  "expected": {
+    "outcome": "WAIT_CAPABILITY",
+    "detail": "geometry_tda + algebra_exact auto-classify; no adapter -> WAIT_CAPABILITY"
+  }
+}

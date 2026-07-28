@@ -12,7 +12,8 @@ a policy that has been weakened or reshaped.
 
 The validation is intentionally strict and complete:
 
-- the schema version must be exactly ``AutonomyPolicy/v1``;
+- the schema version must be a known ``AutonomyPolicy`` version (v1 or v2),
+  with per-version cross-field constraints enforced;
 - all 19 expected keys must be present, with no extras;
 - each key must have the declared JSON type;
 - where a key is a string, its value must be one of the allowed enum members.
@@ -29,7 +30,16 @@ from pathlib import Path
 from typing import Any, Final
 
 # Schema identity. Bumping this is a governance change (see GOVERNANCE.md).
-POLICY_SCHEMA_VERSION: Final[str] = "AutonomyPolicy/v1"
+# v1: initial policy, lanes fixed at 4. v2 (governance-change GOV-0001,
+# operator-authorized): lanes may be 4..6. A policy document declares its
+# own version; the loader enforces the per-version constraints.
+POLICY_SCHEMA_VERSION: Final[str] = "AutonomyPolicy/v2"
+POLICY_SCHEMA_VERSIONS: Final[frozenset[str]] = frozenset(
+    {"AutonomyPolicy/v1", "AutonomyPolicy/v2"}
+)
+# v1 cross-field constraint: lanes fixed at exactly 4 under v1.
+_V1_SCHEMA_VERSION: Final[str] = "AutonomyPolicy/v1"
+_V1_LANES: Final[int] = 4
 
 # The embedded expectation: key -> (json type name, allowed values or None).
 # This is the authority. ``automation/policy.json`` must match it exactly.
@@ -44,12 +54,12 @@ _EXPECTED: Final[dict[str, tuple[str, frozenset[str] | None]]] = {
     "decision_policy": ("str", frozenset({"MATURE_ENGINEERING_V1"})),
     "deployment_allowed": ("bool", frozenset({"false"})),
     "external_pr_auto_merge": ("bool", frozenset({"false"})),
-    "max_parallel_implementation_lanes": ("int", frozenset({"4"})),
+    "max_parallel_implementation_lanes": ("int", frozenset({"4", "5", "6"})),
     "max_scientific_execution_wip": ("int", frozenset({"1"})),
     "merge_method": ("str", frozenset({"squash"})),
     "mode": ("str", frozenset({"noninteractive_within_scope"})),
     "public_repo": ("bool", None),
-    "schema_version": ("str", frozenset({POLICY_SCHEMA_VERSION})),
+    "schema_version": ("str", POLICY_SCHEMA_VERSIONS),
     "secret_use_in_public_ci": ("bool", frozenset({"false"})),
     "self_hosted_runner_allowed": ("bool", frozenset({"false"})),
     "t7_execution_allowed": ("bool", frozenset({"false"})),
@@ -133,13 +143,21 @@ def _validate_policy_dict(policy: dict[str, Any]) -> None:
                 msg = f"policy key {key!r} has value {token!r}, expected one of {sorted(allowed)}"
                 raise PolicyError(msg, key=key, reason="bad_value")
 
-    # Identity anchor: the schema version must be exactly v1.
-    if policy["schema_version"] != POLICY_SCHEMA_VERSION:
+    # Identity anchor: the schema version must be a known version.
+    if policy["schema_version"] not in POLICY_SCHEMA_VERSIONS:
         msg = (
             f"policy schema_version is {policy['schema_version']!r}, "
-            f"expected {POLICY_SCHEMA_VERSION!r}"
+            f"expected one of {sorted(POLICY_SCHEMA_VERSIONS)}"
         )
         raise PolicyError(msg, key="schema_version", reason="bad_schema_version")
+
+    # Cross-field version constraints: v1 fixes lanes at exactly 4.
+    if (
+        policy["schema_version"] == _V1_SCHEMA_VERSION
+        and policy["max_parallel_implementation_lanes"] != _V1_LANES
+    ):
+        msg = "AutonomyPolicy/v1 requires max_parallel_implementation_lanes=4"
+        raise PolicyError(msg, key="max_parallel_implementation_lanes", reason="version_constraint")
 
 
 def load_policy(path: str | Path) -> dict[str, Any]:

@@ -1,0 +1,18 @@
+{
+  "schema_version": "TaskSpec/v1",
+  "task_id": "task-29",
+  "title": "Packet containing local path marker refused",
+  "category": "public-redaction",
+  "input": {
+    "packet": {
+      "schema_version": "ScientificObjectEnvelope/v1",
+      "note": "computed from /Users/alice/secret/local.bin",
+      "canonical_writes": 0,
+      "grants_authority": false
+    }
+  },
+  "expected": {
+    "outcome": "REJECT_CONTRACT",
+    "detail": "packet bytes contain local-path marker /Users/ -> public-boundary refusal"
+  }
+}

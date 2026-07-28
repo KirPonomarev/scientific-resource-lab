@@ -1,0 +1,20 @@
+{
+  "schema_version": "TaskSpec/v1",
+  "task_id": "task-19",
+  "title": "Confounded naive estimate flagged",
+  "category": "causal-assumptions",
+  "input": {
+    "claim": {
+      "statement": "A naive causal estimate ignores an observed confounder; flag it via causal identification and a time series analysis."
+    },
+    "request": {
+      "requested_profiles": [
+        "causal_time_series"
+      ]
+    }
+  },
+  "expected": {
+    "outcome": "WAIT_CAPABILITY",
+    "detail": "causal_time_series auto-classifies; no adapter -> WAIT_CAPABILITY"
+  }
+}

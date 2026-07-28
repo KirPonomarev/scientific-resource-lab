@@ -1,0 +1,19 @@
+{
+  "schema_version": "RunnerFixture/v1",
+  "fixture_id": "memory-bomb-descriptor",
+  "purpose": "A descriptor for the memory-bomb enforcement check. The child allocates memory in 64 MiB slabs until it is killed. On Linux (CI) RLIMIT_AS (derived from policy rss_bytes) kills the child with MemoryError/SIGSEGV; on macOS RLIMIT_AS cannot be lowered below the current hard limit, so the wall watchdog is the backstop. Either way the run does not complete and no receipt is written.",
+  "expected_behavior": {
+    "outcome": "not_completed",
+    "status_set": ["resource_limit", "timeout", "failed"],
+    "receipt_written": false,
+    "platform_split": {
+      "linux": "RLIMIT_AS is enforced; the child is killed when its address space exceeds policy.default.rss_bytes (1.5 GiB in M1). The child exits non-zero (MemoryError); the runner reports resource_limit or failed.",
+      "macos": "RLIMIT_AS cannot be lowered (the kernel rejects it); the wall watchdog kills the child at wall_seconds. The runner reports timeout. The other limits (CPU, FSIZE, NOFILE, NPROC) are still applied."
+    },
+    "rss_bytes_assertion": "usage.rss_bytes > 0 (the run consumed real memory before being bounded)"
+  },
+  "adapter_id": "bomb.v1",
+  "input_payload": {},
+  "wall_seconds": 3,
+  "notes": "bomb.v1 is a test-only adapter (loaded only under SRL_RUNNER_TEST_ADAPTERS=1). The gate accepts {resource_limit, timeout, failed} as a bounded outcome and asserts receipt_written is False."
+}

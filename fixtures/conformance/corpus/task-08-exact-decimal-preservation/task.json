@@ -1,0 +1,15 @@
+{
+  "schema_version": "TaskSpec/v1",
+  "task_id": "task-08",
+  "title": "Decimal string preservation (0.1 stays 0.1)",
+  "category": "exact-arithmetic",
+  "input": {
+    "ir": {
+      "const": "0.1"
+    }
+  },
+  "expected": {
+    "outcome": "PASS",
+    "detail": "decimal const validates against the decimal-string policy -> PASS"
+  }
+}

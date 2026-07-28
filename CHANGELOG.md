@@ -11,8 +11,42 @@ is supported. See `README.md` and `GOVERNANCE.md` for the evidence rules.
 
 ## [Unreleased]
 
+
 ### Added
 
+- Thirty-task public conformance corpus under `srl.planning` (WP-B15):
+  `srl.planning.corpus` — a pure, no-I/O corpus runner (`load_corpus`,
+  `run_task`, `verdict`, `run_corpus`) that executes each `TaskSpec/v1`
+  against the real science-lab pipeline (classifier → router → planner) and
+  the real contract validators (the MathIR allowlist, the artifact-ref
+  contract, the schema consts), resolving each task to one of seven typed
+  outcomes (`PASS` / `WAIT_CAPABILITY` / `REJECT_CONTRACT` / `REJECT_IR` /
+  `REJECT_RESOURCE` / `REJECT_LICENSE` / `REJECT_AUTHORITY`; `MISMATCH` is
+  the internal verdict sentinel). The runner NEVER writes outside memory and
+  maps every pipeline exception to the matching typed rejection outcome. The
+  honesty model is load-bearing: because no scientific backend ships in this
+  codebase, the dominant outcome is `WAIT_CAPABILITY` (an applicable profile
+  with no available adapter waits honestly rather than fabricating one); the
+  two exact-arithmetic tasks are the only `PASS` outcomes (clean IR constants
+  with no capability engaged); `REJECT_IR` is a real `UnsupportedOperatorError`
+  from the closed allowlist (`arith1.sqrt` / `arith1.log` for the domain
+  violations); `REJECT_RESOURCE` is a real `ResourceAdmissionError`
+  (`WAIT_REMOTE_EXECUTOR`); `REJECT_CONTRACT` is a real artifact-ref /
+  structural rejection (incl. the public-boundary refusal of a packet
+  smuggling a local path); `REJECT_AUTHORITY` is the real `grants_authority=
+  false` schema const; `REJECT_LICENSE` is the documented corpus copyleft-
+  refusal policy (GPL/AGPL/LGPL/SSPL/BUSL). `fixtures/conformance/corpus/`
+  — exactly 30 public synthetic tasks (`task-NN-<slug>/task.json` +
+  `README.md`) across 18 declared categories (algebraic identities, units
+  and dimensions, domain violations, exact arithmetic, SAT/UNSAT/UNKNOWN,
+  symbolic-law false positives, topology, SPD geometry, causal assumptions,
+  uncertainty, ODE/PDE interface, model composition, literature extraction,
+  proof obligations, resource/license/path/authority rejection), each with a
+  category-coverage map (`manifest.json`); `scripts/checks/wp15-corpus.py`
+  — the `CorpusReceipt/v1` check (30 outcomes, zero mismatches, category
+  coverage vs manifest, byte-identical across runs); `make corpus` target;
+  `public_conformance_corpus` CI job in `contracts.yml`;
+  `tests/planning/test_corpus.py`; `docs/contracts/conformance-corpus.md`.
 - Evidence assessment and science-lab run receipt model under `srl.semantic`
   (WP-B13): `EvidenceAssessment/v1` (`evidence-assessment.json`) — a typed
   assessment of the evidence behind a `ScientificClaim` on **11 orthogonal**
@@ -390,6 +424,69 @@ is supported. See `README.md` and `GOVERNANCE.md` for the evidence rules.
 - `.python-version` pinning the project baseline to `3.12`.
 - Committed `uv.lock` and tracked the WP-A01 closeout receipt
   (`automation/receipts/wp-closeout-a01.json`).
+- Deterministic claim router and plan builder under `srl.planning` (WP-B14):
+  `ScienceLabRunRequest/v1` (`science-lab-run-request.json`) — a request to run
+  the science lab against a `ScientificClaim`, carrying the requested capability
+  profiles, the resource class, and the seed/threads policy, with the two
+  request-specific safety consts pinned
+  (`prospective_holdout_materialization_allowed=false`,
+  `status_promotion_allowed=false`) — a request is an intent, never authority;
+  `ScienceLabPlan/v1` (`science-lab-plan.json`) — a deterministic execution plan
+  produced by the planner, a DAG of steps in topological order with typed
+  selection states (`SELECTED` / `EXCLUDED_TYPED` / `NOT_APPLICABLE` /
+  `WAIT_CAPABILITY`), resource estimates, dependency edges, and the
+  `policy_hash` / `catalog_hash` it was built against; both schemas registered in
+  the loader (`srl.contracts.schema`).
+- The 15 capability profiles (`srl.planning.profiles.SCIENCE_LAB_PROFILES`):
+  `algebra_exact`, `symbolic_law`, `dynamics`, `geometry_tda`,
+  `causal_time_series`, `uncertainty`, `optimization`, `formal_protocol`,
+  `literature`, `theorem_or_proof_obligation`,
+  `nonlinear_continuous_or_hybrid_constraint`, `executable_ode_dae_sde_model`,
+  `pde_variational_model`, `model_composition`, `literature_extraction`, each
+  with typed `required_inputs` (MathIR cds / object types),
+  `produced_evidence_axes`, and `default_resource_class`.
+- A deterministic claim classifier (`srl.planning.classifier.classify`): a pure
+  function with an explicit rule table; every decision backed by a `rule_trace`.
+- An in-repo capability catalog (`srl.planning.catalog`, `catalog_data.json`):
+  a content-addressed map from the 15 profiles to future adapters, marking every
+  adapter `future` or `remote_required` (no scientific backend ships in this
+  codebase); `catalog_digest` = sha256 over the canonical bytes.
+- A deterministic router (`srl.planning.router.route`): produces a
+  `RoutingDecision` over all 15 profiles; `remote_required` profiles never fall
+  back to a local adapter (absence yields `WAIT_CAPABILITY`, never a silent
+  substitute).
+- A deterministic plan builder (`srl.planning.planner.build_plan`): dependency
+  DAG with topological order and cycle detection (raising `PlanError`,
+  `CONTRACT_INVALID`), resource admission against per-class caps (default wall
+  300s / rss 1.5 GiB / scratch 4 GiB; exception wall 900s / rss 2 GiB) with
+  overflow raising `ResourceAdmissionError` (`WAIT_REMOTE_EXECUTOR`), and
+  `plan_digest` over canonical bytes; byte-identical for byte-identical inputs
+  (determinism).
+- Two new typed fail reasons in `automation/fail-reasons.json`: `WAIT_CAPABILITY`
+  (a required capability has no available adapter) and `WAIT_REMOTE_EXECUTOR` (a
+  plan's summed estimates exceed the admission caps).
+- Conformance vectors under `fixtures/conformance/planning/`: 3 positive
+  scenarios (geometry TDA `WAIT_CAPABILITY`, a 3-step composition DAG, explicit
+  `EXCLUDED_TYPED`) and 3 negative scenarios (cyclic dependency, resource
+  overflow, remote_required no-fallback), with a manifest and README.
+- `scripts/checks/wp14-gate.py` running the four WP-B14 checks (B14-01
+  determinism across 3 rebuilds incl. shuffled input keys, B14-02 decision
+  coverage of all 15 profiles, B14-03 no silent fallback for remote_required,
+  B14-04 unknown capability -> `WAIT_CAPABILITY` + cyclic-dependency and
+  resource-overflow negatives) and printing a `GateReceipt/v1` receipt;
+  `scripts/checks/router-determinism.py` rebuilding the golden plan twice and
+  comparing bytes.
+- `make gate-wp14` and `make router-determinism` targets; a
+  `router-planner-gate (WP-B14)` job in `.github/workflows/ci.yml`; a
+  `router_determinism` job in `.github/workflows/contracts.yml`.
+- Unit tests under `tests/planning/` (`test_classifier.py`, `test_router.py`,
+  `test_planner.py`) covering rule-trace determinism, all four selection states,
+  no-fallback, DAG order, cycle detection, admission, digest stability, and a
+  Hypothesis property test that random valid requests produce deterministic
+  plans.
+- `docs/architecture/router-planner.md` documenting the profiles, decision
+  states, honesty rules (a plan is not evidence; `WAIT_CAPABILITY` is honest
+  absence; no silent fallback), admission policy, and determinism.
 
 ### Fixed
 
@@ -443,7 +540,17 @@ is supported. See `README.md` and `GOVERNANCE.md` for the evidence rules.
 - Documented the public repository boundary and the prohibition on committing
   secrets, real datasets, operator identity, and absolute local paths.
 
-## [0.1.0] - Unreleased
+## [0.1.0] - 2026-07-28
+
+
+Release contents: public repository with protected main and 22 required
+checks; canonical JSON and SHA-256 object identity; Scientific IR
+(restricted OpenMath allowlist); object fabric; transformation receipts
+with explicit lossiness; 11-axis orthogonal evidence model; deterministic
+claim router and plan builder; thirty-task public conformance corpus
+(30/30 expected outcomes matched); AutonomyPolicy/v2 governance; M1
+resource policy; T7 storage identity guard; fixed-entrypoint bounded
+runner with sandbox; weekly-deep scheduled verification.
 
 The first milestone target (`v0.1.0`) covers the repository, contracts, the
 Scientific IR, and conformance. It is tracked as a GitHub milestone and is
