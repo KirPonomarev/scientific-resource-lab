@@ -72,12 +72,19 @@ def claim_id(claim: dict[str, Any]) -> str:
     """Compute the ``claim_id`` for a claim: sha256 over its canonical bytes.
 
     The id is computed over the canonical encoding of the claim *without* the
-    ``claim_id`` field, so a claim carrying a pre-populated id is rejected as a
-    self-hash (propagated from :func:`srl.contracts.ids.object_id`). The claim
-    is validated first (defense in depth).
+    ``claim_id`` field (the field is stripped here, since the content-addressing
+    helper :func:`srl.contracts.ids.object_id` only guards a field literally
+    named ``object_id``). This makes the id idempotent: calling ``claim_id`` on
+    a claim with or without its id field yields the same value, so two
+    independent agents that build the same claim compute the same id with no
+    coordination. A claim carrying a pre-populated ``claim_id`` whose value
+    differs from the freshly computed id is rejected by :func:`validate` (see
+    the ``claim_id_consistent`` invariant). The claim is validated first
+    (defense in depth).
     """
     validate(claim)
-    return object_id(claim)
+    doc = {k: v for k, v in claim.items() if k != "claim_id"}
+    return object_id(doc)
 
 
 def validate(claim: Any) -> dict[str, Any]:
@@ -146,6 +153,27 @@ def validate(claim: Any) -> dict[str, Any]:
             f"{_SUPPORTED!r} without at least one support_ref"
         )
         raise ClaimInvariantError(msg, invariant="candidate_supported_requires_support")
+
+    # Invariant 3: a present claim_id MUST be consistent (content-addressed over
+    # the claim WITHOUT the id field). A claim_id computed over the claim
+    # including itself is a self-hash fixed point: a logically inconsistent
+    # identity (the id depends on a field whose value is the id). Two
+    # independent builders of the same claim must compute the same id; a
+    # self-hash id makes that impossible. This fires only when a claim_id is
+    # already present (the build-then-compute flow passes no id), so it rejects
+    # a stale or self-hash id while never blocking construction. This is defense
+    # in depth for the idempotency property of :func:`claim_id`.
+    present_id = claim.get("claim_id")
+    if isinstance(present_id, str) and present_id:
+        recomputed = object_id({k: v for k, v in claim.items() if k != "claim_id"})
+        if present_id != recomputed:
+            msg = (
+                "ScientificClaim invariant violated: claim_id "
+                f"{present_id!r} is not the content-addressed id of the claim "
+                f"(expected {recomputed!r}); the id must be computed over the "
+                "claim WITHOUT the claim_id field (a self-hash is inconsistent)"
+            )
+            raise ClaimInvariantError(msg, invariant="claim_id_consistent")
 
     return claim
 

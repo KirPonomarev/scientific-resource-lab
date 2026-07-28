@@ -1,0 +1,58 @@
+{
+  "schema_version": "EvidenceVectorManifest/v1",
+  "description": "Conformance vectors for the SRL evidence assessment and science-lab run receipts (WP-B13): a probe-only EvidenceAssessment, an actual-compute + checked + formal-checked assessment with a certificate, a completed engine receipt, a proven validation receipt with a certificate, a completed run receipt, and the five prohibited collapses the orthogonality rules prevent (an import probe with a completed engine, a formal proven without a certificate, a formal-axis update mutating a statistical axis, a reserved integration_authority tier, and a probe receipt claiming output objects). Each positive vector is a valid object that must validate against its schema (and pass the Python validator); each negative vector names the validator, exception, invariant, and fail reason its input must be rejected with.",
+  "positive": [
+    {
+      "name": "p01-assessment-probe-only",
+      "schema": "EvidenceAssessment",
+      "description": "A probe-only EvidenceAssessment: exercise_level=import_probe, engine_execution=not_run (a probe only checks the object imports/loads; it cannot have produced computed output). The lowest-honesty starting point an assessment grows from."
+    },
+    {
+      "name": "p02-assessment-compute-checked-formal",
+      "schema": "EvidenceAssessment",
+      "description": "An EvidenceAssessment that has reached actual_compute + engine completed + scientific checked + formal checked (exact_statement scope) + integration_authority=proposal_only. The axes are independent: the formal axis did not move the statistical/causal axes (each was set by its own evidence)."
+    },
+    {
+      "name": "p03-engine-receipt-compute",
+      "schema": "ScienceLabEngineReceipt",
+      "description": "A ScienceLabEngineReceipt for a completed actual_compute run that produced one output object, binding the adapter_id and pack_ref."
+    },
+    {
+      "name": "p04-validation-receipt-proven-cert",
+      "schema": "ScienceLabValidationReceipt",
+      "description": "A ScienceLabValidationReceipt with formal_check=proven and a non-null formal_certificate_ref (a verified, independently-checkable certificate). proven REQUIRES the certificate; without it the receipt is rejected."
+    },
+    {
+      "name": "p05-run-receipt-completed",
+      "schema": "ScienceLabRunReceipt",
+      "description": "A ScienceLabRunReceipt tying a completed engine run and its proven validation into a terminal_status=completed outcome with aggregate resource usage."
+    }
+  ],
+  "negative": [
+    {
+      "name": "n01-probe-with-completed-engine",
+      "validator": "evidence_assessment",
+      "reason": "An EvidenceAssessment with exercise_level=import_probe and engine_execution=completed violates the probe_not_compute orthogonality (an import probe cannot have produced computed output). Rejected at the schema allOf/if-then layer and by srl.semantic.evidence.validate in Python (defense in depth) with CONTRACT_INVALID."
+    },
+    {
+      "name": "n02-formal-proven-no-certificate",
+      "validator": "validation_receipt",
+      "reason": "A ScienceLabValidationReceipt with formal_check=proven and a null formal_certificate_ref violates the proven_requires_certificate invariant (a SMT-style answer without a verified certificate yields at most checked). Rejected at the schema allOf/if-then layer and by srl.semantic.evidence.build_validation_receipt in Python (defense in depth) with CONTRACT_INVALID."
+    },
+    {
+      "name": "n03-authority-admitted-a2",
+      "validator": "evidence_assessment",
+      "reason": "An EvidenceAssessment with integration_authority=admitted_a2 violates the authority_path_none invariant: the admitted_* tiers are reserved and SRL has no authority path to set them. Rejected by srl.semantic.evidence.validate in Python with CONTRACT_INVALID."
+    },
+    {
+      "name": "n04-probe-receipt-claims-outputs",
+      "validator": "engine_receipt",
+      "reason": "A ScienceLabEngineReceipt with exercise_level=import_probe and a non-empty output_object_ids violates the probe_not_compute invariant (an import probe produces no scientific output). Rejected at the schema allOf/if-then layer and by srl.semantic.evidence.build_engine_receipt in Python (defense in depth) with CONTRACT_INVALID."
+    },
+    {
+      "name": "n05-formal-update-mutates-statistical",
+      "validator": "update_assessment",
+      "reason": "An update_assessment delta that moves a formal axis (formal_check) and an empirical axis (statistical_support) in the same step violates the formal_not_empirical orthogonality (formal proof is not empirical truth). Rejected by srl.semantic.evidence.update_assessment in Python with CONTRACT_INVALID."
+    }
+  ]
+}

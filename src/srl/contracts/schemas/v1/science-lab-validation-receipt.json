@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srlab.dev/v1/ScienceLabValidationReceipt.json",
+  "title": "ScienceLabValidationReceipt/v1",
+  "description": "A receipt proving an independent validator checked the scientific output of an engine run, carrying the honest scientific and formal check outcomes. The receipt binds a validator_id to an engine_receipt_id (the engine run whose output was checked) and records the scientific_check (checked / contradicted / inconclusive) and the formal_check (unchecked / checked / proven). CRITICAL INVARIANT (schema + python): formal_check=proven REQUIRES a non-null formal_certificate_ref — a verified, independently-checkable certificate. A SMT-style SAT/UNSAT answer yields at most formal_check=checked (a solver result without a verified certificate is not proven); proven without a certificate is a dishonest upgrade and is rejected. The validation receipt also carries the statistical_support and causal_identification axes (re-asserted here by the validator, independently of the formal axes — formal proof never updates statistical or causal support). The receipt carries the two safety consts (canonical_writes=0, grants_authority=false). Canonical JSON contract: sorted keys, compact separators, UTF-8, no NaN/Infinity, trailing newline.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "receipt_id",
+    "engine_receipt_id",
+    "validator_id",
+    "scientific_check",
+    "formal_check",
+    "formal_certificate_ref",
+    "statistical_support",
+    "causal_identification",
+    "created_utc",
+    "canonical_writes",
+    "grants_authority"
+  ],
+  "allOf": [
+    {
+      "$comment": "formal_check=proven REQUIRES a non-null formal_certificate_ref. A verified certificate is the load-bearing artifact for a proven formal statement: without it, the statement is at most checked (a solver result). Encoding the SAT/UNSAT-is-not-proven rule at the schema layer; re-enforced in python (proven_requires_certificate).",
+      "if": {
+        "properties": {
+          "formal_check": {
+            "const": "proven"
+          }
+        },
+        "required": [
+          "formal_check"
+        ]
+      },
+      "then": {
+        "properties": {
+          "formal_certificate_ref": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "formal_certificate_ref"
+        ]
+      }
+    }
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Identity anchor; const for ScienceLabValidationReceipt/v1.",
+      "type": "string",
+      "const": "ScienceLabValidationReceipt/v1"
+    },
+    "receipt_id": {
+      "description": "Content-addressed identity: sha256 over the canonical encoding of the receipt (without this field), prefixed 'sha256:'. Computed by the python receipt builder.",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "engine_receipt_id": {
+      "description": "The receipt_id of the ScienceLabEngineReceipt/v1 whose output this validation checked. The validation receipt binds back to the engine run so the compute lineage and the validation lineage tie together.",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "validator_id": {
+      "description": "The logical identifier of the independent validator that produced the check. Names which validator discharged the scientific/formal check.",
+      "type": "string",
+      "minLength": 1
+    },
+    "scientific_check": {
+      "description": "The outcome of checking the engine output against the claim: checked (the output is consistent with the claim), contradicted (the output contradicts the claim), inconclusive (the check could not reach a verdict). NOT a formal verdict — it is the scientific consistency of the computed output.",
+      "type": "string",
+      "enum": [
+        "checked",
+        "contradicted",
+        "inconclusive"
+      ]
+    },
+    "formal_check": {
+      "description": "The level of formal verification the validator discharged: unchecked (no formal statement checked), checked (a solver returned SAT/UNSAT or a checked-but-unverified result), proven (a verified, independently-checkable certificate exists — REQUIRES a non-null formal_certificate_ref). A SMT-style answer without a verified certificate yields at most checked; proven without a certificate is rejected.",
+      "type": "string",
+      "enum": [
+        "unchecked",
+        "checked",
+        "proven"
+      ]
+    },
+    "formal_certificate_ref": {
+      "description": "An ArtifactRef/v1 pointing at the verified, independently-checkable formal certificate, or null when no certificate exists (formal_check != proven). REQUIRED non-null when formal_check=proven (encoded by the allOf/if-then above). Carried inline as a structural object when present (schema_version const ArtifactRef/v1, media_type, digest, size_bytes, optional path); the full field contract is enforced at the python layer.",
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema_version",
+            "media_type",
+            "digest",
+            "size_bytes"
+          ],
+          "properties": {
+            "schema_version": {
+              "description": "Identity anchor; const for ArtifactRef/v1.",
+              "type": "string",
+              "const": "ArtifactRef/v1"
+            },
+            "media_type": {
+              "description": "IANA-style media type of the referenced certificate payload (e.g. application/vnd.srlab.formal-certificate+json).",
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9!#$&^_.+-]+/[A-Za-z0-9!#$&^_.+-]+$"
+            },
+            "digest": {
+              "description": "Content digest of the certificate bytes: sha256 + 64 lowercase hex digits.",
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            "size_bytes": {
+              "description": "Non-negative integer byte count of the referenced certificate payload.",
+              "type": "integer",
+              "minimum": 0
+            },
+            "path": {
+              "description": "Optional portable repo-relative path to the certificate bytes. Validated for portability at the python layer; the digest remains authoritative.",
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[^/].*$"
+            }
+          }
+        }
+      ]
+    },
+    "statistical_support": {
+      "description": "The statistical support axis as re-asserted by the validator (not_applicable / none / weak / moderate / strong). INDEPENDENT of formal_check: a formal proof never updates statistical support. The validator asserts this from its own statistical evidence, not from the formal certificate.",
+      "type": "string",
+      "enum": [
+        "not_applicable",
+        "none",
+        "weak",
+        "moderate",
+        "strong"
+      ]
+    },
+    "causal_identification": {
+      "description": "The causal identification axis as re-asserted by the validator (not_applicable / assumed / partially_identified / identified). INDEPENDENT of formal_check: a formal proof never updates causal identification.",
+      "type": "string",
+      "enum": [
+        "not_applicable",
+        "assumed",
+        "partially_identified",
+        "identified"
+      ]
+    },
+    "created_utc": {
+      "description": "RFC 3339 UTC timestamp at seconds precision (YYYY-MM-DDTHH:MM:SSZ). No offset, no fractional seconds.",
+      "type": "string",
+      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]Z$"
+    },
+    "canonical_writes": {
+      "description": "Safety const: a receipt is immutable once authored. Always 0; a non-zero value is a contract violation.",
+      "type": "integer",
+      "const": 0
+    },
+    "grants_authority": {
+      "description": "Safety const: a receipt never grants authority on its own. Always false; a true value is a contract violation. A proven formal statement is still an admission of formal verification, not an authorization.",
+      "type": "boolean",
+      "const": false
+    }
+  }
+}

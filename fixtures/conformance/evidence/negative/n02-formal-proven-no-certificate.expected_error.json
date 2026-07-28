@@ -1,0 +1,7 @@
+{
+  "validator": "validation_receipt",
+  "exception": "EvidenceAxisError",
+  "fail_reason": "CONTRACT_INVALID",
+  "invariant": "proven_requires_certificate",
+  "reason": "A ScienceLabValidationReceipt with formal_check=proven and a null formal_certificate_ref violates the proven_requires_certificate invariant (a verified, independently-checkable certificate is required; a SMT-style answer without a certificate yields at most checked). Rejected by the schema allOf/if-then and by srl.semantic.evidence.build_validation_receipt in Python (defense in depth) with CONTRACT_INVALID."
+}

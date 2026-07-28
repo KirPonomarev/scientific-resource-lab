@@ -46,6 +46,10 @@ HTTP today, but it must be unique and must not change for a given shape.
 | `model-interface.json`            | `ModelInterface/v1`           | A typed interface to a scientific model (ode/dae/...). |
 | `adapter-semantic-profile.json`   | `AdapterSemanticProfile/v1`   | A typed semantic profile for a backend adapter (supported_cds subset of MATH_IR_ALLOWLIST, unsupported-feature behavior, determinism, network posture, SPDX license). |
 | `transformation-receipt.json`     | `TransformationReceipt/v1`    | A receipt binding source->target by a named transform, carrying the honest cost (LOSSLESS / LOSSY_EXPLICIT / LOSSY_IMPLICIT_DETECTED) and lineage. |
+| `evidence-assessment.json`        | `EvidenceAssessment/v1`       | A typed assessment of the evidence behind a ScientificClaim on 11 ORTHOGONAL axes (capability / exercise / engine / scientific / formal / statistical / causal / algorithmic / empirical / authority), enforcing orthogonality (probe is not compute; formal is not empirical; algorithmic is not independent; exportable is not admitted). |
+| `science-lab-engine-receipt.json` | `ScienceLabEngineReceipt/v1`  | A receipt proving a backend engine ran (or failed) for a run request, carrying the honest exercise_level and engine_execution (an import_probe cannot yield completed-and-computed semantics). |
+| `science-lab-validation-receipt.json` | `ScienceLabValidationReceipt/v1` | A receipt proving an independent validator checked an engine run's output, carrying the scientific_check and formal_check (formal_check=proven REQUIRES a non-null formal_certificate_ref). |
+| `science-lab-run-receipt.json`    | `ScienceLabRunReceipt/v1`     | A receipt tying an engine run and its optional validation into a single terminal run outcome with aggregate resource usage. |
 
 ## Naming and compatibility policy
 

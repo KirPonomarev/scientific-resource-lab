@@ -13,6 +13,87 @@ is supported. See `README.md` and `GOVERNANCE.md` for the evidence rules.
 
 ### Added
 
+- Evidence assessment and science-lab run receipt model under `srl.semantic`
+  (WP-B13): `EvidenceAssessment/v1` (`evidence-assessment.json`) — a typed
+  assessment of the evidence behind a `ScientificClaim` on **11 orthogonal**
+  evidence axes (capability_state / exercise_level / engine_execution /
+  scientific_check / formal_check / formal_scope / statistical_support /
+  causal_identification / algorithmic_cross_engine_reproduction /
+  independent_empirical_replication / integration_authority), encoding the
+  orthogonality invariants that a movement on one axis never grants a movement
+  on another via `allOf`/`if-then` and re-enforced in Python by
+  `srl.semantic.evidence.validate` / `build_assessment` (raising
+  `EvidenceAxisError`, fail reason `CONTRACT_INVALID`, defense in depth):
+  probe is not compute (`exercise_level=import_probe` forbids
+  `engine_execution=completed`, invariant `probe_not_compute`), failed is not
+  checked (`engine_execution=failed` forbids `scientific_check=checked`,
+  invariant `failed_not_checked`), and the authority path is none (the reserved
+  `admitted_a1_sandbox` / `admitted_a2` tiers are rejected, invariant
+  `authority_path_none`); `ScienceLabEngineReceipt/v1`
+  (`science-lab-engine-receipt.json`) — a receipt proving a backend engine ran
+  (or failed) for a run request, with the honest `exercise_level` and
+  `engine_execution`, encoding that an `import_probe` receipt CANNOT yield
+  completed-and-computed semantics (a probe with non-empty
+  `output_object_ids` is rejected); `ScienceLabValidationReceipt/v1`
+  (`science-lab-validation-receipt.json`) — a receipt proving an independent
+  validator checked an engine run's output, encoding that `formal_check=proven`
+  REQUIRES a non-null `formal_certificate_ref` (invariant
+  `proven_requires_certificate`; a SMT-style answer without a verified
+  certificate yields at most `checked`); `ScienceLabRunReceipt/v1`
+  (`science-lab-run-receipt.json`) — a receipt tying an engine run and its
+  optional validation into a single terminal outcome with aggregate resource
+  usage; all four schemas registered in the loader (`srl.contracts.schema`) and
+  the four object types (`evidence_assessment`, `engine_receipt`,
+  `validation_receipt`, `run_receipt`) added to
+  `SUPPORTED_OBJECT_TYPES` (the envelope `object_type` enum widens additively
+  to include `engine_receipt` and `validation_receipt`).
+- `srl.semantic.evidence`: a typed `EvidenceAssessment` builder
+  (`build_assessment`) enforcing the orthogonality invariants; an
+  `update_assessment(prior, delta, evidence_ref, regression_reason=…) -> new
+  assessment` with a per-axis monotonic transition guard (up freely; down only
+  with a `regression_reason` naming the contradicted/divergent evidence,
+  invariant `monotonic_transition`) and delta-orthogonality enforcement
+  (formal_not_empirical: a formal-axis update never modifies
+  statistical_support/causal_identification in the same step;
+  algorithmic_not_independent: setting algorithmic reproduction never sets
+  independent replication), threading the full prior state into the new
+  assessment's `parents`; receipt builders `build_engine_receipt` /
+  `build_validation_receipt` / `build_run_receipt` enforcing the
+  probe-is-not-compute and proven-requires-certificate invariants; and three
+  executable honesty collapse assertions `assert_probe_not_compute` /
+  `assert_formal_not_empirical` / `assert_algorithmic_not_independent`.
+- Conformance vectors under `fixtures/conformance/evidence/`: 5 positive (a
+  probe-only assessment, an actual-compute + checked + formal-checked
+  assessment with a certificate, a completed engine receipt, a proven
+  validation receipt with a certificate, a completed run receipt) and 5
+  negative (an import probe with a completed engine, a formal proven without a
+  certificate, a formal-axis update mutating a statistical axis, a reserved
+  integration_authority tier, a probe receipt claiming output objects), with a
+  `manifest.json` and `README.md`.
+- `scripts/checks/wp13-gate.py` running the four WP-B13 checks (B13-01 an
+  import probe cannot yield COMPUTED at receipt + assessment levels; B13-02 a
+  SMT-style answer yields at most CHECKED without a verified certificate,
+  proven rejected without one; B13-03 a formal axis cannot update an empirical
+  axis; B13-04 algorithmic reproduction differs from independent replication,
+  reserved authority rejected, and the positive/negative fixtures
+  validate/reject) and emitting a `GateReceipt/v1`; an `evidence-model-gate
+  (WP-B13)` job in `.github/workflows/ci.yml`; a `receipt-invariants` job in
+  `.github/workflows/contracts.yml` (backed by
+  `scripts/checks/receipt-invariants.py`) verifying every receipt schema pins
+  `canonical_writes=0` and `grants_authority=false` as `const`; a `Makefile`
+  `gate-wp13` target.
+- Unit and property tests under `tests/contracts/` (`test_evidence.py`,
+  `test_receipts.py`) pinning the orthogonality invariants at both layers, the
+  monotonic-transition guard, lineage threading, identity idempotency, schema
+  round-trips, the receipt safety consts, plus a Hypothesis property that
+  random axis-update sequences never produce a forbidden combination.
+- `docs/contracts/evidence-model.md` documenting the 11 orthogonal axes, the
+  orthogonality rules, the prohibited collapses table (READY != COMPUTED,
+  COMPUTED != VALIDATED, SAT/UNSAT != empirical truth, algorithm agreement !=
+  independent replication, formal proof != market validation, exportable !=
+  admitted), the monotonic-transition ladder, the run receipts, and the
+  authority states.
+
 - Transformation receipts and adapter semantic profiles under `srl.semantic`
   (WP-B12): `TransformationReceipt/v1` (`transformation-receipt.json`) — a
   receipt binding `source_object_id`→`target_object_id` by a named
@@ -310,23 +391,43 @@ is supported. See `README.md` and `GOVERNANCE.md` for the evidence rules.
 - Committed `uv.lock` and tracked the WP-A01 closeout receipt
   (`automation/receipts/wp-closeout-a01.json`).
 
+### Fixed
+
+- `srl.semantic.claims.claim_id` is now idempotent: it strips the claim's own
+  `claim_id` field before hashing, so building the same claim twice (with or
+  without a pre-populated id) yields the same id. Previously `claim_id` hashed
+  the claim including its own `claim_id` field (the content-addressing helper
+  only guards a field literally named `object_id`), producing a
+  self-referential fixed point and breaking the property that two independent
+  builders of the same claim compute the same id — the same class of bug fixed
+  earlier in `transforms.receipt_id` and `adapter_profiles.profile_id`.
+  `validate` now also rejects a present `claim_id` that was computed over the
+  claim including itself (new `claim_id_consistent` invariant, fail reason
+  `CONTRACT_INVALID`, defense in depth). Regression tests pin both directions.
+
 ### Changed
 
-- `.github/workflows/ci.yml` adds the `transformations-gate` job (WP-B12),
-  previously added the `object-fabric-gate` job (WP-B11), earlier added the
-  `canonical-json-gate` job (WP-B10), and the `autonomy-contracts-gate` job
-  (WP-A03); the existing lint, typecheck, unit, and package jobs are unchanged.
-  `.github/workflows/contracts.yml` adds the `schema-compat` job (WP-B11)
-  verifying the loader registry is complete.
+- `.github/workflows/ci.yml` adds the `evidence-model-gate` job (WP-B13),
+  previously added the `transformations-gate` job (WP-B12), earlier added the
+  `object-fabric-gate` job (WP-B11), the `canonical-json-gate` job (WP-B10),
+  and the `autonomy-contracts-gate` job (WP-A03); the existing lint,
+  typecheck, unit, and package jobs are unchanged.
+  `.github/workflows/contracts.yml` adds the `receipt-invariants` job (WP-B13)
+  verifying every receipt schema pins the safety consts, previously added the
+  `schema-compat` job (WP-B11) verifying the loader registry is complete.
 - The schema loader registry (`srl.contracts.schema._SCHEMA_NAME_TO_FILE`) and
-  the schemas README table now carry the two new WP-B12 schemas
-  (`AdapterSemanticProfile`, `TransformationReceipt`), previously the six WP-B11
-  schemas (`ScientificClaim`, `MathIR`, `SymbolTable`, `ConditionSet`,
-  `ConstantRef`, `ModelInterface`); the existing `ArtifactRef`,
+  the schemas README table now carry the four new WP-B13 schemas
+  (`EvidenceAssessment`, `ScienceLabEngineReceipt`,
+  `ScienceLabValidationReceipt`, `ScienceLabRunReceipt`), previously the two
+  WP-B12 schemas (`AdapterSemanticProfile`, `TransformationReceipt`), earlier
+  the six WP-B11 schemas (`ScientificClaim`, `MathIR`, `SymbolTable`,
+  `ConditionSet`, `ConstantRef`, `ModelInterface`); the existing `ArtifactRef`,
   `ScientificObjectEnvelope`, and `GateReceipt` schemas are unchanged
-  (additive only). `srl.semantic.fabric.SUPPORTED_OBJECT_TYPES` widens from six
-  to eight kinds, adding `adapter_profile` and `transformation_receipt`; the
-  envelope's `object_type` enum (17 kinds) is unchanged.
+  (additive only). `srl.semantic.fabric.SUPPORTED_OBJECT_TYPES` widens from
+  eight to twelve kinds, adding `evidence_assessment`, `engine_receipt`,
+  `validation_receipt`, and `run_receipt`; the envelope's `object_type` enum
+  widens additively to include `engine_receipt` and `validation_receipt`
+  (the `evidence_assessment` and `run_receipt` kinds were already present).
 - `pyproject.toml` declares `jsonschema>=4.23` as the first runtime
   dependency and adds `types-jsonschema>=4.23` to the `dev` group; the sdist
   include list now carries `src/srl/contracts/schemas/v1` so schema documents

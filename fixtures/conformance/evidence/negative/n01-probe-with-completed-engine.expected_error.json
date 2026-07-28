@@ -1,0 +1,7 @@
+{
+  "validator": "evidence_assessment",
+  "exception": "EvidenceAxisError",
+  "fail_reason": "CONTRACT_INVALID",
+  "invariant": "probe_not_compute",
+  "reason": "An EvidenceAssessment with exercise_level=import_probe and engine_execution=completed violates the probe_not_compute orthogonality (an import probe cannot have produced computed output). Rejected by the schema allOf/if-then and by srl.semantic.evidence.validate in Python (defense in depth) with CONTRACT_INVALID."
+}
