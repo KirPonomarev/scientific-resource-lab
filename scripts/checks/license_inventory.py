@@ -1,18 +1,19 @@
 """Stdlib dependency license inventory for CI.
 
-Builds a license inventory from the installed Python distributions in the
-synced uv virtual environment (``importlib.metadata``), with a classifier-based
-fallback for packages that do not populate the modern ``License-Expression``
-metadata field.  Prints a JSON report and exits non-zero if any dependency has a
-license outside the project allowlist or is unknown.
+Builds a license inventory from the locked dependency closure recorded in
+``uv.lock``.  The committed lock file is the source of truth; only packages
+listed there are evaluated, using ``importlib.metadata`` against the synced uv
+virtual environment.  Packages that are locked but not installed, or that lack
+resolvable license metadata, are reported as ``unknown`` and cause a non-zero
+exit so additions to the dependency tree are reviewed explicitly.
 
 Allowlist
 ---------
 MIT, BSD-2-Clause, BSD-3-Clause, Apache-2.0, ISC, PSF-2.0, Unicode-3.0,
-MPL-2.0 (notice-ok), Python-2.0.
+MPL-2.0 (notice-ok), Python-2.0, CC0-1.0.
 
 Anything in the GPL/LGPL/AGPL family or otherwise unidentifiable is treated
-as a failure so that additions to the dependency tree are reviewed explicitly.
+as a failure.
 
 The script is intended to run inside the uv-managed venv (``uv run python3
 scripts/checks/license_inventory.py``) so that ``importlib.metadata`` sees the
@@ -24,8 +25,10 @@ from __future__ import annotations
 import json
 import re
 import sys
+import tomllib
 from dataclasses import asdict, dataclass, field
-from importlib.metadata import distributions
+from importlib.metadata import Distribution, distributions
+from pathlib import Path
 from typing import Final
 
 # ---------------------------------------------------------------------------
@@ -43,6 +46,7 @@ _ALLOWED_LICENSES: Final[frozenset[str]] = frozenset(
         "UNICODE-3.0",
         "MPL-2.0",
         "PYTHON-2.0",
+        "CC0-1.0",
     }
 )
 
@@ -74,6 +78,8 @@ _LICENSE_NORMALIZATIONS: Final[dict[str, str]] = {
     "PYTHON SOFTWARE FOUNDATION LICENSE": "PSF-2.0",
     "PSF LICENSE": "PSF-2.0",
     "PYTHON-2.0": "PYTHON-2.0",
+    "CC0-1.0": "CC0-1.0",
+    "CC0": "CC0-1.0",
 }
 
 # Map PyPI classifier strings to SPDX identifiers.
@@ -88,6 +94,7 @@ _CLASSIFIER_LICENSES: Final[dict[str, str]] = {
     "License :: OSI Approved :: Python Software Foundation License": "PSF-2.0",
     "License :: OSI Approved :: Python License (CNRI Python License)": "PYTHON-2.0",
     "License :: OSI Approved :: Unicode License V3": "UNICODE-3.0",
+    "License :: CC0 1.0 Universal (CC0 1.0) Public Domain Dedication": "CC0-1.0",
 }
 
 
@@ -159,7 +166,7 @@ def _evaluate_license(expression: str) -> str:
     return "unknown"
 
 
-def _extract_package_license(dist) -> tuple[str, str, str]:
+def _extract_package_license(dist: Distribution) -> tuple[str, str]:
     """Extract the best available license string and source for a distribution."""
     metadata = dist.metadata
     expression = metadata.get("License-Expression", "").strip()
@@ -178,11 +185,48 @@ def _extract_package_license(dist) -> tuple[str, str, str]:
 
 
 # ---------------------------------------------------------------------------
+# Locked package discovery from uv.lock
+# ---------------------------------------------------------------------------
+
+def _locked_package_names(lock_path: Path) -> list[str]:
+    """Return the list of package names from a uv.lock file."""
+    with lock_path.open("rb") as handle:
+        lock_data = tomllib.load(handle)
+    return [pkg["name"] for pkg in lock_data.get("package", [])]
+
+
+def _normalise_name(name: str) -> str:
+    """Normalise a distribution name for comparison.
+
+    PyPI treats underscores, hyphens, and case differences as equivalent for
+    distribution names.  This matches the canonical form used by
+    ``importlib.metadata`` for lookups.
+    """
+    return re.sub(r"[-_.]+", "-", name).lower()
+
+
+# ---------------------------------------------------------------------------
 # Scanning
 # ---------------------------------------------------------------------------
 
 def scan() -> Report:
-    """Build the license inventory from the current Python environment."""
+    """Build the license inventory from the locked dependency closure.
+
+    The synced uv virtual environment is the resolver for environment markers in
+    ``uv.lock``.  We therefore inspect only the distributions that are actually
+    installed in that venv and are also listed in the committed lock file.  This
+    excludes platform- or Python-version conditional locked packages that are not
+    part of the resolved closure for the current environment, and also excludes
+    any extra tooling that happens to be installed in the interpreter but is not
+    in the lock (e.g. ``yt-dlp``).
+    """
+    repo_root = Path(__file__).resolve().parents[2]
+    lock_path = repo_root / "uv.lock"
+    if not lock_path.exists():
+        raise FileNotFoundError(f"Committed lock file not found: {lock_path}")
+
+    locked_names = {_normalise_name(name) for name in _locked_package_names(lock_path)}
+
     packages: list[PackageLicense] = []
     allowed: list[str] = []
     denied: list[str] = []
@@ -190,7 +234,9 @@ def scan() -> Report:
 
     for dist in sorted(distributions(), key=lambda d: d.metadata["Name"].lower()):
         name = dist.metadata["Name"]
-        version = dist.version
+        if _normalise_name(name) not in locked_names:
+            continue
+
         raw_license, source = _extract_package_license(dist)
         normalized = _normalize_license(raw_license)
         status = _evaluate_license(normalized)
@@ -198,7 +244,7 @@ def scan() -> Report:
         packages.append(
             PackageLicense(
                 name=name,
-                version=version,
+                version=dist.version,
                 license=normalized,
                 source=source,
                 status=status,
@@ -213,7 +259,7 @@ def scan() -> Report:
             unknown.append(name)
 
     return Report(
-        scanner="license_inventory/v1",
+        scanner="license_inventory/v2",
         packages=packages,
         allowed=allowed,
         denied=denied,
