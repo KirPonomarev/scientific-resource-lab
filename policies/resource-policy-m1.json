@@ -1,0 +1,1 @@
+{"canonical_writes":0,"concurrency":1,"cpu_cores":1,"exception":{"cpu_cores":2,"rss_bytes":2147483648,"scratch_bytes":4294967296,"wall_seconds":900},"grants_authority":false,"name":"m1-default","overflow_action":"WAIT_REMOTE_EXECUTOR","required_free_disk_bytes":21474836480,"rss_bytes":1610612736,"schema_version":"ResourcePolicy/v1","scratch_bytes":4294967296,"wall_seconds":300}
