@@ -1,0 +1,111 @@
+# Scientific Resource Lab CI.
+# Actions are pinned to full commit SHAs for reproducibility and supply-chain
+# integrity. Bump by resolving the new tag's commit SHA via the GitHub API and
+# replacing the SHA here (keeping the comment with the human-readable tag).
+#
+# Resolved SHAs (re-resolve on update):
+#   actions/checkout  v5.1.0 -> fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+#   astral-sh/setup-uv v9.0.0 -> c771a70e6277c0a99b617c7a806ffedaca235ff9
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  merge_group:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: lint (ruff)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Setup uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9  # v9.0.0
+        with:
+          enable-cache: true
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+      - name: Install dependencies (locked)
+        run: uv sync --locked
+      - name: Ruff check
+        run: uv run ruff check .
+      - name: Ruff format check
+        run: uv run ruff format --check .
+
+  typecheck:
+    name: typecheck (mypy)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Setup uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9  # v9.0.0
+        with:
+          enable-cache: true
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+      - name: Install dependencies (locked)
+        run: uv sync --locked
+      - name: Mypy strict
+        run: uv run mypy
+
+  unit:
+    name: unit (python ${{ matrix.python-version }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Setup uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9  # v9.0.0
+        with:
+          enable-cache: true
+      - name: Set up Python ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
+      - name: Install dependencies (locked)
+        run: uv sync --locked --python ${{ matrix.python-version }}
+      - name: Pytest
+        run: uv run --locked --python ${{ matrix.python-version }} pytest
+
+  package:
+    name: package & repro-check (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Setup uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9  # v9.0.0
+        with:
+          enable-cache: true
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+      - name: Install dependencies (locked)
+        run: uv sync --locked
+      - name: Build sdist + wheel
+        run: uv build
+      - name: Reproducible-wheel check
+        run: uv run python scripts/build/reproducible-check.py
