@@ -82,9 +82,7 @@ import json
 from pathlib import Path
 
 out = Path("synthetic-envelope-claim-00.json")
-out.write_text(
-    json.dumps(envelope, sort_keys=True, separators=(",", ":")) + "\n"
-)
+out.write_text(json.dumps(envelope, sort_keys=True, separators=(",", ":")) + "\n")
 print(f"wrote {out}")
 ```
 
