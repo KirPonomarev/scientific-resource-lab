@@ -68,6 +68,10 @@ _PATH_ALLOWLIST_FILES: Final[frozenset[str]] = frozenset(
         "automation/checks.json",
         "tests/unit/test_leakguard.py",
         "scripts/checks/wp03-gate.py",
+        "fixtures/conformance/corpus/task-29-redaction-local-path-refused/task.json",
+        "scripts/checks/wp20-gate.py",
+        "tests/cas/test_identity.py",
+        "tests/cas/test_privacy.py",
     }
 )
 

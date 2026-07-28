@@ -1,8 +1,10 @@
 """Stdlib Markdown link-domain allowlist checker for CI.
 
-Walks every ``*.md`` file under the repository root, extracts ``https://`` URLs,
-and verifies that each URL's domain is in the project allowlist.  No live
-network requests are made; the check is a pure local domain test.
+Walks every tracked ``*.md`` file in the repository, extracts ``https://`` URLs,
+and verifies that each URL's domain is in the project allowlist.  Only tracked
+files are inspected, so generated cache directories (``.pytest_cache``,
+``.venv``, ...) are ignored.  No live network requests are made; the check is a
+pure local domain test.
 
 The allowlist is intentionally small and maps to domains that are part of the
 project's public references (GitHub, SRL schemas, open-source license and
@@ -16,6 +18,8 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
+import subprocess
 import sys
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
@@ -99,26 +103,39 @@ def _is_allowed(domain: str) -> bool:
     return False
 
 
+_GIT_EXECUTABLE: Final[str] = shutil.which("git") or "git"
+
+
+def _tracked_markdown_files() -> list[str]:
+    """Return tracked ``*.md`` paths relative to the repository root."""
+    result = subprocess.run(  # noqa: S603
+        [_GIT_EXECUTABLE, "ls-files", "--", "*.md"],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return [line for line in result.stdout.splitlines() if line]
+
+
 # ---------------------------------------------------------------------------
 # Scanning
 # ---------------------------------------------------------------------------
 
 def scan() -> Report:
-    """Scan all Markdown files and check their link domains."""
+    """Scan all tracked Markdown files and check their link domains."""
     issues: list[LinkIssue] = []
     files_scanned = 0
     links_ok = 0
+    repo_root = Path.cwd()
 
-    for path in sorted(Path.cwd().rglob("*.md")):
-        if ".git" in path.parts:
-            continue
+    for file_path in _tracked_markdown_files():
         files_scanned += 1
         try:
-            text = path.read_text(encoding="utf-8", errors="replace")
+            text = (repo_root / file_path).read_text(encoding="utf-8", errors="replace")
         except OSError as exc:
             issues.append(
                 LinkIssue(
-                    file=str(path),
+                    file=file_path,
                     line=0,
                     url="",
                     domain="",
@@ -136,7 +153,7 @@ def scan() -> Report:
                 if domain is None:
                     issues.append(
                         LinkIssue(
-                            file=str(path),
+                            file=file_path,
                             line=line_idx,
                             url=url,
                             domain="",
@@ -148,7 +165,7 @@ def scan() -> Report:
                 else:
                     issues.append(
                         LinkIssue(
-                            file=str(path),
+                            file=file_path,
                             line=line_idx,
                             url=url,
                             domain=domain,
