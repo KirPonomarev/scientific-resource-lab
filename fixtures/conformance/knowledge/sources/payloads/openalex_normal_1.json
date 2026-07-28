@@ -1,0 +1,23 @@
+{
+  "meta": {
+    "count": 1,
+    "db_version": "synthetic-WP-E44",
+    "page": 1,
+    "per_page": 1,
+    "synthetic": true,
+    "redistribution": "clear"
+  },
+  "results": [
+    {
+      "id": "openalex:W1234567890",
+      "doi": "10.1234/synthetic.openalex.1",
+      "title": "Synthetic OpenAlex Work One for WP-E44",
+      "authorships": [
+        {"author": {"id": "openalex:A1", "display_name": "Alice Author"}},
+        {"author": {"id": "openalex:A2", "display_name": "Bob Author"}}
+      ],
+      "publication_year": 2024,
+      "cited_by_count": 42
+    }
+  ]
+}

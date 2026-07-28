@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <!-- Synthetic malformed arXiv feed for WP-E44. redistribution=clear synthetic=true -->
+  <title>Synthetic Malformed arXiv Feed for WP-E44</title>
+  <entry>
+    <title>Entry Missing an ID Element</title>
+    <summary>This entry is malformed because it lacks an id.</summary>
+  </entry>
+</feed>
