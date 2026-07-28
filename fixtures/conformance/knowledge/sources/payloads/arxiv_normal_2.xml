@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <!-- Synthetic arXiv feed for WP-E44. redistribution=clear synthetic=true -->
+  <title>Synthetic arXiv Feed Two for WP-E44</title>
+  <entry>
+    <id>https://arxiv.org/abs/2101.99999</id>
+    <title>Synthetic arXiv Entry Two for WP-E44</title>
+    <summary>Another synthetic arXiv abstract.</summary>
+    <published>2023-12-31T23:59:59Z</published>
+    <author><name>Charlie Author</name></author>
+  </entry>
+</feed>

@@ -1,0 +1,14 @@
+{
+  "case_id": "s02-conjunction",
+  "category": "sat",
+  "description": "A conjunction of bounds 0 < x < 10 is satisfiable (e.g. x = 1).",
+  "formula_spec": [
+    "and",
+    [">", ["int-var", "x"], ["int-const", 0]],
+    ["<", ["int-var", "x"], ["int-const", 10]]
+  ],
+  "expected_result": "sat",
+  "solver": "z3",
+  "timeout_seconds": 5,
+  "notes": "Two-variable-independent bounds on a single integer; the solver returns a witness in the open interval."
+}

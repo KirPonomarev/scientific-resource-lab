@@ -1,0 +1,20 @@
+{
+  "meta": {
+    "count": 1,
+    "db_version": "synthetic-WP-E44",
+    "page": 1,
+    "per_page": 1,
+    "synthetic": true,
+    "redistribution": "clear"
+  },
+  "results": [
+    {
+      "id": "https://openalex.org/works/W9876543210",
+      "doi": "10.5678/synthetic.openalex.2",
+      "title": "Synthetic OpenAlex Work Two for WP-E44",
+      "authorships": 1,
+      "publication_year": 2023,
+      "cited_by_count": 7
+    }
+  ]
+}

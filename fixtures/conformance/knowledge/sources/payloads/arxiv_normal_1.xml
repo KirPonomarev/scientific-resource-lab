@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <!-- Synthetic arXiv feed for WP-E44. redistribution=clear synthetic=true -->
+  <title>Synthetic arXiv Feed One for WP-E44</title>
+  <entry>
+    <id>http://arxiv.org/abs/synthetic.2024.00001</id>
+    <title>Synthetic arXiv Entry One for WP-E44</title>
+    <summary>This is a synthetic arXiv abstract used by the WP-E44 conformance suite.</summary>
+    <published>2024-01-01T00:00:00Z</published>
+    <author><name>Alice Author</name></author>
+    <author><name>Bob Author</name></author>
+  </entry>
+</feed>

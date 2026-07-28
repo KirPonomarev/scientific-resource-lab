@@ -1,0 +1,13 @@
+{
+  "case_id": "o01-exceeds-size-cap",
+  "category": "oversized",
+  "description": "A formula_spec whose AST node count exceeds MAX_FORMULA_NODES (10000). The adapter must reject it with SmtError (CONTRACT_INVALID) before the solver is constructed. This case is generated, not hand-authored; the generator runs at gate time to avoid committing a 10000+ node JSON blob.",
+  "formula_spec_generator": {
+    "operator": "and",
+    "operand": [">", ["int-var", "x"], ["int-const", 0]],
+    "repeat": 12000
+  },
+  "expected": "SmtError",
+  "expected_fail_reason": "CONTRACT_INVALID",
+  "notes": "The gate materializes the formula by repeating `operand` under an `and` `repeat` times (12000 > 10000 = MAX_FORMULA_NODES) and asserts check() raises SmtError. The committed fixture carries only the generator, not the inflated spec, so the corpus stays reviewable."
+}

@@ -1,0 +1,13 @@
+{
+  "status": "ok",
+  "message-type": "work",
+  "message-version": "1.0.0-synthetic",
+  "message": {
+    "DOI": "10.5678/synthetic.crossref.2",
+    "title": ["Synthetic Crossref Work Two for WP-E44"],
+    "publisher": "Synthetic Society",
+    "published-online": {"date-parts": [[2023, 6, 15]]},
+    "synthetic": true,
+    "redistribution": "clear"
+  }
+}
