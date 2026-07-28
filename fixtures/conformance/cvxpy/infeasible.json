@@ -1,0 +1,17 @@
+{
+  "description": "Small LP with contradictory box bounds; the honest first-class status is infeasible.",
+  "problem_spec": {
+    "problem_type": "lp",
+    "c": [1],
+    "constraints": [
+      {
+        "kind": "box",
+        "lower": [1],
+        "upper": [0]
+      }
+    ]
+  },
+  "expected_status": "infeasible",
+  "expected_objective_decimal": null,
+  "expected_solution": null
+}

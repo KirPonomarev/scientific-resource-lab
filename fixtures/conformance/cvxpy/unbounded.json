@@ -1,0 +1,16 @@
+{
+  "description": "Small LP with no upper bound; the honest first-class status is unbounded.",
+  "problem_spec": {
+    "problem_type": "lp",
+    "c": [-1],
+    "constraints": [
+      {
+        "kind": "box",
+        "lower": [0]
+      }
+    ]
+  },
+  "expected_status": "unbounded",
+  "expected_objective_decimal": null,
+  "expected_solution": null
+}
