@@ -135,9 +135,7 @@ def _check_c23_01() -> dict[str, Any]:
             errors.append(f"receipt[{i}].stage={receipt.stage!r} != {expected_stage!r}")
         expected_from = STAGES[i]
         if receipt.from_stage != expected_from:
-            errors.append(
-                f"receipt[{i}].from_stage={receipt.from_stage!r} != {expected_from!r}"
-            )
+            errors.append(f"receipt[{i}].from_stage={receipt.from_stage!r} != {expected_from!r}")
 
     if errors:
         return {"status": "FAIL", "detail": "; ".join(errors)}
@@ -198,8 +196,7 @@ def _check_c23_03() -> dict[str, Any]:
         return {
             "status": "FAIL",
             "detail": (
-                f"source verification failure rejected with wrong fail_reason: "
-                f"{exc.fail_reason!r}"
+                f"source verification failure rejected with wrong fail_reason: {exc.fail_reason!r}"
             ),
         }
     except Exception as exc:
@@ -261,8 +258,7 @@ def _check_c23_04() -> dict[str, Any]:
     return {
         "status": "PASS",
         "detail": (
-            "unknown license rejected as LICENSE_UNKNOWN, "
-            "incompatible as LICENSE_INCOMPATIBLE"
+            "unknown license rejected as LICENSE_UNKNOWN, incompatible as LICENSE_INCOMPATIBLE"
         ),
         "cases": cases,
     }
