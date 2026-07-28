@@ -13,6 +13,55 @@ is supported. See `README.md` and `GOVERNANCE.md` for the evidence rules.
 
 ### Added
 
+- Autonomous workflow contracts under `AutonomyPolicy/v1` (WP-A03):
+  `automation/policy.json` (`AutonomyPolicy/v1`, canonical JSON, 19 keys)
+  encoding the active governance policy; `automation/fail-reasons.json`
+  (`FailReasonRegistry/v1`) registering the 40 typed fail reasons with their
+  class, hard-stop, and retriable flags; `automation/state.schema.json`
+  (`AutomationStateSchema/v1`, JSON Schema 2020-12) for the persisted runtime
+  state including the 17-value `terminal_status` enum and the max-4 lanes /
+  max-1 scientific WIP bounds; and `automation/checks.json`
+  (`GateCheckRegistry/v1`) mapping the five WP-A03 gate checks to script
+  invocations.
+- `src/srl/autonomy/` package (mypy strict, ruff clean, stdlib only):
+  `policy.load_policy` validates the on-disk policy against an embedded
+  expectation (19 keys, types, enum values, schema version) and raises
+  `PolicyError` on drift; `scopes.check_write` enforces the declared write
+  scope pre-write, rejecting out-of-scope, `..` traversal, and absolute paths
+  with `ScopeViolation` (fail reason `CONTRACT_INVALID`); `leakguard.scan_diff`
+  is a pure pre-commit public-leak guard flagging absolute POSIX home paths,
+  `/Volumes/` paths, GitHub PAT shapes, `sk-`, AWS access key IDs, PEM private
+  keys, and long hex secrets (fail reason `PUBLIC_LEAK_DETECTED`), with a
+  false-positive guard so the word "secret" in prose is not flagged; and
+  `resume.reconcile` implements the deterministic resume table (10 rows)
+  with the SHA-256 idempotency key over `(repository_id, mission_digest,
+  wp_id, base_sha, policy_sha)`, where only `RECONCILE_MERGED` permits merge.
+- `scripts/checks/wp03-gate.py` (executable; stdlib + in-repo `srl` package)
+  running the five WP-A03 acceptance checks (A03-01..A03-05) and emitting a
+  canonical `GateReceipt/v1` JSON receipt with a non-zero exit on any FAIL,
+  including a pre-write proof that no file is created for refused writes and
+  an inline synthetic secret fixture (obviously fake `ghp_EXAMPLE...` token).
+- `Makefile` `gate-wp03` target and an `autonomy-contracts-gate` job in
+  `.github/workflows/ci.yml` (ubuntu-24.04, 15-minute timeout, same pinned uv
+  setup) running the WP-A03 gate; the existing jobs are unchanged.
+- `docs/architecture/autonomous-workflow.md` documenting the Git lifecycle
+  state machine (mermaid + prose), work-package identity fields, commit
+  policy, the ten auto-merge conditions, post-merge steps, the idempotency
+  key formula, and the retry policy (max 2 retries with backoff only for
+  explicit 429/5xx/network-reset; never for permission/privacy/license/
+  policy/hash/injection/resource/scientific/conflict failures; product CI
+  failures max 3 bounded fix cycles then park).
+- Unit tests for the autonomy package: `test_autonomy_policy.py` (valid
+  policy loads; each missing/extra/wrong-type/bad-value/wrong-schema
+  deviation rejected), `test_scopes.py` (in-scope accept; out-of-scope,
+  `..`, absolute, backslash, partial-name all raise), `test_leakguard.py`
+  (each pattern class detected; clean diff passes; "secret" in prose is not
+  flagged; bytes entry point reports scan failure), and `test_resume.py`
+  (every resume-table row; only `RECONCILE_MERGED` permits merge; failing
+  checks never merge; idempotency key stability and field sensitivity;
+  byte-identical deterministic JSON).
+- Committed the WP-A02 closeout receipt
+  (`automation/receipts/wp-closeout-a02.json`).
 - Repository governance baseline under `AutonomyPolicy/v1`: policy immutability
   for an active mission, protected governance paths, and a dedicated
   governance-change workflow requiring the old verifier on the new diff, a new
@@ -60,6 +109,8 @@ is supported. See `README.md` and `GOVERNANCE.md` for the evidence rules.
 
 ### Changed
 
+- `.github/workflows/ci.yml` adds the `autonomy-contracts-gate` job (WP-A03);
+  the existing lint, typecheck, unit, and package jobs are unchanged.
 - README now references `CHANGELOG.md`, `GOVERNANCE.md`, and `NOTICE`.
 
 ### Security
