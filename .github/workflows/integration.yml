@@ -1,0 +1,48 @@
+# P0 integration gate (WP-E45). The Phase E capstone: proves the four P0
+# packs (units, smt, ripser, pyriemann) integrate as a coherent, measured,
+# honestly-claimed release.
+#
+# Actions are pinned to the same full commit SHAs as ci.yml for reproducibility
+# and supply-chain integrity.
+#
+# Resolved SHAs (re-resolve on update):
+#   actions/checkout  v5.1.0 -> fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+#   astral-sh/setup-uv v9.0.0 -> c771a70e6277c0a99b617c7a806ffedaca235ff9
+name: integration
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  merge_group:
+
+permissions:
+  contents: read
+
+jobs:
+  p0-integration-gate:
+    name: p0-integration-gate (WP-E45)
+    runs-on: ubuntu-24.04
+    # 30 minutes is a generous envelope over the measured corpus: the WP-E45
+    # gate completes in single-digit seconds on commodity hardware (the
+    # published gate_wall_seconds is ~0.2s; the 30-minute ceiling absorbs CI
+    # runner provisioning, dependency install, and the five-distinct-runs-per-
+    # pack measurement batch). The gate itself enforces a hard 300s wall guard.
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Setup uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9  # v9.0.0
+        with:
+          enable-cache: true
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+      - name: Install dependencies (locked)
+        run: uv sync --locked
+      - name: WP-E45 P0 integration gate
+        run: uv run python scripts/checks/wp45-gate.py
+      - name: P0 integration end-to-end tests
+        run: uv run pytest tests/integration -q
