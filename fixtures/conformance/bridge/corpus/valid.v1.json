@@ -1,0 +1,259 @@
+{
+  "schema_version": "BridgeCorpusDoc/v1",
+  "description": "Twelve synthetic, disclosure-safe LabExportPacket/v1 build cases for the WP-I81 export-adversarial corpus. Every object here is SYNTHETIC: synthetic sha256 digests are LOW-ENTROPY (a 2-hex pattern repeated 32 times, Shannon entropy <= 1.0 bits/char) so the secret_scan long_hex detector does not flag them, while remaining valid 'sha256:<64 hex>' identities; disclosure-safe summaries describe the science (never the environment). No local paths, no credentials, no private keys, no raw dataset markers, no T7/VPS topology identifiers, no live/trading/promotion flags, no argv/shell markers, no env assignments. The corpus covers the coarse object-type vocabulary (claim, math_ir, receipt, catalog, evidence, plan, request, pilot, condition, constant, model interface, adapter, symbol table) AND BOTH disclosure policies (digest_replaced and omitted), single-object and multi-object packets, empty and non-empty provenance, both default and tightened summary_max_bytes budgets. The WP-I81 gate (scripts/checks/wp81-corpus.py) rebuilds each case through srl.bridge.exporter.build_packet and asserts it builds, schema-validates, and is under the 1 MiB cap. This file is scanner-clean under scripts/checks/public_boundary.py and scripts/checks/secret_scan.py EVEN WHEN TRACKED.",
+  "cases": [
+    {
+      "case_id": "valid-01-claim-digest-replaced",
+      "policy": {
+        "private_identities": "digest_replaced",
+        "summary_max_bytes": 1024
+      },
+      "created_utc": "2026-07-28T00:00:00Z",
+      "source_snapshot_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "objects": [
+        {
+          "object_digest": "sha256:0101010101010101010101010101010101010101010101010101010101010101",
+          "object_type": "claim",
+          "sanitized_summary": "The iterative solver converges quadratically near the fixed point.",
+          "provenance_refs": [
+            "sha256:0202020202020202020202020202020202020202020202020202020202020202"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "valid-02-claim-omitted",
+      "policy": {
+        "private_identities": "omitted",
+        "summary_max_bytes": 512
+      },
+      "created_utc": "2026-07-28T01:02:03Z",
+      "source_snapshot_digest": null,
+      "objects": [
+        {
+          "object_digest": "sha256:0303030303030303030303030303030303030303030303030303030303030303",
+          "object_type": "claim",
+          "sanitized_summary": "The estimator is consistent under the stated identification assumptions.",
+          "provenance_refs": [
+            "sha256:0404040404040404040404040404040404040404040404040404040404040404",
+            "sha256:0505050505050505050505050505050505050505050505050505050505050505"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "valid-03-math-ir-multi-object",
+      "policy": {
+        "private_identities": "digest_replaced",
+        "summary_max_bytes": 1024
+      },
+      "created_utc": "2026-07-28T02:00:00Z",
+      "source_snapshot_digest": "sha256:0606060606060606060606060606060606060606060606060606060606060606",
+      "objects": [
+        {
+          "object_digest": "sha256:0707070707070707070707070707070707070707070707070707070707070707",
+          "object_type": "math_ir",
+          "sanitized_summary": "The recurrence relation reduces to a contraction mapping on a bounded domain.",
+          "provenance_refs": []
+        },
+        {
+          "object_digest": "sha256:0808080808080808080808080808080808080808080808080808080808080808",
+          "object_type": "symbol_table",
+          "sanitized_summary": "Symbol table binds the free variable to a real constant in a single scope.",
+          "provenance_refs": [
+            "sha256:0909090909090909090909090909090909090909090909090909090909090909"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "valid-04-condition-set-omitted",
+      "policy": {
+        "private_identities": "omitted",
+        "summary_max_bytes": 256
+      },
+      "created_utc": "2026-07-28T03:30:00Z",
+      "source_snapshot_digest": null,
+      "objects": [
+        {
+          "object_digest": "sha256:0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a",
+          "object_type": "condition_set",
+          "sanitized_summary": "Boundary conditions close the system on a compact interval.",
+          "provenance_refs": []
+        }
+      ]
+    },
+    {
+      "case_id": "valid-05-constant-ref-digest-replaced",
+      "policy": {
+        "private_identities": "digest_replaced",
+        "summary_max_bytes": 1024
+      },
+      "created_utc": "2026-07-28T04:15:00Z",
+      "source_snapshot_digest": "sha256:0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b",
+      "objects": [
+        {
+          "object_digest": "sha256:0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c",
+          "object_type": "constant_ref",
+          "sanitized_summary": "A named dimensionless constant cited from a public reference table.",
+          "provenance_refs": [
+            "sha256:0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d0d",
+            "sha256:0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "valid-06-model-interface-omitted",
+      "policy": {
+        "private_identities": "omitted",
+        "summary_max_bytes": 1024
+      },
+      "created_utc": "2026-07-28T05:00:00Z",
+      "source_snapshot_digest": null,
+      "objects": [
+        {
+          "object_digest": "sha256:0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f",
+          "object_type": "model_interface",
+          "sanitized_summary": "The model interface exposes a forward map and its adjoint, both bounded.",
+          "provenance_refs": [
+            "sha256:1010101010101010101010101010101010101010101010101010101010101010"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "valid-07-adapter-profile-digest-replaced",
+      "policy": {
+        "private_identities": "digest_replaced",
+        "summary_max_bytes": 2000
+      },
+      "created_utc": "2026-07-28T06:00:00Z",
+      "source_snapshot_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+      "objects": [
+        {
+          "object_digest": "sha256:1212121212121212121212121212121212121212121212121212121212121212",
+          "object_type": "adapter_profile",
+          "sanitized_summary": "Adapter profile records a bounded execution shape with no private topology.",
+          "provenance_refs": []
+        }
+      ]
+    },
+    {
+      "case_id": "valid-08-transformation-receipt-digest-replaced",
+      "policy": {
+        "private_identities": "digest_replaced",
+        "summary_max_bytes": 1024
+      },
+      "created_utc": "2026-07-28T07:07:07Z",
+      "source_snapshot_digest": null,
+      "objects": [
+        {
+          "object_digest": "sha256:1313131313131313131313131313131313131313131313131313131313131313",
+          "object_type": "transformation_receipt",
+          "sanitized_summary": "A transformation receipt confirms a reversible map was applied to the math IR.",
+          "provenance_refs": [
+            "sha256:1414141414141414141414141414141414141414141414141414141414141414"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "valid-09-evidence-engine-run-receipts-omitted",
+      "policy": {
+        "private_identities": "omitted",
+        "summary_max_bytes": 1024
+      },
+      "created_utc": "2026-07-28T08:00:00Z",
+      "source_snapshot_digest": "sha256:1515151515151515151515151515151515151515151515151515151515151515",
+      "objects": [
+        {
+          "object_digest": "sha256:1616161616161616161616161616161616161616161616161616161616161616",
+          "object_type": "evidence_assessment",
+          "sanitized_summary": "Weak statistical support; not yet independently replicated.",
+          "provenance_refs": [
+            "sha256:1717171717171717171717171717171717171717171717171717171717171717",
+            "sha256:1818181818181818181818181818181818181818181818181818181818181818"
+          ]
+        },
+        {
+          "object_digest": "sha256:1919191919191919191919191919191919191919191919191919191919191919",
+          "object_type": "engine_receipt",
+          "sanitized_summary": "Engine completed actual compute in bounded wall time.",
+          "provenance_refs": [
+            "sha256:1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a"
+          ]
+        },
+        {
+          "object_digest": "sha256:1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b",
+          "object_type": "run_receipt",
+          "sanitized_summary": "Run receipt records a bounded deterministic execution envelope.",
+          "provenance_refs": []
+        }
+      ]
+    },
+    {
+      "case_id": "valid-10-validation-receipt-digest-replaced",
+      "policy": {
+        "private_identities": "digest_replaced",
+        "summary_max_bytes": 512
+      },
+      "created_utc": "2026-07-28T09:30:00Z",
+      "source_snapshot_digest": null,
+      "objects": [
+        {
+          "object_digest": "sha256:1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c",
+          "object_type": "validation_receipt",
+          "sanitized_summary": "Validation receipt records a contract-layer check that passed on the synthetic input.",
+          "provenance_refs": [
+            "sha256:1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d1d"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "valid-11-plan-request-pilot-digest-replaced",
+      "policy": {
+        "private_identities": "digest_replaced",
+        "summary_max_bytes": 1024
+      },
+      "created_utc": "2026-07-28T10:10:10Z",
+      "source_snapshot_digest": "sha256:1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e",
+      "objects": [
+        {
+          "object_digest": "sha256:1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f",
+          "object_type": "plan",
+          "sanitized_summary": "A bounded plan orders three review-only steps with no canonical writes.",
+          "provenance_refs": []
+        },
+        {
+          "object_digest": "sha256:2020202020202020202020202020202020202020202020202020202020202020",
+          "object_type": "request",
+          "sanitized_summary": "A request asks for a bounded review of the synthetic math object.",
+          "provenance_refs": [
+            "sha256:2121212121212121212121212121212121212121212121212121212121212121"
+          ]
+        },
+        {
+          "object_digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+          "object_type": "pilot_spec",
+          "sanitized_summary": "A pilot spec fixes a synthetic bounded execution profile.",
+          "provenance_refs": [
+            "sha256:2323232323232323232323232323232323232323232323232323232323232323",
+            "sha256:2424242424242424242424242424242424242424242424242424242424242424"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "valid-12-empty-objects-digest-replaced",
+      "policy": {
+        "private_identities": "digest_replaced",
+        "summary_max_bytes": 1024
+      },
+      "created_utc": "2026-07-28T11:11:11Z",
+      "source_snapshot_digest": null,
+      "objects": []
+    }
+  ]
+}

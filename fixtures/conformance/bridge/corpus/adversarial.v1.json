@@ -1,0 +1,395 @@
+{
+  "schema_version": "BridgeCorpusDoc/v1",
+  "description": "Adversarial LabExportPacket/v1 build inputs for the WP-I81 export-adversarial corpus (>=40 cases, I81-02). Each case names ONE forbidden class (or structural failure mode) and an expected typed fail_reason. The token_template uses CHARACTER-LEVEL placeholder tokens only ({S} for slash, {H} for hyphen, {U} for underscore, {E} for equals, {B} for backslash, {FW} for the fullwidth slash U+FF0F, {ZW} for the zero-width space U+200B), so this file is scanner-clean under scripts/checks/public_boundary.py EVEN WHEN TRACKED: it contains no literal slash in any path shape, no literal credential shape, no literal private key header, and no literal UUIDv7. Credential-shaped tokens ({GH}, {SK}, {AK}, {PEM}) appear in the templates as OPAQUE LABELS; the gate script (scripts/checks/wp81-corpus.py) owns their literal expansion in Python source (split across concatenation so no contiguous forbidden literal appears in the tracked .py either). The gate substitutes every placeholder at runtime to reconstruct the literal forbidden string, then feeds it to srl.bridge.exporter.build_packet. Each case MUST be rejected: fail_reason=BRIDGE_CONTRACT_MISMATCH for a forbidden summary class or an oversize packet or a smuggling hit; fail_reason=CONTRACT_INVALID for a structural/schema/object-construction failure. No literal secrets: every credential is a placeholder pattern (concatenation), never a live value.",
+  "placeholder_map": {
+    "{S}": "/",
+    "{H}": "-",
+    "{U}": "_",
+    "{E}": "=",
+    "{B}": "\\",
+    "{FW}": "／",
+    "{ZW}": "​"
+  },
+  "cases": [
+    {
+      "case_id": "adv-001-local-path-users",
+      "class": "forbidden_summary",
+      "forbidden_class": "local_path",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "saw the artifact at ",
+      "token_template": "{S}Users{S}alice{S}secret{S}local.bin"
+    },
+    {
+      "case_id": "adv-002-local-path-volumes",
+      "class": "forbidden_summary",
+      "forbidden_class": "local_path",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "stored on volume ",
+      "token_template": "{S}Volumes{S}T7{S}dataset.bin"
+    },
+    {
+      "case_id": "adv-003-structural-app-path",
+      "class": "forbidden_summary",
+      "forbidden_class": "unix_path",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "stored at ",
+      "token_template": "{S}app{S}secret{S}file",
+      "note": "Red-team structural path with an unlisted directory root (/app); the detector is structural, not list-based."
+    },
+    {
+      "case_id": "adv-004-structural-opt-path",
+      "class": "forbidden_summary",
+      "forbidden_class": "unix_path",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "data resides at ",
+      "token_template": "{S}opt{S}data{S}f"
+    },
+    {
+      "case_id": "adv-005-argv-long-flag",
+      "class": "forbidden_summary",
+      "forbidden_class": "argv_flag",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "invoked with flag ",
+      "token_template": "{H}{H}secret-token"
+    },
+    {
+      "case_id": "adv-006-argv-short-flag",
+      "class": "forbidden_summary",
+      "forbidden_class": "argv_short_flag",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "ran with ",
+      "token_template": "{H}x8 secret"
+    },
+    {
+      "case_id": "adv-007-shell-executable",
+      "class": "forbidden_summary",
+      "forbidden_class": "shell_command",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "the operator ran ",
+      "token_template": "sudo chmod 777"
+    },
+    {
+      "case_id": "adv-008-env-assignment-uppercase",
+      "class": "forbidden_summary",
+      "forbidden_class": "env_assignment",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "configured via ",
+      "token_template": "API_KEY{E}deadbeefcafe"
+    },
+    {
+      "case_id": "adv-009-env-assignment-lowercase",
+      "class": "forbidden_summary",
+      "forbidden_class": "env_assignment",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "configured via ",
+      "token_template": "api{U}key{E}deadbeef",
+      "note": "Case-insensitive env-assignment detection: lowercase api_key=deadbeef is refused (red-team cycle 1 finding)."
+    },
+    {
+      "case_id": "adv-010-env-reference",
+      "class": "forbidden_summary",
+      "forbidden_class": "env_reference",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "reads token from var ",
+      "token_template": "$DATABASE_TOKEN"
+    },
+    {
+      "case_id": "adv-011-credential-github-pat",
+      "class": "forbidden_summary",
+      "forbidden_class": "credential_pattern",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "github pat ",
+      "token_template": "{GH}_AAAAAAAAAAAAAAAA"
+    },
+    {
+      "case_id": "adv-012-credential-sk-key",
+      "class": "forbidden_summary",
+      "forbidden_class": "credential_pattern",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "the bearer token is ",
+      "token_template": "{SK}{H}AAAAAAAAAAAAAAAA"
+    },
+    {
+      "case_id": "adv-013-credential-aws-key",
+      "class": "forbidden_summary",
+      "forbidden_class": "credential_pattern",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "uses aws key ",
+      "token_template": "{AK}ZZZZZZZZZZZZZZZZ"
+    },
+    {
+      "case_id": "adv-014-credential-pem-key",
+      "class": "forbidden_summary",
+      "forbidden_class": "credential_pattern",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "embedded key header ",
+      "token_template": "{PEM}"
+    },
+    {
+      "case_id": "adv-015-credential-keyword-secret",
+      "class": "forbidden_summary",
+      "forbidden_class": "credential_keyword",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "the field ",
+      "token_template": "secret{E}hunter2",
+      "note": "A secret field bound by = discloses a secret shape even when the value is not a recognized concrete credential pattern."
+    },
+    {
+      "case_id": "adv-016-raw-dataset-marker-one",
+      "class": "forbidden_summary",
+      "forbidden_class": "raw_dataset_marker",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "summarizes the ",
+      "token_template": "raw{U}dataset of patient records"
+    },
+    {
+      "case_id": "adv-017-raw-dataset-marker-two",
+      "class": "forbidden_summary",
+      "forbidden_class": "raw_dataset_marker",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "drawn from the ",
+      "token_template": "private{U}data of the cohort"
+    },
+    {
+      "case_id": "adv-018-t7-identity-uuidv7-one",
+      "class": "forbidden_summary",
+      "forbidden_class": "t7_uuidv7",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "t7 volume id ",
+      "token_template": "017f22e2{H}7d2c{H}7123{H}9abc{H}def012345678"
+    },
+    {
+      "case_id": "adv-019-t7-identity-uuidv7-two",
+      "class": "forbidden_summary",
+      "forbidden_class": "t7_uuidv7",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "bound to volume ",
+      "token_template": "018a4b0c{H}7e01{H}7abc{H}8def{H}001122334455"
+    },
+    {
+      "case_id": "adv-020-vps-topology-host",
+      "class": "forbidden_summary",
+      "forbidden_class": "vps_topology_marker",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "runs on ",
+      "token_template": "vps{U}host{U}01 in region"
+    },
+    {
+      "case_id": "adv-021-vps-topology-zone",
+      "class": "forbidden_summary",
+      "forbidden_class": "vps_topology_marker",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "deployed to ",
+      "token_template": "availability{U}zone us{H}east{H}1a"
+    },
+    {
+      "case_id": "adv-022-pulse-shape",
+      "class": "forbidden_summary",
+      "forbidden_class": "private_key_marker",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "derived from the ",
+      "token_template": "organism{U}pulse object"
+    },
+    {
+      "case_id": "adv-023-snapshot-shape",
+      "class": "forbidden_summary",
+      "forbidden_class": "private_key_marker",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "origin is the ",
+      "token_template": "unified{U}snapshot view"
+    },
+    {
+      "case_id": "adv-024-operator-context-shape",
+      "class": "forbidden_summary",
+      "forbidden_class": "private_key_marker",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "bound to the ",
+      "token_template": "operator{U}context record"
+    },
+    {
+      "case_id": "adv-025-live-mode-flag",
+      "class": "forbidden_summary",
+      "forbidden_class": "promotion_flag",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "marks ",
+      "token_template": "live{U}mode as enabled"
+    },
+    {
+      "case_id": "adv-026-trading-flag",
+      "class": "forbidden_summary",
+      "forbidden_class": "promotion_flag",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "enables ",
+      "token_template": "live{U}trading for this run"
+    },
+    {
+      "case_id": "adv-027-promotion-flag",
+      "class": "forbidden_summary",
+      "forbidden_class": "promotion_flag",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "records ",
+      "token_template": "promotion{U}granted to production"
+    },
+    {
+      "case_id": "adv-028-windows-path",
+      "class": "forbidden_summary",
+      "forbidden_class": "windows_path",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "log written to drive ",
+      "token_template": "D:{B}ProgramData{B}srl{B}run.log"
+    },
+    {
+      "case_id": "adv-029-self-referential-fixed-point",
+      "class": "self_referential_hash",
+      "forbidden_class": "self_referential_hash",
+      "expected_fail_reason": "CONTRACT_INVALID",
+      "prefix": "a self-referential fixed point is not constructible through the public API",
+      "token_template": "",
+      "note": "The exporter derives a packet-local replacement for each object digest (sha256(seed + private)); the seed is independent of any object digest, so no object_digest can equal its own raw private digest. The gate confirms no fixed point exists; a structurally-invalid digest is rejected as CONTRACT_INVALID."
+    },
+    {
+      "case_id": "adv-030-stale-hash",
+      "class": "stale_hash",
+      "forbidden_class": "stale_hash",
+      "expected_fail_reason": "CONTRACT_INVALID",
+      "prefix": "a stale object digest that no longer matches its content is rejected",
+      "token_template": "",
+      "note": "A stale (no-longer-content-addressed) object digest: the gate tamper-substitutes a non-sha256 digest into an object slot and asserts schema validation rejects it as CONTRACT_INVALID (defense in depth). The exporter never trusts a caller-supplied object digest in the wire form."
+    },
+    {
+      "case_id": "adv-031-unknown-schema-version",
+      "class": "unknown_schema_version",
+      "forbidden_class": "unknown_schema_version",
+      "expected_fail_reason": "CONTRACT_INVALID",
+      "prefix": "a packet with a wrong schema version must fail validation",
+      "token_template": "",
+      "note": "Structural failure: schema-validation defense-in-depth rejects a packet whose schema_version is not LabExportPacket/v1."
+    },
+    {
+      "case_id": "adv-032-unknown-license-field",
+      "class": "unknown_license",
+      "forbidden_class": "unknown_license",
+      "expected_fail_reason": "CONTRACT_INVALID",
+      "prefix": "a packet with an unknown license field must fail validation",
+      "token_template": "",
+      "note": "Structural failure: LabExportPacket/v1 forbids additional properties (additionalProperties: false). A smuggled 'license' field (e.g. an incompatible or unknown license label) is rejected as CONTRACT_INVALID by schema validation. The packet carries no license field by design."
+    },
+    {
+      "case_id": "adv-033-unknown-object-type",
+      "class": "unknown_object_type",
+      "forbidden_class": "unknown_object_type",
+      "expected_fail_reason": "CONTRACT_INVALID",
+      "prefix": "valid summary text",
+      "token_template": "",
+      "object_type": "private_payload_shape",
+      "note": "Structural failure: an object_type outside the disclosure-safe enum vocabulary is rejected as CONTRACT_INVALID at ExportObject construction. The bogus type is deliberately not a real private object-type alias."
+    },
+    {
+      "case_id": "adv-034-oversize-packet",
+      "class": "oversize_packet",
+      "forbidden_class": "oversize_packet",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "oversize",
+      "token_template": "",
+      "note": "A packet whose canonical encoded bytes exceed the 1 MiB cap is rejected with OversizePacketError (fail reason BRIDGE_CONTRACT_MISMATCH). The exporter performs NO truncation. The gate builds enough safe objects to exceed the cap."
+    },
+    {
+      "case_id": "adv-035-nested-smuggling-path",
+      "class": "nested_smuggling",
+      "forbidden_class": "nested_smuggling",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "see the artifact at ",
+      "token_template": "{S}app{S}secret{S}file",
+      "smuggle_field": "notes",
+      "note": "Red-team smuggling vector: a forbidden structural path hidden in a NESTED non-exempt field ('notes') of the packet payload. The recursive payload scan (scan_payload) refuses it with BRIDGE_CONTRACT_MISMATCH, closing the vector where a forbidden value hidden outside sanitized_summary would reach a built packet."
+    },
+    {
+      "case_id": "adv-036-nested-smuggling-credential",
+      "class": "nested_smuggling",
+      "forbidden_class": "nested_smuggling",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "the token is ",
+      "token_template": "{SK}{H}AAAAAAAAAAAAAAAA",
+      "smuggle_field": "metadata",
+      "note": "Red-team smuggling vector: a credential-shaped value hidden in a NESTED non-exempt field ('metadata'). The recursive payload scan refuses it with BRIDGE_CONTRACT_MISMATCH."
+    },
+    {
+      "case_id": "adv-037-unicode-fullwidth-slash-attempt",
+      "class": "unicode_evasion",
+      "forbidden_class": "unicode_evasion",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "stored at ",
+      "token_template": "{FW}opt and then {S}etc{S}foo",
+      "note": "Unicode-evasion ATTEMPT: a fullwidth slash (U+FF0F) is interspersed in a path, but the case ALSO carries an ASCII structural path (/etc/foo) so an ASCII detector still fires and the attempt is REFUSED. Rationale: the sanitizer does NOT unicode-normalize, so a fullwidth slash ALONE would be an evasion gap; this corpus case documents that the attempt is caught here only because an ASCII forbidden substring co-occurs. The standalone fullwidth-slash gap is recorded in docs/security/export-adversarial.md as a known, accepted limitation (refuse-not-strip forbids a quiet unicode rewrite)."
+    },
+    {
+      "case_id": "adv-038-unicode-zwsp-in-path-attempt",
+      "class": "unicode_evasion",
+      "forbidden_class": "unicode_evasion",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "stored at ",
+      "token_template": "{S}app{S}sec{ZW}ret{S}file",
+      "note": "Unicode-evasion ATTEMPT: a zero-width space (U+200B) is injected INSIDE a path segment ('sec<ZW>ret') so the ASCII slash structure stays intact. The structural path detector still matches the contiguous /app/sec...ret/file sequence, so the attempt is REFUSED (unix_path). Documents that ZWSP inserted inside a segment does not bypass the detector because the slashes and segment bodies remain contiguous; ZWSP inserted BETWEEN segments (replacing a slash) WOULD bypass it — that is a known, accepted limitation recorded in docs/security/export-adversarial.md."
+    },
+    {
+      "case_id": "adv-039-wrong-type-summary-numeric",
+      "class": "wrong_type",
+      "forbidden_class": "wrong_type",
+      "expected_fail_reason": "CONTRACT_INVALID",
+      "prefix": "wrong-type numeric summary",
+      "token_template": "",
+      "wrong_value_kind": "numeric_summary",
+      "note": "Wrong-type failure: sanitized_summary is a number, not a string. normalize_summary enforces the string type at build time and rejects it as CONTRACT_INVALID (the field is a free-text disclosure surface; a non-string value is a structural contract violation)."
+    },
+    {
+      "case_id": "adv-040-wrong-type-object-digest",
+      "class": "wrong_type",
+      "forbidden_class": "wrong_type",
+      "expected_fail_reason": "CONTRACT_INVALID",
+      "prefix": "wrong-type integer object digest",
+      "token_template": "",
+      "wrong_value_kind": "integer_digest",
+      "note": "Wrong-type failure: object_digest is an integer, not a sha256 string. ExportObject construction rejects it as CONTRACT_INVALID (the field must be a 'sha256:<64 hex>' digest)."
+    },
+    {
+      "case_id": "adv-041-grants-authority-tamper-true",
+      "class": "grants_authority_tamper",
+      "forbidden_class": "grants_authority_tamper",
+      "expected_fail_reason": "CONTRACT_INVALID",
+      "prefix": "a packet whose grants_authority is tampered to true must fail validation",
+      "token_template": "",
+      "tamper_field": "grants_authority",
+      "tamper_value": true,
+      "note": "Safety-const tamper: grants_authority is pinned false (const). Tampering it to true fails schema validation as CONTRACT_INVALID. A disclosed summary is never an authorization to act, integrate, or promote."
+    },
+    {
+      "case_id": "adv-042-grants-authority-tamper-writes",
+      "class": "grants_authority_tamper",
+      "forbidden_class": "grants_authority_tamper",
+      "expected_fail_reason": "CONTRACT_INVALID",
+      "prefix": "a packet whose canonical_writes is tampered to a positive number must fail validation",
+      "token_template": "",
+      "tamper_field": "canonical_writes",
+      "tamper_value": 1,
+      "note": "Safety-const tamper: canonical_writes is pinned 0 (const). Tampering it to 1 fails schema validation as CONTRACT_INVALID. Authoring a packet performs zero canonical writes."
+    },
+    {
+      "case_id": "adv-043-credential-keyword-token",
+      "class": "forbidden_summary",
+      "forbidden_class": "credential_keyword",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "the header ",
+      "token_template": "token: abc123value",
+      "note": "A token field bound by ':' discloses a secret shape; detected case-insensitively as credential_keyword."
+    },
+    {
+      "case_id": "adv-044-credential-keyword-password",
+      "class": "forbidden_summary",
+      "forbidden_class": "credential_keyword",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "the field ",
+      "token_template": "password{E}letmein99",
+      "note": "A password field bound by '=' discloses a secret shape; detected case-insensitively as credential_keyword."
+    }
+  ]
+}
