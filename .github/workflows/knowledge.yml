@@ -37,3 +37,25 @@ jobs:
         run: uv run pytest tests/knowledge
       - name: WP-D33 api-retriever gate
         run: uv run python3 scripts/checks/wp33-gate.py
+
+  knowledge-sources-gate:
+    name: knowledge-sources-gate (WP-E44)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Setup uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9  # v9.0.0
+        with:
+          enable-cache: true
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+      - name: Install dependencies (locked)
+        run: uv sync --locked
+      - name: Hermetic source adapter tests
+        run: uv run pytest tests/knowledge/sources
+      - name: WP-E44 knowledge sources gate
+        run: uv run python3 scripts/checks/wp44-gate.py
