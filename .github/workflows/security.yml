@@ -49,10 +49,12 @@ jobs:
         run: uv sync --locked
       # pip-audit is pinned to 2.8.0. The export step materializes the locked
       # dependency set as a requirements file so pip-audit can scan it;
-      # process substitution is avoided for shell portability.
+      # process substitution is avoided for shell portability. The local project
+      # package is excluded because pip-audit cannot audit an editable source
+      # tree and its wheel hash is not available in the export.
       - name: Dependency audit
         run: |
-          uv export --locked --format requirements-txt > /tmp/requirements.txt
+          uv export --locked --format requirements-txt --no-emit-project > /tmp/requirements.txt
           uv run --with pip-audit==2.8.0 pip-audit --requirement /tmp/requirements.txt
 
   license-inventory:
