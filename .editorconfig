@@ -1,0 +1,42 @@
+# EditorConfig is awesome: https://editorconfig.org
+# Scientific Resource Lab shared editor configuration.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+[*.{py,pyi}]
+indent_size = 4
+max_line_length = 100
+
+[*.{yml,yaml,json,jsonc,json5}]
+indent_size = 2
+
+[*.{cfl,cff}]
+indent_size = 2
+
+[*.{md,markdown}]
+# Markdown: preserve trailing two-space hard line breaks; do not trim them.
+trim_trailing_whitespace = false
+max_line_length = off
+
+[*.{rst,txt}]
+indent_size = 4
+
+[*.{toml,ini,cfg}]
+indent_size = 2
+
+[Makefile]
+indent_style = tab
+
+[*.{sh,bash}]
+indent_size = 2
+
+[*.lock]
+# Lock files are machine-managed; do not reflow.
+indent_size = 2

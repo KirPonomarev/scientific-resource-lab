@@ -1,0 +1,43 @@
+# Scientific Resource Lab pre-commit hooks.
+# Install once per clone:  pre-commit install
+# Run manually on all files: pre-commit run --all-files
+# Hook repos are pinned to exact revisions for reproducibility.
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+        name: trailing-whitespace
+      - id: end-of-file-fixer
+        name: end-of-file-fixer
+      - id: check-json
+        name: check-json
+        exclude: |
+          (?x)^(
+            \.ipynb
+          )$
+      - id: check-yaml
+        name: check-yaml
+        # Issue templates and CI files may use multi-document YAML or
+        # frontmatter that check-yaml's safe_load cannot load directly.
+        args: [--allow-multiple-documents]
+        exclude: |
+          (?x)^(
+            \.github/workflows/.*|
+            \.pre-commit-config\.yaml
+          )$
+      - id: check-added-large-files
+        name: check-added-large-files
+        args: [--maxkb=5120]
+      - id: detect-private-key
+        name: detect-private-key
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.0
+    hooks:
+      - id: ruff
+        name: ruff check --fix
+        args: [--fix]
+      - id: ruff-format
+        name: ruff-format
