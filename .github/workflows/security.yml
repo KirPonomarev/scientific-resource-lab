@@ -1,0 +1,76 @@
+# Security hardening workflow (WP-A04).
+# Actions are pinned to full commit SHAs for reproducibility and supply-chain
+# integrity. Bump by resolving the new tag's commit SHA via the GitHub API and
+# replacing the SHA here (keeping the comment with the human-readable tag).
+#
+# Resolved SHAs (re-resolve on update):
+#   actions/checkout  v5.1.0 -> fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+#   astral-sh/setup-uv v9.0.0 -> c771a70e6277c0a99b617c7a806ffedaca235ff9
+name: security
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  merge_group:
+
+permissions:
+  contents: read
+
+jobs:
+  secret-scan:
+    name: secret scan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Secret scan
+        run: python3 scripts/checks/secret_scan.py
+
+  dependency-audit:
+    name: dependency audit (pip-audit)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Setup uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9  # v9.0.0
+        with:
+          enable-cache: true
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+      - name: Install dependencies (locked)
+        run: uv sync --locked
+      # pip-audit is pinned to 2.8.0. The export step materializes the locked
+      # dependency set as a requirements file so pip-audit can scan it;
+      # process substitution is avoided for shell portability.
+      - name: Dependency audit
+        run: |
+          uv export --locked --format requirements-txt > /tmp/requirements.txt
+          uv run --with pip-audit==2.8.0 pip-audit --requirement /tmp/requirements.txt
+
+  license-inventory:
+    name: license inventory
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Setup uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9  # v9.0.0
+        with:
+          enable-cache: true
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+      - name: Install dependencies (locked)
+        run: uv sync --locked
+      - name: License inventory
+        run: uv run python3 scripts/checks/license_inventory.py
