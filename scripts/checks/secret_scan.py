@@ -78,6 +78,12 @@ _LONG_HEX_ENTROPY_THRESHOLD: Final[float] = 3.0  # bits per hex character
 # Files that are known to contain benign long-hex strings by design.
 _LONG_HEX_SKIP_FILES: Final[frozenset[str]] = frozenset({"uv.lock"})
 
+# Path prefixes of files whose long-hex content is a content-hash manifest
+# rather than a secret (e.g. public synthetic fixture manifests).
+_LONG_HEX_SKIP_PREFIXES: Final[tuple[str, ...]] = (
+    "fixtures/public/",
+)
+
 # Snippet sanitization constants.
 _SNIPPET_CONTEXT_CHARS: Final[int] = 12
 _SNIPPET_KEEP_CHARS: Final[int] = 4
@@ -224,6 +230,8 @@ def _scan_long_hex(
 ) -> list[Finding]:
     """Return long-hex findings for a single line, skipped for known hash files."""
     if file_path in _LONG_HEX_SKIP_FILES:
+        return []
+    if any(file_path.startswith(prefix) for prefix in _LONG_HEX_SKIP_PREFIXES):
         return []
     findings: list[Finding] = []
     for match in re.finditer(r"\b[0-9a-fA-F]{64,}\b", line):
