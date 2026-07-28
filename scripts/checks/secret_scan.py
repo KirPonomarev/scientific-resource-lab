@@ -166,12 +166,24 @@ def _tracked_files() -> list[str]:
 
 
 def _load_allowlist(path: Path) -> set[str]:
-    """Load the set of allowed SHA-256 digests from *path*."""
+    """Load the set of allowed SHA-256 digests from *path*.
+
+    The allowlist is strictly digest-only: each entry records the SHA-256 of a
+    benign string and a reason, never the literal string itself.  If an entry
+    contains a ``sample`` field, the allowlist has been reverted to the unsafe
+    literal-token format and the scanner fails closed.
+    """
     if not path.exists():
         return set()
     with path.open("r", encoding="utf-8") as handle:
         data = json.load(handle)
     entries = data.get("entries", {})
+    for digest, meta in entries.items():
+        if "sample" in meta:
+            raise ValueError(
+                f"Allowlist entry {digest} contains a literal 'sample' field; "
+                "store only SHA-256 digests and reasons."
+            )
     return set(entries.keys())
 
 
