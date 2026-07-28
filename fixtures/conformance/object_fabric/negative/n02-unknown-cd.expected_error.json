@@ -1,0 +1,7 @@
+{
+  "name": "n02-unknown-cd",
+  "validator": "math_ir_expression",
+  "exception": "UnsupportedOperatorError",
+  "fail_reason": "IR_UNSUPPORTED",
+  "reason": "foo1 is not an accepted content dictionary; rejected by the allowlist."
+}

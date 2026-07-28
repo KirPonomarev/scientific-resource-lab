@@ -1,0 +1,7 @@
+{
+  "name": "n06-ir-depth-bomb",
+  "validator": "math_ir_expression",
+  "exception": "IRResourceLimitError",
+  "fail_reason": "CONTRACT_INVALID",
+  "reason": "Expression depth exceeds the 64-node depth guard."
+}

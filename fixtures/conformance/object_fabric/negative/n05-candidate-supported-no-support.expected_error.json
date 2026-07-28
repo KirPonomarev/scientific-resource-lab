@@ -1,0 +1,7 @@
+{
+  "name": "n05-candidate-supported-no-support",
+  "validator": "claim",
+  "exception": "ClaimInvariantError",
+  "fail_reason": "CONTRACT_INVALID",
+  "reason": "candidate_hypothesis cannot graduate to supported without support_refs."
+}

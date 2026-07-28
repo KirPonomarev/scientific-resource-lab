@@ -1,0 +1,39 @@
+{
+  "schema_version": "ConditionSet/v1",
+  "conditions": [
+    {
+      "condition_id": "c1",
+      "kind": "positivity",
+      "expression": {
+        "math": {
+          "op": "relation1.gt",
+          "args": [
+            {
+              "var": "k"
+            },
+            {
+              "const": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "condition_id": "c2",
+      "kind": "positivity",
+      "expression": {
+        "math": {
+          "op": "relation1.gt",
+          "args": [
+            {
+              "var": "m"
+            },
+            {
+              "const": "0"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

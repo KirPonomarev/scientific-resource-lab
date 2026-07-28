@@ -1,0 +1,7 @@
+{
+  "name": "n04-established-law-no-literature",
+  "validator": "claim",
+  "exception": "ClaimInvariantError",
+  "fail_reason": "CONTRACT_INVALID",
+  "reason": "established_law_reference requires epistemic_source=literature."
+}

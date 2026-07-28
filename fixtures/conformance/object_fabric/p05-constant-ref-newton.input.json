@@ -1,0 +1,10 @@
+{
+  "schema_version": "ConstantRef/v1",
+  "constant_id": "pack_local.newton",
+  "source": "pack_local",
+  "symbol": "N",
+  "value": "1",
+  "uncertainty": "0",
+  "unit": "kg.m.s-2",
+  "vintage": "pack-2026-07"
+}

@@ -1,0 +1,185 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srlab.dev/v1/ScientificClaim.json",
+  "title": "ScientificClaim/v1",
+  "description": "A typed scientific statement under epistemic discipline. A claim carries a structured statement (a subject/predicate/object triple or a MathIR reference), a claim_class placing it on the epistemic ladder, a claim_status tracking investigation, an epistemic_source naming how the claim came to be, and support_refs pointing at the supporting objects. CRITICAL INVARIANT: claim_class='established_law_reference' REQUIRES epistemic_source='literature' AND a non-empty support_refs; a claim_class='candidate_hypothesis' can never carry claim_status='supported' without support_refs. These are encoded via allOf/if-then below and re-enforced in srl.semantic.claims at the Python level (defense in depth). The payload also carries the two safety consts (canonical_writes=0, grants_authority=false). Canonical JSON contract: sorted keys, compact separators, UTF-8, no NaN/Infinity, trailing newline.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "claim_id",
+    "statement",
+    "claim_class",
+    "claim_status",
+    "epistemic_source",
+    "support_refs",
+    "created_utc",
+    "canonical_writes",
+    "grants_authority"
+  ],
+  "allOf": [
+    {
+      "$comment": "established_law_reference => epistemic_source=literature AND support_refs non-empty.",
+      "if": {
+        "properties": {
+          "claim_class": {
+            "const": "established_law_reference"
+          }
+        },
+        "required": [
+          "claim_class"
+        ]
+      },
+      "then": {
+        "properties": {
+          "epistemic_source": {
+            "const": "literature"
+          },
+          "support_refs": {
+            "minItems": 1
+          }
+        },
+        "required": [
+          "epistemic_source",
+          "support_refs"
+        ]
+      }
+    },
+    {
+      "$comment": "candidate_hypothesis AND status=supported => support_refs non-empty (a hypothesis cannot graduate to supported without support).",
+      "if": {
+        "allOf": [
+          {
+            "properties": {
+              "claim_class": {
+                "const": "candidate_hypothesis"
+              }
+            },
+            "required": [
+              "claim_class"
+            ]
+          },
+          {
+            "properties": {
+              "claim_status": {
+                "const": "supported"
+              }
+            },
+            "required": [
+              "claim_status"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "properties": {
+          "support_refs": {
+            "minItems": 1
+          }
+        },
+        "required": [
+          "support_refs"
+        ]
+      }
+    }
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Identity anchor; const for ScientificClaim/v1.",
+      "type": "string",
+      "const": "ScientificClaim/v1"
+    },
+    "claim_id": {
+      "description": "Content-addressed identity: sha256 over the canonical encoding of the claim (without this field), prefixed 'sha256:'. Computed by srl.semantic.claims.claim_id.",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "statement": {
+      "description": "The structured statement. Either a subject/predicate/object triple or a MathIR reference (an inline expression tree under 'math' or a MathIR object_id under 'math_ref'). The two shapes are mutually exclusive.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "subject": {
+          "description": "The subject of the claim (a name or symbol reference).",
+          "type": "string",
+          "minLength": 1
+        },
+        "predicate": {
+          "description": "The predicate relating subject and object (a name or relation symbol).",
+          "type": "string",
+          "minLength": 1
+        },
+        "object": {
+          "description": "The object of the claim (a name, value, or symbol reference).",
+          "type": "string",
+          "minLength": 1
+        },
+        "math": {
+          "description": "An inline MathIR expression tree carrying the mathematical content of the claim. Validated for allowlist compliance by srl.semantic.ir.validate_expression.",
+          "type": "object"
+        },
+        "math_ref": {
+          "description": "A reference (object_id) to a MathIR/v1 object carrying the claim's mathematical content.",
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      }
+    },
+    "claim_class": {
+      "description": "The epistemic class placing the claim on the ladder: a candidate_hypothesis is a proposal awaiting evidence; a derived_result follows from other claims; an established_law_reference cites a physical law from the literature (REQUIRES epistemic_source=literature and a support_ref); an empirical_observation is a measured fact; a definition is a definitional convention (tautological, not evidence-bearing).",
+      "type": "string",
+      "enum": [
+        "candidate_hypothesis",
+        "derived_result",
+        "established_law_reference",
+        "empirical_observation",
+        "definition"
+      ]
+    },
+    "claim_status": {
+      "description": "The investigation status. A proposed/under_investigation claim is open; supported means evidence supports it (a candidate_hypothesis needs support_refs to reach this); refuted means evidence contradicts it; inconclusive means the evidence is mixed.",
+      "type": "string",
+      "enum": [
+        "proposed",
+        "under_investigation",
+        "supported",
+        "refuted",
+        "inconclusive"
+      ]
+    },
+    "epistemic_source": {
+      "description": "How the claim came to be: operator (an agent authored it), literature (it cites prior work; REQUIRED for established_law_reference), derivation (it follows by symbolic/numeric derivation), experiment (it follows from a measurement).",
+      "type": "string",
+      "enum": [
+        "operator",
+        "literature",
+        "derivation",
+        "experiment"
+      ]
+    },
+    "support_refs": {
+      "description": "The object_ids of supporting objects (other claims, MathIR, evidence assessments). Empty for an unsupported proposal. Non-empty is REQUIRED for established_law_reference and for a candidate_hypothesis that has graduated to supported.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      },
+      "uniqueItems": true
+    },
+    "created_utc": {
+      "description": "RFC 3339 UTC timestamp at seconds precision (YYYY-MM-DDTHH:MM:SSZ). No offset, no fractional seconds.",
+      "type": "string",
+      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]Z$"
+    },
+    "canonical_writes": {
+      "description": "Safety const: a claim is immutable once authored. Always 0; a non-zero value is a contract violation.",
+      "type": "integer",
+      "const": 0
+    },
+    "grants_authority": {
+      "description": "Safety const: a claim never grants authority on its own. Always false; a true value is a contract violation. A supported claim is still an admission, not an authorization.",
+      "type": "boolean",
+      "const": false
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "name": "n03-bool-as-int-exponent",
+  "validator": "math_ir_expression",
+  "exception": "ContractError",
+  "fail_reason": "CONTRACT_INVALID",
+  "reason": "A bool is not a decimal-string constant; the const channel rejects bool-as-int."
+}

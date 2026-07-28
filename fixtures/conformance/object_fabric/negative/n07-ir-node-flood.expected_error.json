@@ -1,0 +1,7 @@
+{
+  "name": "n07-ir-node-flood",
+  "validator": "math_ir_expression",
+  "exception": "IRResourceLimitError",
+  "fail_reason": "CONTRACT_INVALID",
+  "reason": "Node count exceeds the 10000-node count guard (depth stays under 64)."
+}

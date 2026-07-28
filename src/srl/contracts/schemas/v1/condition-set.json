@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srlab.dev/v1/ConditionSet.json",
+  "title": "ConditionSet/v1",
+  "description": "A set of conditions (assumptions) attached to a ModelInterface: a domain restriction, a positivity/boundedness/smoothness/stationarity/independence assumption, or a custom named condition. Each condition carries a kind and a mathematical expression given either as a reference (object_id) to a MathIR/v1 object or as an inline MathIR tree (structurally validated here, allowlist-validated by srl.semantic.ir.validate_expression). Canonical JSON contract: sorted keys, compact separators, UTF-8, no NaN/Infinity, trailing newline.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "conditions"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Identity anchor; const for ConditionSet/v1.",
+      "type": "string",
+      "const": "ConditionSet/v1"
+    },
+    "conditions": {
+      "description": "The conditions. condition_id values SHOULD be unique within the set (validated by srl.semantic at runtime).",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "condition_id",
+          "kind",
+          "expression"
+        ],
+        "properties": {
+          "condition_id": {
+            "description": "Stable logical identifier for the condition within the set.",
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "description": "The class of assumption.",
+            "type": "string",
+            "enum": [
+              "domain",
+              "positivity",
+              "boundedness",
+              "smoothness",
+              "stationarity",
+              "independence",
+              "custom"
+            ]
+          },
+          "expression": {
+            "description": "The mathematical content: a reference (object_id) to a MathIR/v1 object, or an inline MathIR tree (allowlist-validated at runtime).",
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "math_ref"
+                ],
+                "properties": {
+                  "math_ref": {
+                    "description": "A reference (object_id) to a MathIR/v1 object.",
+                    "type": "string",
+                    "pattern": "^sha256:[0-9a-f]{64}$"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "math"
+                ],
+                "properties": {
+                  "math": {
+                    "description": "An inline MathIR expression tree (allowlist-validated by srl.semantic.ir.validate_expression).",
+                    "type": "object"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

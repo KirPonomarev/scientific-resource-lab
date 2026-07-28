@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srlab.dev/v1/SymbolTable.json",
+  "title": "SymbolTable/v1",
+  "description": "A table of symbols used by a MathIR expression or a ModelInterface: each symbol has a stable logical symbol_id, a human-readable name, a role on the model (variable, parameter, constant, function, or index), an optional domain (a MathIR set expression, inline or null), and an optional unit_ref pointing at a ConstantRef constant_id. Design decision (WP-B11): the inline domain expression uses a STRUCTURAL shape (oneOf of application/const/var with op as a pattern string) rather than the full MathIR op enum, so the symbol table schema does not duplicate the allowlist; srl.semantic.ir.validate_expression enforces the allowlist against the inline tree. Canonical JSON contract: sorted keys, compact separators, UTF-8, no NaN/Infinity, trailing newline.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "symbols"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Identity anchor; const for SymbolTable/v1.",
+      "type": "string",
+      "const": "SymbolTable/v1"
+    },
+    "symbols": {
+      "description": "The declared symbols. symbol_id values SHOULD be unique within the table (validated by srl.semantic at runtime; uniqueness is not a per-schema constraint so a table can be merged before de-duplication).",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "symbol_id",
+          "name",
+          "role"
+        ],
+        "properties": {
+          "symbol_id": {
+            "description": "Stable logical identifier referenced by {var: symbol_id} nodes in MathIR expressions. Not a content hash.",
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "description": "Human-readable name of the symbol (e.g. 'position', 'spring constant').",
+            "type": "string",
+            "minLength": 1
+          },
+          "role": {
+            "description": "The role of the symbol in a model.",
+            "type": "string",
+            "enum": [
+              "variable",
+              "parameter",
+              "constant",
+              "function",
+              "index"
+            ]
+          },
+          "domain": {
+            "description": "The domain of the symbol as a MathIR set expression (inline), or null when unconstrained. The inline tree is structurally validated here and allowlist-validated by srl.semantic.ir.validate_expression.",
+            "oneOf": [
+              {
+                "$ref": "#/$defs/inline_expr"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "unit_ref": {
+            "description": "A reference to a ConstantRef constant_id giving the unit (and its physical value), or null when the symbol is dimensionless or the unit is not yet known.",
+            "oneOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "inline_expr": {
+      "description": "Structural shape for an inline MathIR tree. The op is a '<cd>.<name>' pattern string; the full allowlist is enforced by srl.semantic.ir.validate_expression (not duplicated here).",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "op",
+            "args"
+          ],
+          "properties": {
+            "op": {
+              "type": "string",
+              "pattern": "^[a-z0-9_]+\\.[a-z0-9_]+$"
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/inline_expr"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "const"
+          ],
+          "properties": {
+            "const": {
+              "type": "string",
+              "pattern": "^-?[0-9]+(\\.[0-9]+)?$"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "var"
+          ],
+          "properties": {
+            "var": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    }
+  }
+}

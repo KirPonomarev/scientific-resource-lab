@@ -1,0 +1,34 @@
+{
+  "schema_version": "ScientificClaim/v1",
+  "statement": {
+    "math": {
+      "op": "relation1.eq",
+      "args": [
+        {
+          "var": "F"
+        },
+        {
+          "op": "arith1.times",
+          "args": [
+            {
+              "var": "m"
+            },
+            {
+              "var": "a"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "claim_class": "established_law_reference",
+  "claim_status": "supported",
+  "epistemic_source": "literature",
+  "support_refs": [
+    "sha256:5015a18875c09a362d1bccfe53c42145927dcfc55230343ff6c819fdf5b642d8"
+  ],
+  "created_utc": "2026-07-28T00:00:00Z",
+  "canonical_writes": 0,
+  "grants_authority": false,
+  "claim_id": "sha256:6ee31b8ebb1dbbbd0c5b95000648f90e14ef2b127bafb23a955909ffb1372d73"
+}

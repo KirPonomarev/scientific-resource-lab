@@ -1,0 +1,16 @@
+{
+  "schema_version": "ScientificClaim/v1",
+  "claim_id": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "statement": {
+    "subject": "x",
+    "predicate": "correlates_with",
+    "object": "y"
+  },
+  "claim_class": "candidate_hypothesis",
+  "claim_status": "supported",
+  "epistemic_source": "operator",
+  "support_refs": [],
+  "created_utc": "2026-07-28T00:00:00Z",
+  "canonical_writes": 0,
+  "grants_authority": false
+}

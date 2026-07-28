@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srlab.dev/v1/ConstantRef.json",
+  "title": "ConstantRef/v1",
+  "description": "A reference to a physical or mathematical constant from a named source. The value and (optional) uncertainty are decimal strings (no exponent, no float coercion) so precision survives a round trip; the unit is a UCUM string or a QUDT IRI; the vintage names the edition (e.g. a CODATA year). Design decision (WP-B11): there is NO separate unit-ref schema; a unit is a single string field carried inline here and in SymbolTable/v1, because SRL does not yet carry a unit-algebra object (full dimensional analysis is deferred to WP-E40). Canonical JSON contract: sorted keys, compact separators, UTF-8, no NaN/Infinity, trailing newline.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "constant_id",
+    "source",
+    "symbol",
+    "value",
+    "unit",
+    "vintage"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Identity anchor; const for ConstantRef/v1.",
+      "type": "string",
+      "const": "ConstantRef/v1"
+    },
+    "constant_id": {
+      "description": "Stable logical identifier for the constant within its source+vintage (e.g. 'codata2022.planck-constant'). Not a content hash; identity of a ConstantRef object is its envelope object_id.",
+      "type": "string",
+      "minLength": 1
+    },
+    "source": {
+      "description": "The authority the constant is drawn from.",
+      "type": "string",
+      "enum": [
+        "CODATA2018",
+        "CODATA2022",
+        "QUDT",
+        "UCUM",
+        "pack_local"
+      ]
+    },
+    "symbol": {
+      "description": "The conventional symbol for the constant (e.g. 'h', 'c', 'G').",
+      "type": "string",
+      "minLength": 1
+    },
+    "value": {
+      "description": "The constant value as a decimal-string policy value: optional sign, integer digits, optional fractional digits, no exponent. Never a float; never NaN/Infinity.",
+      "type": "string",
+      "pattern": "^-?[0-9]+(\\.[0-9]+)?$"
+    },
+    "uncertainty": {
+      "description": "The one-standard-deviation uncertainty as a decimal string, or null when the source does not report one. Never a float.",
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^-?[0-9]+(\\.[0-9]+)?$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "unit": {
+      "description": "The unit as a UCUM string (e.g. 'm.s-1', 'kg.m2.s-2') or a QUDT IRI (e.g. 'http://qudt.org/vocab/unit#MeterPerSecond'). Carried inline; SRL has no unit-ref object until WP-E40.",
+      "type": "string",
+      "minLength": 1
+    },
+    "vintage": {
+      "description": "The edition/release the value was drawn from (e.g. 'CODATA-2022', 'QUDT-3.1.4', 'pack-2026-07'). A free-form but non-empty string.",
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

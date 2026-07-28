@@ -2,7 +2,7 @@
 # Portable: no absolute paths or usernames. Uses uv for everything.
 # Targets run via `uv run` so contributors only need uv installed.
 
-.PHONY: bootstrap lint format typecheck test build verify repro-check gate-wp03 gate-wp10 clean help
+.PHONY: bootstrap lint format typecheck test build verify repro-check gate-wp03 gate-wp10 gate-wp11 clean help
 
 help: ## Show this help.
 	@awk 'BEGIN {FS = ":.*##"; printf "Usage:\n  make <target>\n\nTargets:\n"} \
@@ -48,6 +48,15 @@ gate-wp03: ## Run the WP-A03 autonomy-contracts acceptance gate.
 # under `uv run python`.
 gate-wp10: ## Run the WP-B10 canonical-JSON acceptance gate.
 	uv run python scripts/checks/wp10-gate.py
+
+# WP-B11 scientific object fabric gate. Runs the four acceptance checks
+# (B11-01..B11-04) — restricted MathIR allowlist, fixture-scoped dimensional
+# consistency, claim invariants at schema + python layer, schemas meta-valid +
+# positive fixtures validate — and prints a GateReceipt/v1 JSON receipt;
+# non-zero exit on any FAIL. Uses the contracts + semantic layer (which depend
+# on jsonschema), so it runs under `uv run python`.
+gate-wp11: ## Run the WP-B11 scientific-object-fabric acceptance gate.
+	uv run python scripts/checks/wp11-gate.py
 
 clean: ## Remove build artifacts and caches.
 	rm -rf dist build .pytest_cache .mypy_cache .ruff_cache

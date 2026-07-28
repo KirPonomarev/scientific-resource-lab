@@ -1,0 +1,21 @@
+{
+  "schema_version": "ModelInterface/v1",
+  "interface_id": "harmonic-oscillator",
+  "kind": "ode",
+  "state_variables": [
+    "x",
+    "v"
+  ],
+  "parameters": [
+    "k",
+    "m"
+  ],
+  "inputs": [],
+  "outputs": [
+    "x"
+  ],
+  "governing": [
+    "sha256:5015a18875c09a362d1bccfe53c42145927dcfc55230343ff6c819fdf5b642d8"
+  ],
+  "composition": []
+}
