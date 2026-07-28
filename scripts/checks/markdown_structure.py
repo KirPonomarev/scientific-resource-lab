@@ -3,7 +3,8 @@
 Walks every ``*.md`` file under the repository root and enforces three
 structural rules:
 
-1. Exactly one top-level heading (H1, i.e. a line starting with ``# ``).
+1. Exactly one top-level heading (H1, i.e. a line starting with ``# ``),
+   excluding H1-like lines inside fenced code blocks.
 2. No trailing whitespace on any line.
 3. The file ends with a single trailing newline.
 
@@ -14,12 +15,15 @@ at least one Markdown file violates the structure rules.
 from __future__ import annotations
 
 import json
+import re
 import sys
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 # Maximum number of characters shown in a trailing-whitespace diagnostic.
 _DETAIL_SAMPLE_LEN: int = 10
+
+
 @dataclass(frozen=True)
 class StructureIssue:
     file: str
@@ -35,9 +39,82 @@ class Report:
     issues: list[StructureIssue] = field(default_factory=list)
 
 
+def _count_h1_outside_fences(lines: list[str]) -> int:
+    """Return the number of H1 headings outside fenced code blocks."""
+    h1_count = 0
+    in_fence = False
+    for line in lines:
+        fence_match = re.match(r"^(\s*)```", line)
+        if fence_match:
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
+        if line.startswith("# "):
+            h1_count += 1
+    return h1_count
+
+
+def _check_h1(path: Path, lines: list[str]) -> list[StructureIssue]:
+    """Return H1 structure issues for a single Markdown file."""
+    h1_count = _count_h1_outside_fences(lines)
+    if h1_count == 0:
+        return [
+            StructureIssue(
+                file=str(path),
+                rule="missing_h1",
+                line=0,
+                detail="no H1 heading found",
+            )
+        ]
+    if h1_count > 1:
+        return [
+            StructureIssue(
+                file=str(path),
+                rule="multiple_h1",
+                line=0,
+                detail=f"found {h1_count} H1 headings",
+            )
+        ]
+    return []
+
+
+def _check_trailing_whitespace(path: Path, lines: list[str]) -> list[StructureIssue]:
+    """Return trailing-whitespace issues for a single Markdown file."""
+    issues: list[StructureIssue] = []
+    for line_idx, line in enumerate(lines, start=1):
+        if line != line.rstrip():
+            if len(line) > _DETAIL_SAMPLE_LEN:
+                sample = repr(line[-_DETAIL_SAMPLE_LEN:])
+            else:
+                sample = repr(line)
+            issues.append(
+                StructureIssue(
+                    file=str(path),
+                    rule="trailing_whitespace",
+                    line=line_idx,
+                    detail=sample,
+                )
+            )
+    return issues
+
+
+def _check_final_newline(path: Path, text: str) -> list[StructureIssue]:
+    """Return final-newline issue for a single Markdown file if missing."""
+    if not text.endswith("\n"):
+        return [
+            StructureIssue(
+                file=str(path),
+                rule="missing_final_newline",
+                line=0,
+                detail="file does not end with a newline",
+            )
+        ]
+    return []
+
+
 def _check_file(path: Path) -> list[StructureIssue]:
     """Return structure issues for a single Markdown file."""
-    issues: list[StructureIssue] = []
     try:
         raw = path.read_bytes()
         text = raw.decode("utf-8", errors="replace")
@@ -52,51 +129,10 @@ def _check_file(path: Path) -> list[StructureIssue]:
         ]
 
     lines = text.splitlines()
-    h1_count = sum(1 for line in lines if line.startswith("# "))
-    if h1_count == 0:
-        issues.append(
-            StructureIssue(
-                file=str(path),
-                rule="missing_h1",
-                line=0,
-                detail="no H1 heading found",
-            )
-        )
-    elif h1_count > 1:
-        issues.append(
-            StructureIssue(
-                file=str(path),
-                rule="multiple_h1",
-                line=0,
-                detail=f"found {h1_count} H1 headings",
-            )
-        )
-
-    for line_idx, line in enumerate(lines, start=1):
-        if line != line.rstrip():
-                if len(line) > _DETAIL_SAMPLE_LEN:
-                    sample = repr(line[-_DETAIL_SAMPLE_LEN:])
-                else:
-                    sample = repr(line)
-                issues.append(
-                    StructureIssue(
-                        file=str(path),
-                        rule="trailing_whitespace",
-                        line=line_idx,
-                        detail=sample,
-                    )
-                )
-
-    if not text.endswith("\n"):
-        issues.append(
-            StructureIssue(
-                file=str(path),
-                rule="missing_final_newline",
-                line=0,
-                detail="file does not end with a newline",
-            )
-        )
-
+    issues: list[StructureIssue] = []
+    issues.extend(_check_h1(path, lines))
+    issues.extend(_check_trailing_whitespace(path, lines))
+    issues.extend(_check_final_newline(path, text))
     return issues
 
 

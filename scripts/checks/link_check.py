@@ -48,6 +48,7 @@ _ALLOWED_DOMAINS: Final[frozenset[str]] = frozenset(
         "mit.edu",
         "python.org",
         "pypi.org",
+        "docs.astral.sh",
         # Referenced by existing project documentation (CHANGELOG.md, CONTRIBUTING.md).
         "semver.org",
         "conventionalcommits.org",
