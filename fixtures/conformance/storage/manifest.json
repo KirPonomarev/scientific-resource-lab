@@ -1,0 +1,36 @@
+{
+  "schema_version": "StorageVectorManifest/v1",
+  "description": "Conformance vectors for the SRL content-addressed storage abstraction and T7 volume identity guard (WP-C20). Three synthetic mount-info documents (a mounted_expected volume with the fake UUID 00000000-0000-4000-8000-000000000001, a mounted_foreign volume with a distinct UUID, and an absent case descriptor where the provider raises T7UnavailableError), one tiny fixture blob (<1 KiB) for the store round-trip, and one oversized synthetic descriptor (declared size > 1 MiB, no real bytes) for the fallback single-object limit refusal. All UUIDs are fake; no vector touches a real disk. The mount_info mount_point fields are pre-redacted to digest-prefix tokens so the fixtures themselves never carry a raw /Volumes/ or /Users/ path.",
+  "vectors": [
+    {
+      "name": "mount_info-mounted-expected",
+      "kind": "mount_info",
+      "case": "mounted_expected",
+      "description": "The expected volume is mounted at the expected point; identity verifies."
+    },
+    {
+      "name": "mount_info-mounted-foreign",
+      "kind": "mount_info",
+      "case": "mounted_foreign",
+      "description": "A different volume is mounted at the expected point; the store fails closed (WRONG_T7_VOLUME)."
+    },
+    {
+      "name": "mount_info-absent",
+      "kind": "mount_info",
+      "case": "absent",
+      "description": "No volume is mounted at the expected point; the store waits (WAIT_STORAGE)."
+    },
+    {
+      "name": "tiny-fixture-blob",
+      "kind": "blob",
+      "case": "tiny_fixture",
+      "description": "A <1 KiB public fixture blob accepted by the local store round-trip and the fallback."
+    },
+    {
+      "name": "oversized-descriptor",
+      "kind": "descriptor",
+      "case": "oversized_synthetic",
+      "description": "A descriptor with declared size > 1 MiB (no real bytes) the fallback must refuse with WAIT_STORAGE."
+    }
+  ]
+}
