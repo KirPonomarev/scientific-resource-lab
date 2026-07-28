@@ -83,6 +83,11 @@ class Report:
 # Helpers
 # ---------------------------------------------------------------------------
 
+def _strip_inline_code(line: str) -> str:
+    """Remove inline Markdown code spans so URLs inside backticks are not scanned."""
+    return re.sub(r"`[^`]*`", "", line)
+
+
 def _domain_from_url(url: str) -> str | None:
     """Return the registered domain for an allowed URL, or None for malformed URLs."""
     parsed = urlparse(url)
@@ -146,7 +151,8 @@ def scan() -> Report:
             continue
 
         for line_idx, line in enumerate(text.splitlines(), start=1):
-            for match in _URL_RE.finditer(line):
+            scan_line = _strip_inline_code(line)
+            for match in _URL_RE.finditer(scan_line):
                 url = match.group(0)
                 # Strip trailing punctuation that may have been captured.
                 url = url.rstrip(".,;:!?'") if not url.endswith("/") else url
