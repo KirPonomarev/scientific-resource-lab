@@ -1,0 +1,7 @@
+{
+  "validator": "pilot_spec",
+  "exception": "PilotSpecError",
+  "fail_reason": "CONTRACT_INVALID",
+  "invariant": "prospective_holdout_materialization",
+  "reason": "A PilotSpec encoding a prospective-holdout materialization marker violates the prospective_holdout_materialization invariant (a retrospective pilot reads already-extant data; materializing a prospective holdout crosses the integrity boundary). Rejected by srl.pilot.spec.validate_holdout_free in Python with CONTRACT_INVALID."
+}

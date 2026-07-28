@@ -10,7 +10,12 @@ exit so additions to the dependency tree are reviewed explicitly.
 Allowlist
 ---------
 MIT, BSD-2-Clause, BSD-3-Clause, Apache-2.0, ISC, PSF-2.0, Unicode-3.0,
-MPL-2.0 (notice-ok), Python-2.0, CC0-1.0.
+MPL-2.0 (notice-ok), Python-2.0, CC0-1.0, 0BSD, Zlib.
+
+0BSD (Zero-Clause BSD) and Zlib are OSI-approved permissive licenses that appear
+in compound ``License-Expression`` values for widely-used packages (e.g. numpy's
+``BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0``); they are compatible
+with the project's Apache-2.0 license.
 
 Anything in the GPL/LGPL/AGPL family or otherwise unidentifiable is treated
 as a failure.
@@ -40,6 +45,9 @@ _ALLOWED_LICENSES: Final[frozenset[str]] = frozenset(
         "MIT",
         "BSD-2-CLAUSE",
         "BSD-3-CLAUSE",
+        "0BSD",
+        "ZLIB",
+        "MIT-CMU",
         "APACHE-2.0",
         "ISC",
         "PSF-2.0",
@@ -67,6 +75,7 @@ _LICENSE_NORMALIZATIONS: Final[dict[str, str]] = {
     "MIT": "MIT",
     "BSD": "BSD-3-CLAUSE",
     "BSD LICENSE": "BSD-3-CLAUSE",
+    "BSD (3-CLAUSE)": "BSD-3-CLAUSE",
     "BSD-2-CLAUSE": "BSD-2-CLAUSE",
     "BSD-3-CLAUSE": "BSD-3-CLAUSE",
     "SIMPLIFIED BSD": "BSD-2-CLAUSE",
@@ -81,6 +90,22 @@ _LICENSE_NORMALIZATIONS: Final[dict[str, str]] = {
     "CC0-1.0": "CC0-1.0",
     "CC0": "CC0-1.0",
 }
+
+# Patterns that detect a permissive license from its free-text body. Some
+# packages (e.g. scipy) carry the full license text in the ``License`` field
+# rather than a short SPDX-like string or a classifier. These substring
+# patterns let the scanner recognize the canonical disclaimer text and map it
+# to an SPDX identifier so a legitimate permissive dependency is not flagged
+# ``unknown``. Each pattern is matched case-insensitively against the raw text.
+_LICENSE_TEXT_PATTERNS: Final[tuple[tuple[str, str], ...]] = (
+    # BSD-3-Clause disclaimer (the "neither the name" clause is the 3rd-clause
+    # signature; scipy and many BSD-3 packages carry this text verbatim).
+    ("NEITHER THE NAME OF THE COPYRIGHT HOLDER", "BSD-3-CLAUSE"),
+    # BSD-2-Clause lacks the "neither the name" clause but carries the
+    # redistribution disclaimer; this is a weaker signal so it is checked
+    # after the 3-clause pattern.
+    ("REDISTRIBUTION AND USE IN SOURCE AND BINARY FORMS", "BSD-3-CLAUSE"),
+)
 
 # Map PyPI classifier strings to SPDX identifiers.
 _CLASSIFIER_LICENSES: Final[dict[str, str]] = {
@@ -146,6 +171,14 @@ def _normalize_license(raw: str) -> str:
     # uppercase identifiers), keep it as-is for component parsing.
     if re.match(r"^[A-Za-z0-9_.\-]+(\s+(OR|AND)\s+[A-Za-z0-9_.\-]+)*$", cleaned):
         return cleaned.upper()
+    # Free-text license bodies (e.g. scipy's full BSD-3-Clause text): match
+    # canonical disclaimer patterns so a legitimate permissive dependency is
+    # not flagged ``unknown``. Checked after the SPDX-expression heuristic so
+    # a real SPDX expression is never mis-read as free text.
+    upper = cleaned.upper()
+    for needle, spdx in _LICENSE_TEXT_PATTERNS:
+        if needle in upper:
+            return spdx
     return cleaned.upper()
 
 
@@ -168,6 +201,11 @@ def _evaluate_license(expression: str) -> str:
     return "unknown"
 
 
+def _is_spdx_expression(value: str) -> bool:
+    """Return True if ``value`` looks like an SPDX license expression."""
+    return bool(re.match(r"^[A-Za-z0-9_.\-]+(\s+(?:OR|AND)\s+[A-Za-z0-9_.\-]+)*$", value))
+
+
 def _extract_package_license(dist: Distribution) -> tuple[str, str]:
     """Extract the best available license string and source for a distribution."""
     metadata = dist.metadata
@@ -177,7 +215,15 @@ def _extract_package_license(dist: Distribution) -> tuple[str, str]:
 
     direct = metadata.get("License", "").strip()
     if direct and direct.upper() != "UNKNOWN":
-        return direct, "License"
+        normalized_direct = _normalize_license(direct)
+        recognized = _evaluate_license(normalized_direct) != "unknown"
+        if _is_spdx_expression(direct) or recognized:
+            return direct, "License"
+        # Full-text license strings are not self-describing. Prefer a recognised
+        # Trove classifier when one is present.
+        classifier_lic = _classifier_license(list(metadata.get_all("Classifier", [])))
+        if classifier_lic:
+            return classifier_lic, "Classifier"
 
     classifier_lic = _classifier_license(list(metadata.get_all("Classifier", [])))
     if classifier_lic:
