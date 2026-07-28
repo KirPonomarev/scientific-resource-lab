@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Synthetic arXiv Query for WP-D33 Conformance</title>
+  <entry>
+    <id>http://arxiv.org/abs/synthetic.1234</id>
+    <title>Synthetic arXiv Entry for WP-D33 Conformance</title>
+    <summary>This is a synthetic arXiv Atom payload used by the WP-D33 hermetic test suite.</summary>
+  </entry>
+</feed>
