@@ -111,14 +111,38 @@ def test_int_value_out_of_allowed_set_is_rejected(tmp_path: Path) -> None:
 
 
 def test_wrong_schema_version_is_rejected(tmp_path: Path) -> None:
-    """A policy with the wrong schema version raises PolicyError."""
+    """A policy with an unknown schema version raises PolicyError."""
     policy = _load_canonical_policy_dict()
-    policy["schema_version"] = "AutonomyPolicy/v2"
+    policy["schema_version"] = "AutonomyPolicy/v0"
     bad = tmp_path / "policy.json"
     bad.write_text(json.dumps(policy), encoding="utf-8")
     with pytest.raises(PolicyError) as exc_info:
         load_policy(bad)
     assert "AutonomyPolicy/v1" in str(exc_info.value)
+
+
+def test_v1_policy_with_nonfour_lanes_is_rejected(tmp_path: Path) -> None:
+    """AutonomyPolicy/v1 fixes lanes at exactly 4 (cross-field constraint)."""
+    policy = _load_canonical_policy_dict()
+    policy["schema_version"] = "AutonomyPolicy/v1"
+    policy["max_parallel_implementation_lanes"] = 6
+    bad = tmp_path / "policy.json"
+    bad.write_text(json.dumps(policy), encoding="utf-8")
+    with pytest.raises(PolicyError) as exc_info:
+        load_policy(bad)
+    assert exc_info.value.reason == "version_constraint"
+    assert exc_info.value.key == "max_parallel_implementation_lanes"
+
+
+def test_v1_policy_with_four_lanes_is_accepted(tmp_path: Path) -> None:
+    """AutonomyPolicy/v1 with lanes=4 remains valid after the v2 bump."""
+    policy = _load_canonical_policy_dict()
+    policy["schema_version"] = "AutonomyPolicy/v1"
+    policy["max_parallel_implementation_lanes"] = 4
+    good = tmp_path / "policy.json"
+    good.write_text(json.dumps(policy), encoding="utf-8")
+    loaded = load_policy(good)
+    assert loaded["schema_version"] == "AutonomyPolicy/v1"
 
 
 def test_bool_is_not_treated_as_int(tmp_path: Path) -> None:
