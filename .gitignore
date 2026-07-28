@@ -3,7 +3,8 @@ __pycache__/
 *.py[cod]
 *.egg-info/
 .eggs/
-build/
+# Anchored: ignore the root-level build/ artifact dir only, not scripts/build/.
+/build/
 dist/
 .venv/
 venv/
