@@ -1,0 +1,9 @@
+{
+  "scenario_id": "n02-resource-overflow-remote-executor",
+  "description": "A plan whose summed SELECTED resource estimates exceed the admission caps for its resource class MUST raise ResourceAdmissionError (fail_reason WAIT_REMOTE_EXECUTOR), never silently overflow local. This vector builds a request with resource_class='exception' that engages enough heavy profiles (via a synthetic available-adapter catalog so the steps are SELECTED) to exceed the exception caps, and asserts the planner raises ResourceAdmissionError carrying WAIT_REMOTE_EXECUTOR. The honest behavior is to wait for a remote executor, not to admit an oversized local plan.",
+  "validator": "resource_overflow",
+  "expected_error": {
+    "exception": "ResourceAdmissionError",
+    "fail_reason": "WAIT_REMOTE_EXECUTOR"
+  }
+}

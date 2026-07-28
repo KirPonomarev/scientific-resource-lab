@@ -1,0 +1,32 @@
+{
+  "schema_version": "PlanningVectorManifest/v1",
+  "description": "Conformance vectors for the SRL deterministic claim router and plan builder (WP-B14). Each positive vector is a scenario (request + claim + expected routing/plan invariants) that the gate replays through srl.planning and asserts. Each negative vector names a validator and the exception/fail_reason/invariant its scenario must produce. The load-bearing invariants: a plan is byte-identical for byte-identical inputs (determinism); the decision covers all 15 profiles (no silent drops); a remote_required profile never falls back to local (WAIT_CAPABILITY, not a fake adapter); resource overflow raises WAIT_REMOTE_EXECUTOR (an honest wait); a cyclic dependency raises CONTRACT_INVALID.",
+  "positive": [
+    {
+      "name": "p01-geometry-tda-wait-capability",
+      "description": "A geometry TDA claim auto-classifies to geometry_tda; with the shipped catalog (ripser adapter future) the router yields WAIT_CAPABILITY (adapterless -> honest wait), NOT_APPLICABLE for the 14 unrelated profiles, EXCLUDED_TYPED for none."
+    },
+    {
+      "name": "p02-multi-profile-3step-dag",
+      "description": "A composition-of-coupled-ODE claim yields a 3-step DAG: model_composition depends on dynamics + executable_ode_dae_sde_model, in topological order."
+    },
+    {
+      "name": "p03-explicit-exclusion-typed",
+      "description": "A request naming one profile yields EXCLUDED_TYPED (reason not_requested) for the other 14, not NOT_APPLICABLE; the decision still covers all 15."
+    }
+  ],
+  "negative": [
+    {
+      "name": "n01-cyclic-dependency",
+      "description": "A cyclic dependency graph raises PlanError (CONTRACT_INVALID, invariant cycle_detected)."
+    },
+    {
+      "name": "n02-resource-overflow-remote-executor",
+      "description": "A plan exceeding the exception caps raises ResourceAdmissionError (WAIT_REMOTE_EXECUTOR), never silently overflowing local."
+    },
+    {
+      "name": "n03-remote-required-no-local-fallback",
+      "description": "A remote_required profile never produces a local step (adapter_id stays null); absence yields WAIT_CAPABILITY, not a fake local substitute."
+    }
+  ]
+}
