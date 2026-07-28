@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.srlab.dev/v1/LabExportPacket.json",
   "title": "LabExportPacket/v1",
-  "description": "The PUBLIC export envelope of an SRL lab run: a sanitized, disclosure-safe summary of internal scientific objects, suitable for release across the public boundary. The packet NEVER carries raw private data: no local paths, no commands, no credentials, no raw dataset markers, no T7/VPS topology identifiers, no Pulse/Snapshot/OperatorContext-shaped private keys, and no live/trading/promotion flags. A private object's identity digest is NOT automatically publishable; under disclosure_policy.private_identities='digest_replaced' the exporter substitutes a packet-local digest (sha256(packet_id + private_digest)) for the raw private digest. The packet is review-only (review_only=true), has no canonical effect (canonical_effect='none'), grants no authority (grants_authority=false), and records no canonical writes (canonical_writes=0). Honesty invariant: exportable != admitted — a packet is a disclosure of summary evidence, never an admission of scientific truth or an authorization to integrate. The canonical ENCODED packet (UTF-8, sorted keys, compact separators, one trailing newline) MUST be at most 1 MiB (1048576 bytes); an oversize packet is a BRIDGE_CONTRACT_MISMATCH refusal, not a truncation. Canonical JSON contract: sorted keys, compact separators, UTF-8, no NaN/Infinity, trailing newline.",
+  "description": "The PUBLIC export envelope of an SRL lab run: a sanitized, disclosure-safe summary of internal scientific objects, suitable for release across the public boundary. The packet NEVER carries raw private data: no local paths, no commands, no credentials, no raw dataset markers, no T7/VPS topology identifiers, no Pulse/Snapshot/OperatorContext-shaped private keys, and no live/trading/promotion flags. A private object's identity digest is NOT automatically publishable; under disclosure_policy.private_identities='digest_replaced' the exporter substitutes a packet-local digest (sha256(packet_seed + private_digest)) for the raw private digest. The packet is review-only (review_only=true), has no canonical effect (canonical_effect='none'), grants no authority (grants_authority=false), and records no canonical writes (canonical_writes=0). Honesty invariant: exportable != admitted — a packet is a disclosure of summary evidence, never an admission of scientific truth or an authorization to integrate. The canonical ENCODED packet (UTF-8, sorted keys, compact separators, one trailing newline) MUST be at most 1 MiB (1048576 bytes); an oversize packet is a BRIDGE_CONTRACT_MISMATCH refusal, not a truncation. Canonical JSON contract: sorted keys, compact separators, UTF-8, no NaN/Infinity, trailing newline.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -52,7 +52,7 @@
         ],
         "properties": {
           "object_digest": {
-            "description": "The object's digest as it appears in this packet. Either the object's own public digest (when the object is already public and disclosure_policy permits), OR — under disclosure_policy.private_identities='digest_replaced' — a packet-local replacement digest of the form sha256(packet_id + private_digest), which is uncorrelated with the raw private digest. The exporter guarantees the raw private digest never appears here when the policy says digest_replaced.",
+            "description": "The object's digest as it appears in this packet. Either the object's own public digest (when the object is already public and disclosure_policy permits), OR — under disclosure_policy.private_identities='digest_replaced' — a packet-local replacement digest of the form sha256(packet_seed + private_digest), which is uncorrelated with the raw private digest. The exporter guarantees the raw private digest never appears here when the policy says digest_replaced.",
             "type": "string",
             "pattern": "^sha256:[0-9a-f]{64}$"
           },
@@ -106,7 +106,7 @@
       ],
       "properties": {
         "private_identities": {
-          "description": "How private object identities were handled. 'digest_replaced': each raw private digest was replaced with a packet-local digest sha256(packet_id + private_digest), deterministically derivable but uncorrelated with the raw digest (the raw digest never appears in the packet). 'omitted': private identities were dropped entirely (provenance_refs is empty and object_digest is absent or null). The exporter never emits the raw private digest when the policy is digest_replaced.",
+          "description": "How private object identities were handled. 'digest_replaced': each raw private digest was replaced with a packet-local digest sha256(packet_seed + private_digest), deterministically derivable but uncorrelated with the raw digest (the raw digest never appears in the packet). 'omitted': private identities were dropped entirely (provenance_refs is empty and object_digest is absent or null). The exporter never emits the raw private digest when the policy is digest_replaced.",
           "type": "string",
           "enum": [
             "digest_replaced",

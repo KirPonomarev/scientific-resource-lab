@@ -64,6 +64,7 @@ from srl.bridge import (
 from srl.bridge.sanitizer import (
     SanitizerRefusalError,
     normalize_summary,
+    scan_payload,
 )
 from srl.contracts import object_id, validate_object_id
 from srl.contracts.canonical import dumps
@@ -352,8 +353,10 @@ def build_packet(
     Applies the disclosure policy to each object: normalizes and forbidden-class
     -checks every summary (refuse-not-strip), and substitutes a packet-local
     digest for each private identity when ``policy.private_identities`` is
-    ``'digest_replaced'``. Validates the packet against the schema (defense in
-    depth) and enforces the 1 MiB canonical-encoded cap.
+    ``'digest_replaced'``. Then recursively scans EVERY string field of the
+    assembled packet (defense in depth, so a forbidden value cannot hide in any
+    field other than ``sanitized_summary``), validates the packet against the
+    schema (defense in depth), and enforces the 1 MiB canonical-encoded cap.
 
     Parameters
     ----------
@@ -429,6 +432,13 @@ def build_packet(
         "canonical_writes": 0,
     }
     packet["packet_id"] = object_id(packet)
+
+    # Defense in depth: recursively scan EVERY string field of the assembled
+    # packet (not just sanitized_summary) for forbidden classes. Each summary was
+    # already checked by normalize_summary above; this closes a smuggling vector
+    # where a forbidden value hidden in any other (current or future) string
+    # field would reach a built packet. Refuse-not-strip: a hit raises here.
+    scan_payload(packet)
 
     # Defense in depth: schema-validate the final packet.
     schema_validate(packet, "LabExportPacket")

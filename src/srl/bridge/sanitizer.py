@@ -1,10 +1,11 @@
-"""Disclosure sanitizer for ``LabExportPacket/v1`` summaries.
+"""Disclosure sanitizer for ``LabExportPacket/v1`` summaries and payloads.
 
 The sanitizer is the security-critical core of the export boundary. Its single
-load-bearing property is **refuse-not-strip**: a summary that contains any
-forbidden class is REFUSED at build time with a typed
-:class:`SanitizerRefusalError` (fail reason ``BRIDGE_CONTRACT_MISMATCH``). The
-sanitizer never silently strips, masks, or rewrites a forbidden substring.
+load-bearing property is **refuse-not-strip**: a summary (or, recursively, any
+string field of the packet payload) that contains any forbidden class is
+REFUSED at build time with a typed :class:`SanitizerRefusalError` (fail reason
+``BRIDGE_CONTRACT_MISMATCH``). The sanitizer never silently strips, masks, or
+rewrites a forbidden substring.
 
 Why refuse, not strip
 ---------------------
@@ -20,14 +21,26 @@ summary can never become a tracked-file violation in the first place.
 
 Forbidden classes
 -----------------
-The sanitizer refuses a summary that contains any of:
+The sanitizer refuses a summary (or payload string) that contains any of:
 
 - **absolute local paths** — ``/Users/``, ``/home/``, ``/Volumes/`` (the same
   regex shape the public-boundary scanner uses);
+- **structural unix paths** — ANY path-shaped token starting with ``/``
+  followed by a plausible body (at least two segments, or one segment with a
+  file-ish extension), detected structurally rather than against a hardcoded
+  directory list, so ``/app/secret/file``, ``/opt/data/f``, ``/tmp/a``, and
+  ``/var/log/x.log`` are all refused (a red team bypassed the old list with an
+  unlisted directory root);
 - **argv / shell markers** — leading-dash command flags (``--secret``,
   ``-verbose``) and shell metacharacters that indicate a command was pasted in;
 - **environment-variable assignments** — ``KEY=value`` shapes and ``$VAR`` /
-  ``${VAR}`` references;
+  ``${VAR}`` references, detected CASE-INSENSITIVELY so ``api_key=...`` and
+  ``${api_key}`` are refused alongside ``API_KEY=...`` (a red team bypassed the
+  uppercase-only detector with lowercase keys);
+- **credential keywords** — ``api[-_]?key``, ``secret``, ``token``, ``password``
+  bound by ``=`` or ``:`` in any case (``api_key=deadbeef``, ``Secret:
+  hunter2``), so a secret field is refused even when its value is not a
+  recognized concrete shape;
 - **credential patterns** — the same concrete shapes
   (:mod:`scripts.checks.public_boundary`) scans for (GitHub PATs, ``sk-`` keys,
   AWS access key IDs, Slack tokens, JWT blobs, PEM private-key headers);
@@ -47,6 +60,18 @@ The sanitizer refuses a summary that contains any of:
 Each forbidden class has a named detector so a refusal carries the class name
 in its ``forbidden_class`` attribute, which lets a gate (and a human) see
 *which* boundary a summary tripped.
+
+Recursive payload scan
+----------------------
+:func:`scan_payload` walks the ENTIRE packet payload (nested dicts, lists,
+arbitrary depth) and refuses if ANY string value — not just
+``sanitized_summary`` — contains a forbidden class. This closes a smuggling
+vector where a forbidden value hidden in a nested object would reach a built
+packet because only the top-level summary was scanned. Structural fields
+(digests, the pinned ``schema_version``, timestamps, and the closed
+``disclosure_policy`` / ``object_type`` vocabularies) are exempt: they are
+validated by the schema and the exporter's constructors and carry no free-text
+risk. Refuse-not-strip is preserved end to end.
 """
 
 from __future__ import annotations
@@ -69,13 +94,29 @@ _LOCAL_PATH_RE: Final[re.Pattern[str]] = re.compile(
     r"|/Volumes/[A-Za-z0-9][A-Za-z0-9._-]*)"
 )
 
-# Unix absolute paths more broadly (a leading / followed by a path component).
-# This catches /etc/, /var/, /tmp/, /root/, /private/... etc. that the
-# /Users|/home|/Volumes set does not name explicitly. We refuse any token that
-# looks like an absolute filesystem path, because a summary should describe the
-# science, never the filesystem.
+# Unix absolute paths, detected STRUCTURALLY rather than against a hardcoded
+# directory list. A summary should describe the science, never the filesystem,
+# so ANY path-shaped token starting with '/' followed by a plausible path body
+# is refused. "Plausible path body" means either:
+#   (a) at least two segments — ``/<seg>/<seg>...`` — e.g. ``/app/secret/file``,
+#       ``/opt/data/f``, ``/tmp/a``; OR
+#   (b) a single segment with a dotted file-ish tail (an extension), e.g.
+#       ``/var/log/x.log``, ``/secret.yaml``.
+# A segment must BEGIN with an alphanumeric/underscore (so ``/5`` arithmetic,
+# ``//`` comments, and ``x / y`` ratios do not trip). The leading slash is not
+# anchored to start-of-string so a path embedded in prose (``stored at
+# /app/secret/file``) is still caught. A preceding identifier character or digit
+# suppresses the match so constructs like ``3/4`` are not misread as paths.
+# This structural rule supersedes the old hardcoded ``etc|var|tmp|...`` list,
+# which a red team bypassed with ``/app/secret/file`` (an unlisted directory
+# root).
 _UNIX_ABS_PATH_RE: Final[re.Pattern[str]] = re.compile(
-    r"(?<![A-Za-z0-9_])(/(?:etc|var|tmp|root|private|opt|srv|proc|sys|dev|mnt|media|data|workspace|repo|build|dist|venv|env)(?:/[^\s'\"]*)?)"
+    r"(?<![A-Za-z0-9_])"
+    r"(?:"
+    r"/[A-Za-z0-9_][A-Za-z0-9_.-]*(?:/[A-Za-z0-9_.-]+)+"  # (a) two+ segments
+    r"|"
+    r"/[A-Za-z0-9_][A-Za-z0-9_-]*\.[A-Za-z0-9]{1,8}"  # (b) one seg + extension
+    r")"
 )
 
 # Windows drive paths: C:\... or C:/... . Refused for the same reason as unix
@@ -98,10 +139,31 @@ _SHELL_COMMAND_RE: Final[re.Pattern[str]] = re.compile(
     r"(?:^|\s)(?:sudo|bash|zsh|curl|wget|scp|ssh|rsync|chmod|chown)\b"
 )
 
-# Environment-variable assignments: KEY=value (KEY is uppercase/digit/underscore,
-# value non-empty), and $VAR / ${VAR} references.
-_ENV_ASSIGN_RE: Final[re.Pattern[str]] = re.compile(r"(?:^|\s)[A-Z][A-Z0-9_]{2,}=\S+")
-_ENV_REF_RE: Final[re.Pattern[str]] = re.compile(r"\$\{?[A-Z][A-Z0-9_]{2,}\}?")
+# Environment-variable assignments and shell-variable references, detected
+# CASE-INSENSITIVELY. A red team bypassed the uppercase-only detector with
+# ``api_key=deadbeef`` and ``${api_key}``; the key shape ``[A-Za-z_][A-Za-z0-9_]{2,}``
+# (at least three characters, starting with a letter or underscore) catches
+# ``API_KEY=``, ``api_key=``, and ``apiKey=`` alike. The assignment requires the
+# ``=`` to be immediately followed by a non-space value (so ``x = y`` equations
+# do not trip), and is anchored to start-of-string or a separating char so a
+# leading identifier char cannot extend into the key. The reference detector
+# matches ``$VAR`` / ``${VAR}`` in any case with a variable name of at least two
+# characters; ``$5`` (price) does not match because the name must start with a
+# letter or underscore.
+_ENV_ASSIGN_RE: Final[re.Pattern[str]] = re.compile(r"(?:^|[\s;&|])[A-Za-z_][A-Za-z0-9_]{2,}=\S")
+_ENV_REF_RE: Final[re.Pattern[str]] = re.compile(r"\$\{?[A-Za-z_][A-Za-z0-9_]{1,}\}?")
+
+# Credential-keyword assignments, detected CASE-INSENSITIVELY. A summary that
+# names a credential field and binds it (``api_key=deadbeef``, ``token: abc``,
+# ``Secret: hunter2``, ``api-key: ...``) discloses a secret shape even when the
+# value is not a recognized concrete pattern above. The keyword alternation
+# (``api[-_]?key`` / ``secret`` / ``token`` / ``password``) is only refused when
+# directly followed by ``=`` or ``:`` and a non-space value, so prose uses
+# (``the secret of convergence``, ``a token of support``) pass.
+_CREDENTIAL_KEYWORD_RE: Final[re.Pattern[str]] = re.compile(
+    r"(?:api[-_]?key|secret|token|password)\s*[:=]\s*\S",
+    re.IGNORECASE,
+)
 
 # Credential patterns: the SAME concrete shapes public_boundary.py scans for.
 # Duplicated here (not imported) so the producer-side sanitizer is independent
@@ -206,6 +268,7 @@ _DETECTORS: Final[tuple[tuple[str, re.Pattern[str]], ...]] = (
     ("shell_command", _SHELL_COMMAND_RE),
     ("env_assignment", _ENV_ASSIGN_RE),
     ("env_reference", _ENV_REF_RE),
+    ("credential_keyword", _CREDENTIAL_KEYWORD_RE),
     ("raw_dataset_marker", _RAW_DATASET_RE),
     ("t7_uuidv7", _UUIDV7_RE),
     ("vps_topology_marker", _VPS_TOPOLOGY_RE),
@@ -323,6 +386,113 @@ def check_summary(summary: str) -> None:
     raise SanitizerRefusalError(msg, forbidden_class=class_name, snippet=snippet)
 
 
+# The deny-list of top-level packet field names whose string VALUES are exempt
+# from the recursive payload scan because they are STRUCTURAL, not disclosure
+# prose. ``schema_version`` is a pinned const; ``packet_id`` /
+# ``source_snapshot_digest`` / ``object_digest`` / ``provenance_refs`` are
+# content-addressed digests (never free text); ``created_utc`` is a normalized
+# RFC 3339 timestamp; ``disclosure_policy`` carries only the two enum/int
+# fields; ``object_type`` is drawn from a small enumerated vocabulary and is
+# validated separately by the exporter. None of these can carry a forbidden
+# class without tripping schema validation first, so scanning them would only
+# add false-positive risk (e.g. a digest containing ``/``-less hex is fine, but
+# a future schema field shaped like ``api_key`` would wrongly refuse). The set
+# is closed: adding a new free-text field to the packet REQUIRES adding it to
+# the recursion (it is NOT exempt) and a reviewer must consciously extend this
+# list only for genuinely-structural fields.
+_PAYLOAD_EXEMPT_FIELD_NAMES: Final[frozenset[str]] = frozenset(
+    {
+        "schema_version",
+        "packet_id",
+        "source_snapshot_digest",
+        "created_utc",
+        "object_digest",
+        "object_type",
+        "provenance_refs",
+        "review_only",
+        "canonical_effect",
+        "grants_authority",
+        "canonical_writes",
+        "private_identities",
+        "summary_max_bytes",
+    }
+)
+
+
+def scan_payload(payload: Any, *, path: str = "") -> None:
+    """Recursively refuse any forbidden class in ANY string field of a payload.
+
+    The summary field (``sanitized_summary``) is the headline disclosure surface
+    and is already forbidden-class-checked by :func:`normalize_summary` at build
+    time. This function is the defense-in-depth RECURSIVE counterpart: it walks
+    the entire packet payload (nested dicts, lists, and arbitrary nesting depth)
+    and refuses if ANY string value — not just ``sanitized_summary`` — contains a
+    forbidden class. This closes a smuggling vector where a forbidden value
+    hidden in a nested object (e.g. a future ``notes`` field or an unvalidated
+    payload blob) would reach a built packet because only the top-level summary
+    was scanned.
+
+    Refuse-not-strip is preserved: a hit RAISES
+    :class:`SanitizerRefusalError` (typed ``BRIDGE_CONTRACT_MISMATCH``); nothing
+    is edited, masked, or dropped.
+
+    Structural fields are exempt: digest fields, the pinned ``schema_version``,
+    timestamps, and the closed ``disclosure_policy``/``object_type`` vocabularies
+    are validated by the schema and the exporter's own constructors and carry no
+    free-text disclosure risk; scanning them would only add false-positive risk.
+    The exemption is by FIELD NAME (see :data:`_PAYLOAD_EXEMPT_FIELD_NAMES`),
+    applied wherever in the tree that name appears.
+
+    Parameters
+    ----------
+    payload:
+        The packet payload (or any sub-tree) to scan. Non-string scalars,
+        ``None``, dicts, and lists are handled; an unknown type is a no-op (it
+        carries no string disclosure surface).
+    path:
+        Dotted field path to the current sub-tree, used only to build a precise
+        refusal message (e.g. ``objects[0].sanitized_summary``). Callers omit it.
+
+    Raises
+    ------
+    SanitizerRefusalError
+        If any non-exempt string value anywhere in the payload contains a
+        forbidden class. Carries the ``forbidden_class`` name, a masked
+        ``snippet``, and a message naming the dotted path.
+    """
+    if isinstance(payload, str):
+        # Exemption is applied by the CALLER (the dict branch below skips exempt
+        # keys before recursing into their values). A bare string with no
+        # enclosing field name is scanned as free disclosure prose.
+        hit = _find_first_forbidden(payload)
+        if hit is None:
+            return
+        class_name, snippet = hit
+        where = f" at {path}" if path else ""
+        msg = (
+            f"payload string{where} refused: contains forbidden class "
+            f"{class_name!r} (snippet={snippet!r}); the exporter refuses, it "
+            "does not strip — honestly re-summarize the object (describe the "
+            "science, not the environment) before exporting"
+        )
+        raise SanitizerRefusalError(msg, forbidden_class=class_name, snippet=snippet)
+    if isinstance(payload, dict):
+        for key, value in payload.items():
+            if isinstance(key, str) and key in _PAYLOAD_EXEMPT_FIELD_NAMES:
+                continue
+            child_path = f"{path}.{key}" if path else key
+            scan_payload(value, path=child_path)
+        return
+    if isinstance(payload, (list, tuple)):
+        for index, item in enumerate(payload):
+            child_path = f"{path}[{index}]" if path else f"[{index}]"
+            scan_payload(item, path=child_path)
+        return
+    # Non-string scalars (int, float, bool, None) and any other type carry no
+    # string disclosure surface; nothing to scan.
+    return
+
+
 def normalize_summary(summary: Any, *, max_bytes: int) -> str:
     """Normalize a summary: strip surrounding whitespace, collapse internal runs.
 
@@ -378,4 +548,5 @@ __all__ = [
     "check_summary",
     "forbidden_classes",
     "normalize_summary",
+    "scan_payload",
 ]

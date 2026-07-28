@@ -150,6 +150,62 @@
       "token_template": "live{U}trading for this run"
     },
     {
+      "case_id": "adv-structural-unix-path",
+      "forbidden_class": "unix_path",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "stored at ",
+      "token_template": "{S}app{S}secret{S}file",
+      "note": "Red-team cycle 1, FINDING 1: the path detector is STRUCTURAL, not list-based. /app/secret/file uses a directory root (/app) NOT in any hardcoded list; the old etc|var|tmp|... detector bypassed it. The structural detector refuses any '/' + plausible path body (>= 2 segments or a file-ish tail)."
+    },
+    {
+      "case_id": "adv-opt-data-path",
+      "forbidden_class": "unix_path",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "data resides at ",
+      "token_template": "{S}opt{S}data{S}f",
+      "note": "Red-team cycle 1, FINDING 1: /opt/data/f is a two-segment structural path, refused regardless of the directory name."
+    },
+    {
+      "case_id": "adv-tmp-path",
+      "forbidden_class": "unix_path",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "scratch file at ",
+      "token_template": "{S}tmp{S}a",
+      "note": "Red-team cycle 1, FINDING 1: /tmp/a is a minimal two-segment structural path, refused."
+    },
+    {
+      "case_id": "adv-var-log-path",
+      "forbidden_class": "unix_path",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "log written to ",
+      "token_template": "{S}var{S}log{S}x.log",
+      "note": "Red-team cycle 1, FINDING 1: /var/log/x.log is a path with a file-ish tail (.log extension), refused by the single-segment-with-extension arm of the structural detector."
+    },
+    {
+      "case_id": "adv-lowercase-env-assignment",
+      "forbidden_class": "env_assignment",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "configured via ",
+      "token_template": "api{U}key{E}deadbeef",
+      "note": "Red-team cycle 1, FINDING 2: env-assignment detection is CASE-INSENSITIVE. The old uppercase-only [A-Z][A-Z0-9_]{2,}= detector bypassed lowercase 'api_key=deadbeef'. The new detector matches [A-Za-z_][A-Za-z0-9_]{2,}= so any-case KEY=value is refused. The reported class is env_assignment (the credential_keyword detector is ordered after it; either refuses the packet)."
+    },
+    {
+      "case_id": "adv-lowercase-env-reference",
+      "forbidden_class": "env_reference",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "reads token from var ",
+      "token_template": "${api{U}key}",
+      "note": "Red-team cycle 1, FINDING 2: shell-variable reference detection is CASE-INSENSITIVE. The old uppercase-only \\$\\{?[A-Z][A-Z0-9_]{2,}\\}? detector bypassed lowercase '${api_key}'. The new detector matches \\$\\{?[A-Za-z_][A-Za-z0-9_]{1,}\\}? so $VAR/${VAR} in any case is refused. The raw '{' and '}' chars are scanner-clean (no slash, no credential shape); {U} expands to '_' giving '${api_key}'."
+    },
+    {
+      "case_id": "adv-credential-keyword-secret",
+      "forbidden_class": "credential_keyword",
+      "expected_fail_reason": "BRIDGE_CONTRACT_MISMATCH",
+      "prefix": "the field ",
+      "token_template": "secret{E}hunter2",
+      "note": "Red-team cycle 1, FINDING 2: credential-keyword detection. A secret field bound by '=' or ':' ('secret=hunter2') discloses a secret shape even when the value is not a recognized concrete credential pattern. Detected case-insensitively: api[-_]?key, secret, token, password followed by = or :. Reports credential_keyword."
+    },
+    {
       "case_id": "adv-unknown-object-type",
       "forbidden_class": "unknown_object_type",
       "expected_fail_reason": "CONTRACT_INVALID",

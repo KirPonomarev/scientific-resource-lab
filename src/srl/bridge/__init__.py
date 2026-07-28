@@ -16,10 +16,10 @@ The second load-bearing property is **digest replacement** (see
 :mod:`srl.bridge.exporter`): a private object's identity digest is not
 automatically publishable. Under the ``digest_replaced`` disclosure policy the
 exporter substitutes a packet-local digest
-``sha256(packet_id + private_digest)`` for the raw private digest. The
-replacement is deterministic (the same packet_id + private digest always yields
-the same replacement) but uncorrelated with the raw digest, so the raw private
-identity never crosses the boundary.
+``sha256(packet_seed + private_digest)`` for the raw private digest. The
+replacement is deterministic (the same packet_seed + private digest always
+yields the same replacement) but uncorrelated with the raw digest, so the raw
+private identity never crosses the boundary.
 
 Honesty
 -------

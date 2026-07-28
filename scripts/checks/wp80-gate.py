@@ -40,6 +40,16 @@ I80-05 review_only / canonical_effect / grants_authority / canonical_writes
     ``grants_authority=false``, and ``canonical_writes=0`` (the four safety
     consts pinned by the schema and the exporter). A tampered packet with a
     wrong const fails schema validation.
+
+I80-06 recursive payload scan (red-team cycle 1)
+    The sanitizer recursively scans EVERY string field of the packet payload
+    (nested dicts/lists, arbitrary depth), not only ``sanitized_summary``. A
+    forbidden value smuggled into a nested object is REFUSED (typed
+    ``BRIDGE_CONTRACT_MISMATCH``). Each of the three red-team cycle-1 bypass
+    vectors is exercised through the recursive scan: a structural unlisted path
+    (``/app/secret/file``), a lowercase env assignment (``api_key=deadbeef``),
+    and a lowercase shell-var reference (``${api_key}``), each hidden in a
+    nested object. A clean nested payload passes.
 """
 
 from __future__ import annotations
