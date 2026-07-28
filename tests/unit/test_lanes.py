@@ -235,7 +235,7 @@ def test_duplicate_lane_id_rejected() -> None:
 def test_worktree_fingerprint_never_persists_raw_path(tmp_path: Path) -> None:
     """The raw absolute worktree path is never written to the ledger file."""
     ledger = LaneLedger()
-    secret_path = "/Users/someone/secret/worktree"  # noqa: S105 (a test path, not a secret)
+    secret_path = "/srv/srl-lane/worktree"  # noqa: S105 (a synthetic path, not a secret)
     _acquire(
         ledger,
         lane_id="a",
