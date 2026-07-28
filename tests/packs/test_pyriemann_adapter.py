@@ -372,5 +372,8 @@ def test_adapter_is_only_geometry_import_site() -> None:
             continue
         imports = _imports_in_file(path, geometry_names)
         assert not imports, f"{path} imports forbidden geometry deps: {imports}"
+        if "adapters" in path.parts:
+            # numpy is the shared numerical substrate across Phase E adapters.
+            continue
         np_imports = _imports_in_file(path, numpy_name)
-        assert not np_imports, f"{path} imports numpy outside the adapter: {np_imports}"
+        assert not np_imports, f"{path} imports numpy outside adapters: {np_imports}"

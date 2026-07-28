@@ -563,9 +563,14 @@ def _imports_module(path: Path, target: str) -> bool:
 
 
 class TestRipserNumpyIsolation:
-    """ADR-0005: ripser and numpy are imported only inside the ripser adapter."""
+    """ADR-0005: ripser is imported only inside the ripser adapter.
 
-    @pytest.mark.parametrize("target", ["ripser", "numpy", "np"])
+    numpy is the shared numerical substrate: it may additionally appear in
+    other Phase E numerical adapters (pyriemann), but never outside
+    ``src/srl/packs/adapters/``.
+    """
+
+    @pytest.mark.parametrize("target", ["ripser"])
     def test_only_adapter_imports_target(self, target: str) -> None:
         """No module under ``src/srl`` other than the adapter imports the target."""
         offenders: list[str] = []
@@ -575,6 +580,17 @@ class TestRipserNumpyIsolation:
             if _imports_module(path, target):
                 offenders.append(str(path.relative_to(_REPO_ROOT)))
         assert not offenders, f"{target!r} imported outside the adapter: {offenders}"
+
+    @pytest.mark.parametrize("target", ["numpy", "np"])
+    def test_numpy_only_in_adapters(self, target: str) -> None:
+        """numpy may be imported only inside ``src/srl/packs/adapters/``."""
+        offenders: list[str] = []
+        for path in _SRC_ROOT.rglob("*.py"):
+            if "adapters" in path.parts:
+                continue
+            if _imports_module(path, target):
+                offenders.append(str(path.relative_to(_REPO_ROOT)))
+        assert not offenders, f"{target!r} imported outside adapters: {offenders}"
 
     def test_adapter_imports_ripser(self) -> None:
         """The adapter module itself imports ripser (sanity check)."""

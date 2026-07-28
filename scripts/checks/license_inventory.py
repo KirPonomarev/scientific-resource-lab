@@ -55,8 +55,6 @@ _ALLOWED_LICENSES: Final[frozenset[str]] = frozenset(
         "MPL-2.0",
         "PYTHON-2.0",
         "CC0-1.0",
-        "0BSD",
-        "ZLIB",
     }
 )
 
