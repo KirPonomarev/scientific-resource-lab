@@ -14,6 +14,23 @@ automation contract; it never means a scientific claim is supported (see
 
 from __future__ import annotations
 
+from srl.autonomy.lanes import (
+    DEFAULT_LEASE_TTL_SECONDS,
+    LEDGER_SCHEMA_VERSION,
+    Executor,
+    LaneEntry,
+    LaneError,
+    LaneLedger,
+    LaneStatus,
+    PathOwnershipError,
+    acquire_lane,
+    expire_leases,
+    heartbeat,
+    load_ledger,
+    policy_lane_cap,
+    release_lane,
+    save_ledger,
+)
 from srl.autonomy.leakguard import LeakViolation, scan_bytes, scan_diff
 from srl.autonomy.policy import PolicyError, load_policy
 from srl.autonomy.resume import (
@@ -26,16 +43,31 @@ from srl.autonomy.resume import (
 from srl.autonomy.scopes import ScopeViolation, check_write
 
 __all__ = [
+    "DEFAULT_LEASE_TTL_SECONDS",
+    "LEDGER_SCHEMA_VERSION",
     "Decision",
+    "Executor",
     "IdempotencyInputs",
+    "LaneEntry",
+    "LaneError",
+    "LaneLedger",
+    "LaneStatus",
     "LeakViolation",
+    "PathOwnershipError",
     "PolicyError",
     "ResumeDecision",
     "ScopeViolation",
+    "acquire_lane",
     "check_write",
+    "expire_leases",
+    "heartbeat",
     "idempotency_key",
+    "load_ledger",
     "load_policy",
+    "policy_lane_cap",
     "reconcile",
+    "release_lane",
+    "save_ledger",
     "scan_bytes",
     "scan_diff",
 ]

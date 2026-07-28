@@ -1,0 +1,54 @@
+# Documentation workflow (WP-A04).
+# Actions are pinned to full commit SHAs for reproducibility and supply-chain
+# integrity. Bump by resolving the new tag's commit SHA via the GitHub API and
+# replacing the SHA here (keeping the comment with the human-readable tag).
+#
+# Resolved SHAs (re-resolve on update):
+#   actions/checkout  v5.1.0 -> fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+name: docs
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  merge_group:
+
+permissions:
+  contents: read
+
+jobs:
+  link-check:
+    name: link check
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Markdown link-domain check
+        run: python3 scripts/checks/link_check.py
+
+  markdown-structure:
+    name: markdown structure
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Markdown structure check
+        run: python3 scripts/checks/markdown_structure.py
+
+  demo-placeholder:
+    name: demo placeholder
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Public demo placeholder
+        run: python3 scripts/checks/demo_placeholder.py

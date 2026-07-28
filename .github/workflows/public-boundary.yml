@@ -1,0 +1,30 @@
+# Public boundary workflow (WP-A04).
+# Actions are pinned to full commit SHAs for reproducibility and supply-chain
+# integrity. Bump by resolving the new tag's commit SHA via the GitHub API and
+# replacing the SHA here (keeping the comment with the human-readable tag).
+#
+# Resolved SHAs (re-resolve on update):
+#   actions/checkout  v5.1.0 -> fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+name: public-boundary
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  merge_group:
+
+permissions:
+  contents: read
+
+jobs:
+  public-boundary:
+    name: public boundary
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Public boundary scan
+        run: python3 scripts/checks/public_boundary.py

@@ -40,6 +40,13 @@ from srl.execution.estimate import (
     ResourceEstimate,
     ResourceEstimateError,
 )
+from srl.execution.materialize import (
+    STAGING_RECEIPT_SCHEMA_VERSION,
+    MaterializationError,
+    MaterializationReceipt,
+    StagedRun,
+    materialize_run,
+)
 from srl.execution.platform_probe import (
     PREFLIGHT_SCHEMA_VERSION,
     RESOURCE_LIMIT_FAIL_REASON,
@@ -81,9 +88,19 @@ from srl.execution.sandbox import (
     make_preexec,
     prepare_scratch,
 )
+from srl.execution.sealer import (
+    ENGINE_RECEIPT_SCHEMA_VERSION,
+    SealedRun,
+    SealerError,
+    seal_run,
+)
+from srl.execution.sealer import (
+    RUN_RECEIPT_SCHEMA_VERSION as SEALER_RUN_RECEIPT_SCHEMA_VERSION,
+)
 
 __all__ = [
     "DEFAULT_OUTPUT_CAP_BYTES",
+    "ENGINE_RECEIPT_SCHEMA_VERSION",
     "ESTIMATE_FAIL_REASON",
     "IR_UNSUPPORTED_REASON",
     "ORPHAN_FAIL_REASON",
@@ -94,12 +111,16 @@ __all__ = [
     "RESOURCE_LIMIT_FAIL_REASON",
     "RESOURCE_POLICY_SCHEMA_VERSION",
     "RUN_RECEIPT_SCHEMA_VERSION",
+    "SEALER_RUN_RECEIPT_SCHEMA_VERSION",
+    "STAGING_RECEIPT_SCHEMA_VERSION",
     "UNKNOWN_ADAPTER_FAIL_REASON",
     "AdapterDescriptor",
     "AdmissionDecision",
     "CapturedOutput",
     "DiskProbe",
     "LimitSetupError",
+    "MaterializationError",
+    "MaterializationReceipt",
     "OrphanDetectedError",
     "OutputLimitError",
     "PolicyError",
@@ -114,6 +135,9 @@ __all__ = [
     "RunStatus",
     "RunUsage",
     "SandboxError",
+    "SealedRun",
+    "SealerError",
+    "StagedRun",
     "StaticPreflightProvider",
     "UnknownAdapterError",
     "admit",
@@ -122,10 +146,12 @@ __all__ = [
     "list_adapters",
     "load_policy",
     "make_preexec",
+    "materialize_run",
     "preflight",
     "prepare_scratch",
     "run_adapter",
     "run_handler",
+    "seal_run",
     "validate_input",
     "validate_output",
 ]
