@@ -1,0 +1,11 @@
+{
+  "vector_id": "wp40-p04-ucum-alias-forms",
+  "description": "UCUM dotted/signed-exponent notation and the Ohm alias parse to the same dimensions as their Python-notation forms.",
+  "expected": "accept",
+  "cases": [
+    {"ucum": "kg.m.s-2", "canonical": "kg*m/s^2", "dimension": "[length] * [mass] * [time]^-2"},
+    {"ucum": "m.s-1", "canonical": "m/s", "dimension": "[length] * [time]^-1"},
+    {"ucum": "kg.m2.s-2", "canonical": "kg*m**2/s**2", "dimension": "[length]^2 * [mass] * [time]^-2"},
+    {"ucum": "Ohm", "canonical": "ohm", "dimension": "[current]^-2 * [length]^2 * [mass] * [time]^-3"}
+  ]
+}

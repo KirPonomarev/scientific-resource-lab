@@ -1,0 +1,13 @@
+{
+  "vector_id": "wp40-p05-codata-units-parse",
+  "description": "Every CODATA 2018 constant's unit field parses to a dimension in the pinned QUDT subset.",
+  "expected": "accept",
+  "cases": [
+    {"constant_id": "codata2018.speed-of-light", "unit": "m/s", "dimension": "[length] * [time]^-1"},
+    {"constant_id": "codata2018.planck-constant", "unit": "kg.m2.s-1", "dimension": "[length]^2 * [mass] * [time]^-1"},
+    {"constant_id": "codata2018.boltzmann-constant", "unit": "kg.m2.s-2.K-1", "dimension": "[length]^2 * [mass] * [temperature]^-1 * [time]^-2"},
+    {"constant_id": "codata2018.avogadro-constant", "unit": "mol-1", "dimension": "[substance]^-1"},
+    {"constant_id": "codata2018.elementary-charge", "unit": "C", "dimension": "[current] * [time]"},
+    {"constant_id": "codata2018.electron-mass", "unit": "kg", "dimension": "[mass]"}
+  ]
+}

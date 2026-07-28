@@ -1,0 +1,10 @@
+{
+  "schema_version": "ConstantRef/v1",
+  "constant_id": "codata2018.planck-constant",
+  "source": "CODATA2018",
+  "symbol": "h",
+  "value": "0.000000000000000000000000000000000662607015",
+  "uncertainty": null,
+  "unit": "kg.m2.s-1",
+  "vintage": "CODATA-2018"
+}

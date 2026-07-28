@@ -1,0 +1,10 @@
+{
+  "schema_version": "ConstantRef/v1",
+  "constant_id": "codata2018.electron-mass",
+  "source": "CODATA2018",
+  "symbol": "m_e",
+  "value": "0.00000000000000000000000000000091093837015",
+  "uncertainty": "0.0000000000000000000000000000000000028",
+  "unit": "kg",
+  "vintage": "CODATA-2018"
+}

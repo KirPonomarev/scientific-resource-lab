@@ -1,0 +1,8 @@
+{
+  "vector_id": "wp40-n01-dimension-mismatch",
+  "description": "kg vs m (mass vs length) are dimensionally incompatible and must be rejected before any compute.",
+  "expected": "reject",
+  "operation": "parse_and_compare",
+  "left": "kg",
+  "right": "m"
+}

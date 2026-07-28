@@ -1,0 +1,14 @@
+{
+  "vector_id": "wp40-p01-si-base-units",
+  "description": "The seven SI base units each parse to their singleton dimension.",
+  "expected": "accept",
+  "cases": [
+    {"unit": "m", "dimension": "[length]"},
+    {"unit": "kg", "dimension": "[mass]"},
+    {"unit": "s", "dimension": "[time]"},
+    {"unit": "A", "dimension": "[current]"},
+    {"unit": "K", "dimension": "[temperature]"},
+    {"unit": "mol", "dimension": "[substance]"},
+    {"unit": "cd", "dimension": "[luminosity]"}
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "vector_id": "wp40-n02-unknown-unit",
+  "description": "A Pint-known but out-of-subset unit ('fortnight') must be rejected with no silent fallback.",
+  "expected": "reject",
+  "operation": "parse_unit",
+  "unit": "fortnight"
+}

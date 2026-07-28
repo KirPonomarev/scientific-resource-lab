@@ -1,0 +1,15 @@
+{
+  "vector_id": "wp40-p02-si-derived-coherent",
+  "description": "The coherent SI derived units parse and reduce to their base-dimension vectors.",
+  "expected": "accept",
+  "cases": [
+    {"unit": "N", "dimension": "[length] * [mass] * [time]^-2"},
+    {"unit": "Pa", "dimension": "[length]^-1 * [mass] * [time]^-2"},
+    {"unit": "J", "dimension": "[length]^2 * [mass] * [time]^-2"},
+    {"unit": "W", "dimension": "[length]^2 * [mass] * [time]^-3"},
+    {"unit": "Hz", "dimension": "[time]^-1"},
+    {"unit": "V", "dimension": "[current]^-1 * [length]^2 * [mass] * [time]^-3"},
+    {"unit": "C", "dimension": "[current] * [time]"},
+    {"unit": "ohm", "dimension": "[current]^-2 * [length]^2 * [mass] * [time]^-3"}
+  ]
+}

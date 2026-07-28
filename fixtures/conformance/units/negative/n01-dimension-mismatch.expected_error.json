@@ -1,0 +1,4 @@
+{
+  "fail_reason": "CONTRACT_INVALID",
+  "detail": "parse_unit('kg') != parse_unit('m'); mass is not length"
+}
