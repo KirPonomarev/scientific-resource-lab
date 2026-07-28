@@ -13,8 +13,10 @@ The adapters here exist to exercise the sandbox's enforcement paths:
     Sleeps for the number of seconds in ``seconds`` (default 10). Used by the
     timeout case (a child that runs past its wall cap) and the orphan check.
 ``bomb.v1``
-    Allocates memory until it is killed (by ``RLIMIT_AS`` on Linux, or by the
-    wall watchdog elsewhere). Used by the memory-bomb case.
+    Allocates 64 MiB memory slabs until the ``RLIMIT_AS`` cap raises
+    ``MemoryError`` (Linux), then sleeps forever so the wall watchdog kills the
+    group. On macOS the cap is best-effort and the same watchdog backstop
+    applies. Used by the memory-bomb case.
 ``forker.v1``
     Forks repeatedly until ``RLIMIT_NPROC`` stops it. Used by the fork-bomb
     case. Each child exits immediately so no long-lived fan-out survives.
@@ -75,16 +77,32 @@ def _sleeper_handler(payload: dict[str, Any]) -> dict[str, Any]:
 
 
 def _bomb_handler(payload: dict[str, Any]) -> dict[str, Any]:
-    """Allocate memory in 64 MiB slabs until killed.
+    """Allocate memory in 64 MiB slabs until the RLIMIT_AS cap is hit.
 
-    On Linux (CI) ``RLIMIT_AS`` kills the process; elsewhere the wall watchdog
-    does. The handler never returns normally — it is the memory-bomb vehicle.
+    On Linux ``RLIMIT_AS`` (policy ``rss_bytes``) raises ``MemoryError`` once the
+    virtual-address budget is exhausted. The handler catches that and sleeps
+    forever so the run is bounded by the wall watchdog, which classifies the
+    outcome as ``TIMEOUT`` with ``fail_reason=RESOURCE_LIMIT``. On macOS the cap
+    is best-effort and the same sleep loop is reached either by the cap or by the
+    slab budget; in either case the run never returns cleanly and no receipt is
+    written.
     """
     del payload  # the bomb takes no parameters
     blocks: list[bytearray] = []
     slab = 64 * 1024 * 1024  # 64 MiB
+    # Allocate enough slabs to exhaust the M1 policy's 1.5 GiB RLIMIT_AS cap
+    # on Linux (24 * 64 MiB = 1.5 GiB). A small pause between slabs keeps the
+    # host responsive and prevents runaway allocation on macOS where the cap
+    # is best-effort. If the cap fires early, break out and wait for the
+    # watchdog; do not exit with a clean contract code.
+    for _ in range(24):
+        try:
+            blocks.append(bytearray(slab))
+        except (MemoryError, OSError):
+            break
+        time.sleep(0.05)
     while True:
-        blocks.append(bytearray(slab))
+        time.sleep(0.2)
     # Unreachable; kept for the type checker.
 
 

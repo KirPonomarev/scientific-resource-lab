@@ -24,7 +24,7 @@ The suite covers 14 adversarial kinds, enumerated in
 | `path_injection` | `path-injection.json` | `rejected` | A path-traversal string as an adapter id is an unknown registry key; rejected before spawn. |
 | `archive_traversal` | `archive-traversal.json` | `rejected` | An archive/path-traversal hybrid id is rejected at the registry; no archive is opened. |
 | `symlink_device` | `symlink-device.json` | `rejected` | A device path (`/dev/null`) as an adapter id is rejected; the registry is not a path resolver. |
-| `memory_bomb` | `memory-bomb.json` | `resource_limit` | `bomb.v1` allocates until killed (`RLIMIT_AS` on Linux, wall watchdog on macOS). Bounded; no receipt. |
+| `memory_bomb` | `memory-bomb.json` | `resource_limit` | `bomb.v1` allocates 64 MiB slabs until the M1 policy's 1.5 GiB `RLIMIT_AS` cap raises `MemoryError` (Linux). The handler catches the error and sleeps forever so the runner's wall watchdog kills the group; the observed status is `timeout` with `fail_reason=RESOURCE_LIMIT`. On macOS the cap is best-effort and the same watchdog backstop applies. Bounded; no receipt. |
 | `fork_bomb` | `fork-bomb.json` | `resource_limit` | `forker.v1` forks until `RLIMIT_NPROC=256` blocks further forks with `EAGAIN`. The parent then stays alive (does not return a clean output) so the runner's wall watchdog kills the whole process group. The observed outcome is `timeout` with `fail_reason=RESOURCE_LIMIT` and no receipt. |
 | `output_bomb` | `output-bomb.json` | `resource_limit` | `chatter.v1` exceeds the 1 MiB per-stream output cap; the child is killed; no receipt. |
 | `timeout` | `timeout.json` | `timeout` | `sleeper.v1` past the wall cap is killed by the process-group watchdog; no receipt; no orphan. |
@@ -154,11 +154,12 @@ gate runtime ceiling is 120s; CI budgets `timeout-minutes: 15`.
 The suite is conservative everywhere and strict on Linux (CI).
 
 **`RLIMIT_AS` (memory).** On macOS arm64 the kernel refuses to lower the hard
-address-space limit, so `RLIMIT_AS` is best-effort there: a memory bomb is
-bounded by the wall watchdog and the output cap instead of `SIGSEGV`. On Linux
-(CI) `RLIMIT_AS` is enforced and kills an over-budget child directly. The
-`memory_bomb` case accepts `resource_limit`, `timeout`, or `failed` on any
-platform.
+address-space limit, so `RLIMIT_AS` is best-effort there. `bomb.v1` allocates
+64 MiB slabs until either the Linux `RLIMIT_AS` cap raises `MemoryError` or the
+24-slab budget (1.5 GiB) is reached; it then sleeps forever so the runner's wall
+watchdog kills the group. The observed status is `timeout` with
+`fail_reason=RESOURCE_LIMIT`, which satisfies the `resource_limit` expectation,
+and no receipt is written.
 
 **`RLIMIT_NPROC` (forks).** Fixed at 256. `forker.v1` forks repeatedly until
 `os.fork()` raises `EAGAIN`; the parent then stays alive so the runner's wall
