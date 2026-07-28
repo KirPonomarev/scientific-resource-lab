@@ -33,10 +33,13 @@ C21-04 1,000 repeated deduplicating ingests produce one object file
     asserted directly.
 
 C21-05 crash at every publish boundary
-    Failure injection at four boundaries (after tmp write, after fsync, after
-    replace, after descriptor) each leaves the store in old-or-new valid state:
-    no receipt is ever written on failure (the receipt is the commit marker,
-    written last), and no partial is ever visible as an object.
+    Failure injection at ALL SEVEN durability boundaries of the transaction
+    (tmp write, tmp fsync, read-back verify, os.replace publish, directory
+    fsync, descriptor write, receipt write) each leaves the store in old-or-new
+    valid state: no receipt is ever written on failure (the receipt is the
+    commit marker, written last), and no partial is ever visible as an object.
+    The seven boundaries are the explicit, single source of truth shared by
+    ``docs/architecture/cas-engine.md``, the gate, and the unit tests.
 
 C21-06 read-back corruption injection detected
     Patching the first read-back to return bytes that hash differently from the
@@ -88,15 +91,53 @@ _TS: Final[str] = "2026-07-28T12:00:00Z"
 # The fail reason surfaced in the gate receipt, mirrored from the registry.
 CAS_INTEGRITY_FAILURE_REF: Final[str] = "CAS_INTEGRITY_FAILURE"
 
+# ---------------------------------------------------------------------------
+# C21-05 crash matrix: the seven durability boundaries of the transaction.
+# ---------------------------------------------------------------------------
+# These seven boundaries are the single source of truth shared by this gate,
+# ``docs/architecture/cas-engine.md`` (## Crash matrix), and
+# ``tests/cas/test_engine_crash.py``. Each maps an injectable failure point to
+# the old-or-new valid state the store must be left in. The boundaries cover
+# every durability step of the receipt-last transaction documented in
+# ``srl/cas/descriptors.py`` (the 7-step condensed list) and ``srl/cas/engine.py``
+# (the 10-step expanded list): they are the same steps, grouped by injectable
+# boundary.
+#
+#   boundary          | injection                         | object | desc | receipt
+#   ------------------+-----------------------------------+--------+------+--------
+#   tmp_write         | os.replace #1 (staging) raises    | absent |  -   | absent
+#   tmp_fsync         | os.fsync #1 (partial) raises      | absent |  -   | absent
+#   readback_verify   | read-back returns wrong bytes     | absent |  -   | absent
+#   replace_publish   | os.replace #2 (publish) raises    | absent |  -   | absent
+#   dir_fsync         | _fsync_dir (post-publish) raises  | present| absent| absent
+#   descriptor_write  | os.replace #3 (descriptor) raises | present| absent| absent
+#   receipt_write     | os.replace #4 (receipt) raises    | present|present| absent
+#
 # os.replace call indices within a single ingest transaction (1-based):
 #   1 = staging rename (incoming/.ingest-* -> partial-*)
 #   2 = publish rename (partial-* -> objects/<shard>/<digest>)
 #   3 = atomic descriptor write (descriptors/<digest>.json)
 #   4 = atomic receipt write (receipts/<receipt_id>.json)
-# Used by the crash-injection checks to fail at a specific boundary.
-_REPLACE_STAGING: Final[int] = 1
-_REPLACE_PUBLISH: Final[int] = 2
-_REPLACE_DESCRIPTOR: Final[int] = 3
+# os.fsync call index within the transaction (1-based):
+#   1 = partial file fsync (step 5); subsequent fsyncs are descriptor/receipt
+#       file fsyncs and best-effort directory fsyncs (not injected here).
+REPLACE_STAGING: Final[int] = 1
+REPLACE_PUBLISH: Final[int] = 2
+REPLACE_DESCRIPTOR: Final[int] = 3
+REPLACE_RECEIPT: Final[int] = 4
+FSYNC_PARTIAL: Final[int] = 1
+
+# The canonical, ordered list of the seven crash-matrix boundaries. Order
+# matches the transaction step order so the gate receipt reads top-to-bottom.
+CRASH_BOUNDARIES: Final[tuple[str, ...]] = (
+    "tmp_write",
+    "tmp_fsync",
+    "readback_verify",
+    "replace_publish",
+    "dir_fsync",
+    "descriptor_write",
+    "receipt_write",
+)
 
 
 def _emit(receipt: dict[str, Any]) -> None:
@@ -244,7 +285,7 @@ def _publish_boom(real_replace: Any) -> Any:
 
     def boom(src: Path | str, dst: Path | str) -> None:
         state["replaces"] += 1
-        if state["replaces"] == _REPLACE_PUBLISH:
+        if state["replaces"] == REPLACE_PUBLISH:
             raise OSError("simulated crash at publish")
         real_replace(src, dst)
 
@@ -366,26 +407,40 @@ def _check_c21_04() -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 
-def _boundary_replace_boom(boundary: str, real_replace: Any) -> Any:
-    """Build an os.replace side effect that fails at the boundary-specific call.
+def _replace_boom_at(fail_at: int, real_replace: Any, label: str) -> Any:
+    """Build an os.replace side effect that raises on the ``fail_at``-th call.
 
-    Each boundary maps to a specific os.replace index in the transaction
-    (1 = staging, 2 = publish, 3 = descriptor). The ``after_fsync`` boundary
-    uses read-back corruption instead (no replace raise), so its boom never
-    raises and the caller installs a separate read_bytes patch.
+    Counts every ``os.replace`` in the transaction and raises ``OSError`` on the
+    ``fail_at``-th call (1-based: 1=staging, 2=publish, 3=descriptor, 4=receipt).
+    Used for the tmp_write / replace_publish / descriptor_write / receipt_write
+    boundaries.
     """
-    fail_at = {
-        "after_tmp_write": _REPLACE_STAGING,
-        "after_replace": _REPLACE_PUBLISH,
-        "after_descriptor": _REPLACE_DESCRIPTOR,
-    }.get(boundary)
     state = {"replaces": 0}
 
     def boom(src: Path | str, dst: Path | str) -> None:
         state["replaces"] += 1
-        if fail_at is not None and state["replaces"] == fail_at:
-            raise OSError(f"boundary {boundary!r}: replace #{state['replaces']}")
+        if state["replaces"] == fail_at:
+            raise OSError(f"boundary {label!r}: replace #{state['replaces']}")
         real_replace(src, dst)
+
+    return boom
+
+
+def _fsync_boom_at(fail_at: int, real_fsync: Any, label: str) -> Any:
+    """Build an os.fsync side effect that raises on the ``fail_at``-th call.
+
+    The transaction's first fsync is the partial-file fsync (step 5). Later
+    fsyncs are descriptor/receipt file fsyncs and best-effort directory fsyncs.
+    The ``dir_fsync`` boundary fails a post-publish directory fsync, so it is
+    handled by patching ``_fsync_dir`` directly instead of this counter.
+    """
+    state = {"fsyncs": 0}
+
+    def boom(fd: int) -> None:
+        state["fsyncs"] += 1
+        if state["fsyncs"] == fail_at:
+            raise OSError(f"boundary {label!r}: fsync #{state['fsyncs']}")
+        real_fsync(fd)
 
     return boom
 
@@ -395,7 +450,8 @@ def _readback_corrupter(real_read_bytes: Any) -> Any:
 
     Only reads of files under ``incoming/`` (the partial) are corrupted; all
     other reads pass through unchanged. The corruption flips the last byte so
-    the read-back hash disagrees with the source hash.
+    the read-back hash disagrees with the source hash (triggers the verify
+    boundary with ``CAS_INTEGRITY_FAILURE``).
     """
 
     def corrupt(self: Path) -> bytes:
@@ -407,58 +463,132 @@ def _readback_corrupter(real_read_bytes: Any) -> Any:
     return corrupt
 
 
+def _dir_fsync_boom(real_fsync_dir: Any, label: str) -> Any:
+    """Build a ``_fsync_dir`` side effect that raises on the first post-publish call.
+
+    The directory-fsync boundary runs *after* the publish (step 8), so by the
+    time ``_fsync_dir`` is first reached the object is already visible. Raising
+    here models a crash after the publish but before the directory entry is
+    durable. The engine's ``_fsync_dir`` normally tolerates OSError, so this
+    injection replaces the whole function to force the raise.
+    """
+
+    def boom(path: Path) -> None:
+        raise OSError(f"boundary {label!r}: directory fsync failed")
+
+    return boom
+
+
+# The expected old-or-new state for each boundary: (object_present, descriptor_present).
+# receipt is ALWAYS absent on failure (the commit marker is written last).
+_BOUNDARY_EXPECTED: Final[dict[str, tuple[bool, bool]]] = {
+    "tmp_write": (False, False),
+    "tmp_fsync": (False, False),
+    "readback_verify": (False, False),
+    "replace_publish": (False, False),
+    "dir_fsync": (True, False),
+    "descriptor_write": (True, False),
+    "receipt_write": (True, True),
+}
+
+
+def _replace_patch_for(boundary: str) -> Any:
+    """Build the os.replace patch for a replace-indexed boundary (or None)."""
+    index = {
+        "tmp_write": REPLACE_STAGING,
+        "replace_publish": REPLACE_PUBLISH,
+        "descriptor_write": REPLACE_DESCRIPTOR,
+        "receipt_write": REPLACE_RECEIPT,
+    }.get(boundary)
+    if index is None:
+        return None
+    return patch(
+        "srl.cas.engine.os.replace",
+        side_effect=_replace_boom_at(index, os.replace, boundary),
+    )
+
+
+def _boundary_patches(boundary: str) -> list[Any]:
+    """Build the (not-yet-started) failure-injection patches for ``boundary``.
+
+    Each boundary maps to exactly one injection: the four ``os.replace``
+    boundaries raise at their 1-based call index; ``tmp_fsync`` raises at the
+    partial-file fsync; ``readback_verify`` corrupts the read-back; ``dir_fsync``
+    raises inside ``_fsync_dir`` (the engine normally swallows OSError there, so
+    the whole function is replaced to force the raise).
+    """
+    replace_patch = _replace_patch_for(boundary)
+    if replace_patch is not None:
+        return [replace_patch]
+    if boundary == "tmp_fsync":
+        return [
+            patch(
+                "srl.cas.engine.os.fsync",
+                side_effect=_fsync_boom_at(FSYNC_PARTIAL, os.fsync, boundary),
+            )
+        ]
+    if boundary == "readback_verify":
+        return [patch("srl.cas.engine.Path.read_bytes", _readback_corrupter(Path.read_bytes))]
+    if boundary == "dir_fsync":
+        return [patch("srl.cas.engine._fsync_dir", side_effect=_dir_fsync_boom(None, boundary))]
+    raise AssertionError(f"unknown boundary {boundary!r}")  # pragma: no cover
+
+
 def _run_boundary(boundary: str, payload: bytes) -> dict[str, Any]:
     """Run one C21-05 boundary case; return its case dict (with status keys).
 
     Installs the boundary-specific failure injection, runs an ingest, and
-    records whether it raised and what records remain. Returns a dict with
-    ``raised``, ``object_files``, ``receipt_files``, ``receipt_absent``, and
-    ``object_state_ok`` keys.
+    records whether it raised and what records remain. Returns a dict with the
+    record counts and the derived ``receipt_absent`` / ``state_ok`` booleans.
     """
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
         store = LocalArtifactStore(root)
-        boom = _boundary_replace_boom(boundary, os.replace)
-        patches = [patch("srl.cas.engine.os.replace", side_effect=boom)]
-        if boundary == "after_fsync":
-            patches.append(
-                patch("srl.cas.engine.Path.read_bytes", _readback_corrupter(Path.read_bytes))
-            )
+        patches = _boundary_patches(boundary)
         for p in patches:
             p.start()
         raised = False
+        raised_kind = ""
         try:
             try:
                 store.ingest_bytes(payload, "application/octet-stream", created_utc=_TS)
-            except (OSError, CasIntegrityError):
+            except (OSError, CasIntegrityError) as exc:
                 raised = True
+                raised_kind = type(exc).__name__
         finally:
             for p in patches:
                 p.stop()
 
         n_obj = _object_count(root)
+        n_desc = _descriptor_count(root)
         n_rec = _receipt_count(root)
-        # Receipt-last invariant: no receipt on any failure.
-        receipt_absent = n_rec == 0
-        # after_descriptor leaves the object published (no descriptor/receipt).
-        object_state_ok = (n_obj == 1) if boundary == "after_descriptor" else (n_obj == 0)
+        expect_obj, expect_desc = _BOUNDARY_EXPECTED[boundary]
         return {
             "case": f"boundary-{boundary}",
             "raised": raised,
+            "raised_kind": raised_kind,
             "object_files": n_obj,
+            "descriptor_files": n_desc,
             "receipt_files": n_rec,
-            "receipt_absent": receipt_absent,
-            "object_state_ok": object_state_ok,
+            "receipt_absent": n_rec == 0,
+            "object_state_ok": n_obj == (1 if expect_obj else 0),
+            "descriptor_state_ok": n_desc == (1 if expect_desc else 0),
         }
 
 
 def _check_c21_05() -> dict[str, Any]:
-    """C21-05: crash injection at four boundaries leaves old-or-new valid state."""
+    """C21-05: crash injection at all seven boundaries leaves old-or-new valid state.
+
+    The seven boundaries (``CRASH_BOUNDARIES``) are the single source of truth
+    shared with ``docs/architecture/cas-engine.md`` and the unit tests. Each is
+    injected in its own hermetic temp dir, and the store is asserted to end in
+    the old-or-new valid state for that boundary: receipt ALWAYS absent, object
+    and descriptor present only for the post-publish boundaries.
+    """
     cases: list[dict[str, Any]] = []
-    boundaries = ["after_tmp_write", "after_fsync", "after_replace", "after_descriptor"]
     payload = b"c21-05-crash-boundary"
 
-    for boundary in boundaries:
+    for boundary in CRASH_BOUNDARIES:
         case = _run_boundary(boundary, payload)
         cases.append(case)
         if not case["raised"]:
@@ -482,14 +612,24 @@ def _check_c21_05() -> dict[str, Any]:
                 ),
                 "cases": cases,
             }
+        if not case["descriptor_state_ok"]:
+            return {
+                "status": "FAIL",
+                "detail": (
+                    f"boundary {boundary!r} left an unexpected descriptor count "
+                    f"({case['descriptor_files']})"
+                ),
+                "cases": cases,
+            }
 
     return {
         "status": "PASS",
         "detail": (
-            "crash injection at four publish boundaries (after tmp write, after "
-            "fsync, after replace, after descriptor) each left old-or-new valid "
-            "state: no receipt was written on any failure, and no partial was "
-            "ever visible as an object"
+            "crash injection at all seven durability boundaries (tmp write, tmp "
+            "fsync, read-back verify, os.replace publish, directory fsync, "
+            "descriptor write, receipt write) each left old-or-new valid state: "
+            "no receipt was written on any failure (commit marker written last), "
+            "and no partial was ever visible as an object"
         ),
         "cases": cases,
     }
@@ -564,12 +704,34 @@ def _check_c21_06() -> dict[str, Any]:
 
 
 def _evidence() -> dict[str, Any]:
-    """Compact evidence summary: inline payload sizes used by the checks."""
+    """Compact evidence summary: inline payload sizes and the crash-matrix rationale."""
     return {
         "payload_c21_01_bytes": len(b"c21-01-no-overwrite"),
         "payload_c21_04_bytes": 256,
-        "boundaries_checked": 4,
+        "boundaries_checked": len(CRASH_BOUNDARIES),
+        "crash_boundaries": list(CRASH_BOUNDARIES),
         "binary_fixture_files": 0,
+        # Hermetic-monkeypatch rationale (red-team cycle-1, finding 2): the
+        # crash matrix injects failures by patching engine-internal symbols
+        # (``srl.cas.engine.os.replace``, ``os.fsync``, ``Path.read_bytes``,
+        # ``_fsync_dir``) inside a per-boundary ``tempfile.TemporaryDirectory``.
+        # This is hermetic and deterministic: no real disk is touched, no wall
+        # clock drives the outcome (the timestamp is pinned), and every patch is
+        # scoped to the single ingest under test and torn down in ``finally``.
+        # Monkeypatching (rather than, say, SIGBUS injection or a FUSE fault
+        # layer) is the right tool here because the invariant under test is the
+        # transaction's *step ordering*, not the kernel's durability guarantees
+        # — we assert that a failure at boundary N leaves exactly the records
+        # that steps < N wrote, which is a property of the code, not the OS.
+        "hermetic_monkeypatch_rationale": (
+            "failures are injected by patching engine-internal os.replace/fsync/"
+            "read_bytes/_fsync_dir symbols inside a per-boundary temp dir; the "
+            "timestamp is pinned and every patch is scoped + torn down in finally. "
+            "The matrix tests the transaction's step ordering (a crash at boundary "
+            "N leaves exactly the records steps < N wrote), which is a code "
+            "property, not a kernel-durability property, so monkeypatching — not "
+            "SIGBUS or a FUSE fault layer — is the correct injection tool."
+        ),
     }
 
 

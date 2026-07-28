@@ -12,7 +12,9 @@ Pins the receipt-last transaction invariant:
    raises ``QuotaExceededError`` (``T7_QUOTA_EXCEEDED``) and writes nothing.
 5. The descriptor and receipt records validate against their canonical schemas.
 6. ``recover_partials`` reports stale partials and never auto-deletes them.
-7. The plain ``put``/``fsck`` (WP-C20) path still works unchanged.
+7. ``put`` is the single public write path and routes through the engine: a
+   ``put`` publishes the object, the descriptor, and the commit-marker receipt
+   (there is no descriptor-less bypass).
 
 All tests are hermetic (``tmp_path``); the 1,000-ingest stress uses a 256-byte
 payload so it finishes well within the unit CI budget.
@@ -321,19 +323,43 @@ def test_recover_partials_classifies_published_partial(tmp_path: Path) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Backward compatibility: plain put/fsck still work.
+# Single write path: put() routes through the engine (no descriptor bypass).
 # ---------------------------------------------------------------------------
 
 
-def test_plain_put_still_works(tmp_path: Path) -> None:
-    """The WP-C20 plain put path still works alongside the engine."""
+def test_put_routes_through_engine(tmp_path: Path) -> None:
+    """``put`` is the single public write path and routes through the engine.
+
+    A ``put`` publishes the object, the descriptor, and the commit-marker
+    receipt (the receipt-last transaction). There is no descriptor-less bypass:
+    the legacy direct-publish path was removed so every public write honors the
+    receipt-last invariant the engine enforces.
+    """
     store = LocalArtifactStore(tmp_path)
     desc = store.put(_PAYLOAD)
     assert store.has(desc.digest)
     assert store.get(desc.digest) == _PAYLOAD
+    # The put routed through the engine: object, descriptor, and receipt are
+    # all present (a descriptor-less direct publish would leave these absent).
+    objects = list((tmp_path / "objects").rglob("sha256:*"))
+    descriptors = list((tmp_path / "descriptors").glob("*.json"))
+    receipts = list((tmp_path / "receipts").glob("*.json"))
+    assert len(objects) == 1
+    assert len(descriptors) == 1
+    assert len(receipts) == 1
+    # The plain fsck still passes on the engine-published object.
     report = store.fsck()
     assert report.objects_checked == 1
     assert report.objects_passed == 1
+
+
+def test_put_dedups_via_engine(tmp_path: Path) -> None:
+    """A re-put of identical bytes dedups through the engine (no second object)."""
+    store = LocalArtifactStore(tmp_path)
+    store.put(_PAYLOAD)
+    store.put(_PAYLOAD)
+    assert len(list((tmp_path / "objects").rglob("sha256:*"))) == 1
+    assert len(list((tmp_path / "receipts").glob("*.json"))) == 1
 
 
 def test_malformed_media_type_rejected(tmp_path: Path) -> None:

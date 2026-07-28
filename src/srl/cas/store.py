@@ -14,6 +14,19 @@ content-addressed store implements, plus two concrete backends:
   the capacity policy, and the mount state are real (and exercised in tests),
   but the byte path raises rather than writing.
 
+Single write path (WP-C21)
+--------------------------
+:class:`LocalArtifactStore` has exactly **one** public byte-write path:
+:meth:`LocalArtifactStore.put` delegates to the transaction engine
+(:func:`srl.cas.engine.ingest`) via :meth:`~LocalArtifactStore.ingest_bytes`.
+There is no second, "fast" write: every public publish goes through the
+receipt-last transaction, so every published object is accompanied by a durable
+descriptor and a commit-marker :class:`~srl.cas.engine.IngestReceipt`. The
+module performs no direct ``os.replace`` into ``objects/``; the engine module
+(``srl.cas.engine``) is the **only** module that publishes into the objects
+tree. A regression test (``tests/cas/test_single_write_path.py``) scans the
+source to keep this invariant structural.
+
 Content addressing
 ------------------
 Every ``put`` returns an :class:`ArtifactDescriptor` keyed by the SHA-256 of the
@@ -24,7 +37,7 @@ received, so the key is a function of content, not of a claim.
 
 Integrity
 ---------
-:class:`LocalArtifactStore` writes each object to a path derived from its
+:class:`LocalArtifactStore` reads each object from a path derived from its
 digest and verifies the digest on every ``get`` and ``fsck``. A mismatch raises
 :class:`StoreIntegrityError` (``CAS_INTEGRITY_FAILURE``, hard stop) so a
 corrupted object is never silently returned.
@@ -35,9 +48,7 @@ from __future__ import annotations
 import abc
 import hashlib
 import json as _json
-import os
 import re
-import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Final, NoReturn
@@ -257,8 +268,13 @@ class LocalArtifactStore(ArtifactStore):
 
     Objects are stored at ``<root>/objects/<dd>/<digest>`` where ``dd`` is the
     first two hex characters of the digest (a sharded layout that keeps any one
-    directory small). Writes are atomic: each object is written to a temporary
-    file and renamed into place, so a reader never observes a partial write.
+    directory small). The store has a single public write path (:meth:`put`),
+    which delegates to the crash-safe transaction engine
+    (:func:`srl.cas.engine.ingest`) so every published object is accompanied by
+    a durable descriptor and a commit-marker :class:`~srl.cas.engine.IngestReceipt`.
+    This module performs no direct ``os.replace`` into ``objects/``; the engine
+    is the only place a publish happens (see
+    ``tests/cas/test_single_write_path.py`` for the structural regression).
 
     The store is integrity-checked on every :meth:`get` and on :meth:`fsck`: the
     bytes are re-hashed and compared to the key digest. A mismatch raises
@@ -313,30 +329,50 @@ class LocalArtifactStore(ArtifactStore):
         return self._root / "objects" / shard / digest
 
     def put(self, data: bytes) -> ArtifactDescriptor:
-        digest = _digest_of(data)
-        target = self._object_path(digest)
-        if not target.exists():
-            target.parent.mkdir(parents=True, exist_ok=True)
-            # Atomic write: write to a temp file in the same directory, fsync,
-            # then rename into place. rename is atomic on POSIX, so a concurrent
-            # reader never sees a partial object.
-            fd, tmp_name = tempfile.mkstemp(prefix=".put-", dir=target.parent)
-            tmp_path = Path(tmp_name)
-            try:
-                with os.fdopen(fd, "wb") as fh:
-                    fh.write(data)
-                    fh.flush()
-                    os.fsync(fh.fileno())
-                os.replace(tmp_path, target)
-            except BaseException:
-                # Clean up the temp file on any failure (including
-                # KeyboardInterrupt) so the shard dir is not littered.
-                tmp_path.unlink(missing_ok=True)
-                raise
+        """Store ``data`` via the transaction engine and return its descriptor.
+
+        This is the **single public write path**. It delegates to
+        :meth:`ingest_bytes` (which delegates to :func:`srl.cas.engine.ingest`)
+        so the publish is receipt-last and crash-safe: the returned descriptor
+        is only handed back once the object, its
+        ``ObjectDescriptor/v1``, and its commit-marker
+        :class:`~srl.cas.engine.IngestReceipt` are all durable. The store
+        module itself performs no direct ``os.replace`` into ``objects/``; the
+        engine is the only publisher (a regression test enforces this
+        structurally).
+
+        Parameters
+        ----------
+        data:
+            The bytes to store. ``application/octet-stream`` is used as the
+            descriptor media type (callers that need a specific media type use
+            :meth:`ingest_bytes` directly).
+
+        Returns
+        -------
+        ArtifactDescriptor
+            The descriptor for the published object, keyed by the SHA-256 of
+            ``data``. On a dedup (identical content already published) the
+            existing object is returned untouched and no bytes are written.
+
+        Raises
+        ------
+        StoreError
+            If ``media_type`` is malformed or a path-safety check fails (the
+            engine's structural errors are surfaced as the store family).
+        QuotaExceededError
+            If a capacity hook (set via :meth:`ingest_bytes`) refuses the
+            ingest. ``put`` does not set a hook, so this is not raised from
+            ``put`` directly.
+        """
+        outcome = self.ingest_bytes(
+            data,
+            "application/octet-stream",
+        )
         return ArtifactDescriptor(
             schema_version=ARTIFACT_DESCRIPTOR_SCHEMA_VERSION,
-            digest=digest,
-            size_bytes=len(data),
+            digest=outcome.digest,
+            size_bytes=outcome.size_bytes,
             store_root_redacted=self._store_root_redacted,
         )
 
@@ -387,12 +423,11 @@ class LocalArtifactStore(ArtifactStore):
     # ------------------------------------------------------------------
     # WP-C21 transaction engine integration.
     # ------------------------------------------------------------------
-    # The methods below layer the transaction engine (see :mod:`srl.cas.engine`)
-    # on top of the simple ``put`` path. ``ingest_bytes`` is the receipt-last,
-    # crash-safe ingest; ``fsck_full`` is the rich sweep (corruption, descriptor,
-    # size, receipt checks); ``recover_partials`` reports stale partials. The
-    # plain ``put``/``fsck`` methods are preserved unchanged for backward
-    # compatibility with WP-C20 callers and tests.
+    # ``put`` (above) delegates to ``ingest_bytes``, so the engine is the single
+    # public write path: every publish is receipt-last and crash-safe.
+    # ``ingest_bytes`` is the rich entry point (media type, capacity hook,
+    # timestamp); ``fsck_full`` is the rich sweep (corruption, descriptor, size,
+    # receipt checks); ``recover_partials`` reports stale partials.
 
     def ingest_bytes(
         self,

@@ -18,6 +18,26 @@ the bytes were content-addressed, read-back verified, and durably published with
 a commit-marker receipt; it never means a scientific claim is supported (see
 `GOVERNANCE.md` for the evidence rules).
 
+## Single write path
+
+`LocalArtifactStore` has exactly **one** public byte-write path: `put` delegates
+to `ingest_bytes`, which delegates to `srl.cas.engine.ingest`. There is no
+second, "fast" write — every public publish goes through the receipt-last
+transaction, so every published object is accompanied by a durable descriptor
+and a commit-marker `IngestReceipt`. The store module (`srl/cas/store.py`)
+performs no direct `os.replace` into `objects/`; the engine module
+(`srl/cas/engine.py`) is the **only** module that publishes into the objects
+tree.
+
+This is enforced **structurally**, not just behaviorally:
+`tests/cas/test_single_write_path.py` walks the `src/` AST and asserts that no
+module outside the engine performs an `os.replace`/`os.rename` whose destination
+resolves into `objects/`. A new publisher would have to be added to the engine
+allow-list (and is almost always a mistake). This guards against the cycle-1
+red-team finding where a legacy `put` published straight into `objects/` with no
+descriptor and no receipt, bypassing the receipt-last invariant the engine
+enforces.
+
 ## Transaction order
 
 `LocalArtifactStore.ingest_bytes` (delegating to `srl.cas.engine.ingest`)
@@ -162,9 +182,36 @@ The invariant that holds at **every** boundary: a partial is never visible as an
 object (the object path only exists after the atomic `os.replace`), and the
 receipt is never written without the object and descriptor preceding it.
 
-The gate (`scripts/checks/wp21-gate.py`, check C21-05) injects failures at four
-of these boundaries and asserts the invariant. The unit tests
-(`tests/cas/test_engine_crash.py`) cover the full matrix.
+### Injected boundaries (seven, the single source of truth)
+
+The crash matrix above enumerates the *fine-grained* crash points for prose; the
+gate and the tests inject failures at the seven **injectable** durability
+boundaries. These seven are the explicit, shared boundary list — the same list
+appears in `scripts/checks/wp21-gate.py` (C21-05, `CRASH_BOUNDARIES`) and in
+`tests/cas/test_engine_crash.py` (`CRASH_BOUNDARIES`), so the docs, the gate,
+and the tests cannot drift:
+
+1. `tmp_write` — the staging `os.replace` into `incoming/partial-<digest>.tmp`;
+2. `tmp_fsync` — the partial-file `fsync` (durability of the staged bytes);
+3. `readback_verify` — the read-back re-hash + size check (verify step);
+4. `replace_publish` — the publish `os.replace` into `objects/<shard>/<digest>`;
+5. `dir_fsync` — the post-publish directory `fsync` (durability of the new entry);
+6. `descriptor_write` — the atomic write of `descriptors/<digest>.json`;
+7. `receipt_write` — the atomic write of `receipts/<receipt_id>.json` (last).
+
+Each maps to the old-or-new valid state above (receipt always absent on failure).
+The gate (`scripts/checks/wp21-gate.py`, check C21-05) injects a failure at
+**every one** of these seven boundaries and asserts the invariant. The unit
+tests (`tests/cas/test_engine_crash.py`) parametrize over the same seven.
+
+The failure injection is hermetic monkeypatching: each boundary patches an
+engine-internal symbol (`os.replace`, `os.fsync`, `Path.read_bytes`, or
+`_fsync_dir`) inside a per-boundary `tempfile.TemporaryDirectory`, with a pinned
+timestamp, and tears the patch down in `finally`. The matrix tests the
+transaction's *step ordering* (a crash at boundary *N* leaves exactly the
+records that steps <*N* wrote) — a property of the code, not of kernel
+durability — so monkeypatching, rather than SIGBUS injection or a FUSE fault
+layer, is the correct tool.
 
 ## fsck (full integrity sweep)
 

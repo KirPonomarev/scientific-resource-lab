@@ -6,12 +6,18 @@ no descriptor, no receipt) or the new valid state (object + descriptor +
 receipt). A partial tmp file may remain in ``incoming/`` but is **never visible
 as an object**.
 
-The crash matrix (parametrized) injects failures at four publish boundaries:
+The crash matrix (parametrized) injects failures at ALL SEVEN durability
+boundaries of the transaction. These seven are the single source of truth
+shared with ``docs/architecture/cas-engine.md`` (## Crash matrix) and the
+gate (``scripts/checks/wp21-gate.py`` C21-05):
 
-- after tmp write (the staging rename to ``partial-<digest>.tmp`` fails);
-- after fsync (the read-back fails);
-- after replace (the publish rename to ``objects/<shard>/<digest>`` fails);
-- after descriptor (the receipt write fails).
+- ``tmp_write`` — the staging rename to ``partial-<digest>.tmp`` fails;
+- ``tmp_fsync`` — the partial-file ``fsync`` fails;
+- ``readback_verify`` — the read-back returns wrong bytes (verify fails);
+- ``replace_publish`` — the publish rename to ``objects/<shard>/<digest>`` fails;
+- ``dir_fsync`` — the post-publish directory ``fsync`` fails;
+- ``descriptor_write`` — the descriptor atomic write fails;
+- ``receipt_write`` — the receipt atomic write fails (last step).
 
 Each yields old-or-new valid state, never a partial visible object.
 
@@ -41,6 +47,28 @@ from srl.cas import CasIntegrityError, LocalArtifactStore
 _TS = "2026-07-28T12:00:00Z"
 _PAYLOAD = b"crash-safety-deterministic-payload"
 
+# The seven durability boundaries of the transaction — the single source of
+# truth shared with docs/architecture/cas-engine.md and the gate (C21-05).
+CRASH_BOUNDARIES = (
+    "tmp_write",
+    "tmp_fsync",
+    "readback_verify",
+    "replace_publish",
+    "dir_fsync",
+    "descriptor_write",
+    "receipt_write",
+)
+
+# os.replace call indices within one ingest (1-based):
+#   1 = staging rename, 2 = publish, 3 = descriptor write, 4 = receipt write.
+# os.fsync call index: 1 = partial-file fsync (step 5).
+_REPLACE_INDEX = {
+    "tmp_write": 1,
+    "replace_publish": 2,
+    "descriptor_write": 3,
+    "receipt_write": 4,
+}
+
 
 def _sha256_hex(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
@@ -59,31 +87,80 @@ def _descriptor_count(root: Path) -> int:
 
 
 # ---------------------------------------------------------------------------
-# Crash matrix: failure injection at every publish boundary.
+# Crash matrix: failure injection at every durability boundary.
 # ---------------------------------------------------------------------------
 
 
-def _make_boundary_injector(boundary: str, real_replace: object) -> tuple[object, bool]:
-    """Build the (replace_side_effect, needs_readback_injection) pair for ``boundary``.
-
-    The injector raises ``OSError`` at the boundary-specific ``os.replace`` call
-    number (1 = staging rename, 2 = publish, 3 = descriptor write). The
-    ``after_fsync`` boundary uses read-back corruption instead (no replace
-    raise), so ``needs_readback_injection`` is True for it.
-    """
-    state = {"replaces": 0}
+def _replace_boom_for(boundary: str) -> object:
+    """Build the os.replace side effect for a replace-indexed boundary (or None)."""
+    fail_at = _REPLACE_INDEX.get(boundary)
+    if fail_at is None:
+        return None
+    real_replace = os.replace
+    state = {"n": 0}
 
     def replace_boom(src: Path | str, dst: Path | str) -> None:
-        state["replaces"] += 1
-        if boundary == "after_tmp_write" and state["replaces"] == 1:
-            raise OSError("injected: staging rename failed")
-        if boundary == "after_replace" and state["replaces"] == 2:
-            raise OSError("injected: publish rename failed")
-        if boundary == "after_descriptor" and state["replaces"] == 3:
-            raise OSError("injected: descriptor write failed")
-        real_replace(src, dst)  # type: ignore[operator]
+        state["n"] += 1
+        if state["n"] == fail_at:
+            raise OSError(f"injected: os.replace #{fail_at} ({boundary})")
+        real_replace(src, dst)
 
-    return replace_boom, boundary == "after_fsync"
+    return replace_boom
+
+
+def _install_boundary_patches(boundary: str) -> list[object]:
+    """Build and start the failure-injection patches for ``boundary``.
+
+    Returns the list of started patches so the caller can stop them in a
+    ``finally``. Each boundary maps to exactly one injection:
+
+    - the four ``os.replace`` boundaries raise at their call index;
+    - ``tmp_fsync`` raises at the partial-file fsync;
+    - ``readback_verify`` corrupts the partial read-back;
+    - ``dir_fsync`` raises inside ``_fsync_dir`` (the engine normally swallows
+      OSError there, so the whole function is replaced to force the raise).
+    """
+    replace_boom = _replace_boom_for(boundary)
+    if replace_boom is not None:
+        patches: list[object] = [patch("srl.cas.engine.os.replace", side_effect=replace_boom)]
+    elif boundary == "tmp_fsync":
+
+        def fsync_boom(fd: int) -> None:
+            raise OSError("injected: partial fsync failed")
+
+        patches = [patch("srl.cas.engine.os.fsync", side_effect=fsync_boom)]
+    elif boundary == "readback_verify":
+        real_read_bytes = Path.read_bytes
+
+        def readback_corrupter(self: Path) -> bytes:
+            data = real_read_bytes(self)
+            if "incoming" in str(self) and data:
+                return data[:-1] + bytes([data[-1] ^ 0xFF])
+            return data
+
+        patches = [patch("srl.cas.engine.Path.read_bytes", readback_corrupter)]
+    elif boundary == "dir_fsync":
+
+        def dir_fsync_boom(_path: Path) -> None:
+            raise OSError("injected: directory fsync failed")
+
+        patches = [patch("srl.cas.engine._fsync_dir", side_effect=dir_fsync_boom)]
+    else:  # pragma: no cover (boundary list is compile-time fixed)
+        raise AssertionError(f"unknown boundary {boundary!r}")
+    for p in patches:
+        p.start()
+    return patches
+
+
+def _expected_state(boundary: str) -> tuple[bool, bool]:
+    """Return (object_present, descriptor_present) expected after a crash at ``boundary``.
+
+    The receipt is ALWAYS absent on failure (it is the commit marker, written
+    last). Object/descriptor presence reflects how far the transaction got.
+    """
+    post_publish = boundary in {"dir_fsync", "descriptor_write", "receipt_write"}
+    post_descriptor = boundary == "receipt_write"
+    return post_publish, post_descriptor
 
 
 def _assert_boundary_invariant(tmp_path: Path, boundary: str) -> None:
@@ -97,15 +174,14 @@ def _assert_boundary_invariant(tmp_path: Path, boundary: str) -> None:
     n_desc = _descriptor_count(tmp_path)
     n_rec = _receipt_count(tmp_path)
     assert n_rec == 0, f"boundary={boundary} wrote a receipt on failure"
-    if boundary == "after_descriptor":
-        # Object published (step 7), dirs fsynced (step 8), descriptor write
-        # (step 9) failed -> object present, no descriptor, no receipt.
-        assert n_obj == 1, f"boundary={boundary} should have published the object"
-        assert n_desc == 0, f"boundary={boundary} should not have a descriptor"
-    else:
-        # after_tmp_write / after_fsync / after_replace raise before the publish.
-        assert n_obj == 0, f"boundary={boundary} published an object on failure"
-        assert n_desc == 0, f"boundary={boundary} wrote a descriptor on failure"
+    expect_obj, expect_desc = _expected_state(boundary)
+    assert n_obj == (1 if expect_obj else 0), (
+        f"boundary={boundary}: expected {'present' if expect_obj else 'absent'} object, got {n_obj}"
+    )
+    assert n_desc == (1 if expect_desc else 0), (
+        f"boundary={boundary}: expected {'present' if expect_desc else 'absent'} descriptor, "
+        f"got {n_desc}"
+    )
     # No partial is ever visible as an object: every entry under objects/ (if
     # any) is a full sha256: digest; partials live only under incoming/.
     objects_dir = tmp_path / "objects"
@@ -118,37 +194,17 @@ def _assert_boundary_invariant(tmp_path: Path, boundary: str) -> None:
                     )
 
 
-@pytest.mark.parametrize(
-    "boundary",
-    ["after_tmp_write", "after_fsync", "after_replace", "after_descriptor"],
-)
-def test_crash_at_publish_boundary_leaves_valid_state(tmp_path: Path, boundary: str) -> None:
-    """A crash at any publish boundary leaves old-or-new valid state.
+@pytest.mark.parametrize("boundary", CRASH_BOUNDARIES)
+def test_crash_at_boundary_leaves_valid_state(tmp_path: Path, boundary: str) -> None:
+    """A crash at any of the seven durability boundaries leaves old-or-new valid state.
 
     The store ends with either zero records (old state) or the new state minus
     the receipt (commit marker); it never ends with a partial visible as an
     object, and the receipt is never written without the object preceding it.
     """
     store = LocalArtifactStore(tmp_path)
-    real_replace = os.replace
-    replace_boom, needs_readback = _make_boundary_injector(boundary, real_replace)
-    real_read_bytes = Path.read_bytes
-
-    def readback_boom(self: Path) -> bytes:
-        data = real_read_bytes(self)
-        if needs_readback and "incoming" in str(self) and data:
-            # Corrupt only the read-back of the partial; triggers the mismatch
-            # path AFTER the fsync succeeded.
-            return data[:-1] + bytes([data[-1] ^ 0xFF])
-        return data
-
-    patches = [patch("srl.cas.engine.os.replace", side_effect=replace_boom)]
-    if needs_readback:
-        patches.append(patch("srl.cas.engine.Path.read_bytes", readback_boom))
-
+    patches = _install_boundary_patches(boundary)
     raised: bool = False
-    for p in patches:
-        p.start()
     try:
         try:
             store.ingest_bytes(_PAYLOAD, "application/octet-stream", created_utc=_TS)
@@ -162,7 +218,7 @@ def test_crash_at_publish_boundary_leaves_valid_state(tmp_path: Path, boundary: 
     _assert_boundary_invariant(tmp_path, boundary)
 
 
-def test_after_fsync_readback_mismatch_deletes_partial(tmp_path: Path) -> None:
+def test_readback_verify_mismatch_deletes_partial(tmp_path: Path) -> None:
     """A read-back mismatch after fsync deletes the partial (no corrupt state)."""
     store = LocalArtifactStore(tmp_path)
     real_read_bytes = Path.read_bytes
