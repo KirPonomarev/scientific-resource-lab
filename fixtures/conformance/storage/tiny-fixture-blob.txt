@@ -1,0 +1,1 @@
+WP-C20 tiny fixture blob: a small public reproducible test vector (<1 KiB) for the content-addressed store round-trip.
