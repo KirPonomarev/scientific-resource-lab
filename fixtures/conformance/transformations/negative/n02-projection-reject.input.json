@@ -1,0 +1,42 @@
+{
+  "profile": {
+    "schema_version": "AdapterSemanticProfile/v1",
+    "adapter_id": "solver-rejects-calculus",
+    "pack_ref": {
+      "schema_version": "ArtifactRef/v1",
+      "media_type": "application/vnd.srlab.adapter-pack+json",
+      "digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "size_bytes": 2048
+    },
+    "supported_cds": [
+      "arith1.plus",
+      "relation1.eq"
+    ],
+    "unsupported_features": [
+      {
+        "feature": "calculus1.diff",
+        "behavior": "reject",
+        "note": "this backend rejects calculus1.diff outright rather than dropping it"
+      }
+    ],
+    "input_contract": "MathIR",
+    "output_contract": "MathIR",
+    "deterministic": true,
+    "network_access": "none",
+    "license_spdx": "Apache-2.0",
+    "canonical_writes": 0,
+    "grants_authority": false
+  },
+  "ir_tree": {
+    "schema_version": "MathIR/v1",
+    "ir_id": "sha256:8f37d07fc1e756477742fcea290ecd1b47683b9aeb82e3893d1b14e48270af48",
+    "expression": {
+      "op": "calculus1.diff",
+      "args": [
+        {
+          "var": "x"
+        }
+      ]
+    }
+  }
+}

@@ -13,6 +13,80 @@ is supported. See `README.md` and `GOVERNANCE.md` for the evidence rules.
 
 ### Added
 
+- Transformation receipts and adapter semantic profiles under `srl.semantic`
+  (WP-B12): `TransformationReceipt/v1` (`transformation-receipt.json`) — a
+  receipt binding `source_object_id`→`target_object_id` by a named
+  `transform_kind` (normalize/project/convert_units/restrict_domain/serialize/
+  deserialize/approximate), carrying the honest cost as a `conversion_class`
+  (`LOSSLESS`/`LOSSY_EXPLICIT`/`LOSSY_IMPLICIT_DETECTED`), the
+  `introduced_assumptions` (each `{assumption, justification}`), and the
+  `dropped_features`, encoding the critical invariant that `LOSSLESS` REQUIRES
+  `introduced_assumptions=[]` AND `dropped_features=[]` via `allOf`/`if-then`
+  and re-enforced in Python by `srl.semantic.transforms.validate` /
+  `record_transformation` (raising `TransformationInvariantError`, fail reason
+  `CONTRACT_INVALID`, invariant `lossless_requires_no_loss`, defense in depth);
+  `LOSSY_IMPLICIT_DETECTED` is detector-only — the producer API
+  (`record_transformation`) cannot set it, only the detector constructor
+  (`record_detected_loss`) can, enforced by constructor separation;
+  `AdapterSemanticProfile/v1` (`adapter-semantic-profile.json`) — a typed
+  semantic profile for a backend adapter declaring its `supported_cds` subset of
+  `MATH_IR_ALLOWLIST`, its per-operator `unsupported_features` behavior
+  (reject/approximate/drop), its input/output schema contracts, its
+  `deterministic`/`network_access` posture, and its `license_spdx`, with the
+  invariant that `supported_cds` MUST be a subset of the (closed) MathIR
+  allowlist (raising `ProfileInvariantError`, invariant
+  `supported_op_outside_allowlist`, defense in depth); both schemas registered
+  in the loader (`srl.contracts.schema`) and the two object types
+  (`adapter_profile`, `transformation_receipt`) added to
+  `SUPPORTED_OBJECT_TYPES`.
+- `srl.semantic.transforms`: a typed `TransformationReceipt` builder
+  (`record_transformation`) enforcing the LOSSLESS invariant; a projection
+  lineage builder (`project_to_backend(ir_tree, profile) -> (restricted_tree,
+  receipt)`) verifying every op is in `profile.supported_cds`, handling
+  unsupported ops by the profile's declared behavior (`reject` ->
+  `UnsupportedFeatureError`, fail reason `IR_UNSUPPORTED`; `approximate`/`drop`
+  -> recorded as a `LOSSY_EXPLICIT` step with the dropped feature and matching
+  assumption), binding `adapter_profile_ref` (the profile's `profile_id`) and
+  `pack_hash` (the profile's `pack_ref` digest) so the projection is
+  reproducible, with lineage chaining (a downstream receipt's
+  `source_object_id` equals the upstream's `target_object_id`); a detector-only
+  `record_detected_loss` constructor producing `LOSSY_IMPLICIT_DETECTED`; and a
+  module-level raw-eval guard `assert_no_raw_eval_route()` introspecting
+  `srl.semantic` and verifying no `sympify`/`sage_eval`/`eval`/`lambdify` input
+  route is exposed (the restricted MathIR allowlist is the only evaluation
+  route).
+- `srl.semantic.adapter_profiles`: the typed `AdapterSemanticProfile` validator
+  (`validate_profile`) re-checking the supported-cds-subset-of-allowlist and
+  no-supported/unsupported-contradiction invariants in Python as defense in
+  depth, plus full `ArtifactRef/v1` validation of the inline `pack_ref`
+  (portable-path rejection etc.); a `profile_id`/`build_profile` pair computing
+  the content-addressed identity.
+- Conformance vectors under `fixtures/conformance/transformations/`: 3 positive
+  (a LOSSLESS unit-annotate receipt, an AdapterSemanticProfile for a solver
+  backend lacking `calculus1.diff`, and the LOSSY_EXPLICIT projection receipt
+  produced by projecting `calculus1.diff(x)` onto that profile) and 3 negative
+  (LOSSLESS claimed with a dropped feature, an unsupported op hitting
+  `behavior=reject`, and a profile claiming an op outside the MathIR allowlist),
+  with a `manifest.json` and `README.md`.
+- `scripts/checks/wp12-gate.py` running the four WP-B12 checks (B12-01 a lossy
+  step cannot claim LOSSLESS at schema + python layer; B12-02 an introduced
+  assumption is carried explicitly; B12-03 a backend projection binds the
+  adapter/pack hash with lineage chaining and `behavior=reject` halts with
+  `IR_UNSUPPORTED`; B12-04 no raw-eval route and the positive/negative fixtures
+  validate/reject) and emitting a `GateReceipt/v1`; a `transformations-gate
+  (WP-B12)` job in `.github/workflows/ci.yml`; a `Makefile` `gate-wp12` target.
+- Unit tests under `tests/contracts/` (`test_transforms.py`,
+  `test_adapter_profiles.py`) pinning the LOSSLESS invariant at both layers, the
+  detector/producer separation, identity idempotency, schema round-trips, the
+  projection lineage chain (two sequential projections link source to prior
+  target), the reject behavior, the allowlist-closure invariant, and the
+  raw-eval guard.
+- `docs/contracts/transformations.md` documenting the conversion classes, the
+  honesty rules (a lossy step never upgrades evidence; introduced assumptions
+  travel with the object forever via lineage; LOSSLESS is a claim the producer
+  must honor; implicit loss is detector-only), the projection lineage, the
+  raw-eval prohibition, and the worked examples.
+
 - Scientific object fabric under the new `srl.semantic` package (WP-B11): six
   scientific object types with JSON Schema 2020-12 documents under
   `src/srl/contracts/schemas/v1/` and typed Python validators. `ScientificClaim/v1`
@@ -238,17 +312,21 @@ is supported. See `README.md` and `GOVERNANCE.md` for the evidence rules.
 
 ### Changed
 
-- `.github/workflows/ci.yml` adds the `object-fabric-gate` job (WP-B11),
-  previously added the `canonical-json-gate` job (WP-B10), and earlier added
-  the `autonomy-contracts-gate` job (WP-A03); the existing lint, typecheck,
-  unit, and package jobs are unchanged. `.github/workflows/contracts.yml` adds
-  the `schema-compat` job (WP-B11) verifying the loader registry is complete.
+- `.github/workflows/ci.yml` adds the `transformations-gate` job (WP-B12),
+  previously added the `object-fabric-gate` job (WP-B11), earlier added the
+  `canonical-json-gate` job (WP-B10), and the `autonomy-contracts-gate` job
+  (WP-A03); the existing lint, typecheck, unit, and package jobs are unchanged.
+  `.github/workflows/contracts.yml` adds the `schema-compat` job (WP-B11)
+  verifying the loader registry is complete.
 - The schema loader registry (`srl.contracts.schema._SCHEMA_NAME_TO_FILE`) and
-  the schemas README table now carry the six new WP-B11 schemas
-  (`ScientificClaim`, `MathIR`, `SymbolTable`, `ConditionSet`,
+  the schemas README table now carry the two new WP-B12 schemas
+  (`AdapterSemanticProfile`, `TransformationReceipt`), previously the six WP-B11
+  schemas (`ScientificClaim`, `MathIR`, `SymbolTable`, `ConditionSet`,
   `ConstantRef`, `ModelInterface`); the existing `ArtifactRef`,
   `ScientificObjectEnvelope`, and `GateReceipt` schemas are unchanged
-  (additive only).
+  (additive only). `srl.semantic.fabric.SUPPORTED_OBJECT_TYPES` widens from six
+  to eight kinds, adding `adapter_profile` and `transformation_receipt`; the
+  envelope's `object_type` enum (17 kinds) is unchanged.
 - `pyproject.toml` declares `jsonschema>=4.23` as the first runtime
   dependency and adds `types-jsonschema>=4.23` to the `dev` group; the sdist
   include list now carries `src/srl/contracts/schemas/v1` so schema documents

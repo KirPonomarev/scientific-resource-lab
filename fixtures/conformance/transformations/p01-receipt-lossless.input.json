@@ -1,0 +1,15 @@
+{
+  "schema_version": "TransformationReceipt/v1",
+  "receipt_id": "sha256:0c4e52ca07bd12eb89c11753bd6690960aa165867466e9ce591d68996a5ad290",
+  "source_object_id": "sha256:5015a18875c09a362d1bccfe53c42145927dcfc55230343ff6c819fdf5b642d8",
+  "target_object_id": "sha256:5015a18875c09a362d1bccfe53c42145927dcfc55230343ff6c819fdf5b642d8",
+  "transform_kind": "normalize",
+  "conversion_class": "LOSSLESS",
+  "introduced_assumptions": [],
+  "dropped_features": [],
+  "adapter_profile_ref": null,
+  "pack_hash": null,
+  "created_utc": "2026-07-28T00:00:00Z",
+  "canonical_writes": 0,
+  "grants_authority": false
+}

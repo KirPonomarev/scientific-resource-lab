@@ -1,0 +1,23 @@
+{
+  "schema_version": "AdapterSemanticProfile/v1",
+  "profile_id": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "adapter_id": "profile-claims-unknown-op",
+  "pack_ref": {
+    "schema_version": "ArtifactRef/v1",
+    "media_type": "application/vnd.srlab.adapter-pack+json",
+    "digest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "size_bytes": 1024
+  },
+  "supported_cds": [
+    "arith1.plus",
+    "transc1.exp"
+  ],
+  "unsupported_features": [],
+  "input_contract": "MathIR",
+  "output_contract": "MathIR",
+  "deterministic": true,
+  "network_access": "none",
+  "license_spdx": "Apache-2.0",
+  "canonical_writes": 0,
+  "grants_authority": false
+}

@@ -38,9 +38,10 @@ _ENVELOPE_V1: Final[str] = "ScientificObjectEnvelope/v1"
 # The schema name to validate the produced envelope against.
 _ENVELOPE_SCHEMA: Final[str] = "ScientificObjectEnvelope"
 
-# The object_type values that carry a WP-B11 payload schema. The envelope's
-# object_type enum is wider (17 kinds); only these six have a v1 payload
-# schema today. The fabric accepts any envelope object_type for forward
+# The object_type values that carry a payload schema. The envelope's
+# object_type enum is wider (17 kinds); these eight have a v1 payload schema
+# today (the six WP-B11 object types plus the two WP-B12 transformation
+# objects). The fabric accepts any envelope object_type for forward
 # compatibility, but the documentation enumerates these.
 SUPPORTED_OBJECT_TYPES: Final[frozenset[str]] = frozenset(
     {
@@ -50,6 +51,8 @@ SUPPORTED_OBJECT_TYPES: Final[frozenset[str]] = frozenset(
         "condition_set",
         "constant_ref",
         "model_interface",
+        "adapter_profile",
+        "transformation_receipt",
     }
 )
 

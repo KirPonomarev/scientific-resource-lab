@@ -1,0 +1,17 @@
+{
+  "schema_version": "TransformationReceipt/v1",
+  "receipt_id": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "source_object_id": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "target_object_id": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "transform_kind": "project",
+  "conversion_class": "LOSSLESS",
+  "introduced_assumptions": [],
+  "dropped_features": [
+    "calculus1.diff"
+  ],
+  "adapter_profile_ref": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "pack_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "created_utc": "2026-07-28T00:00:00Z",
+  "canonical_writes": 0,
+  "grants_authority": false
+}

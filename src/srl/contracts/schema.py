@@ -56,6 +56,8 @@ _SCHEMA_NAME_TO_FILE: Final[dict[str, str]] = {
     "ConditionSet": "condition-set.json",
     "ConstantRef": "constant-ref.json",
     "ModelInterface": "model-interface.json",
+    "AdapterSemanticProfile": "adapter-semantic-profile.json",
+    "TransformationReceipt": "transformation-receipt.json",
 }
 
 # Typed fail reason for schema-level failures (meta-validation + instance

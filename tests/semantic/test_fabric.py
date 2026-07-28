@@ -116,10 +116,23 @@ def test_mint_object_carries_parents() -> None:
     assert env2["parents"] == [parent]
 
 
-def test_supported_object_types_cover_six_kinds() -> None:
-    """SUPPORTED_OBJECT_TYPES enumerates the six WP-B11 payload-bearing kinds."""
+def test_supported_object_types_cover_payload_kinds() -> None:
+    """SUPPORTED_OBJECT_TYPES enumerates the payload-bearing kinds.
+
+    The six WP-B11 object types plus the two WP-B12 transformation objects
+    (adapter_profile, transformation_receipt), each with a v1 payload schema.
+    """
     assert SUPPORTED_OBJECT_TYPES == frozenset(
-        {"claim", "math_ir", "symbol_table", "condition_set", "constant_ref", "model_interface"}
+        {
+            "claim",
+            "math_ir",
+            "symbol_table",
+            "condition_set",
+            "constant_ref",
+            "model_interface",
+            "adapter_profile",
+            "transformation_receipt",
+        }
     )
 
 

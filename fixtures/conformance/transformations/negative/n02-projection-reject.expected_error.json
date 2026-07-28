@@ -1,0 +1,6 @@
+{
+  "validator": "project_to_backend",
+  "exception": "UnsupportedFeatureError",
+  "fail_reason": "IR_UNSUPPORTED",
+  "reason": "Projecting a tree carrying calculus1.diff onto a profile that declares behavior=reject for calculus1.diff halts the projection with UnsupportedFeatureError (fail reason IR_UNSUPPORTED). The op and its cd are named on the error. No receipt is produced; the source tree is never projected onto the rejecting backend."
+}

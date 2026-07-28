@@ -1,0 +1,7 @@
+{
+  "validator": "adapter_profile",
+  "exception": "ProfileInvariantError",
+  "fail_reason": "CONTRACT_INVALID",
+  "invariant": "supported_op_outside_allowlist",
+  "reason": "A profile's supported_cds MUST be a subset of MATH_IR_ALLOWLIST (the allowlist is closed). This profile claims support for 'transc1.exp', which is outside the MathIR allowlist (transc1 is not an accepted content dictionary). validate_profile rejects it with the supported_op_outside_allowlist invariant before the profile can be the basis of a projection."
+}
