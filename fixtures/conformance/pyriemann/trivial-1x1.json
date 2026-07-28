@@ -1,0 +1,16 @@
+{
+  "schema_version": "ConformanceVectors/v1",
+  "pack": "geometry-pyriemann",
+  "description": "Trivial 1x1 covariances that must be rejected with CONTRACT_INVALID.",
+  "comment": "A 1x1 covariance carries no off-diagonal geometry; every SPD metric collapses to a scalar ratio, so the adapter refuses it explicitly.",
+  "cases": [
+    {
+      "id": "t01-unit",
+      "matrix": [[1.0]]
+    },
+    {
+      "id": "t02-scalar",
+      "matrix": [[2.5]]
+    }
+  ]
+}
