@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srlab.dev/v1/ScientificObjectEnvelope.json",
+  "title": "ScientificObjectEnvelope/v1",
+  "description": "Base envelope for every SRL scientific object. The envelope carries identity (object_id), provenance (created_utc, parents), and the two safety consts (canonical_writes=0, grants_authority=false). The payload is an opaque object whose shape is governed by the object_type-specific sub-schema. Canonical JSON contract: sorted keys, compact separators, UTF-8, no NaN/Infinity, trailing newline.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "object_id",
+    "object_type",
+    "created_utc",
+    "parents",
+    "payload",
+    "canonical_writes",
+    "grants_authority"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Identity anchor; const for ScientificObjectEnvelope/v1.",
+      "type": "string",
+      "const": "ScientificObjectEnvelope/v1"
+    },
+    "object_id": {
+      "description": "Content-addressed identity: sha256 over the canonical encoding of the object without this field, prefixed 'sha256:'. Computed by srl.contracts.ids.object_id; a pre-populated value is rejected as a self-hash.",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "object_type": {
+      "description": "Discriminator selecting the payload sub-schema. The enumerated set is the union of all scientific object kinds the fabric produces.",
+      "type": "string",
+      "enum": [
+        "claim",
+        "math_ir",
+        "symbol_table",
+        "condition_set",
+        "constant_ref",
+        "model_interface",
+        "adapter_profile",
+        "transformation_receipt",
+        "evidence_assessment",
+        "run_receipt",
+        "catalog_snapshot",
+        "knowledge_snapshot",
+        "portal_snapshot",
+        "export_packet",
+        "pilot_spec",
+        "plan",
+        "request"
+      ]
+    },
+    "created_utc": {
+      "description": "RFC 3339 UTC timestamp at seconds precision (YYYY-MM-DDTHH:MM:SSZ). No offset, no fractional seconds.",
+      "type": "string",
+      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]Z$"
+    },
+    "parents": {
+      "description": "Provenance: the object_ids this object derives from. Each entry is a sha256 id. Empty for a root object.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      },
+      "uniqueItems": true
+    },
+    "payload": {
+      "description": "The type-specific payload. Shape is governed by the object_type sub-schema (added in later work packages). The envelope admits any object here so it can carry payloads before every sub-schema is authored.",
+      "type": "object"
+    },
+    "canonical_writes": {
+      "description": "Safety const: an SRL scientific object is immutable once authored. Always 0; a non-zero value is a contract violation.",
+      "type": "integer",
+      "const": 0
+    },
+    "grants_authority": {
+      "description": "Safety const: an SRL scientific object never grants authority on its own. Always false; a true value is a contract violation.",
+      "type": "boolean",
+      "const": false
+    }
+  }
+}

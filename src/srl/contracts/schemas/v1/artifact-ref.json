@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srlab.dev/v1/ArtifactRef.json",
+  "title": "ArtifactRef/v1",
+  "description": "A portable, content-addressed reference to an SRL artifact. The digest is authoritative; the optional path is a repo-relative hint. Canonical JSON contract: sorted keys, compact separators, UTF-8, no NaN/Infinity, trailing newline.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "media_type", "digest", "size_bytes"],
+  "properties": {
+    "schema_version": {
+      "description": "Identity anchor; const for ArtifactRef/v1.",
+      "type": "string",
+      "const": "ArtifactRef/v1"
+    },
+    "media_type": {
+      "description": "IANA-style media type of the referenced payload (e.g. application/json).",
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9!#$&^_.+-]+/[A-Za-z0-9!#$&^_.+-]+$"
+    },
+    "digest": {
+      "description": "Content digest: sha256 + 64 lowercase hex digits. Lowercase-only for byte-stable identity.",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "size_bytes": {
+      "description": "Non-negative integer byte count of the referenced payload. bool is rejected by the runtime validator even though JSON Schema models bool as an int.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "path": {
+      "description": "Optional portable repo-relative path to the bytes. Must be relative, no '..', no drive letter, no leading '/', no backslash. The digest remains authoritative.",
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[^/].*$"
+    }
+  }
+}

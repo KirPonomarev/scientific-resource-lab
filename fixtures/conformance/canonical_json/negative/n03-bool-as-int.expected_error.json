@@ -1,0 +1,1 @@
+{"exception":"NumericContractError","fail_reason":"CONTRACT_INVALID","name":"n03-bool-as-int","validator":"integer_byte_count"}

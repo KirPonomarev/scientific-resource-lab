@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srlab.dev/v1/GateReceipt.json",
+  "title": "GateReceipt/v1",
+  "description": "Receipt emitted by an SRL work-package acceptance gate. Provenance only; never a scientific claim. Canonical JSON contract: sorted keys, compact separators, UTF-8, no NaN/Infinity, trailing newline.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "wp_id", "overall", "checks"],
+  "properties": {
+    "schema_version": {
+      "description": "Identity anchor; const for GateReceipt/v1.",
+      "type": "string",
+      "const": "GateReceipt/v1"
+    },
+    "wp_id": {
+      "description": "Work-package identifier the gate covers (e.g. WP-B10).",
+      "type": "string",
+      "minLength": 1
+    },
+    "overall": {
+      "description": "Aggregate gate result. PASS only if every check PASSed.",
+      "type": "string",
+      "enum": ["PASS", "FAIL"]
+    },
+    "checks": {
+      "description": "Per-check results keyed by check id (e.g. B10-01). Each value carries at least a status.",
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": ["status"],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["PASS", "FAIL"]
+          },
+          "detail": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "evidence": {
+      "description": "Optional structured evidence summary.",
+      "type": "object"
+    }
+  }
+}

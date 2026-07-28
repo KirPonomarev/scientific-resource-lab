@@ -13,6 +13,10 @@ description = "Reproducible, bounded and evidence-first scientific computation f
 readme = "README.md"
 requires-python = ">=3.11"
 license = "Apache-2.0"
+# Runtime dependencies. The package was stdlib-only through Phase A; the
+# contracts layer (WP-B10) adds `jsonschema` for meta-validation of shipped
+# 2020-12 schema documents. See docs/adr/0002-jsonschema-library.md.
+dependencies = ["jsonschema>=4.23"]
 authors = [{ name = "Scientific Resource Lab contributors" }]
 keywords = ["scientific-computing", "reproducibility", "agents", "evidence"]
 classifiers = [
@@ -39,9 +43,19 @@ Changelog = "https://github.com/KirPonomarev/scientific-resource-lab/blob/main/C
 
 # Hatchling build targets. The import package (srl) differs from the
 # distribution name (srlab), so the wheel target is declared explicitly to map
-# the src/ layout. See docs/adr/0001-build-backend.md.
+# the src/ layout. The schema documents under schemas/v1 ship alongside the
+# package so importlib.resources can load them at runtime. See
+# docs/adr/0001-build-backend.md (build backend) and
+# docs/adr/0002-jsonschema-library.md (schema loading).
 [tool.hatch.build.targets.sdist]
-include = ["src/srl", "tests", "scripts", "README.md", "pyproject.toml"]
+include = [
+    "src/srl",
+    "src/srl/contracts/schemas/v1",
+    "tests",
+    "scripts",
+    "README.md",
+    "pyproject.toml",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/srl"]
@@ -57,6 +71,9 @@ dev = [
     "mypy>=1.18",
     "ruff>=0.12",
     "build>=1.3",
+    # Type-checking stubs for the jsonschema runtime dependency (jsonschema
+    # does not ship a py.typed marker). Dev-only; not a runtime requirement.
+    "types-jsonschema>=4.23",
 ]
 
 # ---------------------------------------------------------------------------

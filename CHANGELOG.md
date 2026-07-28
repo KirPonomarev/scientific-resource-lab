@@ -13,6 +13,78 @@ is supported. See `README.md` and `GOVERNANCE.md` for the evidence rules.
 
 ### Added
 
+- Canonical JSON and identifiers foundation under the `srl.contracts` package
+  (WP-B10): `canonical.py` providing `dumps(obj)->bytes` enforcing sorted keys,
+  compact separators, UTF-8 (`ensure_ascii=False`), `allow_nan=False`, and a
+  final newline, with `loads`/`validate` round-trip helpers and
+  `decimal_to_str` rendering precision-sensitive values to the
+  `^-?[0-9]+(\.[0-9]+)?$` policy string (no exponent); `ids.py` providing
+  `object_id(obj)->str` computing `sha256:` + 64 lowercase hex over the
+  canonical bytes, with `SelfHashError` (fail reason `CONTRACT_INVALID`)
+  rejecting an object that already carries its own `object_id` field;
+  `numbers.py` providing strict numeric validation (reject NaN/Infinity,
+  reject bool-as-int, enforce decimal strings, non-negative integer byte
+  counts); `timestamps.py` enforcing RFC 3339 UTC at seconds precision
+  (`YYYY-MM-DDTHH:MM:SSZ`) with `validate`/`normalize`; `artifact_refs.py`
+  validating `ArtifactRef/v1` including portable-path rejection (relative,
+  no `..`, no drive letter, no leading `/`, no backslash); and `errors.py`
+  with the `ContractError` base carrying a typed `fail_reason`.
+- JSON Schema 2020-12 documents under `src/srl/contracts/schemas/v1/`:
+  `ArtifactRef/v1`, `ScientificObjectEnvelope/v1` (the base envelope with
+  `object_id`, `object_type` enum of 17 kinds, `created_utc`, `parents`,
+  `payload`, and the safety consts `canonical_writes=0` /
+  `grants_authority=false`), and `GateReceipt/v1`, each with a canonical
+  `https://schemas.srlab.dev/v1/<Name>.json` `$id`, `additionalProperties:
+  false`, and explicit `required`; plus a `README.md` documenting the
+  naming/compatibility policy (additive optional -> minor; breaking -> major
+  with the old `vN` retained).
+- `src/srl/contracts/schema.py` schema loader: `load_schema(name)->dict` via
+  `importlib.resources` (schemas ship in the wheel), meta-validating every
+  schema against the 2020-12 meta-schema on first load (memoized), and
+  `validate(instance, schema_name)->None` raising
+  `ContractValidationError` (fail reason `CONTRACT_INVALID`) carrying the
+  failing JSON path and keyword; `meta_validate_all()` returns the
+  name->`$id` map and asserts `$id` uniqueness.
+- `jsonschema>=4.23` as the project's first runtime third-party dependency
+  (see `docs/adr/0002-jsonschema-library.md`), with `types-jsonschema>=4.23`
+  added to the `dev` group for `mypy --strict` stubs; resolved to
+  `jsonschema==4.26.0` in `uv.lock`.
+- Conformance vectors under `fixtures/conformance/canonical_json/`: 12
+  positive vector pairs (input variant + expected canonical bytes) covering
+  key-order normalization, unicode NFC/supplementary passthrough, nested
+  empty containers, decimal-string preservation, integer byte counts, deep
+  sorted nesting, array-order preservation, null/bool/int distinctness, and
+  safe-range large integers; plus 8 negative vectors (NaN, Infinity,
+  bool-as-int, self-hash, absolute path, traversal path, fractional
+  timestamp, offset timestamp) each naming the typed rejection it must
+  trigger.
+- `scripts/checks/wp10-gate.py` (executable; in-repo `srl` package) running
+  the four WP-B10 acceptance checks (B10-01..B10-04: key-order determinism;
+  NaN/Infinity/bool-as-int rejection; self-hash rejection; portable-path
+  rejection) and emitting a canonical `GateReceipt/v1` receipt with a
+  non-zero exit on any FAIL.
+- `scripts/checks/schema-meta-validate.py` and
+  `scripts/checks/canonical-vectors.py` (executable) printing JSON receipts:
+  the former meta-validates every shipped schema against the 2020-12
+  meta-schema and cross-checks the on-disk file set; the latter verifies
+  every positive vector canonicalizes to its expected bytes and every
+  negative vector is rejected with the named typed error.
+- `Makefile` `gate-wp10` target and a `canonical-json-gate` job in
+  `.github/workflows/ci.yml` (ubuntu-24.04, 15-minute timeout, same pinned uv
+  setup); a new `.github/workflows/contracts.yml` workflow with
+  `schema_meta_validate` and `canonical_json_vectors` jobs (SHA-pinned
+  actions, `contents: read`, 15-minute timeout).
+- Unit and property tests under `tests/contracts/`:
+  `test_canonical_roundtrip.py` (Hypothesis: byte-stable round trip,
+  key-order independence, no non-finite floats; decimal policy helpers),
+  `test_ids.py` (determinism, self-hash rejection, shape),
+  `test_numbers.py`, `test_timestamps.py`, `test_artifact_refs.py`, and
+  `test_schema_loader.py` (meta-validation passes for all shipped schemas;
+  envelope accepts valid, rejects `grants_authority=true`, rejects unknown
+  additional property).
+- `docs/adr/0002-jsonschema-library.md` recording the `jsonschema` decision
+  (alternatives: none/hand-rolled/`fastjsonschema`; justification: mature,
+  MIT-licensed, full 2020-12 support, structured errors).
 - Autonomous workflow contracts under `AutonomyPolicy/v1` (WP-A03):
   `automation/policy.json` (`AutonomyPolicy/v1`, canonical JSON, 19 keys)
   encoding the active governance policy; `automation/fail-reasons.json`
@@ -109,8 +181,17 @@ is supported. See `README.md` and `GOVERNANCE.md` for the evidence rules.
 
 ### Changed
 
-- `.github/workflows/ci.yml` adds the `autonomy-contracts-gate` job (WP-A03);
-  the existing lint, typecheck, unit, and package jobs are unchanged.
+- `.github/workflows/ci.yml` adds the `canonical-json-gate` job (WP-B10) and
+  previously added the `autonomy-contracts-gate` job (WP-A03); the existing
+  lint, typecheck, unit, and package jobs are unchanged.
+- `pyproject.toml` declares `jsonschema>=4.23` as the first runtime
+  dependency and adds `types-jsonschema>=4.23` to the `dev` group; the sdist
+  include list now carries `src/srl/contracts/schemas/v1` so schema documents
+  ship in the wheel for `importlib.resources`.
+- `src/srl/canonical.py` is now a compatibility re-export shim (ASCII-only,
+  `str` return) preserving the Phase-A behavior for the autonomy receipts and
+  CLI dispatcher; the scientific contracts layer uses the stricter
+  `srl.contracts.canonical` (UTF-8 bytes, `allow_nan=False`).
 - README now references `CHANGELOG.md`, `GOVERNANCE.md`, and `NOTICE`.
 
 ### Security
