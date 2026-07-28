@@ -2413,7 +2413,6 @@ name = "srlab"
 version = "0.4.0"
 source = { editable = "." }
 dependencies = [
-    { name = "arviz" },
     { name = "clarabel" },
     { name = "cvxpy" },
     { name = "jsonschema" },
@@ -2445,7 +2444,6 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "arviz", specifier = ">=0.23.4" },
     { name = "arviz", marker = "extra == 'bayesian'", specifier = ">=0.20,<1" },
     { name = "clarabel", specifier = ">=0.11.1" },
     { name = "cvxpy", specifier = ">=1.9.2" },
