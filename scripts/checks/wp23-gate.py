@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """WP-C23 acceptance gate for the pack admission pipeline.
 
-Runs the six WP-C23 checks, prints a single canonical ``GateReceipt/v1`` JSON
+Runs the seven WP-C23 checks, prints a single canonical ``GateReceipt/v1`` JSON
 line to stdout, and exits 0 only if every check PASSes. The gate exercises the
 linear nine-stage admission machine and its typed terminal rejections using
 synthetic evidence dicts.
@@ -33,6 +33,11 @@ C23-06 build, byte, and probe integrity
     ``PACK_INTEGRITY_FAILURE``; failed runtime and actual-compute probes raise
     ``ACTUAL_COMPUTE_FAILED``; accepting from ``RUNTIME_PROBED`` without the
     actual-compute probe stage raises ``PACK_PROBE_ONLY``.
+
+C23-07 crafted skip-chain rejected at construction and minting
+    A hand-crafted receipt tuple that skips a stage is rejected by
+    ``build_pack_stage_receipt`` and by ``AdmissionState`` construction with
+    ``CONTRACT_INVALID``.
 """
 
 from __future__ import annotations
@@ -60,10 +65,16 @@ from srl.packs import (  # noqa: E402
     PACK_PROBE_ONLY_REASON,
     UPSTREAM_SOURCE_UNVERIFIED_REASON,
     AdmissionError,
+    AdmissionState,
     advance,
     initial_state,
 )
-from srl.packs.receipts import STAGES  # noqa: E402
+from srl.packs.receipts import (  # noqa: E402
+    STAGES,
+    PackStageReceipt,
+    ReceiptError,
+    build_pack_stage_receipt,
+)
 
 # Receipt identity.
 GATE_SCHEMA: Final[str] = "GateReceipt/v1"
@@ -382,6 +393,73 @@ def _check_c23_06() -> dict[str, Any]:
 
 
 # ---------------------------------------------------------------------------
+# C23-07: crafted skip-chain rejected at construction and minting.
+# ---------------------------------------------------------------------------
+
+
+def _check_c23_07() -> dict[str, Any]:
+    """C23-07: a hand-crafted skip-chain is rejected by both builders."""
+    # Receipt minting must refuse an illegal hop.
+    try:
+        build_pack_stage_receipt(
+            pack_id="wp23.c23-07.pack",
+            stage="BUILT",
+            from_stage="DISCOVERED",
+            evidence={"kind": "build_manifest", "valid": True},
+            created_utc="2026-01-01T00:00:00Z",
+        )
+        return {
+            "status": "FAIL",
+            "detail": "build_pack_stage_receipt accepted DISCOVERED -> BUILT",
+        }
+    except ReceiptError:
+        pass
+    except Exception as exc:
+        return {
+            "status": "FAIL",
+            "detail": f"unexpected exception at receipt minting: {type(exc).__name__}: {exc}",
+        }
+
+    # State construction must refuse the same crafted chain.
+    try:
+        receipt = PackStageReceipt(
+            schema_version="PackStageReceipt/v1",
+            receipt_id="sha256:" + "0" * 64,
+            pack_id="wp23.c23-07.pack",
+            stage="BUILT",
+            from_stage="DISCOVERED",
+            evidence={"kind": "build_manifest", "valid": True},
+            created_utc="2026-01-01T00:00:00Z",
+            canonical_writes=0,
+            grants_authority=False,
+        )
+        AdmissionState(
+            pack_id="wp23.c23-07.pack",
+            current_stage="BUILT",
+            receipts=(receipt,),
+        )
+        return {
+            "status": "FAIL",
+            "detail": "AdmissionState accepted DISCOVERED -> BUILT skip-chain",
+        }
+    except AdmissionError as exc:
+        if exc.fail_reason == CONTRACT_INVALID:
+            return {
+                "status": "PASS",
+                "detail": ("crafted skip-chain rejected at receipt minting and state construction"),
+            }
+        return {
+            "status": "FAIL",
+            "detail": (f"state construction rejected with wrong fail_reason: {exc.fail_reason!r}"),
+        }
+    except Exception as exc:
+        return {
+            "status": "FAIL",
+            "detail": f"unexpected exception at state construction: {type(exc).__name__}: {exc}",
+        }
+
+
+# ---------------------------------------------------------------------------
 # Receipt assembly.
 # ---------------------------------------------------------------------------
 
@@ -395,6 +473,7 @@ def _build_receipt() -> dict[str, Any]:
         "C23-04": _check_c23_04(),
         "C23-05": _check_c23_05(),
         "C23-06": _check_c23_06(),
+        "C23-07": _check_c23_07(),
     }
 
     statuses = {cid: result["status"] for cid, result in checks.items()}

@@ -16,6 +16,7 @@ stage, pack, evidence, and timestamp produce the same id.
 from __future__ import annotations
 
 import hashlib
+import itertools
 import time
 from dataclasses import asdict, dataclass
 from typing import Any, Final
@@ -39,6 +40,11 @@ STAGES: Final[tuple[str, ...]] = (
     "ACTUAL_COMPUTE_PROBED",
     "EXPERIMENTAL_ACCEPTED",
 )
+
+# All legal single-step transitions in the linear admission pipeline. This is
+# the single source of truth for stage adjacency; both receipt minting and state
+# construction validate against it.
+LEGAL_STAGE_HOPS: Final[frozenset[tuple[str, str]]] = frozenset(itertools.pairwise(STAGES))
 
 
 class ReceiptError(ContractError):
@@ -117,6 +123,23 @@ def _validate_stage(stage: str) -> str:
     return stage
 
 
+def _validate_stage_hop(from_stage: str | None, stage: str) -> None:
+    """Validate that ``from_stage -> stage`` is a legal single-step hop.
+
+    The initial receipt (``from_stage is None``) may only represent the starting
+    ``DISCOVERED`` stage. Every other hop must move exactly one step forward in
+    the ordered pipeline; skips, repeats, and backwards hops are illegal.
+    """
+    if from_stage is None:
+        if stage != STAGES[0]:
+            msg = f"initial receipt must start at {STAGES[0]!r}, got {stage!r}"
+            raise ReceiptError(msg)
+        return
+    if (from_stage, stage) not in LEGAL_STAGE_HOPS:
+        msg = f"illegal stage hop from {from_stage!r} to {stage!r}"
+        raise ReceiptError(msg)
+
+
 def _require_non_empty_str(value: Any, field: str) -> str:
     """Return ``value`` if it is a non-empty string, else raise ReceiptError."""
     if not isinstance(value, str) or value == "":
@@ -175,6 +198,7 @@ def build_pack_stage_receipt(
         if from_stage == stage:
             msg = f"from_stage and stage must differ, got {stage!r}"
             raise ReceiptError(msg)
+    _validate_stage_hop(from_stage, stage)
     if not isinstance(evidence, dict):
         msg = f"evidence must be a dict, got {type(evidence).__name__}"
         raise ReceiptError(msg)

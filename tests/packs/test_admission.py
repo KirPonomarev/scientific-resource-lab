@@ -25,7 +25,7 @@ from srl.packs import (
     advance,
     initial_state,
 )
-from srl.packs.receipts import STAGES
+from srl.packs.receipts import STAGES, ReceiptError, build_pack_stage_receipt
 
 
 def _valid_evidence(stage: str) -> dict[str, Any]:
@@ -285,6 +285,101 @@ def test_advance_from_experimental_accepted_is_terminal() -> None:
     )
     assert resumed_state is state
     assert resumed_receipt.stage == "EXPERIMENTAL_ACCEPTED"
+
+
+def test_build_pack_stage_receipt_rejects_illegal_hop() -> None:
+    """Receipt minting refuses a non-adjacent stage hop."""
+    with pytest.raises(ReceiptError) as exc_info:
+        build_pack_stage_receipt(
+            pack_id="test.pack",
+            stage="BUILT",
+            from_stage="DISCOVERED",
+            evidence={"kind": "build_manifest", "valid": True},
+            created_utc="2026-01-01T00:00:00Z",
+        )
+    assert exc_info.value.fail_reason == CONTRACT_INVALID_FAIL_REASON
+
+
+def test_admission_state_rejects_skipped_first_receipt() -> None:
+    """A crafted DISCOVERED -> BUILT receipt is rejected at state construction."""
+    receipt = PackStageReceipt(
+        schema_version="PackStageReceipt/v1",
+        receipt_id="sha256:" + "a" * 64,
+        pack_id="test.pack",
+        stage="BUILT",
+        from_stage="DISCOVERED",
+        evidence={"kind": "build_manifest", "valid": True},
+        created_utc="2026-01-01T00:00:00Z",
+        canonical_writes=0,
+        grants_authority=False,
+    )
+    with pytest.raises(AdmissionError) as exc_info:
+        AdmissionState(
+            pack_id="test.pack",
+            current_stage="BUILT",
+            receipts=(receipt,),
+        )
+    assert exc_info.value.fail_reason == CONTRACT_INVALID_FAIL_REASON
+
+
+def test_admission_state_rejects_probe_only_skip_chain() -> None:
+    """A crafted chain that skips ACTUAL_COMPUTE_PROBED is rejected."""
+    state = _advance_to("RUNTIME_PROBED")
+    legal_receipts = state.receipts
+    bad_receipt = PackStageReceipt(
+        schema_version=legal_receipts[-1].schema_version,
+        receipt_id="sha256:" + "b" * 64,
+        pack_id="test.pack",
+        stage="EXPERIMENTAL_ACCEPTED",
+        from_stage="RUNTIME_PROBED",
+        evidence={"kind": "experimental_accept", "detail": "admitted"},
+        created_utc=legal_receipts[-1].created_utc,
+        canonical_writes=0,
+        grants_authority=False,
+    )
+    with pytest.raises(AdmissionError) as exc_info:
+        AdmissionState(
+            pack_id="test.pack",
+            current_stage="EXPERIMENTAL_ACCEPTED",
+            receipts=(*legal_receipts, bad_receipt),
+        )
+    assert exc_info.value.fail_reason == CONTRACT_INVALID_FAIL_REASON
+
+
+def test_admission_state_rejects_duplicated_middle_stage() -> None:
+    """A crafted chain that repeats a middle stage is rejected."""
+    state = _advance_to("LICENSE_CLEARED")
+    legal_receipts = state.receipts
+    dup_receipt = PackStageReceipt(
+        schema_version=legal_receipts[-1].schema_version,
+        receipt_id="sha256:" + "c" * 64,
+        pack_id="test.pack",
+        stage="LICENSE_CLEARED",
+        from_stage="LICENSE_CLEARED",
+        evidence={"kind": "license_clearance", "status": "allowed", "spdx": "MIT"},
+        created_utc=legal_receipts[-1].created_utc,
+        canonical_writes=0,
+        grants_authority=False,
+    )
+    with pytest.raises(AdmissionError) as exc_info:
+        AdmissionState(
+            pack_id="test.pack",
+            current_stage="LICENSE_CLEARED",
+            receipts=(*legal_receipts, dup_receipt),
+        )
+    assert exc_info.value.fail_reason == CONTRACT_INVALID_FAIL_REASON
+
+
+def test_admission_state_accepts_full_legal_chain() -> None:
+    """Reconstructing a state from the full legal chain succeeds."""
+    state = _advance_all()
+    rebuilt = AdmissionState(
+        pack_id=state.pack_id,
+        current_stage=state.current_stage,
+        receipts=state.receipts,
+    )
+    assert rebuilt.current_stage == "EXPERIMENTAL_ACCEPTED"
+    assert len(rebuilt.receipts) == 8
 
 
 def _advance_to(stage: str) -> AdmissionState:

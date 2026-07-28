@@ -48,6 +48,7 @@ from srl.packs.manifest import (
     PACK_INTEGRITY_FAILURE_REASON,
 )
 from srl.packs.receipts import (
+    LEGAL_STAGE_HOPS,
     STAGES,
     PackStageReceipt,
     build_pack_stage_receipt,
@@ -108,15 +109,20 @@ class AdmissionState:
                     f"current_stage {self.current_stage!r}"
                 )
                 raise AdmissionError(msg)
-        for i, receipt in enumerate(self.receipts[1:], start=1):
-            prev = self.receipts[i - 1]
-            if receipt.from_stage != prev.stage:
-                msg = (
-                    f"receipt chain broken at index {i}: "
-                    f"{receipt.stage!r} claims from {receipt.from_stage!r}, "
-                    f"but previous stage is {prev.stage!r}"
-                )
-                raise AdmissionError(msg)
+
+            prev = "DISCOVERED"
+            for i, receipt in enumerate(self.receipts):
+                if (prev, receipt.stage) not in LEGAL_STAGE_HOPS:
+                    msg = f"illegal stage hop at index {i}: from {prev!r} to {receipt.stage!r}"
+                    raise AdmissionError(msg)
+                if receipt.from_stage != prev:
+                    msg = (
+                        f"receipt chain linkage broken at index {i}: "
+                        f"{receipt.stage!r} claims from {receipt.from_stage!r}, "
+                        f"but expected previous stage is {prev!r}"
+                    )
+                    raise AdmissionError(msg)
+                prev = receipt.stage
 
 
 def initial_state(pack_id: str) -> AdmissionState:
