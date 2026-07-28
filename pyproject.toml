@@ -18,14 +18,15 @@ license = "Apache-2.0"
 # 2020-12 schema documents (docs/adr/0002-jsonschema-library.md). The units
 # core pack (WP-E40) adds `pint` for dimensional analysis and unit conversion,
 # isolated behind the units adapter (docs/adr/0003-pint-dependency.md). The
-# SMT pack (WP-E41) adds `z3-solver` for satisfiability checking over a
-# restricted S-expression formula spec, isolated behind the SMT adapter
-# (docs/adr/0004-smt-solvers.md). cvc5 is NOT a dependency: its wheels bundle
-# GPLv3/LGPLv3 components and ship no resolvable license expression, so it is
-# excluded on license grounds and marked WAIT_LICENSE (see ADR-0004).
+# SMT pack (WP-E41) adds `z3-solver` for satisfiability checking, isolated
+# behind the SMT adapter; cvc5 is excluded on GPL grounds (docs/adr/0004-smt-solvers.md).
+# The ripser TDA pack (WP-E42) adds `ripser` (MIT) and `numpy`, isolated behind
+# the ripser adapter (docs/adr/0005-ripser.md).
 dependencies = [
     "jsonschema>=4.23",
+    "numpy>=2.0",
     "pint>=0.25.3",
+    "ripser>=0.6.15",
     "z3-solver>=4.13.0",
 ]
 authors = [{ name = "Scientific Resource Lab contributors" }]
@@ -131,6 +132,14 @@ indent-style = "space"
 module = "srl.*"
 strict = true
 
+# ripser.py does not ship a py.typed marker (no stub package exists). The
+# adapter treats the ripser import as opaque (typed as Any, ADR-0005), so the
+# missing stubs are expected and safe. This keeps mypy strict on the adapter
+# body while admitting the untyped dependency.
+[[tool.mypy.overrides]]
+module = "ripser"
+ignore_missing_imports = true
+
 # z3 (z3-solver) ships no py.typed marker, so mypy cannot find library stubs.
 # The SMT adapter (the sole z3 import site) treats all z3 objects as opaque
 # Any by design (ADR-0004: z3 is isolated behind the adapter's typed surface),
@@ -165,4 +174,23 @@ branch = true
 exclude_also = [
     "if __name__ == .__main__.:",
     "if TYPE_CHECKING:",
+]
+
+# ---------------------------------------------------------------------------
+# uv: dependency overrides (WP-E42).
+#
+# ripser.py declares `persim` as a hard runtime dependency, but the core
+# ``ripser.ripser()`` function — the only surface the SRL adapter uses — does
+# not import it (persim is imported lazily inside the optional ``Rips.plot()``
+# method, which the adapter never calls). persim pulls in `hopcroftkarp`, which
+# is GPL-3.0 and therefore incompatible with the SRL Apache-2.0 policy and the
+# pack license allowlist (the `GPL-` prefix is denied). Dropping persim from
+# ripser's resolved closure removes the GPL transitive without affecting the
+# adapter's compute path. The architecture test in
+# tests/packs/test_ripser_adapter.py asserts the adapter imports neither persim
+# nor hopcroftkarp.
+# ---------------------------------------------------------------------------
+[tool.uv]
+override-dependencies = [
+    "persim ; python_version < '0'",  # never resolve: always-false marker
 ]
