@@ -2,7 +2,7 @@
 # Portable: no absolute paths or usernames. Uses uv for everything.
 # Targets run via `uv run` so contributors only need uv installed.
 
-.PHONY: bootstrap lint format typecheck test build verify repro-check gate-wp03 gate-wp10 gate-wp11 gate-wp12 gate-wp13 gate-wp14 corpus router-determinism clean help
+.PHONY: bootstrap lint format typecheck test build verify repro-check gate-wp03 gate-wp10 gate-wp11 gate-wp12 gate-wp13 gate-wp14 gate-wp45 corpus router-determinism clean help
 
 help: ## Show this help.
 	@awk 'BEGIN {FS = ":.*##"; printf "Usage:\n  make <target>\n\nTargets:\n"} \
@@ -96,6 +96,19 @@ gate-wp14: ## Run the WP-B14 router-planner acceptance gate.
 # a RouterDeterminismReceipt/v1 JSON receipt; non-zero exit on failure.
 router-determinism: ## Run the router/planner determinism check.
 	uv run python scripts/checks/router-determinism.py
+
+# WP-E45 P0 integration gate. The Phase E capstone: runs the six acceptance
+# checks (E45-01..E45-06) — runtime probes for all four P0 packs (units, smt,
+# ripser, pyriemann), actual-compute probes against their goldens, >=5 distinct
+# MEASURED real-compute runs per pack (wall/rss/expanded_bytes read off the
+# process, never fabricated), catalog seal determinism, the synthetic
+# end-to-end slice (claim -> plan -> run -> validate -> portal), and an
+# overclaim scan (no formal_check=proven with authority=none) — and prints an
+# IntegrationReceipt/v1 JSON receipt; non-zero exit on any FAIL or if the gate
+# wall exceeds 300s. Uses the packs + planning + portal + semantic layers, so
+# it runs under `uv run python`.
+gate-wp45: ## Run the WP-E45 P0 integration acceptance gate.
+	uv run python scripts/checks/wp45-gate.py
 
 # WP-B15 public conformance corpus. Loads the thirty-task public corpus under
 # fixtures/conformance/corpus/, runs each TaskSpec/v1 through the real

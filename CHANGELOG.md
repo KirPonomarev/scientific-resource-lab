@@ -11,6 +11,86 @@ is supported. See `README.md` and `GOVERNANCE.md` for the evidence rules.
 
 ## [Unreleased]
 
+### Added
+
+- **P0 integration release (WP-E45)** — the Phase E capstone that proves the
+  four P0 packs (units, smt, ripser, pyriemann) integrate as a coherent,
+  measured, honestly-claimed release. `scripts/checks/wp45-gate.py` emits an
+  `IntegrationReceipt/v1` with six checks: E45-01 runtime probes (each P0 pack
+  adapter imports and its typed surface resolves), E45-02 actual-compute probes
+  (each pack runs ONE real bounded compute matching its golden — a coherent SI
+  identity, a SAT+UNSAT pair, the circle's single long-lived H1, the
+  closed-form log-Euclidean mean), E45-03 ≥5 DISTINCT measured real-compute
+  runs per pack with a REAL wall/rss/expanded-bytes triple read off the process
+  (never fabricated), E45-04 catalog seal determinism (rebuild → identical
+  `snapshot_id`/`merkle_root`/canonical bytes), E45-05 the synthetic
+  end-to-end slice (claim → classify/plan → real units conversion → engine +
+  validation receipts → demo portal page) with `exercise_level=actual_compute`
+  and `integration_authority=none`, and E45-06 an overclaim scan (no
+  `formal_check=proven` without a certificate; pack ceilings ≤ `checked`). The
+  gate enforces a hard 300s wall guard; the measured corpus runs in
+  single-digit seconds. `tests/integration/test_p0_end_to_end.py` — ten
+  integration tests pinning the per-stage invariants and the full slice;
+  `make gate-wp45` target; `p0-integration-gate (WP-E45)` job in
+  `.github/workflows/integration.yml` (ubuntu-24.04, 30-minute timeout
+  justified by the measured corpus, actions pinned from `ci.yml`);
+  `docs/architecture/p0-integration.md` and `docs/adr/0007-p0-integration.md`.
+- **P1 admission framework with typed candidate verdicts** under
+  `srl.packs.admission` — an eight-stage candidate pipeline
+  (`Candidate`, `CandidateBuilder`, `evaluate_candidate`) producing one of five
+  typed verdicts (`EXPERIMENTAL_ACCEPTED` / `STABLE_ACCEPTED` /
+  `REJECTED_LICENSE` / `REJECTED_CONTRACT` / `REJECTED_RESOURCE`) with a
+  content-addressed `AdmissionVerdict/v1`, the public `admit(pack_dir)` entry
+  point, and the train-only / license / resource gates a candidate must pass.
+- **Static evidence portal with synthetic demo mode** under `srl.portal.build`
+  (`PortalMode.private_local` / `PortalMode.public_demo`,
+  `build_portal(objects_dir, out_dir, mode) -> PortalBuildReport`) — a
+  stdlib-only static site generator emitting an index, per-object detail,
+  transformation lineage, evidence matrix, run resources, and model interfaces
+  pages from `string.Template` templates; the `public_demo` mode drops
+  non-synthetic objects and refuses any input carrying an absolute local path
+  or credential pattern with a typed `PUBLIC_LEAK_DETECTED` refusal
+  (fail-closed on any leak).
+- **pyRiemann SPD geometry pack (WP-E43)** under
+  `srl.packs.adapters.pyriemann_adapter` — Riemannian and log-Euclidean means,
+  distances, and a train-only shrinkage API (`fit_transform` / `transform`)
+  whose state carries only training-derived statistics; non-SPD and trivial
+  1×1 inputs raise `SpdError` (`CONTRACT_INVALID`) before any compute.
+- **PilotSpec schema and private overlay machinery** under `srl.pilot` — a
+  `PilotSpec/v1` schema for scoped pilot studies with a private overlay layer
+  that keeps operator-local configuration out of the public fabric.
+- **ripser TDA pack (WP-E42)** under `srl.packs.adapters.ripser_adapter` —
+  persistent homology of a point cloud under hard resource limits (points,
+  ambient dimension, homology degree) with decimal-string birth/death pairs, a
+  deterministic preprocessing receipt, and a phase-randomized surrogate helper
+  for null-hypothesis controls; `long_lived_classes` / `max_finite_persistence`
+  analysis helpers.
+- **Read-only stdio MCP server (F51)** under `srl.mcp` — a hand-rolled stdio
+  MCP server exposing seven read-only P0 methods (catalog snapshot, capability
+  lookup, plan inspection, evidence assessment, receipt fetch, corpus
+  enumeration, portal manifest) with no write surface and no network egress.
+- **AutonomyPolicy/v3 (governance)** — raises the implementation lane ceiling
+  from 6 to 8 concurrent lanes, widening the governed multi-lane capacity
+  without changing the lane path-ownership or lease disciplines.
+- **Z3+cvc5 SMT pack (WP-E41)** under `srl.packs.adapters.smt` — a
+  satisfiability adapter over a restricted S-expression grammar (no raw
+  SMT-LIB text eval) with z3 as the cleared solver (cvc5 is `WAIT_LICENSE`),
+  disagreement preservation (a dual-solver disagreement is recorded, never
+  silently resolved), and an honest `FORMAL_CHECK_CEILING=checked` (a SAT/UNSAT
+  answer is never promoted to `proven` without a verified certificate).
+- **OpenAlex/Crossref/arXiv/OEIS knowledge source adapters (WP-E44)** under
+  `srl.knowledge.sources` — four source parsers producing `SourceRecord/v1`
+  entries with attribution, an `EndpointPolicy` with byte/cost budgets, and a
+  `search_*` retriever that enforces the budget with a typed `RESOURCE_LIMIT`
+  refusal; no FRED/ALFRED/Wolfram credential-requiring adapter ships.
+
+### Changed
+
+- The `integration_authority` axis is pinned `none` across every P0 integration
+  receipt and assessment: an actual-compute run never grants integration
+  authority, and the reserved `admitted_a1_sandbox` / `admitted_a2` tiers
+  remain unreachable (there is no admission route in this codebase).
+
 ## [0.2.0] - 2026-07-28
 
 Release contents: transactional CAS ingest engine with dedup, fsck and
