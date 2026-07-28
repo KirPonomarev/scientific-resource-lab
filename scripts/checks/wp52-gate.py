@@ -154,7 +154,9 @@ def _check_f52_02() -> dict[str, Any]:
             "parents": [],
             "payload": {
                 "source_path": "fixtures/public/private-marker.json",
-                "local_path": "/" + "Users" + "/alice/secret.txt",  # synthetic marker, built at runtime
+                "local_path": "/"
+                + "Users"
+                + "/alice/secret.txt",  # synthetic marker, built at runtime
                 "password": "hunter2",
             },
             "canonical_writes": 0,
