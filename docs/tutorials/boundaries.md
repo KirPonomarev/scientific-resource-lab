@@ -25,7 +25,7 @@ restates the exclusion list from the project plan for contributors.
    - Paths under `/Users/`, `/home/`, `/Volumes/`, `C:\Users\`, or any other
      real home directory.
    - Machine hostnames, internal IP addresses, or container identifiers.
-   - Personal directory names such as `kirillponomarev` or other operator names.
+   - Personal directory names (operator usernames) or other operator-identifying names.
 
 4. **Proprietary or licensed materials**
    - Third-party papers, preprints, datasets, or source code under a license
