@@ -1,0 +1,14 @@
+{
+  "case_id": "s03-real-arithmetic",
+  "category": "sat",
+  "description": "A real-arithmetic system y = 2*x and y > 1 is satisfiable (e.g. x = 1.0, y = 2.0).",
+  "formula_spec": [
+    "and",
+    ["=", ["real-var", "y"], ["*", ["int-const", 2], ["real-var", "x"]]],
+    [">", ["real-var", "y"], ["int-const", 1]]
+  ],
+  "expected_result": "sat",
+  "solver": "z3",
+  "timeout_seconds": 5,
+  "notes": "Exercises real-variable unification across a linear equality and a strict bound."
+}

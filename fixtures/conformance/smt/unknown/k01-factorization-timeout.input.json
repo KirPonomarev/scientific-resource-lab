@@ -1,0 +1,28 @@
+{
+  "case_id": "k01-factorization-timeout",
+  "category": "unknown",
+  "description": "A nonlinear integer factorization obligation that z3 cannot decide in the time bound: the product of six integers each > 1 is constrained to equal a large prime (1000003), which is unsatisfiable but expensive to prove. The solver returns unknown (timeout).",
+  "formula_spec": [
+    "and",
+    [">", ["int-var", "x0"], ["int-const", 1]],
+    [">", ["int-var", "x1"], ["int-const", 1]],
+    [">", ["int-var", "x2"], ["int-const", 1]],
+    [">", ["int-var", "x3"], ["int-const", 1]],
+    [">", ["int-var", "x4"], ["int-const", 1]],
+    [">", ["int-var", "x5"], ["int-const", 1]],
+    [
+      "=",
+      [
+        "*",
+        ["*", ["*", ["int-var", "x0"], ["int-var", "x1"]], ["*", ["int-var", "x2"], ["int-var", "x3"]]],
+        ["*", ["int-var", "x4"], ["int-var", "x5"]]
+      ],
+      ["int-const", 1000003]
+    ]
+  ],
+  "expected_result": "unknown",
+  "expected_unknown_reason_contains": "timeout",
+  "solver": "z3",
+  "timeout_seconds": 1.5,
+  "notes": "Integer factorization is the canonical hard case for nonlinear integer arithmetic: z3 must enumerate factorizations of 1000003 (a prime), which does not factor into six integers > 1, but the search does not complete in 1.5 s. This is an honest `unknown` (the solver hit its bound), not a failure."
+}
