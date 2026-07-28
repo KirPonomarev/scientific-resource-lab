@@ -1,0 +1,20 @@
+{
+  "schema_version": "TaskSpec/v1",
+  "task_id": "task-14",
+  "title": "Conservation law overreach",
+  "category": "symbolic-law-false-positives",
+  "input": {
+    "claim": {
+      "statement": "A conservation law is overreached to a regime where it does not hold; check symbolic law consistency."
+    },
+    "request": {
+      "requested_profiles": [
+        "symbolic_law"
+      ]
+    }
+  },
+  "expected": {
+    "outcome": "WAIT_CAPABILITY",
+    "detail": "symbolic_law auto-classifies; no adapter -> WAIT_CAPABILITY"
+  }
+}

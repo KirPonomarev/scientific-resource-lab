@@ -1,0 +1,20 @@
+{
+  "schema_version": "TaskSpec/v1",
+  "task_id": "task-07",
+  "title": "Logarithm of a non-positive number",
+  "category": "domain-violations",
+  "input": {
+    "ir": {
+      "op": "arith1.log",
+      "args": [
+        {
+          "const": "0"
+        }
+      ]
+    }
+  },
+  "expected": {
+    "outcome": "REJECT_IR",
+    "detail": "arith1.log outside MATH_IR_ALLOWLIST -> UnsupportedOperatorError"
+  }
+}

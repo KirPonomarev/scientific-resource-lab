@@ -1,0 +1,20 @@
+{
+  "schema_version": "TaskSpec/v1",
+  "task_id": "task-01",
+  "title": "Distributivity check (a*(b+c) = a*b + a*c)",
+  "category": "algebraic-identities",
+  "input": {
+    "claim": {
+      "statement": "Verify the distributivity identity a times (b plus c) equals a times b plus a times c via exact arithmetic and symbolic algebra."
+    },
+    "request": {
+      "requested_profiles": [
+        "algebra_exact"
+      ]
+    }
+  },
+  "expected": {
+    "outcome": "WAIT_CAPABILITY",
+    "detail": "algebra_exact auto-classifies; no available adapter -> WAIT_CAPABILITY"
+  }
+}

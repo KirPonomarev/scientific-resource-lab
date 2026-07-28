@@ -2,7 +2,7 @@
 # Portable: no absolute paths or usernames. Uses uv for everything.
 # Targets run via `uv run` so contributors only need uv installed.
 
-.PHONY: bootstrap lint format typecheck test build verify repro-check gate-wp03 gate-wp10 gate-wp11 gate-wp12 gate-wp13 gate-wp14 router-determinism clean help
+.PHONY: bootstrap lint format typecheck test build verify repro-check gate-wp03 gate-wp10 gate-wp11 gate-wp12 gate-wp13 gate-wp14 corpus router-determinism clean help
 
 help: ## Show this help.
 	@awk 'BEGIN {FS = ":.*##"; printf "Usage:\n  make <target>\n\nTargets:\n"} \
@@ -96,6 +96,17 @@ gate-wp14: ## Run the WP-B14 router-planner acceptance gate.
 # a RouterDeterminismReceipt/v1 JSON receipt; non-zero exit on failure.
 router-determinism: ## Run the router/planner determinism check.
 	uv run python scripts/checks/router-determinism.py
+
+# WP-B15 public conformance corpus. Loads the thirty-task public corpus under
+# fixtures/conformance/corpus/, runs each TaskSpec/v1 through the real
+# science-lab pipeline (a pure evaluation against the router/planner + the
+# contract validators), compares each task's expected outcome against the
+# outcome the pipeline produced, and verifies the declared category coverage.
+# Prints a CorpusReceipt/v1 JSON receipt (30 outcomes, zero mismatches on
+# PASS); non-zero exit on any mismatch or coverage drift. Pure stdlib + the
+# in-repo srl package, so it runs under `python3` without a prior install.
+corpus: ## Run the WP-B15 public conformance corpus check.
+	uv run python scripts/checks/wp15-corpus.py
 
 clean: ## Remove build artifacts and caches.
 	rm -rf dist build .pytest_cache .mypy_cache .ruff_cache

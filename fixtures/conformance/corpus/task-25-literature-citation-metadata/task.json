@@ -1,0 +1,26 @@
+{
+  "schema_version": "TaskSpec/v1",
+  "task_id": "task-25",
+  "title": "Citation metadata shape",
+  "category": "literature-extraction",
+  "input": {
+    "claim": {
+      "statement": "Extract structured citation metadata from a literature reference.",
+      "claim_class": "established_law_reference",
+      "epistemic_source": "literature",
+      "support_refs": [
+        "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      ]
+    },
+    "request": {
+      "requested_profiles": [
+        "literature_extraction",
+        "literature"
+      ]
+    }
+  },
+  "expected": {
+    "outcome": "WAIT_CAPABILITY",
+    "detail": "literature_extraction + literature (both remote_required) auto-classify -> WAIT_CAPABILITY"
+  }
+}

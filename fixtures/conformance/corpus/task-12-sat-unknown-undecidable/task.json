@@ -1,0 +1,20 @@
+{
+  "schema_version": "TaskSpec/v1",
+  "task_id": "task-12",
+  "title": "UNKNOWN undecidable fragment",
+  "category": "sat-unsat-unknown",
+  "input": {
+    "claim": {
+      "statement": "Report UNKNOWN for an undecidable fragment via constraint solving and SMT satisfiability."
+    },
+    "request": {
+      "requested_profiles": [
+        "nonlinear_continuous_or_hybrid_constraint"
+      ]
+    }
+  },
+  "expected": {
+    "outcome": "WAIT_CAPABILITY",
+    "detail": "nonlinear_continuous_or_hybrid_constraint auto-classifies; z3 adapter future -> WAIT_CAPABILITY"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "schema_version": "TaskSpec/v1",
+  "task_id": "task-17",
+  "title": "Valid SPD distance",
+  "category": "spd-geometry",
+  "input": {
+    "claim": {
+      "statement": "Compute the geodesic distance in the symmetric positive definite manifold under a metric; check the geometry."
+    },
+    "request": {
+      "requested_profiles": [
+        "geometry_tda",
+        "optimization"
+      ]
+    }
+  },
+  "expected": {
+    "outcome": "WAIT_CAPABILITY",
+    "detail": "geometry_tda + optimization auto-classify; no adapter -> WAIT_CAPABILITY"
+  }
+}
