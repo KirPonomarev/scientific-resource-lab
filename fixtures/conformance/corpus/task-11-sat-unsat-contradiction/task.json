@@ -1,0 +1,20 @@
+{
+  "schema_version": "TaskSpec/v1",
+  "task_id": "task-11",
+  "title": "UNSAT contradiction (x > 1 and x < 0)",
+  "category": "sat-unsat-unknown",
+  "input": {
+    "claim": {
+      "statement": "Decide a contradiction x greater than one and x less than zero via SMT satisfiability."
+    },
+    "request": {
+      "requested_profiles": [
+        "nonlinear_continuous_or_hybrid_constraint"
+      ]
+    }
+  },
+  "expected": {
+    "outcome": "WAIT_CAPABILITY",
+    "detail": "nonlinear_continuous_or_hybrid_constraint auto-classifies; z3 adapter future -> WAIT_CAPABILITY"
+  }
+}

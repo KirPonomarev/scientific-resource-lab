@@ -1,0 +1,10 @@
+{
+  "scenario_id": "n03-remote-required-no-local-fallback",
+  "description": "A remote_required profile MUST NEVER fall back to a local adapter: absence of a local adapter yields WAIT_CAPABILITY, never a fake local substitute. This vector routes a claim engaging remote_required profiles (literature, executable_ode_dae_sde_model, literature_extraction — all remote_required in the shipped catalog) and asserts the plan produces NO local step (adapter_id is null) for any remote_required profile. A remote_required profile with an adapter_id in the catalog still routes WAIT_CAPABILITY; the router refuses to engage the adapter locally.",
+  "validator": "remote_required_no_fallback",
+  "expected_error": {
+    "exception": "AssertionError",
+    "fail_reason": "remote_required_local_step_forbidden",
+    "invariant": "no_silent_fallback"
+  }
+}

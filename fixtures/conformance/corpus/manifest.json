@@ -1,0 +1,25 @@
+{
+  "schema_version": "CorpusManifest/v1",
+  "description": "Conformance vectors for the SRL thirty-task public conformance corpus (WP-B15). Each task is a TaskSpec/v1 (task.json) in a task-NN-<slug>/ directory plus a one-paragraph README.md. The corpus is loaded by srl.planning.corpus.load_corpus and executed by scripts/checks/wp15-corpus.py (the public_conformance_corpus CI job). Honesty: a corpus PASS never means scientific validation; the honest outcome for unbuilt capabilities is WAIT_CAPABILITY (the router waits rather than fabricating an adapter). The category coverage and per-task expected outcomes are asserted by the check.",
+  "task_count": 30,
+  "categories": {
+    "algebraic-identities": 3,
+    "units-and-dimensions": 2,
+    "domain-violations": 2,
+    "exact-arithmetic": 2,
+    "sat-unsat-unknown": 3,
+    "symbolic-law-false-positives": 2,
+    "topology": 2,
+    "spd-geometry": 2,
+    "causal-assumptions": 2,
+    "uncertainty": 1,
+    "ode-pde-interface": 2,
+    "model-composition": 1,
+    "literature-extraction": 1,
+    "proof-obligations": 1,
+    "resource-rejection": 1,
+    "license-rejection": 1,
+    "public-redaction": 1,
+    "bridge-authority": 1
+  }
+}

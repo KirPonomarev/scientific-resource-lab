@@ -1,0 +1,20 @@
+{
+  "schema_version": "TaskSpec/v1",
+  "task_id": "task-05",
+  "title": "Dimension mismatch (metres vs seconds)",
+  "category": "units-and-dimensions",
+  "input": {
+    "claim": {
+      "statement": "Detect a dimension mismatch when adding a length in metres to a time in seconds."
+    },
+    "request": {
+      "requested_profiles": [
+        "algebra_exact"
+      ]
+    }
+  },
+  "expected": {
+    "outcome": "WAIT_CAPABILITY",
+    "detail": "algebra_exact auto-classifies; no available adapter -> WAIT_CAPABILITY"
+  }
+}

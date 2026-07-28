@@ -1,0 +1,18 @@
+{
+  "schema_version": "TaskSpec/v1",
+  "task_id": "task-30",
+  "title": "Packet claiming grants_authority refused",
+  "category": "bridge-authority",
+  "input": {
+    "packet": {
+      "schema_version": "ScientificObjectEnvelope/v1",
+      "note": "privileged run",
+      "canonical_writes": 0,
+      "grants_authority": true
+    }
+  },
+  "expected": {
+    "outcome": "REJECT_AUTHORITY",
+    "detail": "packet bytes carry grants_authority=true -> authority refusal"
+  }
+}

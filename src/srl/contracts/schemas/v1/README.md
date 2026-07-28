@@ -50,6 +50,8 @@ HTTP today, but it must be unique and must not change for a given shape.
 | `science-lab-engine-receipt.json` | `ScienceLabEngineReceipt/v1`  | A receipt proving a backend engine ran (or failed) for a run request, carrying the honest exercise_level and engine_execution (an import_probe cannot yield completed-and-computed semantics). |
 | `science-lab-validation-receipt.json` | `ScienceLabValidationReceipt/v1` | A receipt proving an independent validator checked an engine run's output, carrying the scientific_check and formal_check (formal_check=proven REQUIRES a non-null formal_certificate_ref). |
 | `science-lab-run-receipt.json`    | `ScienceLabRunReceipt/v1`     | A receipt tying an engine run and its optional validation into a single terminal run outcome with aggregate resource usage. |
+| `science-lab-run-request.json`    | `ScienceLabRunRequest/v1`     | A request to run the science lab against a ScientificClaim: the router/planner input (claim, requested profiles, resource class, seed/threads policy). A request is an intent, never authority (prospective_holdout_materialization_allowed and status_promotion_allowed pinned false). |
+| `science-lab-plan.json`           | `ScienceLabPlan/v1`           | A deterministic execution plan produced by the planner: a DAG of capability-profile steps with typed selection states (SELECTED / EXCLUDED_TYPED / NOT_APPLICABLE / WAIT_CAPABILITY), resource estimates, and dependency edges. A plan is not evidence (grants_authority pinned false). |
 
 ## Naming and compatibility policy
 
