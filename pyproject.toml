@@ -36,6 +36,8 @@ license = "Apache-2.0"
 #   SRL surface can validate arrays and eigenvalues without relying only on
 #   transitive dependency versions.
 dependencies = [
+    "clarabel>=0.11.1",
+    "cvxpy>=1.9.2",
     "jsonschema>=4.23",
     "numpy>=2.0",
     "pint>=0.25.3",
@@ -162,6 +164,14 @@ ignore_missing_imports = true
 # so missing stubs are expected and ignored here. See ADR-0004.
 [[tool.mypy.overrides]]
 module = "z3"
+ignore_missing_imports = true
+
+# cvxpy ships no stub package and has no py.typed marker. The CVXPY adapter is
+# the sole import site; it treats all cvxpy objects as opaque Any by design
+# (ADR-0009), so missing stubs are expected and ignored here.
+[[tool.mypy.overrides]]
+module = "cvxpy.*"
+follow_imports = "skip"
 ignore_missing_imports = true
 
 [tool.mypy]

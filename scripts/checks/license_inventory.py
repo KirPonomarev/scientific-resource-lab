@@ -43,6 +43,7 @@ from typing import Final
 _ALLOWED_LICENSES: Final[frozenset[str]] = frozenset(
     {
         "MIT",
+        "MIT-0",
         "BSD-2-CLAUSE",
         "BSD-3-CLAUSE",
         "0BSD",
