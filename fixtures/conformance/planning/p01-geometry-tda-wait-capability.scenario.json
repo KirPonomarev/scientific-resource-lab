@@ -1,0 +1,36 @@
+{
+  "scenario_id": "p01-geometry-tda-wait-capability",
+  "description": "A geometry TDA claim (persistent homology + Betti numbers) auto-classifies to geometry_tda. With the shipped catalog (ripser adapter is availability=future, no local adapter present), the router yields WAIT_CAPABILITY for geometry_tda (adapterless -> honest wait, never a local fallback), NOT_APPLICABLE for the 14 unrelated profiles, and EXCLUDED_TYPED for none (auto-classify never excludes). The plan is a 15-step DAG with exactly one WAIT_CAPABILITY step and zero SELECTED steps.",
+  "claim": {
+    "schema_version": "ScientificClaim/v1",
+    "claim_id": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "statement": "We compute persistent homology and the Betti numbers of the point cloud.",
+    "claim_class": "candidate_hypothesis",
+    "claim_status": "proposed",
+    "epistemic_source": "operator",
+    "support_refs": [],
+    "created_utc": "2026-07-28T00:00:00Z",
+    "canonical_writes": 0,
+    "grants_authority": false
+  },
+  "request": {
+    "claim_id": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "requested_profiles": [],
+    "resource_class": "default",
+    "seed": 0,
+    "threads": 1,
+    "output_schemas": []
+  },
+  "expected": {
+    "classifier_profiles": ["geometry_tda"],
+    "classifier_trace": ["R-TDA"],
+    "selections": {
+      "geometry_tda": "WAIT_CAPABILITY"
+    },
+    "selected_profiles": [],
+    "waiting_profiles": ["geometry_tda"],
+    "not_applicable_count": 14,
+    "excluded_typed_count": 0,
+    "plan_step_count": 15
+  }
+}

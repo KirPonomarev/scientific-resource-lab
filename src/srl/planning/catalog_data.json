@@ -1,0 +1,96 @@
+{
+  "schema_version": "CapabilityCatalog/v1",
+  "description": "The in-repo capability catalog (WP-B14): a minimal, deterministic map from the 15 science-lab capability profiles to the future adapters that will back them. Every adapter is marked availability=future or remote_required because NO scientific backend ships in this codebase (the router must WAIT_CAPABILITY rather than fall back to a local substitute). The catalog is content-addressed (catalog_digest = sha256 over the canonical bytes of the catalog document); a plan carries the catalog_hash so a re-plan after a catalog change is detectable. Canonical JSON: sorted keys, compact separators, UTF-8, trailing newline.",
+  "capabilities": [
+    {
+      "capability_id": "cap.algebra_exact",
+      "profile": "algebra_exact",
+      "adapter_id": null,
+      "availability": "future"
+    },
+    {
+      "capability_id": "cap.symbolic_law",
+      "profile": "symbolic_law",
+      "adapter_id": null,
+      "availability": "future"
+    },
+    {
+      "capability_id": "cap.dynamics",
+      "profile": "dynamics",
+      "adapter_id": null,
+      "availability": "future"
+    },
+    {
+      "capability_id": "cap.geometry_tda",
+      "profile": "geometry_tda",
+      "adapter_id": "ripser",
+      "availability": "future"
+    },
+    {
+      "capability_id": "cap.causal_time_series",
+      "profile": "causal_time_series",
+      "adapter_id": null,
+      "availability": "future"
+    },
+    {
+      "capability_id": "cap.uncertainty",
+      "profile": "uncertainty",
+      "adapter_id": null,
+      "availability": "future"
+    },
+    {
+      "capability_id": "cap.optimization",
+      "profile": "optimization",
+      "adapter_id": null,
+      "availability": "future"
+    },
+    {
+      "capability_id": "cap.formal_protocol",
+      "profile": "formal_protocol",
+      "adapter_id": null,
+      "availability": "future"
+    },
+    {
+      "capability_id": "cap.literature",
+      "profile": "literature",
+      "adapter_id": null,
+      "availability": "remote_required"
+    },
+    {
+      "capability_id": "cap.theorem_or_proof_obligation",
+      "profile": "theorem_or_proof_obligation",
+      "adapter_id": null,
+      "availability": "future"
+    },
+    {
+      "capability_id": "cap.nonlinear_continuous_or_hybrid_constraint",
+      "profile": "nonlinear_continuous_or_hybrid_constraint",
+      "adapter_id": "z3",
+      "availability": "future"
+    },
+    {
+      "capability_id": "cap.executable_ode_dae_sde_model",
+      "profile": "executable_ode_dae_sde_model",
+      "adapter_id": null,
+      "availability": "remote_required"
+    },
+    {
+      "capability_id": "cap.pde_variational_model",
+      "profile": "pde_variational_model",
+      "adapter_id": null,
+      "availability": "future"
+    },
+    {
+      "capability_id": "cap.model_composition",
+      "profile": "model_composition",
+      "adapter_id": null,
+      "availability": "future"
+    },
+    {
+      "capability_id": "cap.literature_extraction",
+      "profile": "literature_extraction",
+      "adapter_id": null,
+      "availability": "remote_required"
+    }
+  ]
+}

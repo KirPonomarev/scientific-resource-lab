@@ -390,6 +390,69 @@ is supported. See `README.md` and `GOVERNANCE.md` for the evidence rules.
 - `.python-version` pinning the project baseline to `3.12`.
 - Committed `uv.lock` and tracked the WP-A01 closeout receipt
   (`automation/receipts/wp-closeout-a01.json`).
+- Deterministic claim router and plan builder under `srl.planning` (WP-B14):
+  `ScienceLabRunRequest/v1` (`science-lab-run-request.json`) — a request to run
+  the science lab against a `ScientificClaim`, carrying the requested capability
+  profiles, the resource class, and the seed/threads policy, with the two
+  request-specific safety consts pinned
+  (`prospective_holdout_materialization_allowed=false`,
+  `status_promotion_allowed=false`) — a request is an intent, never authority;
+  `ScienceLabPlan/v1` (`science-lab-plan.json`) — a deterministic execution plan
+  produced by the planner, a DAG of steps in topological order with typed
+  selection states (`SELECTED` / `EXCLUDED_TYPED` / `NOT_APPLICABLE` /
+  `WAIT_CAPABILITY`), resource estimates, dependency edges, and the
+  `policy_hash` / `catalog_hash` it was built against; both schemas registered in
+  the loader (`srl.contracts.schema`).
+- The 15 capability profiles (`srl.planning.profiles.SCIENCE_LAB_PROFILES`):
+  `algebra_exact`, `symbolic_law`, `dynamics`, `geometry_tda`,
+  `causal_time_series`, `uncertainty`, `optimization`, `formal_protocol`,
+  `literature`, `theorem_or_proof_obligation`,
+  `nonlinear_continuous_or_hybrid_constraint`, `executable_ode_dae_sde_model`,
+  `pde_variational_model`, `model_composition`, `literature_extraction`, each
+  with typed `required_inputs` (MathIR cds / object types),
+  `produced_evidence_axes`, and `default_resource_class`.
+- A deterministic claim classifier (`srl.planning.classifier.classify`): a pure
+  function with an explicit rule table; every decision backed by a `rule_trace`.
+- An in-repo capability catalog (`srl.planning.catalog`, `catalog_data.json`):
+  a content-addressed map from the 15 profiles to future adapters, marking every
+  adapter `future` or `remote_required` (no scientific backend ships in this
+  codebase); `catalog_digest` = sha256 over the canonical bytes.
+- A deterministic router (`srl.planning.router.route`): produces a
+  `RoutingDecision` over all 15 profiles; `remote_required` profiles never fall
+  back to a local adapter (absence yields `WAIT_CAPABILITY`, never a silent
+  substitute).
+- A deterministic plan builder (`srl.planning.planner.build_plan`): dependency
+  DAG with topological order and cycle detection (raising `PlanError`,
+  `CONTRACT_INVALID`), resource admission against per-class caps (default wall
+  300s / rss 1.5 GiB / scratch 4 GiB; exception wall 900s / rss 2 GiB) with
+  overflow raising `ResourceAdmissionError` (`WAIT_REMOTE_EXECUTOR`), and
+  `plan_digest` over canonical bytes; byte-identical for byte-identical inputs
+  (determinism).
+- Two new typed fail reasons in `automation/fail-reasons.json`: `WAIT_CAPABILITY`
+  (a required capability has no available adapter) and `WAIT_REMOTE_EXECUTOR` (a
+  plan's summed estimates exceed the admission caps).
+- Conformance vectors under `fixtures/conformance/planning/`: 3 positive
+  scenarios (geometry TDA `WAIT_CAPABILITY`, a 3-step composition DAG, explicit
+  `EXCLUDED_TYPED`) and 3 negative scenarios (cyclic dependency, resource
+  overflow, remote_required no-fallback), with a manifest and README.
+- `scripts/checks/wp14-gate.py` running the four WP-B14 checks (B14-01
+  determinism across 3 rebuilds incl. shuffled input keys, B14-02 decision
+  coverage of all 15 profiles, B14-03 no silent fallback for remote_required,
+  B14-04 unknown capability -> `WAIT_CAPABILITY` + cyclic-dependency and
+  resource-overflow negatives) and printing a `GateReceipt/v1` receipt;
+  `scripts/checks/router-determinism.py` rebuilding the golden plan twice and
+  comparing bytes.
+- `make gate-wp14` and `make router-determinism` targets; a
+  `router-planner-gate (WP-B14)` job in `.github/workflows/ci.yml`; a
+  `router_determinism` job in `.github/workflows/contracts.yml`.
+- Unit tests under `tests/planning/` (`test_classifier.py`, `test_router.py`,
+  `test_planner.py`) covering rule-trace determinism, all four selection states,
+  no-fallback, DAG order, cycle detection, admission, digest stability, and a
+  Hypothesis property test that random valid requests produce deterministic
+  plans.
+- `docs/architecture/router-planner.md` documenting the profiles, decision
+  states, honesty rules (a plan is not evidence; `WAIT_CAPABILITY` is honest
+  absence; no silent fallback), admission policy, and determinism.
 
 ### Fixed
 

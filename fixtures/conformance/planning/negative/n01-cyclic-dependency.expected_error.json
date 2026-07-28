@@ -1,0 +1,10 @@
+{
+  "scenario_id": "n01-cyclic-dependency",
+  "description": "A cyclic dependency among plan steps MUST raise PlanError (fail_reason CONTRACT_INVALID). The planner's topological sort detects the cycle and refuses to emit a plan with a back-edge. This vector injects a synthetic cyclic dependency graph (a -> b -> a) into the planner's topological sort and asserts it raises PlanError with invariant 'cycle_detected'.",
+  "validator": "topological_cycle",
+  "expected_error": {
+    "exception": "PlanError",
+    "fail_reason": "CONTRACT_INVALID",
+    "invariant": "cycle_detected"
+  }
+}
