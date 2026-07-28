@@ -1,0 +1,235 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srlab.dev/v1/ScienceLabPlan.json",
+  "title": "ScienceLabPlan/v1",
+  "description": "A deterministic execution plan produced by the planner (WP-B14) from a ScienceLabRunRequest + the router's decisions. A plan is a DAG of steps (each a capability profile engaged for the claim) with typed selection states, resource estimates, and dependency edges. The plan carries the policy_hash and catalog_hash it was built against so a re-plan after either changes is detectable. A plan is NOT evidence: grants_authority is pinned to false, and a step SELECTED means the capability applies and an adapter is available, NOT that the capability ran or that the claim is supported. Canonical JSON contract: sorted keys, compact separators, UTF-8, no NaN/Infinity, trailing newline.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "plan_id",
+    "request_id",
+    "plan_digest",
+    "steps",
+    "policy_hash",
+    "catalog_hash",
+    "created_utc",
+    "canonical_writes",
+    "grants_authority"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Identity anchor; const for ScienceLabPlan/v1.",
+      "type": "string",
+      "const": "ScienceLabPlan/v1"
+    },
+    "plan_id": {
+      "description": "Content-addressed identity: sha256 over the canonical encoding of the plan (without this field), prefixed 'sha256:'. Computed by srl.planning.planner.plan_id.",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "request_id": {
+      "description": "The request_id of the ScienceLabRunRequest/v1 this plan satisfies. The plan is a deterministic function of (request, claim, catalog, policy); the same inputs yield a byte-identical plan.",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "plan_digest": {
+      "description": "A sha256 digest over the canonical encoding of the plan WITHOUT plan_id and without this field (i.e. over the plan's content: steps, hashes, created_utc). Distinct from plan_id: plan_id is the identity over the WHOLE plan (including plan_digest), while plan_digest is the content digest an executor can recompute to verify the plan body was not tampered with after the id was minted.",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "steps": {
+      "description": "The ordered DAG of plan steps, in topological order (a step appears after every step it depends_on). Each step names a capability profile, its selection state (SELECTED / EXCLUDED_TYPED / NOT_APPLICABLE / WAIT_CAPABILITY), the adapter it would use (or null), its dependencies, and a resource estimate. The planner admits the SUMMED resource estimates against the request's resource_class caps.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "step_id",
+          "profile",
+          "capability_id",
+          "adapter_id",
+          "depends_on",
+          "selection",
+          "exclusion_reason",
+          "resource_estimate"
+        ],
+        "properties": {
+          "step_id": {
+            "description": "A stable step identifier within the plan: '<profile>' for single-instance profiles, or '<profile>:<index>' for multi-instance profiles (e.g. a model_composition over several components). Referenced by depends_on.",
+            "type": "string",
+            "minLength": 1
+          },
+          "profile": {
+            "description": "The capability profile this step engages. One of the 15 capability profiles.",
+            "type": "string",
+            "enum": [
+              "algebra_exact",
+              "symbolic_law",
+              "dynamics",
+              "geometry_tda",
+              "causal_time_series",
+              "uncertainty",
+              "optimization",
+              "formal_protocol",
+              "literature",
+              "theorem_or_proof_obligation",
+              "nonlinear_continuous_or_hybrid_constraint",
+              "executable_ode_dae_sde_model",
+              "pde_variational_model",
+              "model_composition",
+              "literature_extraction"
+            ]
+          },
+          "capability_id": {
+            "description": "The catalog capability identifier for this profile (e.g. 'cap.geometry_tda'). For a profile with no catalog entry, this is the synthesized id 'cap.<profile>'.",
+            "type": "string",
+            "minLength": 1
+          },
+          "adapter_id": {
+            "description": "The logical adapter identifier the step would run on (e.g. 'ripser'), or null if no adapter is available (WAIT_CAPABILITY). A REMOTE_REQUIRED profile never falls back to a local adapter: absence of a local adapter yields WAIT_CAPABILITY, never a fake local substitute.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "depends_on": {
+            "description": "The step_ids this step depends on (its inputs come from their outputs). The planner orders steps topologically; a cycle raises CONTRACT_INVALID. Empty for a root step.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "selection": {
+            "description": "The typed selection state: SELECTED (the profile applies AND an adapter is available, so the step will run), EXCLUDED_TYPED (the request or classifier explicitly excluded this profile, with a reason), NOT_APPLICABLE (the profile does not apply to this claim), WAIT_CAPABILITY (the profile applies but no adapter is available yet, or the capability is unknown/future/remote_required — an honest wait, never a silent fallback).",
+            "type": "string",
+            "enum": [
+              "SELECTED",
+              "EXCLUDED_TYPED",
+              "NOT_APPLICABLE",
+              "WAIT_CAPABILITY"
+            ]
+          },
+          "exclusion_reason": {
+            "description": "A typed reason string when selection=EXCLUDED_TYPED (e.g. 'not_requested', 'classifier_excluded'), or null otherwise. REQUIRED non-null when selection=EXCLUDED_TYPED; REQUIRED null otherwise.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "resource_estimate": {
+            "description": "The estimated resource footprint of running this step: wall_seconds (CPU/wall time), rss_bytes (resident set size), scratch_bytes (scratch disk). Non-negative integers. For a non-SELECTED step, these are the estimate as if it WERE selected (so an executor can budget a future WAIT_CAPABILITY step); the planner sums only the SELECTED steps' estimates against the caps.",
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "wall_seconds",
+              "rss_bytes",
+              "scratch_bytes"
+            ],
+            "properties": {
+              "wall_seconds": {
+                "description": "Estimated wall-clock seconds (non-negative integer).",
+                "type": "integer",
+                "minimum": 0
+              },
+              "rss_bytes": {
+                "description": "Estimated resident-set-size bytes (non-negative integer).",
+                "type": "integer",
+                "minimum": 0
+              },
+              "scratch_bytes": {
+                "description": "Estimated scratch-disk bytes (non-negative integer).",
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        "allOf": [
+          {
+            "$comment": "exclusion_reason is REQUIRED non-null iff selection=EXCLUDED_TYPED; REQUIRED null otherwise. A SELECTED/WAIT_CAPABILITY/NOT_APPLICABLE step with a non-null exclusion_reason is a contract violation.",
+            "if": {
+              "properties": {
+                "selection": {
+                  "const": "EXCLUDED_TYPED"
+                }
+              },
+              "required": [
+                "selection"
+              ]
+            },
+            "then": {
+              "properties": {
+                "exclusion_reason": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "exclusion_reason"
+              ]
+            },
+            "else": {
+              "properties": {
+                "exclusion_reason": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          {
+            "$comment": "A SELECTED step MUST carry a non-null adapter_id (a selected step runs on a real adapter). A WAIT_CAPABILITY/NOT_APPLICABLE/EXCLUDED_TYPED step has a null adapter_id (no adapter is engaged).",
+            "if": {
+              "properties": {
+                "selection": {
+                  "const": "SELECTED"
+                }
+              },
+              "required": [
+                "selection"
+              ]
+            },
+            "then": {
+              "properties": {
+                "adapter_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "adapter_id"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "policy_hash": {
+      "description": "The sha256 digest of the canonical encoding of the AdmissionPolicy the plan was admitted against. A change in policy (e.g. tightened caps) changes this hash, so a stored plan's policy_hash lets an executor detect a stale plan.",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "catalog_hash": {
+      "description": "The sha256 digest of the canonical encoding of the capability catalog the plan was built against (catalog_digest). A change in catalog (e.g. an adapter became available) changes this hash.",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "created_utc": {
+      "description": "RFC 3339 UTC timestamp at seconds precision (YYYY-MM-DDTHH:MM:SSZ). No offset, no fractional seconds.",
+      "type": "string",
+      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]Z$"
+    },
+    "canonical_writes": {
+      "description": "Safety const: a plan is immutable once authored. Always 0; a non-zero value is a contract violation.",
+      "type": "integer",
+      "const": 0
+    },
+    "grants_authority": {
+      "description": "Safety const: a plan never grants authority on its own. Always false; a true value is a contract violation. A plan is a schedule, not evidence; SELECTED means 'will run', not 'the claim is supported'.",
+      "type": "boolean",
+      "const": false
+    }
+  }
+}

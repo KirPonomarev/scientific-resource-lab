@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srlab.dev/v1/ScienceLabRunRequest.json",
+  "title": "ScienceLabRunRequest/v1",
+  "description": "A request to run the science lab against a ScientificClaim. This is the INPUT to the router/planner (WP-B14): it names the claim, the requested capability profiles, the resource class, and the seed/threads policy. It carries NO evidence and NO plan: prospective_holdout_materialization_allowed and status_promotion_allowed are pinned to false (a request is an intent, not an authority to materialize a holdout or promote a status), and grants_authority is pinned to false. The router produces a ScienceLabPlan/v1 from it; the plan, not the request, is what an executor consumes. Canonical JSON contract: sorted keys, compact separators, UTF-8, no NaN/Infinity, trailing newline.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "request_id",
+    "claim_id",
+    "requested_profiles",
+    "resource_class",
+    "seed_policy",
+    "output_schemas",
+    "prospective_holdout_materialization_allowed",
+    "status_promotion_allowed",
+    "created_utc",
+    "canonical_writes",
+    "grants_authority"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Identity anchor; const for ScienceLabRunRequest/v1.",
+      "type": "string",
+      "const": "ScienceLabRunRequest/v1"
+    },
+    "request_id": {
+      "description": "Content-addressed identity: sha256 over the canonical encoding of the request (without this field), prefixed 'sha256:'. Computed by srl.planning.request_id.",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "claim_id": {
+      "description": "The claim_id of the ScientificClaim/v1 this request targets. The router reads the claim (and its symbol_table / condition_set) to classify which capability profiles apply.",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "requested_profiles": {
+      "description": "The capability profiles the request asks to engage. Each entry MUST be one of the 15 capability profiles (see SCIENCE_LAB_PROFILES). An EMPTY array means 'auto-classify': the router runs the classifier over the claim and engages the profiles the classifier selects. A non-empty array is a request to engage exactly those profiles (the router still excludes profiles not applicable to the claim).",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "algebra_exact",
+          "symbolic_law",
+          "dynamics",
+          "geometry_tda",
+          "causal_time_series",
+          "uncertainty",
+          "optimization",
+          "formal_protocol",
+          "literature",
+          "theorem_or_proof_obligation",
+          "nonlinear_continuous_or_hybrid_constraint",
+          "executable_ode_dae_sde_model",
+          "pde_variational_model",
+          "model_composition",
+          "literature_extraction"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "resource_class": {
+      "description": "The resource admission class: 'default' (wall 300s, rss 1.5 GiB, scratch 4 GiB) or 'exception' (wall 900s, rss 2 GiB). The planner admits a plan's summed resource estimates against the class caps; overflow raises WAIT_REMOTE_EXECUTOR (an honest wait, never a silent local substitute).",
+      "type": "string",
+      "enum": [
+        "default",
+        "exception"
+      ]
+    },
+    "seed_policy": {
+      "description": "Determinism policy: a non-negative seed integer (the PRNG seed the engines MUST use) and a positive threads integer (the thread budget the engines MUST NOT exceed). Two requests byte-identical except in seed_policy produce DIFFERENT plans; two requests byte-identical INCLUDING seed_policy produce byte-identical plans (router/planner determinism).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "seed",
+        "threads"
+      ],
+      "properties": {
+        "seed": {
+          "description": "A non-negative integer PRNG seed. Engines consume this verbatim; it is threaded into the plan so the plan is deterministic given (request, claim, catalog, policy).",
+          "type": "integer",
+          "minimum": 0
+        },
+        "threads": {
+          "description": "A positive integer thread budget (>=1). Engines MUST NOT exceed this; the planner does not admit a plan whose per-step thread need exceeds it.",
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "output_schemas": {
+      "description": "The schema names the request asks the run to emit (e.g. ['ScienceLabRunReceipt','EvidenceAssessment']). Carried into the plan so an executor knows what to produce. May be empty.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "prospective_holdout_materialization_allowed": {
+      "description": "Safety const: a request CANNOT authorize the materialization of a prospective holdout (data held out for out-of-sample validation). Pinned to false. A holdout may only be materialized through a separate authority path this codebase does not provide.",
+      "type": "boolean",
+      "const": false
+    },
+    "status_promotion_allowed": {
+      "description": "Safety const: a request CANNOT authorize promoting a claim's status (e.g. from under_investigation to supported). Pinned to false. Status promotion is a governance decision; the router/planner never performs it.",
+      "type": "boolean",
+      "const": false
+    },
+    "created_utc": {
+      "description": "RFC 3339 UTC timestamp at seconds precision (YYYY-MM-DDTHH:MM:SSZ). No offset, no fractional seconds.",
+      "type": "string",
+      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]Z$"
+    },
+    "canonical_writes": {
+      "description": "Safety const: a request is immutable once authored. Always 0; a non-zero value is a contract violation.",
+      "type": "integer",
+      "const": 0
+    },
+    "grants_authority": {
+      "description": "Safety const: a request never grants authority on its own. Always false; a true value is a contract violation. A request is an intent, not an authority.",
+      "type": "boolean",
+      "const": false
+    }
+  }
+}
