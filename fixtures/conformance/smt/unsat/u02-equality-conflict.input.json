@@ -1,0 +1,14 @@
+{
+  "case_id": "u02-equality-conflict",
+  "category": "unsat",
+  "description": "An equality conflict x = 5 and x = 7 is unsatisfiable.",
+  "formula_spec": [
+    "and",
+    ["=", ["int-var", "x"], ["int-const", 5]],
+    ["=", ["int-var", "x"], ["int-const", 7]]
+  ],
+  "expected_result": "unsat",
+  "solver": "z3",
+  "timeout_seconds": 5,
+  "notes": "Two distinct constant equalities on one variable; the solver's congruence closure decides it."
+}

@@ -30,12 +30,12 @@ from pathlib import Path
 from typing import Any, Final
 
 # Schema identity. Bumping this is a governance change (see GOVERNANCE.md).
-# v1: initial policy, lanes fixed at 4. v2 (governance-change GOV-0001,
-# operator-authorized): lanes may be 4..6. A policy document declares its
-# own version; the loader enforces the per-version constraints.
-POLICY_SCHEMA_VERSION: Final[str] = "AutonomyPolicy/v2"
+# v1: initial policy, lanes fixed at 4. v2 (GOV-0001): lanes 4..6.
+# v3 (GOV-0002, operator-authorized): lanes 4..8. A policy document declares
+# its own version; the loader enforces the per-version constraints.
+POLICY_SCHEMA_VERSION: Final[str] = "AutonomyPolicy/v3"
 POLICY_SCHEMA_VERSIONS: Final[frozenset[str]] = frozenset(
-    {"AutonomyPolicy/v1", "AutonomyPolicy/v2"}
+    {"AutonomyPolicy/v1", "AutonomyPolicy/v2", "AutonomyPolicy/v3"}
 )
 # v1 cross-field constraint: lanes fixed at exactly 4 under v1.
 _V1_SCHEMA_VERSION: Final[str] = "AutonomyPolicy/v1"
@@ -54,7 +54,7 @@ _EXPECTED: Final[dict[str, tuple[str, frozenset[str] | None]]] = {
     "decision_policy": ("str", frozenset({"MATURE_ENGINEERING_V1"})),
     "deployment_allowed": ("bool", frozenset({"false"})),
     "external_pr_auto_merge": ("bool", frozenset({"false"})),
-    "max_parallel_implementation_lanes": ("int", frozenset({"4", "5", "6"})),
+    "max_parallel_implementation_lanes": ("int", frozenset({"4", "5", "6", "7", "8"})),
     "max_scientific_execution_wip": ("int", frozenset({"1"})),
     "merge_method": ("str", frozenset({"squash"})),
     "mode": ("str", frozenset({"noninteractive_within_scope"})),

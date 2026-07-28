@@ -4,33 +4,30 @@ An adapter is the Python module a resource pack's ``entrypoint`` points at. It
 owns one scientific capability and is the boundary between the control plane
 (manifest, admission, materialization) and the compute plane.
 
-WP-E40 ships the units adapter: :mod:`srl.packs.adapters.units`, the units
+WP-E40 ships the first adapter: :mod:`srl.packs.adapters.units`, the units
 semantic core (dimensional analysis and conversion, backed by Pint and isolated
-behind a typed surface). WP-E42 ships the TDA adapter:
-:mod:`srl.packs.adapters.ripser_adapter`, the persistent-homology core (backed
-by ripser + numpy and isolated behind a typed surface).
+behind a typed surface). WP-E41 adds the SMT satisfiability adapter:
+:mod:`srl.packs.adapters.smt`, backed by Z3 and isolated behind a typed
+surface that yields at most ``formal_check=checked`` (never ``proven``
+without a verified certificate).
 """
 
 from __future__ import annotations
 
-from srl.packs.adapters.ripser_adapter import (
-    INF_DEATH_SENTINEL,
-    MAX_AMBIENT_DIM,
-    MAX_HOMOLOGY_DIM,
-    MAX_POINTS,
-    PERSISTENCE_SIG_DIGITS,
-    RIPSER_CONTRACT_INVALID_FAIL_REASON,
-    RIPSER_RESOURCE_LIMIT_FAIL_REASON,
-    PersistenceResult,
-    PreprocessingReceipt,
-    RipserInputError,
-    RipserResourceLimitError,
-    compute_persistence,
-    long_lived_classes,
-    max_finite_persistence,
-    numpy_version,
-    phase_randomized_surrogate,
-    ripser_version,
+from srl.packs.adapters.smt import (
+    AVAILABLE_SOLVERS,
+    FORMAL_CHECK_CEILING,
+    MAX_FORMULA_NODES,
+    MAX_WALL_SECONDS,
+    SMT_FAIL_REASON,
+    SUPPORTED_OPERATORS,
+    WAIT_LICENSE_SOLVERS,
+    SmtError,
+    SmtOutcome,
+    SmtResult,
+    SolverChoice,
+    check,
+    z3_version,
 )
 from srl.packs.adapters.units import (
     CONVERSION_SIG_DIGITS,
@@ -46,31 +43,27 @@ from srl.packs.adapters.units import (
 )
 
 __all__ = [
+    "AVAILABLE_SOLVERS",
     "CONVERSION_SIG_DIGITS",
-    "INF_DEATH_SENTINEL",
-    "MAX_AMBIENT_DIM",
-    "MAX_HOMOLOGY_DIM",
-    "MAX_POINTS",
-    "PERSISTENCE_SIG_DIGITS",
+    "FORMAL_CHECK_CEILING",
+    "MAX_FORMULA_NODES",
+    "MAX_WALL_SECONDS",
     "PINNED_QUDT_SUBSET",
-    "RIPSER_CONTRACT_INVALID_FAIL_REASON",
-    "RIPSER_RESOURCE_LIMIT_FAIL_REASON",
     "SI_BASE_DIMENSIONS",
+    "SMT_FAIL_REASON",
+    "SUPPORTED_OPERATORS",
     "UNIT_FAIL_REASON",
+    "WAIT_LICENSE_SOLVERS",
     "Dimension",
-    "PersistenceResult",
-    "PreprocessingReceipt",
-    "RipserInputError",
-    "RipserResourceLimitError",
+    "SmtError",
+    "SmtOutcome",
+    "SmtResult",
+    "SolverChoice",
     "UnitError",
-    "compute_persistence",
+    "check",
     "convert",
-    "long_lived_classes",
-    "max_finite_persistence",
-    "numpy_version",
     "parse_unit",
-    "phase_randomized_surrogate",
     "pint_version",
-    "ripser_version",
     "validate_dimensions",
+    "z3_version",
 ]

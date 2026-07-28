@@ -18,15 +18,16 @@ license = "Apache-2.0"
 # 2020-12 schema documents (docs/adr/0002-jsonschema-library.md). The units
 # core pack (WP-E40) adds `pint` for dimensional analysis and unit conversion,
 # isolated behind the units adapter (docs/adr/0003-pint-dependency.md). The
-# ripser TDA pack (WP-E42) adds `ripser` (MIT) for persistent homology and
-# `numpy` for array computation — the fabric's first numerical closure —
-# isolated behind the ripser adapter (docs/adr/0005-ripser.md). numpy is added
-# explicitly because several Phase E packs (SMT, pyriermann, ...) require it.
+# SMT pack (WP-E41) adds `z3-solver` for satisfiability checking, isolated
+# behind the SMT adapter; cvc5 is excluded on GPL grounds (docs/adr/0004-smt-solvers.md).
+# The ripser TDA pack (WP-E42) adds `ripser` (MIT) and `numpy`, isolated behind
+# the ripser adapter (docs/adr/0005-ripser.md).
 dependencies = [
     "jsonschema>=4.23",
+    "numpy>=2.0",
     "pint>=0.25.3",
     "ripser>=0.6.15",
-    "numpy>=2.0",
+    "z3-solver>=4.13.0",
 ]
 authors = [{ name = "Scientific Resource Lab contributors" }]
 keywords = ["scientific-computing", "reproducibility", "agents", "evidence"]
@@ -137,6 +138,12 @@ strict = true
 # body while admitting the untyped dependency.
 [[tool.mypy.overrides]]
 module = "ripser"
+# z3 (z3-solver) ships no py.typed marker, so mypy cannot find library stubs.
+# The SMT adapter (the sole z3 import site) treats all z3 objects as opaque
+# Any by design (ADR-0004: z3 is isolated behind the adapter's typed surface),
+# so missing stubs are expected and ignored here. See ADR-0004.
+[[tool.mypy.overrides]]
+module = "z3"
 ignore_missing_imports = true
 
 [tool.mypy]

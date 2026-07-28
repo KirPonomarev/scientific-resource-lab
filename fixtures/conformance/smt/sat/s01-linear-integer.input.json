@@ -1,0 +1,10 @@
+{
+  "case_id": "s01-linear-integer",
+  "category": "sat",
+  "description": "A single linear integer inequality x > 0 is satisfiable (e.g. x = 1).",
+  "formula_spec": [">", ["int-var", "x"], ["int-const", 0]],
+  "expected_result": "sat",
+  "solver": "z3",
+  "timeout_seconds": 5,
+  "notes": "The simplest SAT case: one variable over the integers, one lower bound."
+}

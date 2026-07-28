@@ -1,0 +1,23 @@
+{
+  "case_id": "k02-five-factor-timeout",
+  "category": "unknown",
+  "description": "A second nonlinear integer factorization obligation that z3 cannot decide in the time bound: the product of five integers each > 1 is constrained to equal a prime (1000003). Fewer variables than k01 but the same prime target, so the factorization search still does not complete in 1.5 s and the solver returns unknown (timeout).",
+  "formula_spec": [
+    "and",
+    [">", ["int-var", "z0"], ["int-const", 1]],
+    [">", ["int-var", "z1"], ["int-const", 1]],
+    [">", ["int-var", "z2"], ["int-const", 1]],
+    [">", ["int-var", "z3"], ["int-const", 1]],
+    [">", ["int-var", "z4"], ["int-const", 1]],
+    [
+      "=",
+      ["*", ["*", ["*", ["int-var", "z0"], ["int-var", "z1"]], ["int-var", "z2"]], ["*", ["int-var", "z3"], ["int-var", "z4"]]],
+      ["int-const", 1000003]
+    ]
+  ],
+  "expected_result": "unknown",
+  "expected_unknown_reason_contains": "timeout",
+  "solver": "z3",
+  "timeout_seconds": 1.5,
+  "notes": "The companion to k01: the same hard nonlinear-integer factorization problem with a smaller variable count. z3's nonlinear integer arithmetic cannot prove unsatisfiability (1000003 does not factor into five integers > 1) within the bound. Distinct from k01 in shape (5 vars vs 6) while remaining a genuine timeout, so the gate exercises two independent hard cases."
+}
