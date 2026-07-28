@@ -31,6 +31,8 @@ and the authority is honestly none. The claim is synthetic.
 from __future__ import annotations
 
 import json
+import resource
+import time
 from pathlib import Path
 from typing import Any
 
@@ -242,8 +244,10 @@ def test_engine_and_validation_receipts_record_actual_compute() -> None:
     conversion is not a formal proof). Both carry ``grants_authority=false``.
     """
     request = _run_request()
-    # Run the real compute so the receipt is honest about what happened.
+    # Run the real compute, measuring it so the receipt carries honest numbers.
+    _t0 = time.perf_counter()
     converted = convert("1", "kg*m/s^2", "N")
+    _wall = time.perf_counter() - _t0
     assert converted == "1"
 
     # A synthetic ArtifactRef/v1 for the units pack the engine "used".
@@ -254,8 +258,8 @@ def test_engine_and_validation_receipts_record_actual_compute() -> None:
         pack_ref=pack_ref,
         engine_execution="completed",
         exercise_level="actual_compute",
-        wall_seconds=0,
-        rss_bytes=0,
+        wall_seconds=round(_wall),  # truthful: sub-second conversion rounds to 0
+        rss_bytes=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
         output_object_ids=[],  # the conversion result is inline, not an object
         created_utc=_FIXTURE_UTC,
     )
@@ -389,8 +393,8 @@ def test_receipts_validate_against_their_json_schemas() -> None:
         pack_ref=pack_ref,
         engine_execution="completed",
         exercise_level="actual_compute",
-        wall_seconds=0,
-        rss_bytes=0,
+        wall_seconds=0,  # truthful: sub-second conversion; rss below is the real measurement
+        rss_bytes=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
         created_utc=_FIXTURE_UTC,
     )
     validation = build_validation_receipt(
@@ -420,8 +424,8 @@ def test_no_overclaim_in_integration_objects() -> None:
         pack_ref=pack_ref,
         engine_execution="completed",
         exercise_level="actual_compute",
-        wall_seconds=0,
-        rss_bytes=0,
+        wall_seconds=0,  # truthful: sub-second conversion; rss below is the real measurement
+        rss_bytes=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
         created_utc=_FIXTURE_UTC,
     )
     validation = build_validation_receipt(
@@ -471,8 +475,8 @@ def test_full_synthetic_slice_claim_plan_run_validate_portal(tmp_path: Path) -> 
         pack_ref=pack_ref,
         engine_execution="completed",
         exercise_level="actual_compute",
-        wall_seconds=0,
-        rss_bytes=0,
+        wall_seconds=0,  # truthful: sub-second conversion; rss below is the real measurement
+        rss_bytes=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
         created_utc=_FIXTURE_UTC,
     )
     validation = build_validation_receipt(
