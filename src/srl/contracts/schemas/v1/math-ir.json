@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srlab.dev/v1/MathIR.json",
+  "title": "MathIR/v1",
+  "description": "A mathematical intermediate representation: a typed expression tree over a RESTRICTED OpenMath-style content-dictionary allowlist. The tree is a discriminated union of application nodes ({op, args}), constant nodes ({const: decimal-string}), and variable nodes ({var: symbol-id}). Every application op is a '<cd>.<name>' pair drawn from a fixed allowlist enumerated in $defs/application.properties.op.enum; an op outside that set fails schema validation. The matching Python allowlist lives at srl.semantic.ir.MATH_IR_ALLOWLIST (the single introspectable source of truth) and srl.semantic.ir.validate_expression enforces it again at runtime plus the depth (64) and node-count (10000) resource guards the schema cannot express. Canonical JSON contract: sorted keys, compact separators, UTF-8, no NaN/Infinity, trailing newline.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "ir_id",
+    "expression"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Identity anchor; const for MathIR/v1.",
+      "type": "string",
+      "const": "MathIR/v1"
+    },
+    "ir_id": {
+      "description": "Content-addressed identity of the expression: sha256 over the canonical encoding of the expression (without this field), prefixed 'sha256:'. Computed by srl.semantic.ir.ir_id; a pre-populated value is rejected as a self-hash.",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "expression": {
+      "description": "The expression tree root. A node is an application ({op, args}), a constant ({const}), or a variable ({var}). Application ops are restricted to the enumerated '<cd>.<name>' allowlist; nums1 symbols (pi, e, i, infinity) are nullary applications ({op: 'nums1.pi', args: []}) and are never carried as float constants.",
+      "$ref": "#/$defs/expr"
+    }
+  },
+  "$defs": {
+    "expr": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/application"
+        },
+        {
+          "$ref": "#/$defs/const"
+        },
+        {
+          "$ref": "#/$defs/var"
+        }
+      ]
+    },
+    "application": {
+      "description": "An application of an allowlisted operator to zero or more argument expressions. nums1 symbols (pi, e, i, infinity) are nullary applications.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "op",
+        "args"
+      ],
+      "properties": {
+        "op": {
+          "description": "The operator as '<cd>.<name>'. The value MUST be a member of this enum; any other value (an unknown name in a known cd such as 'arith1.log', or an entirely unknown cd such as 'foo1.plus') fails schema validation. The Python validator (srl.semantic.ir.validate_expression) re-checks the same set.",
+          "type": "string",
+          "enum": [
+            "arith1.abs",
+            "arith1.divide",
+            "arith1.minus",
+            "arith1.plus",
+            "arith1.power",
+            "arith1.root",
+            "arith1.times",
+            "arith1.unary_minus",
+            "calculus1.diff",
+            "calculus1.int",
+            "calculus1.partialdiff",
+            "fns1.domain",
+            "fns1.lambda",
+            "fns1.range",
+            "linalg1.determinant",
+            "linalg1.inverse",
+            "linalg1.transpose",
+            "logic1.and",
+            "logic1.equivalent",
+            "logic1.implies",
+            "logic1.not",
+            "logic1.or",
+            "nums1.e",
+            "nums1.i",
+            "nums1.infinity",
+            "nums1.pi",
+            "relation1.eq",
+            "relation1.geq",
+            "relation1.gt",
+            "relation1.leq",
+            "relation1.lt",
+            "relation1.neq",
+            "set1.in",
+            "set1.intersect",
+            "set1.subset",
+            "set1.union",
+            "stats1.covariance",
+            "stats1.mean",
+            "stats1.variance"
+          ]
+        },
+        "args": {
+          "description": "Argument expressions. Empty for nullary symbols (nums1.pi, nums1.e, nums1.i, nums1.infinity).",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/expr"
+          }
+        }
+      }
+    },
+    "const": {
+      "description": "A decimal-string constant. Non-finite values are never carried here: infinity is the nullary symbol 'nums1.infinity', not a float.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "const"
+      ],
+      "properties": {
+        "const": {
+          "description": "A decimal-string policy value: optional sign, integer digits, optional fractional digits, no exponent.",
+          "type": "string",
+          "pattern": "^-?[0-9]+(\\.[0-9]+)?$"
+        }
+      }
+    },
+    "var": {
+      "description": "A reference to a symbol-id declared in a SymbolTable/v1.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "var"
+      ],
+      "properties": {
+        "var": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

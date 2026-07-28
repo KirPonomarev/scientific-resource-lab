@@ -38,6 +38,12 @@ HTTP today, but it must be unique and must not change for a given shape.
 | `artifact-ref.json`               | `ArtifactRef/v1`              | Portable, content-addressed reference to bytes.    |
 | `scientific-object-envelope.json` | `ScientificObjectEnvelope/v1` | Base envelope for every scientific object.         |
 | `gate-receipt.json`               | `GateReceipt/v1`              | Receipt emitted by an acceptance gate.             |
+| `scientific-claim.json`           | `ScientificClaim/v1`          | A typed scientific statement under epistemic discipline. |
+| `math-ir.json`                    | `MathIR/v1`                   | A mathematical IR expression tree over a restricted OpenMath allowlist. |
+| `symbol-table.json`               | `SymbolTable/v1`              | A table of symbols (id/name/role/domain/unit).     |
+| `condition-set.json`              | `ConditionSet/v1`             | A set of assumptions (domain/positivity/...) attached to a model. |
+| `constant-ref.json`               | `ConstantRef/v1`              | A reference to a physical/mathematical constant from a named source. |
+| `model-interface.json`            | `ModelInterface/v1`           | A typed interface to a scientific model (ode/dae/...). |
 
 ## Naming and compatibility policy
 

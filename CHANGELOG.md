@@ -13,6 +13,62 @@ is supported. See `README.md` and `GOVERNANCE.md` for the evidence rules.
 
 ### Added
 
+- Scientific object fabric under the new `srl.semantic` package (WP-B11): six
+  scientific object types with JSON Schema 2020-12 documents under
+  `src/srl/contracts/schemas/v1/` and typed Python validators. `ScientificClaim/v1`
+  (`scientific-claim.json`) — a typed statement under epistemic discipline with
+  `claim_class`/`claim_status`/`epistemic_source`/`support_refs`, encoding the
+  critical invariant that an `established_law_reference` REQUIRES
+  `epistemic_source='literature'` and a non-empty `support_refs` (and that a
+  `candidate_hypothesis` cannot carry `claim_status='supported'` without
+  `support_refs`) via `allOf`/`if-then` and re-enforced in Python by
+  `srl.semantic.claims.validate` (raising `ClaimInvariantError`, fail reason
+  `CONTRACT_INVALID`, defense in depth); `MathIR/v1` (`math-ir.json`) — a
+  mathematical IR expression tree over a restricted OpenMath-style allowlist
+  (`srl.semantic.ir.MATH_IR_ALLOWLIST`, 39 operators across 9 content
+  dictionaries arith1/relation1/logic1/set1/calculus1/linalg1/nums1/fns1/stats1)
+  enumerated in the schema's `op.enum` and re-checked by
+  `srl.semantic.ir.validate_expression`, with nullary nums1 symbols
+  (`pi`/`e`/`i`/`infinity`) carried as applications and never as floats, plus
+  resource guards (depth 64, node-count 10000) raising
+  `IRResourceLimitError`, and an `UnsupportedOperatorError` (fail reason
+  `IR_UNSUPPORTED`) distinguishing unknown-name-in-known-cd from unknown-cd;
+  `SymbolTable/v1`, `ConditionSet/v1`, `ConstantRef/v1`, and
+  `ModelInterface/v1` (`symbol-table.json`, `condition-set.json`,
+  `constant-ref.json`, `model-interface.json`); all nine schemas registered in
+  the loader (`srl.contracts.schema`) and documented in the schemas README.
+- `srl.semantic.fabric.mint_object(object_type, payload, parents=…,
+  created_utc=…)` wrapping a type-specific payload into a
+  `ScientificObjectEnvelope/v1` with a computed `object_id` (sha256 over the
+  canonical encoding of the envelope without the id), provenance, and the two
+  safety consts, validated against the envelope schema.
+- Conformance vectors under `fixtures/conformance/object_fabric/`: 7 positive
+  (Newton's second law as MathIR and as an established-law claim, a candidate
+  hypothesis, a symbol table with units, a ConstantRef, a ConditionSet, a
+  harmonic-oscillator ModelInterface) and 7 negative (unknown operator, unknown
+  content dictionary, bool-as-int in exponents, established-law without
+  literature source, candidate-supported without support, IR depth bomb, IR
+  node flood), with a `manifest.json` and `README.md`.
+- `scripts/checks/wp11-gate.py` running the four WP-B11 checks (restricted
+  allowlist enforced at schema + python layer; fixture-scoped dimensional
+  consistency `kg.m.s-2`≡`N` accepted and `kg` vs `m` rejected; candidate
+  claim cannot be typed as established law at both layers; all schemas
+  meta-valid and positive fixtures validate) and emitting a `GateReceipt/v1`;
+  a `schema-compat` job in `.github/workflows/contracts.yml` verifying every
+  `schemas/v1/*.json` meta-validates and the loader registry is complete (no
+  on-disk orphans); an `object-fabric-gate (WP-B11)` job in
+  `.github/workflows/ci.yml`; a `Makefile` `gate-wp11` target.
+- Unit and property tests under `tests/semantic/` (`test_math_ir.py`,
+  `test_claims.py`, `test_fabric.py`) pinning the allowlist, the two failure
+  modes, the resource guards, identity determinism, the claim invariants, and
+  fixture round-trips, plus Hypothesis properties that random allowlist-only
+  trees always validate and random ops outside the allowlist always raise
+  `IR_UNSUPPORTED`.
+- `docs/contracts/object-fabric.md` documenting the six object types, the
+  restricted MathIR allowlist, the invariants, the prohibited collapses
+  (candidate claim != established law; SAT/UNSAT != empirical truth), and the
+  worked examples.
+
 - Canonical JSON and identifiers foundation under the `srl.contracts` package
   (WP-B10): `canonical.py` providing `dumps(obj)->bytes` enforcing sorted keys,
   compact separators, UTF-8 (`ensure_ascii=False`), `allow_nan=False`, and a
@@ -181,9 +237,17 @@ is supported. See `README.md` and `GOVERNANCE.md` for the evidence rules.
 
 ### Changed
 
-- `.github/workflows/ci.yml` adds the `canonical-json-gate` job (WP-B10) and
-  previously added the `autonomy-contracts-gate` job (WP-A03); the existing
-  lint, typecheck, unit, and package jobs are unchanged.
+- `.github/workflows/ci.yml` adds the `object-fabric-gate` job (WP-B11),
+  previously added the `canonical-json-gate` job (WP-B10), and earlier added
+  the `autonomy-contracts-gate` job (WP-A03); the existing lint, typecheck,
+  unit, and package jobs are unchanged. `.github/workflows/contracts.yml` adds
+  the `schema-compat` job (WP-B11) verifying the loader registry is complete.
+- The schema loader registry (`srl.contracts.schema._SCHEMA_NAME_TO_FILE`) and
+  the schemas README table now carry the six new WP-B11 schemas
+  (`ScientificClaim`, `MathIR`, `SymbolTable`, `ConditionSet`,
+  `ConstantRef`, `ModelInterface`); the existing `ArtifactRef`,
+  `ScientificObjectEnvelope`, and `GateReceipt` schemas are unchanged
+  (additive only).
 - `pyproject.toml` declares `jsonschema>=4.23` as the first runtime
   dependency and adds `types-jsonschema>=4.23` to the `dev` group; the sdist
   include list now carries `src/srl/contracts/schemas/v1` so schema documents

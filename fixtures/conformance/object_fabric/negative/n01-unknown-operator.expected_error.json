@@ -1,0 +1,7 @@
+{
+  "name": "n01-unknown-operator",
+  "validator": "math_ir_expression",
+  "exception": "UnsupportedOperatorError",
+  "fail_reason": "IR_UNSUPPORTED",
+  "reason": "arith1.log is a known cd (arith1) but an unknown name; rejected by the allowlist."
+}

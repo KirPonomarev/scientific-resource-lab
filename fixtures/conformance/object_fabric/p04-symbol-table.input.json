@@ -1,0 +1,47 @@
+{
+  "schema_version": "SymbolTable/v1",
+  "symbols": [
+    {
+      "symbol_id": "x",
+      "name": "position",
+      "role": "variable",
+      "domain": null,
+      "unit_ref": "pack_local.meter"
+    },
+    {
+      "symbol_id": "v",
+      "name": "velocity",
+      "role": "variable",
+      "domain": null,
+      "unit_ref": "pack_local.meter-per-second"
+    },
+    {
+      "symbol_id": "k",
+      "name": "spring constant",
+      "role": "parameter",
+      "domain": {
+        "op": "relation1.gt",
+        "args": [
+          {
+            "const": "0"
+          }
+        ]
+      },
+      "unit_ref": "pack_local.newton-per-meter"
+    },
+    {
+      "symbol_id": "m",
+      "name": "mass",
+      "role": "parameter",
+      "domain": {
+        "op": "relation1.gt",
+        "args": [
+          {
+            "const": "0"
+          }
+        ]
+      },
+      "unit_ref": "pack_local.kilogram"
+    }
+  ]
+}

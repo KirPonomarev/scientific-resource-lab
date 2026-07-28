@@ -50,6 +50,12 @@ _SCHEMA_NAME_TO_FILE: Final[dict[str, str]] = {
     "ArtifactRef": "artifact-ref.json",
     "ScientificObjectEnvelope": "scientific-object-envelope.json",
     "GateReceipt": "gate-receipt.json",
+    "ScientificClaim": "scientific-claim.json",
+    "MathIR": "math-ir.json",
+    "SymbolTable": "symbol-table.json",
+    "ConditionSet": "condition-set.json",
+    "ConstantRef": "constant-ref.json",
+    "ModelInterface": "model-interface.json",
 }
 
 # Typed fail reason for schema-level failures (meta-validation + instance

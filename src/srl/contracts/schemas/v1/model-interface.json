@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srlab.dev/v1/ModelInterface.json",
+  "title": "ModelInterface/v1",
+  "description": "A typed interface to a scientific model: the kind of model (ode, dae, sde, pde_variational, discrete_map, statistical_model, or composition), the symbol_ids it exposes (state variables, parameters, inputs, outputs), the governing equations as MathIR references, an optional ConditionSet reference stating its assumptions, and a composition list referencing sub-model interfaces (empty when the model is atomic). The symbol_ids and interface references are logical identifiers resolved against SymbolTable/v1 and other ModelInterface/v1 objects at the fabric level. Canonical JSON contract: sorted keys, compact separators, UTF-8, no NaN/Infinity, trailing newline.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "interface_id",
+    "kind",
+    "state_variables",
+    "parameters",
+    "inputs",
+    "outputs",
+    "governing",
+    "composition"
+  ],
+  "properties": {
+    "schema_version": {
+      "description": "Identity anchor; const for ModelInterface/v1.",
+      "type": "string",
+      "const": "ModelInterface/v1"
+    },
+    "interface_id": {
+      "description": "Stable logical identifier for the interface (referenced by other interfaces' composition lists). Not a content hash; identity of a ModelInterface object is its envelope object_id.",
+      "type": "string",
+      "minLength": 1
+    },
+    "kind": {
+      "description": "The model class. An atomic model selects ode/dae/sde/pde_variational/discrete_map/statistical_model; a composite model selects 'composition' and references its parts via the composition list.",
+      "type": "string",
+      "enum": [
+        "ode",
+        "dae",
+        "sde",
+        "pde_variational",
+        "discrete_map",
+        "statistical_model",
+        "composition"
+      ]
+    },
+    "state_variables": {
+      "description": "symbol_ids of the state variables (evolving quantities). Empty for a purely statistical model.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "parameters": {
+      "description": "symbol_ids of the model parameters (fixed-for-a-run quantities).",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "inputs": {
+      "description": "symbol_ids of the model inputs (exogenous drivers).",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "outputs": {
+      "description": "symbol_ids of the model outputs (observed/returned quantities).",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "governing": {
+      "description": "References (object_ids) to the MathIR/v1 objects carrying the governing equations. Empty when the interface is purely declarative.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      },
+      "uniqueItems": true
+    },
+    "assumptions": {
+      "description": "A reference (object_id) to a ConditionSet/v1 object stating the model's assumptions, or omitted when none are declared.",
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "composition": {
+      "description": "interface_ids of the sub-models, for kind='composition'. Empty when the model is atomic.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    }
+  }
+}

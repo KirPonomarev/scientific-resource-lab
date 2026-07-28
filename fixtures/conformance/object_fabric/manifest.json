@@ -1,0 +1,78 @@
+{
+  "schema_version": "ObjectFabricVectorManifest/v1",
+  "description": "Conformance vectors for the SRL scientific object fabric (WP-B11): six object types (ScientificClaim, MathIR, SymbolTable, ConditionSet, ConstantRef, ModelInterface) and the MathIR allowlist + resource guards. Each positive vector is a valid object that must validate against its schema (and pass the Python validator where one exists). Each negative vector names the contract reason its input must be rejected with.",
+  "positive": [
+    {
+      "name": "p01-math-ir-newton",
+      "schema": "MathIR",
+      "description": "Newton's second law F = m*a as a MathIR expression tree over the restricted OpenMath allowlist (relation1.eq, arith1.times)."
+    },
+    {
+      "name": "p02-claim-newton",
+      "schema": "ScientificClaim",
+      "description": "Newton's second law as an established_law_reference claim WITH a support_ref and epistemic_source=literature (satisfies the established-law invariant)."
+    },
+    {
+      "name": "p03-claim-hypothesis",
+      "schema": "ScientificClaim",
+      "description": "A bare candidate_hypothesis claim (proposed, unsupported) — a hypothesis that has not graduated to supported."
+    },
+    {
+      "name": "p04-symbol-table",
+      "schema": "SymbolTable",
+      "description": "A symbol table with units and positivity domains for the harmonic-oscillator symbols."
+    },
+    {
+      "name": "p05-constant-ref-newton",
+      "schema": "ConstantRef",
+      "description": "A ConstantRef for the Newton unit (force), value carried as a decimal string, unit in UCUM form (kg.m.s-2)."
+    },
+    {
+      "name": "p06-condition-set",
+      "schema": "ConditionSet",
+      "description": "A ConditionSet of positivity assumptions on k and m (inline MathIR, allowlist-compliant)."
+    },
+    {
+      "name": "p07-model-interface-oscillator",
+      "schema": "ModelInterface",
+      "description": "A ModelInterface for the harmonic oscillator (kind=ode) with state variables, parameters, governing MathIR ref, and an empty composition list (atomic)."
+    }
+  ],
+  "negative": [
+    {
+      "name": "n01-unknown-operator",
+      "validator": "math_ir_expression",
+      "reason": "arith1.log is a known content dictionary (arith1) but an unknown name; rejected by the allowlist with IR_UNSUPPORTED."
+    },
+    {
+      "name": "n02-unknown-cd",
+      "validator": "math_ir_expression",
+      "reason": "foo1 is not an accepted content dictionary; rejected by the allowlist with IR_UNSUPPORTED."
+    },
+    {
+      "name": "n03-bool-as-int-exponent",
+      "validator": "math_ir_expression",
+      "reason": "A bool is not a decimal-string constant; the const channel rejects bool-as-int with CONTRACT_INVALID."
+    },
+    {
+      "name": "n04-established-law-no-literature",
+      "validator": "claim",
+      "reason": "established_law_reference requires epistemic_source=literature; rejected by the claim invariant with CONTRACT_INVALID."
+    },
+    {
+      "name": "n05-candidate-supported-no-support",
+      "validator": "claim",
+      "reason": "A candidate_hypothesis cannot carry claim_status=supported without support_refs; rejected by the claim invariant with CONTRACT_INVALID."
+    },
+    {
+      "name": "n06-ir-depth-bomb",
+      "validator": "math_ir_expression",
+      "reason": "An expression deeper than the 64-node depth guard is rejected by the resource guard with CONTRACT_INVALID."
+    },
+    {
+      "name": "n07-ir-node-flood",
+      "validator": "math_ir_expression",
+      "reason": "An expression with more than 10000 nodes (breadth-heavy, depth 2) is rejected by the resource guard with CONTRACT_INVALID."
+    }
+  ]
+}

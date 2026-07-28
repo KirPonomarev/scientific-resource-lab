@@ -1,0 +1,15 @@
+{
+  "schema_version": "MathIR/v1",
+  "ir_id": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "expression": {
+    "op": "arith1.power",
+    "args": [
+      {
+        "const": true
+      },
+      {
+        "var": "x"
+      }
+    ]
+  }
+}

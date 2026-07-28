@@ -1,0 +1,559 @@
+{
+  "schema_version": "MathIR/v1",
+  "ir_id": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+  "expression": {
+    "op": "arith1.plus",
+    "args": [
+      {
+        "op": "arith1.plus",
+        "args": [
+          {
+            "op": "arith1.plus",
+            "args": [
+              {
+                "op": "arith1.plus",
+                "args": [
+                  {
+                    "op": "arith1.plus",
+                    "args": [
+                      {
+                        "op": "arith1.plus",
+                        "args": [
+                          {
+                            "op": "arith1.plus",
+                            "args": [
+                              {
+                                "op": "arith1.plus",
+                                "args": [
+                                  {
+                                    "op": "arith1.plus",
+                                    "args": [
+                                      {
+                                        "op": "arith1.plus",
+                                        "args": [
+                                          {
+                                            "op": "arith1.plus",
+                                            "args": [
+                                              {
+                                                "op": "arith1.plus",
+                                                "args": [
+                                                  {
+                                                    "op": "arith1.plus",
+                                                    "args": [
+                                                      {
+                                                        "op": "arith1.plus",
+                                                        "args": [
+                                                          {
+                                                            "op": "arith1.plus",
+                                                            "args": [
+                                                              {
+                                                                "op": "arith1.plus",
+                                                                "args": [
+                                                                  {
+                                                                    "op": "arith1.plus",
+                                                                    "args": [
+                                                                      {
+                                                                        "op": "arith1.plus",
+                                                                        "args": [
+                                                                          {
+                                                                            "op": "arith1.plus",
+                                                                            "args": [
+                                                                              {
+                                                                                "op": "arith1.plus",
+                                                                                "args": [
+                                                                                  {
+                                                                                    "op": "arith1.plus",
+                                                                                    "args": [
+                                                                                      {
+                                                                                        "op": "arith1.plus",
+                                                                                        "args": [
+                                                                                          {
+                                                                                            "op": "arith1.plus",
+                                                                                            "args": [
+                                                                                              {
+                                                                                                "op": "arith1.plus",
+                                                                                                "args": [
+                                                                                                  {
+                                                                                                    "op": "arith1.plus",
+                                                                                                    "args": [
+                                                                                                      {
+                                                                                                        "op": "arith1.plus",
+                                                                                                        "args": [
+                                                                                                          {
+                                                                                                            "op": "arith1.plus",
+                                                                                                            "args": [
+                                                                                                              {
+                                                                                                                "op": "arith1.plus",
+                                                                                                                "args": [
+                                                                                                                  {
+                                                                                                                    "op": "arith1.plus",
+                                                                                                                    "args": [
+                                                                                                                      {
+                                                                                                                        "op": "arith1.plus",
+                                                                                                                        "args": [
+                                                                                                                          {
+                                                                                                                            "op": "arith1.plus",
+                                                                                                                            "args": [
+                                                                                                                              {
+                                                                                                                                "op": "arith1.plus",
+                                                                                                                                "args": [
+                                                                                                                                  {
+                                                                                                                                    "op": "arith1.plus",
+                                                                                                                                    "args": [
+                                                                                                                                      {
+                                                                                                                                        "op": "arith1.plus",
+                                                                                                                                        "args": [
+                                                                                                                                          {
+                                                                                                                                            "op": "arith1.plus",
+                                                                                                                                            "args": [
+                                                                                                                                              {
+                                                                                                                                                "op": "arith1.plus",
+                                                                                                                                                "args": [
+                                                                                                                                                  {
+                                                                                                                                                    "op": "arith1.plus",
+                                                                                                                                                    "args": [
+                                                                                                                                                      {
+                                                                                                                                                        "op": "arith1.plus",
+                                                                                                                                                        "args": [
+                                                                                                                                                          {
+                                                                                                                                                            "op": "arith1.plus",
+                                                                                                                                                            "args": [
+                                                                                                                                                              {
+                                                                                                                                                                "op": "arith1.plus",
+                                                                                                                                                                "args": [
+                                                                                                                                                                  {
+                                                                                                                                                                    "op": "arith1.plus",
+                                                                                                                                                                    "args": [
+                                                                                                                                                                      {
+                                                                                                                                                                        "op": "arith1.plus",
+                                                                                                                                                                        "args": [
+                                                                                                                                                                          {
+                                                                                                                                                                            "op": "arith1.plus",
+                                                                                                                                                                            "args": [
+                                                                                                                                                                              {
+                                                                                                                                                                                "op": "arith1.plus",
+                                                                                                                                                                                "args": [
+                                                                                                                                                                                  {
+                                                                                                                                                                                    "op": "arith1.plus",
+                                                                                                                                                                                    "args": [
+                                                                                                                                                                                      {
+                                                                                                                                                                                        "op": "arith1.plus",
+                                                                                                                                                                                        "args": [
+                                                                                                                                                                                          {
+                                                                                                                                                                                            "op": "arith1.plus",
+                                                                                                                                                                                            "args": [
+                                                                                                                                                                                              {
+                                                                                                                                                                                                "op": "arith1.plus",
+                                                                                                                                                                                                "args": [
+                                                                                                                                                                                                  {
+                                                                                                                                                                                                    "op": "arith1.plus",
+                                                                                                                                                                                                    "args": [
+                                                                                                                                                                                                      {
+                                                                                                                                                                                                        "op": "arith1.plus",
+                                                                                                                                                                                                        "args": [
+                                                                                                                                                                                                          {
+                                                                                                                                                                                                            "op": "arith1.plus",
+                                                                                                                                                                                                            "args": [
+                                                                                                                                                                                                              {
+                                                                                                                                                                                                                "op": "arith1.plus",
+                                                                                                                                                                                                                "args": [
+                                                                                                                                                                                                                  {
+                                                                                                                                                                                                                    "op": "arith1.plus",
+                                                                                                                                                                                                                    "args": [
+                                                                                                                                                                                                                      {
+                                                                                                                                                                                                                        "op": "arith1.plus",
+                                                                                                                                                                                                                        "args": [
+                                                                                                                                                                                                                          {
+                                                                                                                                                                                                                            "op": "arith1.plus",
+                                                                                                                                                                                                                            "args": [
+                                                                                                                                                                                                                              {
+                                                                                                                                                                                                                                "op": "arith1.plus",
+                                                                                                                                                                                                                                "args": [
+                                                                                                                                                                                                                                  {
+                                                                                                                                                                                                                                    "op": "arith1.plus",
+                                                                                                                                                                                                                                    "args": [
+                                                                                                                                                                                                                                      {
+                                                                                                                                                                                                                                        "op": "arith1.plus",
+                                                                                                                                                                                                                                        "args": [
+                                                                                                                                                                                                                                          {
+                                                                                                                                                                                                                                            "op": "arith1.plus",
+                                                                                                                                                                                                                                            "args": [
+                                                                                                                                                                                                                                              {
+                                                                                                                                                                                                                                                "op": "arith1.plus",
+                                                                                                                                                                                                                                                "args": [
+                                                                                                                                                                                                                                                  {
+                                                                                                                                                                                                                                                    "op": "arith1.plus",
+                                                                                                                                                                                                                                                    "args": [
+                                                                                                                                                                                                                                                      {
+                                                                                                                                                                                                                                                        "op": "arith1.plus",
+                                                                                                                                                                                                                                                        "args": [
+                                                                                                                                                                                                                                                          {
+                                                                                                                                                                                                                                                            "op": "arith1.plus",
+                                                                                                                                                                                                                                                            "args": [
+                                                                                                                                                                                                                                                              {
+                                                                                                                                                                                                                                                                "op": "arith1.plus",
+                                                                                                                                                                                                                                                                "args": [
+                                                                                                                                                                                                                                                                  {
+                                                                                                                                                                                                                                                                    "op": "arith1.plus",
+                                                                                                                                                                                                                                                                    "args": [
+                                                                                                                                                                                                                                                                      {
+                                                                                                                                                                                                                                                                        "op": "arith1.plus",
+                                                                                                                                                                                                                                                                        "args": [
+                                                                                                                                                                                                                                                                          {
+                                                                                                                                                                                                                                                                            "op": "arith1.plus",
+                                                                                                                                                                                                                                                                            "args": [
+                                                                                                                                                                                                                                                                              {
+                                                                                                                                                                                                                                                                                "op": "arith1.plus",
+                                                                                                                                                                                                                                                                                "args": [
+                                                                                                                                                                                                                                                                                  {
+                                                                                                                                                                                                                                                                                    "op": "arith1.plus",
+                                                                                                                                                                                                                                                                                    "args": [
+                                                                                                                                                                                                                                                                                      {
+                                                                                                                                                                                                                                                                                        "const": "1"
+                                                                                                                                                                                                                                                                                      },
+                                                                                                                                                                                                                                                                                      {
+                                                                                                                                                                                                                                                                                        "const": "1"
+                                                                                                                                                                                                                                                                                      }
+                                                                                                                                                                                                                                                                                    ]
+                                                                                                                                                                                                                                                                                  },
+                                                                                                                                                                                                                                                                                  {
+                                                                                                                                                                                                                                                                                    "const": "1"
+                                                                                                                                                                                                                                                                                  }
+                                                                                                                                                                                                                                                                                ]
+                                                                                                                                                                                                                                                                              },
+                                                                                                                                                                                                                                                                              {
+                                                                                                                                                                                                                                                                                "const": "1"
+                                                                                                                                                                                                                                                                              }
+                                                                                                                                                                                                                                                                            ]
+                                                                                                                                                                                                                                                                          },
+                                                                                                                                                                                                                                                                          {
+                                                                                                                                                                                                                                                                            "const": "1"
+                                                                                                                                                                                                                                                                          }
+                                                                                                                                                                                                                                                                        ]
+                                                                                                                                                                                                                                                                      },
+                                                                                                                                                                                                                                                                      {
+                                                                                                                                                                                                                                                                        "const": "1"
+                                                                                                                                                                                                                                                                      }
+                                                                                                                                                                                                                                                                    ]
+                                                                                                                                                                                                                                                                  },
+                                                                                                                                                                                                                                                                  {
+                                                                                                                                                                                                                                                                    "const": "1"
+                                                                                                                                                                                                                                                                  }
+                                                                                                                                                                                                                                                                ]
+                                                                                                                                                                                                                                                              },
+                                                                                                                                                                                                                                                              {
+                                                                                                                                                                                                                                                                "const": "1"
+                                                                                                                                                                                                                                                              }
+                                                                                                                                                                                                                                                            ]
+                                                                                                                                                                                                                                                          },
+                                                                                                                                                                                                                                                          {
+                                                                                                                                                                                                                                                            "const": "1"
+                                                                                                                                                                                                                                                          }
+                                                                                                                                                                                                                                                        ]
+                                                                                                                                                                                                                                                      },
+                                                                                                                                                                                                                                                      {
+                                                                                                                                                                                                                                                        "const": "1"
+                                                                                                                                                                                                                                                      }
+                                                                                                                                                                                                                                                    ]
+                                                                                                                                                                                                                                                  },
+                                                                                                                                                                                                                                                  {
+                                                                                                                                                                                                                                                    "const": "1"
+                                                                                                                                                                                                                                                  }
+                                                                                                                                                                                                                                                ]
+                                                                                                                                                                                                                                              },
+                                                                                                                                                                                                                                              {
+                                                                                                                                                                                                                                                "const": "1"
+                                                                                                                                                                                                                                              }
+                                                                                                                                                                                                                                            ]
+                                                                                                                                                                                                                                          },
+                                                                                                                                                                                                                                          {
+                                                                                                                                                                                                                                            "const": "1"
+                                                                                                                                                                                                                                          }
+                                                                                                                                                                                                                                        ]
+                                                                                                                                                                                                                                      },
+                                                                                                                                                                                                                                      {
+                                                                                                                                                                                                                                        "const": "1"
+                                                                                                                                                                                                                                      }
+                                                                                                                                                                                                                                    ]
+                                                                                                                                                                                                                                  },
+                                                                                                                                                                                                                                  {
+                                                                                                                                                                                                                                    "const": "1"
+                                                                                                                                                                                                                                  }
+                                                                                                                                                                                                                                ]
+                                                                                                                                                                                                                              },
+                                                                                                                                                                                                                              {
+                                                                                                                                                                                                                                "const": "1"
+                                                                                                                                                                                                                              }
+                                                                                                                                                                                                                            ]
+                                                                                                                                                                                                                          },
+                                                                                                                                                                                                                          {
+                                                                                                                                                                                                                            "const": "1"
+                                                                                                                                                                                                                          }
+                                                                                                                                                                                                                        ]
+                                                                                                                                                                                                                      },
+                                                                                                                                                                                                                      {
+                                                                                                                                                                                                                        "const": "1"
+                                                                                                                                                                                                                      }
+                                                                                                                                                                                                                    ]
+                                                                                                                                                                                                                  },
+                                                                                                                                                                                                                  {
+                                                                                                                                                                                                                    "const": "1"
+                                                                                                                                                                                                                  }
+                                                                                                                                                                                                                ]
+                                                                                                                                                                                                              },
+                                                                                                                                                                                                              {
+                                                                                                                                                                                                                "const": "1"
+                                                                                                                                                                                                              }
+                                                                                                                                                                                                            ]
+                                                                                                                                                                                                          },
+                                                                                                                                                                                                          {
+                                                                                                                                                                                                            "const": "1"
+                                                                                                                                                                                                          }
+                                                                                                                                                                                                        ]
+                                                                                                                                                                                                      },
+                                                                                                                                                                                                      {
+                                                                                                                                                                                                        "const": "1"
+                                                                                                                                                                                                      }
+                                                                                                                                                                                                    ]
+                                                                                                                                                                                                  },
+                                                                                                                                                                                                  {
+                                                                                                                                                                                                    "const": "1"
+                                                                                                                                                                                                  }
+                                                                                                                                                                                                ]
+                                                                                                                                                                                              },
+                                                                                                                                                                                              {
+                                                                                                                                                                                                "const": "1"
+                                                                                                                                                                                              }
+                                                                                                                                                                                            ]
+                                                                                                                                                                                          },
+                                                                                                                                                                                          {
+                                                                                                                                                                                            "const": "1"
+                                                                                                                                                                                          }
+                                                                                                                                                                                        ]
+                                                                                                                                                                                      },
+                                                                                                                                                                                      {
+                                                                                                                                                                                        "const": "1"
+                                                                                                                                                                                      }
+                                                                                                                                                                                    ]
+                                                                                                                                                                                  },
+                                                                                                                                                                                  {
+                                                                                                                                                                                    "const": "1"
+                                                                                                                                                                                  }
+                                                                                                                                                                                ]
+                                                                                                                                                                              },
+                                                                                                                                                                              {
+                                                                                                                                                                                "const": "1"
+                                                                                                                                                                              }
+                                                                                                                                                                            ]
+                                                                                                                                                                          },
+                                                                                                                                                                          {
+                                                                                                                                                                            "const": "1"
+                                                                                                                                                                          }
+                                                                                                                                                                        ]
+                                                                                                                                                                      },
+                                                                                                                                                                      {
+                                                                                                                                                                        "const": "1"
+                                                                                                                                                                      }
+                                                                                                                                                                    ]
+                                                                                                                                                                  },
+                                                                                                                                                                  {
+                                                                                                                                                                    "const": "1"
+                                                                                                                                                                  }
+                                                                                                                                                                ]
+                                                                                                                                                              },
+                                                                                                                                                              {
+                                                                                                                                                                "const": "1"
+                                                                                                                                                              }
+                                                                                                                                                            ]
+                                                                                                                                                          },
+                                                                                                                                                          {
+                                                                                                                                                            "const": "1"
+                                                                                                                                                          }
+                                                                                                                                                        ]
+                                                                                                                                                      },
+                                                                                                                                                      {
+                                                                                                                                                        "const": "1"
+                                                                                                                                                      }
+                                                                                                                                                    ]
+                                                                                                                                                  },
+                                                                                                                                                  {
+                                                                                                                                                    "const": "1"
+                                                                                                                                                  }
+                                                                                                                                                ]
+                                                                                                                                              },
+                                                                                                                                              {
+                                                                                                                                                "const": "1"
+                                                                                                                                              }
+                                                                                                                                            ]
+                                                                                                                                          },
+                                                                                                                                          {
+                                                                                                                                            "const": "1"
+                                                                                                                                          }
+                                                                                                                                        ]
+                                                                                                                                      },
+                                                                                                                                      {
+                                                                                                                                        "const": "1"
+                                                                                                                                      }
+                                                                                                                                    ]
+                                                                                                                                  },
+                                                                                                                                  {
+                                                                                                                                    "const": "1"
+                                                                                                                                  }
+                                                                                                                                ]
+                                                                                                                              },
+                                                                                                                              {
+                                                                                                                                "const": "1"
+                                                                                                                              }
+                                                                                                                            ]
+                                                                                                                          },
+                                                                                                                          {
+                                                                                                                            "const": "1"
+                                                                                                                          }
+                                                                                                                        ]
+                                                                                                                      },
+                                                                                                                      {
+                                                                                                                        "const": "1"
+                                                                                                                      }
+                                                                                                                    ]
+                                                                                                                  },
+                                                                                                                  {
+                                                                                                                    "const": "1"
+                                                                                                                  }
+                                                                                                                ]
+                                                                                                              },
+                                                                                                              {
+                                                                                                                "const": "1"
+                                                                                                              }
+                                                                                                            ]
+                                                                                                          },
+                                                                                                          {
+                                                                                                            "const": "1"
+                                                                                                          }
+                                                                                                        ]
+                                                                                                      },
+                                                                                                      {
+                                                                                                        "const": "1"
+                                                                                                      }
+                                                                                                    ]
+                                                                                                  },
+                                                                                                  {
+                                                                                                    "const": "1"
+                                                                                                  }
+                                                                                                ]
+                                                                                              },
+                                                                                              {
+                                                                                                "const": "1"
+                                                                                              }
+                                                                                            ]
+                                                                                          },
+                                                                                          {
+                                                                                            "const": "1"
+                                                                                          }
+                                                                                        ]
+                                                                                      },
+                                                                                      {
+                                                                                        "const": "1"
+                                                                                      }
+                                                                                    ]
+                                                                                  },
+                                                                                  {
+                                                                                    "const": "1"
+                                                                                  }
+                                                                                ]
+                                                                              },
+                                                                              {
+                                                                                "const": "1"
+                                                                              }
+                                                                            ]
+                                                                          },
+                                                                          {
+                                                                            "const": "1"
+                                                                          }
+                                                                        ]
+                                                                      },
+                                                                      {
+                                                                        "const": "1"
+                                                                      }
+                                                                    ]
+                                                                  },
+                                                                  {
+                                                                    "const": "1"
+                                                                  }
+                                                                ]
+                                                              },
+                                                              {
+                                                                "const": "1"
+                                                              }
+                                                            ]
+                                                          },
+                                                          {
+                                                            "const": "1"
+                                                          }
+                                                        ]
+                                                      },
+                                                      {
+                                                        "const": "1"
+                                                      }
+                                                    ]
+                                                  },
+                                                  {
+                                                    "const": "1"
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "const": "1"
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "const": "1"
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "const": "1"
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "const": "1"
+                                  }
+                                ]
+                              },
+                              {
+                                "const": "1"
+                              }
+                            ]
+                          },
+                          {
+                            "const": "1"
+                          }
+                        ]
+                      },
+                      {
+                        "const": "1"
+                      }
+                    ]
+                  },
+                  {
+                    "const": "1"
+                  }
+                ]
+              },
+              {
+                "const": "1"
+              }
+            ]
+          },
+          {
+            "const": "1"
+          }
+        ]
+      },
+      {
+        "const": "1"
+      }
+    ]
+  }
+}

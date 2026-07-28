@@ -1,0 +1,23 @@
+{
+  "schema_version": "MathIR/v1",
+  "ir_id": "sha256:5015a18875c09a362d1bccfe53c42145927dcfc55230343ff6c819fdf5b642d8",
+  "expression": {
+    "op": "relation1.eq",
+    "args": [
+      {
+        "var": "F"
+      },
+      {
+        "op": "arith1.times",
+        "args": [
+          {
+            "var": "m"
+          },
+          {
+            "var": "a"
+          }
+        ]
+      }
+    ]
+  }
+}
