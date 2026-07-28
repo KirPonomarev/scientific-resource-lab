@@ -1,0 +1,1 @@
+{"case_id":"archive-traversal","expected":"rejected","kind":"archive_traversal","notes":"An archive/path-traversal hybrid id. The registry rejects the unknown key; no archive is opened and no traversal path is joined.","payload":{"adapter_id":"echo.v1/../../../outside.pkg"},"schema_version":"AdversarialCase/v1"}

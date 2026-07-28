@@ -7,8 +7,9 @@ a scientific step locally. It is **bounded** on every axis that can escape:
   :mod:`srl.execution.entrypoints`). An unknown id — including anything that
   looks like command injection — raises before any process is created.
 - **subprocess sandbox**: the handler runs in a child process with a sanitized
-  environment, a private scratch dir, POSIX resource limits, a process-group
-  watchdog, and capped output capture (see :mod:`srl.execution.sandbox`).
+  environment, a private scratch dir as its working directory (never the parent
+  repo root), POSIX resource limits, a process-group watchdog, and capped
+  output capture (see :mod:`srl.execution.sandbox`).
 - **wall timeout**: the child is killed if it runs past ``policy.wall_seconds``.
 - **receipt-last**: a run receipt is written to scratch *only after* output
   validation passes. A policy/limit violation never produces a receipt.
@@ -380,6 +381,13 @@ def run_adapter(  # noqa: PLR0913 (kw-only set IS the run's tunable set)
     popen_kwargs: dict[str, Any] = {
         "args": cmd,
         "env": env,
+        # The child's working directory is the private scratch dir, never the
+        # orchestrator's CWD (which may be the repo root). Setting ``cwd`` to
+        # the scratch dir means a child that touches the filesystem by relative
+        # path lands inside the cage, and a handler reading the CWD cannot
+        # discover the source tree. This is the WP-D34 hardening requirement:
+        # the child must NOT inherit the parent repo root as its CWD.
+        "cwd": str(scratch),
         "stdin": subprocess.DEVNULL,
         "stdout": subprocess.PIPE,
         "stderr": subprocess.PIPE,
