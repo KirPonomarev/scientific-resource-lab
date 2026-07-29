@@ -1038,9 +1038,9 @@ terminal_result PASS запрещён, если remaining_internal_waits не п
 <!-- END_PLAN_CONTRACT_V3_7 -->
 
 <!-- BEGIN_MUTABLE_STATE_V3_7 -->
-STATE_REVISION: 3
-PREVIOUS_STATE_SHA256: 348b2c37-557aebc7-364f9572-02bce394-b60180ab-29cadedc-09512a23-97933935
-CURRENT_STATE_SHA256: 980eabc7-98a73da7-ba3444cd-33e126c9-55d0ce5a-7f35b90b-620c3530-43aa2c4f
+STATE_REVISION: 4
+PREVIOUS_STATE_SHA256: 980eabc7-98a73da7-ba3444cd-33e126c9-55d0ce5a-7f35b90b-620c3530-43aa2c4f
+CURRENT_STATE_SHA256: eb787b9b-10c8b4c7-58ae0ee6-c705102c-eed3ff11-2112cb3c-8aa2502a-99baac11
 
 ## CURRENT_FACTS
 
@@ -1062,6 +1062,8 @@ current_facts:
   production_signer: missing
   enforced_t2_t3_sandbox: missing
   t7_binding: WAIT_T7_BINDING
+  a02_t7_binding_gate: ACTIVE
+  a02_physical_binding: WAIT_AUTHORITY
   compute_target: WAIT_COMPUTE_NODE
   market_bridge: INACTIVE_WAIT_RUNTIME_HEALTH
   security_bridge: INACTIVE_WAIT_SECURITY_HEALTH
@@ -1074,17 +1076,19 @@ current_facts:
 
 ~~~yaml
 execution_state:
-  status: A01_ACCEPTED
-  current_stage: A02
-  next_stage: A02_non_destructive_t7_binding
+  status: A02_PARKED_WAIT_AUTHORITY
+  current_stage: A03
+  next_stage: A03_environment_factory_and_supply_chain_gate
   completed_stages:
     - A00
     - A01
-  active_branch_or_null: codex/srf-a01-truth-ledger
+  parked_stages:
+    - A02_non_destructive_t7_binding
+  active_branch_or_null: codex/srf-a02-t7-binding
   active_pr_or_null: null
   writer_lease_or_null: null
-  blocker_or_null: null
-  next_executable_action: perform non-destructive T7 binding preflight and authority check
+  blocker_or_null: WAIT_AUTHORITY:A02_BIND_T7_NATIVE_TARGET
+  next_executable_action: continue A03 software supply-chain lane without claiming T7 ACTIVE
   updated_at: 2026-07-29
 ~~~
 
@@ -1108,6 +1112,8 @@ decision_log:
     decision: A01 CapabilityTruthLedger is the machine source for V3.7 capability closure truth
   - id: V37-D008
     decision: DONE/v2.0.0 release closure rejects fixture signer, policy-only sandbox, missing T7 and mandatory toolchain WAIT states
+  - id: V37-D009
+    decision: A02 non-destructive software gate is active, but physical T7 binding remains WAIT_AUTHORITY until native target receipt exists
 ~~~
 
 ## EVIDENCE_INDEX
@@ -1125,6 +1131,9 @@ evidence_index:
   - CAPABILITY-TRUTH-LEDGER.md
   - scripts/checks/srf-v37-a01-gate.py
   - docs/verification/srf-v3-7-a01-truth-ledger-receipt.json
+  - scripts/checks/srf-v37-a02-gate.py
+  - docs/target-binding/t7-native-binding-operator-action.json
+  - docs/verification/srf-v3-7-a02-t7-binding-wait-receipt.json
 ~~~
 
 <!-- END_MUTABLE_STATE_V3_7 -->

@@ -1,0 +1,17 @@
+{
+  "canonical_writes": 0,
+  "external_physical_disk_observed": true,
+  "gate_command": "uv run python scripts/checks/srf-v37-a02-gate.py",
+  "grants_authority": false,
+  "namespace_hash": "48eb506f-6ec11316-d4aba628-3293ddae-b209b040-50a2c5ea-4a9ce3c3-acb5c9e8",
+  "operator_action_hash": "a3028eef-04e3f0f3-d0e8dac7-42237dc5-b2308119-0b18b687-5feadeba-798bc315",
+  "physical_t7_writes": 0,
+  "protected_operator_action": "docs/target-binding/t7-native-binding-operator-action.json",
+  "quota_hash": "c2577ed6-29eab173-d15f4e42-1954f6ad-1fa3275b-dd4333f1-d2058f27-d3e4c69a",
+  "receipt_id_grouped_sha256": "4044de9b-7dc00ec5-69fb77df-d2767ea1-55781a0c-cb693163-e76c3361-7682d6f9",
+  "release_claim": "BLOCKED_UNTIL_NATIVE_T7_BINDING_RECEIPT",
+  "schema_version": "StageWaitReceipt/v1",
+  "stage_closure": "PARKED_WAIT_AUTHORITY",
+  "stage_id": "A02",
+  "terminal_state": "WAIT_T7_BINDING"
+}
