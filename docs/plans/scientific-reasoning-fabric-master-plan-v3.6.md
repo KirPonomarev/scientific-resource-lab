@@ -1900,9 +1900,9 @@ The final report must list exact IDs and hashes, never subjective percentages.
 
 <!-- BEGIN_MUTABLE_STATE_V3_6 -->
 
-STATE_REVISION: 25
-PREVIOUS_STATE_SHA256: 42282136-960357c4-b9649a84-d63f2a6c-ad55a70f-89339046-19a409c6-08968fcc
-CURRENT_STATE_SHA256: d327d950-df4ba2a6-ade5159e-d89966d5-0c3c6a42-69ab9529-914aade7-b41238c4
+STATE_REVISION: 26
+PREVIOUS_STATE_SHA256: d327d950-df4ba2a6-ade5159e-d89966d5-0c3c6a42-69ab9529-914aade7-b41238c4
+CURRENT_STATE_SHA256: 3f889a13-d0f7a0fb-3f29d392-9fc0f085-761e6bde-7e17f38e-acf05d26-ef29aaf3
 
 ## CURRENT_FACTS
 
@@ -1927,20 +1927,20 @@ current_facts:
 ~~~yaml
 execution_state:
   status: IN_PROGRESS
-  current_stage: S24
-  next_stage: S25_after_t7_profile
-  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven, S09_health_recovery_proven, S10_interface_convergence_proven, S11_p0_core_proven, S12_lean_primary_proven, S13_cross_prover_proven, S14_knowledge_layer_proven, S15_lawminer_proven, S16_applied_science_proven, S17_sciml_domain_proven, S18_heavy_capability_routing_proven, S19_shared_contract_child_request_prepared, S20_market_bridge_inactive_proven, S21_security_bridge_inactive_proven, S22_market_native_child_wait_recorded, S23_security_native_child_wait_recorded]
+  current_stage: S25
+  next_stage: S26_after_validation
+  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven, S09_health_recovery_proven, S10_interface_convergence_proven, S11_p0_core_proven, S12_lean_primary_proven, S13_cross_prover_proven, S14_knowledge_layer_proven, S15_lawminer_proven, S16_applied_science_proven, S17_sciml_domain_proven, S18_heavy_capability_routing_proven, S19_shared_contract_child_request_prepared, S20_market_bridge_inactive_proven, S21_security_bridge_inactive_proven, S22_market_native_child_wait_recorded, S23_security_native_child_wait_recorded, S24_physical_profile_preflight_proven]
   invalidated_stages: []
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: security_native_child_wait_health_recorded
+  last_proven_transition: physical_profile_preflight_proven
   active_branch_or_null: codex/srf-fabric-v1
   active_pr_or_null: null
   active_worktree_or_null: isolated_codex_worktree
   writer_lease_or_null: srf-fabric-v1-single-writer
-  active_operation_or_null: S24_t7_physical_profile
+  active_operation_or_null: S25_full_system_validation
   active_process_or_job_or_null: null
-  next_checkpoint: after_S24_t7_profile_or_wait_receipt
-  next_executable_action: prepare physical T7 profile and optional Science Compute Node preflight without storage writes
+  next_checkpoint: after_S25_full_system_validation_receipt
+  next_executable_action: run full-system validation, chaos and solo-agent acceptance checks
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -1952,30 +1952,28 @@ state_capsule:
   project_id: scientific-resource-lab
   project_fingerprint: d56e03d0-d5e1a9bb-9c33a008-ab989510-2d8e41e8-bfd001df-bfc8e1c8-0b9df0b3
   mission_id: build-scientific-reasoning-fabric-v1
-  stage_id: S24
-  state_revision: 25
+  stage_id: S25
+  state_revision: 26
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: security_native_child_wait_health_recorded
-  active_operation: S24_t7_physical_profile
+  last_proven_transition: physical_profile_preflight_proven
+  active_operation: S25_full_system_validation
   active_process_or_job: null
   frozen_preimages:
     - baseline HEAD
     - repository governance
     - operator-supplied V3.6 protocol
   new_primary_evidence:
-    - SecurityBridgeChildWaitReceipt a7bbccf2-db4ee9f5-a2f568d0-ef2ea46b-ac2ecc35-7256577a-268d29ef-9fc2ac73
-    - Security child request sha256:d2f56da7-c9b47d52-45c28288-397fb176-2018a6b5-220a3147-f0ed6f5a-9aa7bcd1
-    - Security child wait receipt sha256:59e8ead1-5918bba4-e4af0ba7-61f7393e-54f6566a-7dd35147-db825323-108002b7
-    - native Security HEAD c5e8349b05b601c3d2976da7bad58bf756600185 observed clean detached; bootstrap target unavailable
-    - child request asks only for native inactive bridge validation and merge; target actions remain native protected actions through ebashim
-    - parent_direct_external_writes=0, live_actions=0 and all S23 artifacts remain authority-negative
-    - secret-scan allowlist updated with SHA-256-of-literal entries for S23 public Security child mission hash/signature false positives
-    - focused native child tests PASS with 3 passed
+    - PhysicalCapabilityBindingPacketReceipt 5e858a49-bccfeb62-e17571c7-e95fa711-60eec672-1bfc8228-a69e535a-35a4ac75
+    - T7 binding request 2cfd1406-9e51d67f-db60fb24-c9d07248-0127c0be-01035064-fe4ff5e1-e4eb1340
+    - T7 read-only preflight f48d4dae-62b28f3c-f48749af-84d643b5-133d05e5-4b91f71f-cd138d70-8ef45081
+    - T7 mount label observed as APFS external physical disk with 544 GiB available and reserve check PASS
+    - native binding remains WAIT_T7_BINDING and Science Compute Node remains WAIT_COMPUTE_NODE
+    - no format, erase, restore, sync, database placement, hardware purchase or cloud purchase was performed
     - make test PASS with 1903 passed and 1 skipped
     - make lint PASS
     - make typecheck PASS
     - secret scan PASS
-  next_executable_action: S24 physical T7 profile and optional Science Compute Node
+  next_executable_action: S25 full-system validation and chaos acceptance
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -2065,6 +2063,9 @@ evidence_index:
   - claim: S23 Security native child lane parked on unavailable native bootstrap
     source: SecurityBridgeChildWaitReceipt/v1
     identity: a7bbccf2-db4ee9f5-a2f568d0-ef2ea46b-ac2ecc35-7256577a-268d29ef-9fc2ac73
+  - claim: S24 physical T7 profile preflight proven with declared waits
+    source: PhysicalCapabilityBindingPacketReceipt/v1
+    identity: 5e858a49-bccfeb62-e17571c7-e95fa711-60eec672-1bfc8228-a69e535a-35a4ac75
   - claim: Market mutation currently forbidden
     source: native operator bootstrap
     identity: 59ce6ff4c8b514c93d8d4b26d648ba6e7dd7b764
@@ -2077,7 +2078,7 @@ evidence_index:
 authority_ledger:
   routine_safe_plan_creation: exercised
   exact_hash_review_authority: exercised
-  implementation_authority: exercised_routine_safe_S01_S23_with_declared_waits
+  implementation_authority: exercised_routine_safe_S01_S24_with_declared_waits
   market_mutation_authority: absent
   security_mutation_authority: absent
   physical_t7_authority: absent
@@ -2156,6 +2157,8 @@ decision_log:
     decision: S22 records a signed Market native child request and exact WAIT_RUNTIME_HEALTH because Market bootstrap is RED at F8; parent performs no Market writes, no activation and no live trading
   - id: D034
     decision: S23 records a signed Security native child request and exact WAIT_SECURITY_HEALTH because native bootstrap is unavailable; parent performs no Security writes, target actions, scanner control or activation
+  - id: D035
+    decision: S24 performs read-only T7 and host capability preflight only, records WAIT_T7_BINDING and WAIT_COMPUTE_NODE for absent native binding/compute receipts, and performs no storage or purchase action
 ~~~
 
 ## PROGRESS_LOG
@@ -2261,6 +2264,10 @@ progress_log:
   - revision: 25
     stage: S23
     result: Security native child request prepared and parked as WAIT_SECURITY_HEALTH:BOOTSTRAP_UNAVAILABLE with no parent Security writes, target actions, scanner control or activation
+    observed_at: 2026-07-29
+  - revision: 26
+    stage: S24
+    result: Physical T7 binding request and read-only preflight prepared with reserve check PASS, WAIT_T7_BINDING and WAIT_COMPUTE_NODE recorded, and no protected storage or purchase action performed
     observed_at: 2026-07-29
 ~~~
 

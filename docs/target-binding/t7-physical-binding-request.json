@@ -1,0 +1,27 @@
+{
+  "canonical_writes": 0,
+  "compute_node_status": "WAIT_COMPUTE_NODE",
+  "forbidden_actions": [
+    "format",
+    "erase",
+    "overwrite_restore_target",
+    "active_database_or_wal",
+    "hardware_purchase",
+    "cloud_purchase"
+  ],
+  "grants_authority": false,
+  "maximum_t7_allocation_gib": 400,
+  "minimum_free_reserve_gib": 100,
+  "mission_id": "srf-t7-compute-binding-v1",
+  "native_binding_status": "WAIT_T7_BINDING",
+  "parent_direct_storage_writes": 0,
+  "request_id_grouped_sha256": "2cfd1406-9e51d67f-db60fb24-c9d07248-0127c0be-01035064-fe4ff5e1-e4eb1340",
+  "requested_actions": [
+    "read_only_identity_probe",
+    "future_native_binding_receipt"
+  ],
+  "schema_version": "PhysicalCapabilityBindingRequest/v1",
+  "source_head": "93992cf73429f01a9f854aeb30520b721bf18323",
+  "target_volume": "/Volumes/T7",
+  "target_volume_role": "cold_append_only_recovery_storage"
+}
