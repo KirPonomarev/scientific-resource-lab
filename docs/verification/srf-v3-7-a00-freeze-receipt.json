@@ -1,0 +1,74 @@
+{
+  "schema_version": "StageCompletionReceipt/v1",
+  "plan_id": "SRF-ACTIVATION-2026-07-29-V3.7",
+  "mission_id": "activate-scientific-reasoning-fabric-v2",
+  "stage_id": "A00",
+  "result": "ACCEPTED",
+  "completed_utc": "2026-07-29T05:45:00Z",
+  "candidate_head": "dc0ceca30c22d30916828c6b37c77962aeec7b66",
+  "branch": "codex/srf-activation-master-plan-v3-7",
+  "plan_artifact": "docs/plans/scientific-reasoning-fabric-activation-master-plan-v3.7.md",
+  "predecessor_artifact": "docs/plans/scientific-reasoning-fabric-master-plan-v3.6.md",
+  "plan_contract_sha256": "170e5a47-2d5c0dcc-b6713f7c-8c9228f4-51f86691-be281544-d92b445c-0a594a5c",
+  "pre_transition_state_sha256": "fe6850c7-c14a0897-67073c11-8efdcfdf-22ab1914-5bf89990-9781ad53-0989c7c7",
+  "post_transition_state_sha256": "348b2c37-557aebc7-364f9572-02bce394-b60180ab-29cadedc-09512a23-97933935",
+  "review": {
+    "reviewed_by": "codex-independent-exact-hash-review",
+    "status": "APPROVED",
+    "findings": [
+      "The normalized repository V3.7 plan artifact matches its declared PLAN_CONTRACT_SHA256.",
+      "The V3.7 mutable state matched its declared CURRENT_STATE_SHA256 before the A00 transition.",
+      "The operator pasted copy is not the executable artifact because line wrapping changes the digest.",
+      "V3.6 is preserved and marked SUPERSEDED_FOR_EXECUTION."
+    ]
+  },
+  "exact_inputs": [
+    "GOVERNANCE.md",
+    "CONTRIBUTING.md",
+    "docs/plans/scientific-reasoning-fabric-activation-master-plan-v3.7.md",
+    "docs/plans/scientific-reasoning-fabric-master-plan-v3.6.md"
+  ],
+  "checks": [
+    {
+      "command": "make bootstrap",
+      "status": "PASS",
+      "summary": "uv sync --locked completed and installed srlab==1.0.1 from the activation worktree"
+    },
+    {
+      "command": "python3 exact hash review over BEGIN_PLAN_CONTRACT_V3_7/END_PLAN_CONTRACT_V3_7",
+      "status": "PASS",
+      "summary": "contract digest matched declared grouped and raw SHA-256"
+    },
+    {
+      "command": "python3 exact hash review over BEGIN_MUTABLE_STATE_V3_7/END_MUTABLE_STATE_V3_7 before transition",
+      "status": "PASS",
+      "summary": "mutable digest matched declared grouped and raw SHA-256 before A00 state update"
+    },
+    {
+      "command": "uv run python scripts/checks/markdown_structure.py",
+      "status": "PASS",
+      "summary": "142 markdown files scanned with zero issues"
+    },
+    {
+      "command": "uv run python scripts/checks/public_boundary.py",
+      "status": "PASS",
+      "summary": "876 files scanned with zero public-boundary violations"
+    },
+    {
+      "command": "uv run python scripts/checks/secret_scan.py",
+      "status": "PASS",
+      "summary": "875 files scanned with zero findings"
+    },
+    {
+      "command": "make verify",
+      "status": "PASS",
+      "summary": "ruff, ruff format --check, mypy strict, pytest 1927 passed / 1 skipped, and uv build all passed"
+    }
+  ],
+  "remaining_internal_waits": [],
+  "remaining_external_waits": [],
+  "canonical_writes": 0,
+  "grants_authority": false,
+  "live_actions": 0,
+  "next_stage": "A01"
+}

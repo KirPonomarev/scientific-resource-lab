@@ -13,6 +13,20 @@ USER_APPROVAL_GATES_FOR_ROUTINE_WORK: 0
 RUN_MODE: PLAN_ONLY
 PLAN_CONTRACT_SHA256: 947d1858-c8cf110f-3c6bdb07-c70a8ff1-32459f9e-7b6448d1-afbf84d4-270c1ff0
 
+## SUPERSESSION
+
+~~~yaml
+SUPERSESSION:
+  status: SUPERSEDED_FOR_EXECUTION
+  successor_path: docs/plans/scientific-reasoning-fabric-activation-master-plan-v3.7.md
+  successor_plan_id: SRF-ACTIVATION-2026-07-29-V3.7
+  successor_contract_sha256: 170e5a47-2d5c0dcc-b6713f7c-8c9228f4-51f86691-be281544-d92b445c-0a594a5c
+  superseding_decision: >-
+    v1.0.1 is preserved as a foundation release, but adapter/config/fixture/WAIT
+    evidence may no longer close real scientific capability activation.
+  preserved_history: true
+~~~
+
 ## Назначение
 
 Этот документ является единственным публично-безопасным исполнимым планом
