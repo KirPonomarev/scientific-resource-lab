@@ -1038,16 +1038,16 @@ terminal_result PASS запрещён, если remaining_internal_waits не п
 <!-- END_PLAN_CONTRACT_V3_7 -->
 
 <!-- BEGIN_MUTABLE_STATE_V3_7 -->
-STATE_REVISION: 5
-PREVIOUS_STATE_SHA256: eb787b9b-10c8b4c7-58ae0ee6-c705102c-eed3ff11-2112cb3c-8aa2502a-99baac11
-CURRENT_STATE_SHA256: e06e6dff-48b499f1-4a9c9423-fbefb69c-2d72361c-8ffd70be-96d7eaef-e733cdee
+STATE_REVISION: 6
+PREVIOUS_STATE_SHA256: e06e6dff-48b499f1-4a9c9423-fbefb69c-2d72361c-8ffd70be-96d7eaef-e733cdee
+CURRENT_STATE_SHA256: 523976b2-7e980d0c-8576a7ed-4b8babe7-4f0593ad-2bff55e8-566c5aca-6cad4621
 
 ## CURRENT_FACTS
 
 ~~~yaml
 current_facts:
   observed_at: 2026-07-29
-  repository_head: 80e1ea710a255745241a4683422b6b1fe43ed454
+  repository_head: 071e5a06c9fedec85c1c7021171361f8c67f75b0
   predecessor_release: v1.0.1
   predecessor_result: RELEASED_WITH_DECLARED_WAITS
   current_active_default_packs:
@@ -1059,7 +1059,10 @@ current_facts:
     - pyriemann
     - cvxpy
     - clarabel
-  production_signer: missing
+  production_signer: WAIT_AUTHORITY
+  production_ed25519_transport_interface: ACTIVE
+  fixture_hmac_production_path: REJECTED
+  transport_crash_reconciliation: ACTIVE
   enforced_t2_t3_sandbox: missing
   t7_binding: WAIT_T7_BINDING
   a02_t7_binding_gate: ACTIVE
@@ -1078,22 +1081,25 @@ current_facts:
 
 ~~~yaml
 execution_state:
-  status: A03_ACCEPTED
-  current_stage: A04
-  next_stage: A04_production_signing_and_transport
+  status: A04_ACCEPTED
+  current_stage: A05
+  next_stage: A05_enforced_sandbox
   completed_stages:
     - A00
     - A01
     - A03
+    - A04
   parked_stages:
     - A02_non_destructive_t7_binding
+    - A04_native_production_key_binding
   parked_blockers:
     - WAIT_AUTHORITY:A02_BIND_T7_NATIVE_TARGET
-  active_branch_or_null: codex/srf-a03-env-factory
+    - WAIT_AUTHORITY:A04_BIND_PRODUCTION_ED25519_KEYRING
+  active_branch_or_null: codex/srf-a04-signing-transport
   active_pr_or_null: null
   writer_lease_or_null: null
   blocker_or_null: null
-  next_executable_action: start A04 production signing and transport without touching protected secrets absent authority
+  next_executable_action: start A05 enforced sandbox without weakening T2/T3 isolation or touching protected compute targets absent authority
   updated_at: 2026-07-29
 ~~~
 
@@ -1121,6 +1127,8 @@ decision_log:
     decision: A02 non-destructive software gate is active, but physical T7 binding remains WAIT_AUTHORITY until native target receipt exists
   - id: V37-D010
     decision: A03 environment factory produces deterministic isolated profile manifests and rejects revoked dependencies, global depots and unknown-license ACTIVE claims
+  - id: V37-D011
+    decision: A04 Ed25519 transport interface is active with fixture-HMAC production rejection, revoked-key/replay guards and crash reconciliation; native production key binding remains WAIT_AUTHORITY
 ~~~
 
 ## EVIDENCE_INDEX
@@ -1144,6 +1152,10 @@ evidence_index:
   - docs/architecture/environment-factory.md
   - scripts/checks/srf-v37-a03-gate.py
   - docs/verification/srf-v3-7-a03-env-factory-receipt.json
+  - docs/architecture/transport.md
+  - docs/target-binding/ed25519-native-key-operator-action.json
+  - scripts/checks/srf-v37-a04-gate.py
+  - docs/verification/srf-v3-7-a04-signing-transport-receipt.json
 ~~~
 
 <!-- END_MUTABLE_STATE_V3_7 -->

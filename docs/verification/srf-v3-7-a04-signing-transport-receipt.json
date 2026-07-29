@@ -1,0 +1,13 @@
+{
+  "canonical_writes": 0,
+  "gate_command": "uv run python scripts/checks/srf-v37-a04-gate.py",
+  "grants_authority": false,
+  "operator_action_hash": "b61b1150-bcc6c322-36dfd347-78e29492-13858bdf-059b6e0f-a7a681eb-edd7b680",
+  "protected_key_binding": "WAIT_AUTHORITY:A04_BIND_PRODUCTION_ED25519_KEYRING",
+  "receipt_id_grouped_sha256": "32ecd7dd-93602c78-fdda1c35-14d64aa4-80245d96-8888c31d-b6643800-28a5457b",
+  "release_claim": "A04_SOFTWARE_TRANSPORT_ONLY",
+  "schema_version": "StageCompletionReceipt/v1",
+  "stage_closure": "SOFTWARE_ED25519_TRANSPORT_ACTIVE_WAIT_NATIVE_KEY_BINDING",
+  "stage_id": "A04",
+  "terminal_state": "A04_ACCEPTED"
+}

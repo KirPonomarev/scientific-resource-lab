@@ -35,6 +35,9 @@ license = "Apache-2.0"
 #   (docs/adr/0006-pyriemann.md). numpy and scipy are declared explicitly so the
 #   SRL surface can validate arrays and eigenvalues without relying only on
 #   transitive dependency versions.
+# - cryptography (A04): Ed25519 detached signatures for production transport
+#   verification. Production private keys remain native/private config; tests
+#   use ephemeral in-memory keys only.
 # - pymc + arviz (WP-H71a): bounded one-chain Bayesian posterior fitting for the
 #   ``uncertainty`` capability profile, isolated behind the pymc adapter
 #   (docs/adr/0008-pymc.md). Both are Apache-2.0, BUT pytensor (pymc's backend)
@@ -58,6 +61,7 @@ license = "Apache-2.0"
 #   the stable ``pm.sample`` / ``az.summary`` surface common to both families.
 dependencies = [
     "clarabel>=0.11.1",
+    "cryptography>=43",
     "cvxpy>=1.9.2",
     "jsonschema>=4.23",
     "numpy>=2.0",

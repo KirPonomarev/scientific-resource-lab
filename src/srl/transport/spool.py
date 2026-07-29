@@ -19,6 +19,16 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any, Protocol
 
+from cryptography.exceptions import InvalidSignature
+from cryptography.hazmat.primitives.asymmetric.ed25519 import (
+    Ed25519PrivateKey,
+    Ed25519PublicKey,
+)
+from cryptography.hazmat.primitives.serialization import (
+    Encoding,
+    PublicFormat,
+)
+
 from srl.contracts import object_id, validate_object_id
 from srl.contracts.canonical import dumps, loads
 from srl.contracts.errors import ContractError
@@ -27,10 +37,12 @@ from srl.contracts.timestamps import normalize as normalize_timestamp
 
 _SIGNATURE_SCHEMA_VERSION = "DetachedSpoolSignature/v1"
 _SIGNATURE_ALGORITHM_HMAC_SHA256 = "test-hmac-sha256"
+_SIGNATURE_ALGORITHM_ED25519 = "ed25519"
 _DEFAULT_ACK_CREATED_UTC = "2026-07-29T00:00:00Z"
 _VALID_CLASSIFICATIONS = frozenset({"D0", "D1"})
 _MIN_RETRY_SECONDS = 1
 _MAX_RETRY_SECONDS = 3600
+_ED25519_RAW_KEY_BYTES = 32
 
 
 class SpoolState(StrEnum):
@@ -87,6 +99,7 @@ class DetachedSignature:
     schema_version: str
     algorithm: str
     signer_cell: str
+    key_id: str
     message_id: str
     sequence: int
     previous_signature_ref: str | None
@@ -98,6 +111,7 @@ class DetachedSignature:
             "schema_version": self.schema_version,
             "algorithm": self.algorithm,
             "signer_cell": self.signer_cell,
+            "key_id": self.key_id,
             "message_id": self.message_id,
             "sequence": self.sequence,
             "previous_signature_ref": self.previous_signature_ref,
@@ -117,6 +131,11 @@ class HmacSha256Signer:
     signer_cell: str
     secret: bytes
 
+    @property
+    def key_id(self) -> str:
+        """Return the fixture key id; never valid for production Ed25519."""
+        return f"fixture-hmac:{self.signer_cell}"
+
     def sign(
         self,
         message: Mapping[str, Any],
@@ -130,6 +149,7 @@ class HmacSha256Signer:
         body = _signature_body(
             algorithm=_SIGNATURE_ALGORITHM_HMAC_SHA256,
             signer_cell=self.signer_cell,
+            key_id=self.key_id,
             message_id=message_id,
             sequence=sequence,
             previous_signature_ref=previous_signature_ref,
@@ -139,6 +159,7 @@ class HmacSha256Signer:
             schema_version=_SIGNATURE_SCHEMA_VERSION,
             algorithm=_SIGNATURE_ALGORITHM_HMAC_SHA256,
             signer_cell=self.signer_cell,
+            key_id=self.key_id,
             message_id=message_id,
             sequence=sequence,
             previous_signature_ref=previous_signature_ref,
@@ -149,13 +170,14 @@ class HmacSha256Signer:
         """Verify a deterministic fixture signature."""
         try:
             _validate_detached_signature(signature)
-            if signature.get("algorithm") != _SIGNATURE_ALGORITHM_HMAC_SHA256:
-                return False
-            if signature.get("schema_version") != _SIGNATURE_SCHEMA_VERSION:
-                return False
-            if signature.get("signer_cell") != self.signer_cell:
-                return False
-            if signature.get("message_id") != message.get("message_id"):
+            fields_match = (
+                signature.get("algorithm") == _SIGNATURE_ALGORITHM_HMAC_SHA256
+                and signature.get("schema_version") == _SIGNATURE_SCHEMA_VERSION
+                and signature.get("signer_cell") == self.signer_cell
+                and signature.get("key_id") == self.key_id
+                and signature.get("message_id") == message.get("message_id")
+            )
+            if not fields_match:
                 return False
             expected = self.sign(
                 message,
@@ -168,6 +190,113 @@ class HmacSha256Signer:
             str(signature.get("signature_value", "")),
             expected.signature_value,
         )
+
+
+@dataclass(frozen=True)
+class Ed25519Signer:
+    """Native Ed25519 detached signature producer.
+
+    Tests use ephemeral keys generated in memory. Production deployments bind
+    the private key outside git through their native secret/config mechanism and
+    publish only public verification keys to the receiver keyring.
+    """
+
+    signer_cell: str
+    private_key: Ed25519PrivateKey
+    key_id: str | None = None
+
+    @classmethod
+    def generate(cls, *, signer_cell: str, key_id: str | None = None) -> Ed25519Signer:
+        """Generate an in-memory Ed25519 signer for conformance tests."""
+        return cls(
+            signer_cell=signer_cell,
+            private_key=Ed25519PrivateKey.generate(),
+            key_id=key_id,
+        )
+
+    @property
+    def public_key_hex(self) -> str:
+        """Return the raw Ed25519 public key bytes as lowercase hex."""
+        return (
+            self.private_key.public_key()
+            .public_bytes(
+                encoding=Encoding.Raw,
+                format=PublicFormat.Raw,
+            )
+            .hex()
+        )
+
+    def resolved_key_id(self) -> str:
+        """Return a content-addressed public key id."""
+        if self.key_id is not None:
+            return _require_non_empty(self.key_id, "key_id")
+        return ed25519_key_id(self.public_key_hex)
+
+    def sign(
+        self,
+        message: Mapping[str, Any],
+        *,
+        sequence: int,
+        previous_signature_ref: str | None,
+    ) -> DetachedSignature:
+        """Sign a message with Ed25519 over the canonical signature body."""
+        _require_positive_sequence(sequence)
+        message_id = _message_id_from_mapping(message)
+        body = _signature_body(
+            algorithm=_SIGNATURE_ALGORITHM_ED25519,
+            signer_cell=self.signer_cell,
+            key_id=self.resolved_key_id(),
+            message_id=message_id,
+            sequence=sequence,
+            previous_signature_ref=previous_signature_ref,
+        )
+        signature_value = self.private_key.sign(dumps(body)).hex()
+        return DetachedSignature(
+            schema_version=_SIGNATURE_SCHEMA_VERSION,
+            algorithm=_SIGNATURE_ALGORITHM_ED25519,
+            signer_cell=self.signer_cell,
+            key_id=self.resolved_key_id(),
+            message_id=message_id,
+            sequence=sequence,
+            previous_signature_ref=previous_signature_ref,
+            signature_value=signature_value,
+        )
+
+
+@dataclass(frozen=True)
+class Ed25519Verifier:
+    """Production-mode Ed25519 verifier with revoked-key refusal."""
+
+    public_keys_by_id: Mapping[str, str]
+    revoked_key_ids: frozenset[str] = frozenset()
+
+    def verify(self, message: Mapping[str, Any], signature: Mapping[str, Any]) -> bool:
+        """Verify an Ed25519 detached signature and reject fixture algorithms."""
+        try:
+            _validate_detached_signature(signature)
+            if signature.get("algorithm") != _SIGNATURE_ALGORITHM_ED25519:
+                return False
+            if signature.get("message_id") != message.get("message_id"):
+                return False
+            key_id = _key_id_from_signature(signature)
+            if key_id in self.revoked_key_ids:
+                return False
+            public_key_hex = self.public_keys_by_id.get(key_id)
+            if public_key_hex is None:
+                return False
+            public_key = _ed25519_public_key_from_hex(public_key_hex)
+            body = _signature_body(
+                algorithm=_SIGNATURE_ALGORITHM_ED25519,
+                signer_cell=str(signature["signer_cell"]),
+                key_id=key_id,
+                message_id=_message_id_from_mapping(message),
+                sequence=_sequence_from_signature(signature),
+                previous_signature_ref=_previous_ref_from_signature(signature),
+            )
+            public_key.verify(bytes.fromhex(str(signature["signature_value"])), dumps(body))
+        except (ContractError, InvalidSignature, ValueError):
+            return False
+        return True
 
 
 class NullSignatureVerifier:
@@ -392,6 +521,8 @@ class SpoolRoot:
                 status="QUARANTINED",
                 created_utc=now_utc,
             )
+        if self._is_duplicate(message):
+            return self._build_ack(message_id=message_id, status="DUPLICATE", created_utc=now_utc)
         if not self._hash_chain_accepts(signature):
             self._quarantine_message(message, reason="hash_chain_rejected")
             return self._write_ack(
@@ -406,8 +537,6 @@ class SpoolRoot:
         if (now - created).total_seconds() > ttl_seconds:
             self._dead_letter_message(message, reason="ttl_expired", created_utc=now_utc)
             return self._write_ack(message_id=message_id, status="EXPIRED", created_utc=now_utc)
-        if self._is_duplicate(message):
-            return self._write_ack(message_id=message_id, status="DUPLICATE", created_utc=now_utc)
         imported_path = self.imported_dir / _json_filename(message_id)
         _atomic_write_json(imported_path, message, tmp_dir=self.tmp_dir)
         return self._write_ack(message_id=message_id, status="ACKNOWLEDGED", created_utc=now_utc)
@@ -453,6 +582,27 @@ class SpoolRoot:
             return None
         sequence, ref = max(signatures, key=lambda item: (item[0], item[1]))
         return ref, sequence
+
+    def reconcile_acknowledgements(
+        self,
+        *,
+        created_utc: str = _DEFAULT_ACK_CREATED_UTC,
+    ) -> tuple[dict[str, Any], ...]:
+        """Rebuild missing ACKs for already imported messages after a crash."""
+        self.initialize()
+        repaired: list[dict[str, Any]] = []
+        for item in self.replay(SpoolState.IMPORTED_AS_C3):
+            ack_path = self.acks_dir / _json_filename(item.message_id)
+            if ack_path.exists():
+                continue
+            repaired.append(
+                self._write_ack(
+                    message_id=item.message_id,
+                    status="ACKNOWLEDGED",
+                    created_utc=created_utc,
+                )
+            )
+        return tuple(repaired)
 
     @property
     def tmp_dir(self) -> Path:
@@ -520,6 +670,11 @@ class SpoolRoot:
         raise SpoolError(msg)
 
     def _write_ack(self, *, message_id: str, status: str, created_utc: str) -> dict[str, Any]:
+        ack = self._build_ack(message_id=message_id, status=status, created_utc=created_utc)
+        _atomic_write_json(self.acks_dir / _json_filename(message_id), ack, tmp_dir=self.tmp_dir)
+        return ack
+
+    def _build_ack(self, *, message_id: str, status: str, created_utc: str) -> dict[str, Any]:
         validate_object_id(message_id)
         ack_without_id = {
             "schema_version": "SpoolAck/v1",
@@ -531,7 +686,6 @@ class SpoolRoot:
         }
         ack = {"ack_id": object_id(ack_without_id), **ack_without_id}
         schema_validate(ack, "SpoolAck")
-        _atomic_write_json(self.acks_dir / _json_filename(message_id), ack, tmp_dir=self.tmp_dir)
         return ack
 
     def _dead_letter_message(
@@ -599,12 +753,27 @@ class SpoolRoot:
     def _hash_chain_accepts(self, signature: Mapping[str, Any]) -> bool:
         sequence = _sequence_from_signature(signature)
         previous = _previous_ref_from_signature(signature)
-        if sequence == 1:
+        latest = self._latest_imported_signature()
+        if latest is None:
             return previous is None
-        if previous is None:
-            return False
-        known_refs = {_file_ref(path) for path in self.signatures_dir.glob("*.json")}
-        return previous in known_refs
+        latest_ref, latest_sequence = latest
+        return sequence == latest_sequence + 1 and previous == latest_ref
+
+    def _latest_imported_signature(self) -> tuple[str, int] | None:
+        signatures: list[tuple[int, str]] = []
+        for path in sorted(self.imported_dir.glob("*.json")):
+            try:
+                message = _read_json_object(path)
+                message_id = _message_id_from_mapping(message)
+                signature_path = self.signature_path_for(message_id)
+                signature = _read_json_object(signature_path)
+                signatures.append((_sequence_from_signature(signature), _file_ref(signature_path)))
+            except (ContractError, OSError):
+                continue
+        if not signatures:
+            return None
+        sequence, ref = max(signatures, key=lambda item: (item[0], item[1]))
+        return ref, sequence
 
 
 def _atomic_write_json(path: Path, payload: Mapping[str, Any], *, tmp_dir: Path) -> None:
@@ -706,6 +875,10 @@ def _previous_ref_from_signature(signature: Mapping[str, Any]) -> str | None:
     return validate_object_id(value)
 
 
+def _key_id_from_signature(signature: Mapping[str, Any]) -> str:
+    return _require_non_empty(str(signature.get("key_id", "")), "key_id")
+
+
 def _validate_detached_signature(signature: Mapping[str, Any]) -> None:
     if signature.get("schema_version") != _SIGNATURE_SCHEMA_VERSION:
         msg = "detached signature schema_version is invalid"
@@ -714,6 +887,7 @@ def _validate_detached_signature(signature: Mapping[str, Any]) -> None:
         msg = "detached signature algorithm must be a non-empty string"
         raise SpoolError(msg)
     _require_non_empty(str(signature.get("signer_cell", "")), "signer_cell")
+    _key_id_from_signature(signature)
     _message_id_from_mapping(signature)
     _sequence_from_signature(signature)
     _previous_ref_from_signature(signature)
@@ -723,10 +897,11 @@ def _validate_detached_signature(signature: Mapping[str, Any]) -> None:
         raise SpoolError(msg)
 
 
-def _signature_body(
+def _signature_body(  # noqa: PLR0913 - detached signature fields intentionally mirror wire form.
     *,
     algorithm: str,
     signer_cell: str,
+    key_id: str,
     message_id: str,
     sequence: int,
     previous_signature_ref: str | None,
@@ -735,10 +910,35 @@ def _signature_body(
         "schema_version": _SIGNATURE_SCHEMA_VERSION,
         "algorithm": algorithm,
         "signer_cell": _require_non_empty(signer_cell, "signer_cell"),
+        "key_id": _require_non_empty(key_id, "key_id"),
         "message_id": validate_object_id(message_id),
         "sequence": sequence,
         "previous_signature_ref": previous_signature_ref,
     }
+
+
+def ed25519_key_id(public_key_hex: str) -> str:
+    """Return a content-addressed key id for raw Ed25519 public key hex."""
+    _ed25519_public_key_from_hex(public_key_hex)
+    return object_id(
+        {
+            "schema_version": "Ed25519PublicKey/v1",
+            "algorithm": _SIGNATURE_ALGORITHM_ED25519,
+            "public_key_hex": public_key_hex,
+        }
+    )
+
+
+def _ed25519_public_key_from_hex(public_key_hex: str) -> Ed25519PublicKey:
+    try:
+        raw = bytes.fromhex(public_key_hex)
+    except ValueError as exc:
+        msg = "Ed25519 public key is not valid hex"
+        raise SpoolError(msg) from exc
+    if len(raw) != _ED25519_RAW_KEY_BYTES:
+        msg = "Ed25519 public key must be exactly 32 raw bytes"
+        raise SpoolError(msg)
+    return Ed25519PublicKey.from_public_bytes(raw)
 
 
 def _parse_utc(value: str) -> datetime:
