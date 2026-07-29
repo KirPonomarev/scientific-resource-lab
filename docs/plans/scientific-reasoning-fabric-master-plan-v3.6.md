@@ -1900,9 +1900,9 @@ The final report must list exact IDs and hashes, never subjective percentages.
 
 <!-- BEGIN_MUTABLE_STATE_V3_6 -->
 
-STATE_REVISION: 16
-PREVIOUS_STATE_SHA256: e78f3965-2c89a575-a945bd2b-c3737638-329abd3f-e9e1c2f9-59369a81-c92b11ab
-CURRENT_STATE_SHA256: 7cf3f7b8-bdfd8f3c-99f87239-5fe1a969-d40ba6c3-0dc72d62-58492329-54337adf
+STATE_REVISION: 17
+PREVIOUS_STATE_SHA256: 7cf3f7b8-bdfd8f3c-99f87239-5fe1a969-d40ba6c3-0dc72d62-58492329-54337adf
+CURRENT_STATE_SHA256: 055a8e39-ccbf186a-86917f74-b5e3e744-13cd15be-f69b5912-a756958b-5c544dac
 
 ## CURRENT_FACTS
 
@@ -1927,20 +1927,20 @@ current_facts:
 ~~~yaml
 execution_state:
   status: IN_PROGRESS
-  current_stage: S15
-  next_stage: S16_after_law_discovery
-  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven, S09_health_recovery_proven, S10_interface_convergence_proven, S11_p0_core_proven, S12_lean_primary_proven, S13_cross_prover_proven, S14_knowledge_layer_proven]
+  current_stage: S16
+  next_stage: S17_after_applied_science
+  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven, S09_health_recovery_proven, S10_interface_convergence_proven, S11_p0_core_proven, S12_lean_primary_proven, S13_cross_prover_proven, S14_knowledge_layer_proven, S15_lawminer_proven]
   invalidated_stages: []
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: knowledge_layer_proven
+  last_proven_transition: lawminer_dynamics_proven
   active_branch_or_null: codex/srf-fabric-v1
   active_pr_or_null: null
   active_worktree_or_null: isolated_codex_worktree
   writer_lease_or_null: srf-fabric-v1-single-writer
-  active_operation_or_null: S15_law_discovery_dynamical_packs
+  active_operation_or_null: S16_applied_science_packs
   active_process_or_job_or_null: null
-  next_checkpoint: after_S15_lawminer_validation_receipt
-  next_executable_action: implement LawMiner and dynamical discovery with null and holdout honesty
+  next_checkpoint: after_S16_applied_science_admission_receipt
+  next_executable_action: complete Geometry, Physics Compiler and Causal Economy Lab foundations
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -1952,28 +1952,28 @@ state_capsule:
   project_id: scientific-resource-lab
   project_fingerprint: d56e03d0-d5e1a9bb-9c33a008-ab989510-2d8e41e8-bfd001df-bfc8e1c8-0b9df0b3
   mission_id: build-scientific-reasoning-fabric-v1
-  stage_id: S15
-  state_revision: 16
+  stage_id: S16
+  state_revision: 17
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: knowledge_layer_proven
-  active_operation: S15_law_discovery_dynamical_packs
+  last_proven_transition: lawminer_dynamics_proven
+  active_operation: S16_applied_science_packs
   active_process_or_job: null
   frozen_preimages:
     - baseline HEAD
     - repository governance
     - operator-supplied V3.6 protocol
   new_primary_evidence:
-    - KnowledgeLayerReceipt d0292caf-1ef6db10-7b5a80ac-77ac063c-6f40573c-0407f988-79f58213-1055d841
-    - KnowledgeLayerManifest sha256:8176c9e4-05f45b50-fa39c043-b07c405c-2f7435ea-97c91826-dcdb89eb-667499dc
-    - OpenAlex, Crossref, arXiv and OEIS source cards ACTIVE through existing bounded adapters
-    - OpenCitations, zbMATH, LMFDB, CSLib, Erdos Problems and Formal Conjectures recorded as WAIT_ADAPTER or WAIT_TERMS
-    - content-addressed knowledge facts carry offsets, payload digests, attribution and taint labels
-    - prompt-injection corpus spans are detected and kept out of privileged prompts
-    - focused knowledge tests PASS with 101 passed
-    - make test PASS with 1849 passed and 1 skipped
+    - LawMinerValidationReceipt 5267df4e-3070c277-c007a48d-e4bb0d3c-01f275ff-74cb5860-7d9c8147-caebad47
+    - LawMinerAdmissionBundle sha256:abc48843-a4767040-63384c25-f5bf8130-ec3c3031-d0a88022-e6deda1b-cddc992a
+    - deterministic linear-law and linear-dynamics candidate receipts produced with promotion_allowed=false
+    - train and validation split overlap is rejected as leakage
+    - deterministic null metrics and seeds are recorded
+    - PySR, SR4MDL, Operon, gplearn, AI-Feynman, PySINDy, PyDMD, pyKoopman and dysts recorded as WAIT_CAPABILITY
+    - focused product tests PASS with 6 passed
+    - make test PASS with 1855 passed and 1 skipped
     - make lint PASS
     - make typecheck PASS
-  next_executable_action: S15 LawMiner and dynamical discovery validation layer
+  next_executable_action: S16 applied geometry, topology, probability, causal and optimization packs
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -2036,6 +2036,9 @@ evidence_index:
   - claim: S14 knowledge layer proven with declared waits
     source: KnowledgeLayerReceipt/v1
     identity: d0292caf-1ef6db10-7b5a80ac-77ac063c-6f40573c-0407f988-79f58213-1055d841
+  - claim: S15 LawMiner and dynamical discovery proven with declared waits
+    source: LawMinerValidationReceipt/v1
+    identity: 5267df4e-3070c277-c007a48d-e4bb0d3c-01f275ff-74cb5860-7d9c8147-caebad47
   - claim: Market mutation currently forbidden
     source: native operator bootstrap
     identity: 59ce6ff4c8b514c93d8d4b26d648ba6e7dd7b764
@@ -2048,7 +2051,7 @@ evidence_index:
 authority_ledger:
   routine_safe_plan_creation: exercised
   exact_hash_review_authority: exercised
-  implementation_authority: exercised_routine_safe_S01_S14
+  implementation_authority: exercised_routine_safe_S01_S15
   market_mutation_authority: absent
   security_mutation_authority: absent
   physical_t7_authority: absent
@@ -2109,6 +2112,8 @@ decision_log:
     decision: S13 ships independent formal contours as explicit ACTIVE or WAIT_TOOLCHAIN records and rejects automatic cross-logic theorem equivalence claims
   - id: D025
     decision: S14 layers taint-safe source-grounded graph manifests over existing retriever adapters and records missing corpus/source adapters as explicit WAIT states
+  - id: D026
+    decision: S15 uses a bounded deterministic LawMiner baseline to prove null, leakage and candidate-only semantics while advanced symbolic and dynamical engines remain explicit WAIT_CAPABILITY
 ~~~
 
 ## PROGRESS_LOG
@@ -2178,6 +2183,10 @@ progress_log:
   - revision: 16
     stage: S14
     result: Knowledge graph and taint layer proven with active bounded sources, declared source waits, prompt-injection detection and raw-corpus prompt boundary
+    observed_at: 2026-07-29
+  - revision: 17
+    stage: S15
+    result: LawMiner and dynamical validation layer proven with candidate-only receipts, null controls, leakage rejection and explicit advanced-engine waits
     observed_at: 2026-07-29
 ~~~
 
