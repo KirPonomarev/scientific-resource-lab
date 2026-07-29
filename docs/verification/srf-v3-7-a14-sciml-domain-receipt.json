@@ -1,0 +1,444 @@
+{
+  "active_packs": [
+    "julia_sciml_ode",
+    "python_diffrax_ode",
+    "python_qutip_quantum",
+    "python_astropy_astronomy",
+    "python_cantera_combustion",
+    "native_battery_rc",
+    "python_quimb_many_body",
+    "python_cotengra_tensor_network"
+  ],
+  "canonical_writes": 0,
+  "checks": [
+    {
+      "activation_receipt": {
+        "active_pack_ids": [
+          "julia_sciml_ode",
+          "python_diffrax_ode",
+          "python_qutip_quantum",
+          "python_astropy_astronomy",
+          "python_cantera_combustion",
+          "native_battery_rc",
+          "python_quimb_many_body",
+          "python_cotengra_tensor_network"
+        ],
+        "automatic_scientific_promotion": false,
+        "canonical_writes": 0,
+        "cross_language_receipt": {
+          "bitwise_identity_claimed": false,
+          "canonical_writes": 0,
+          "comparison_label": "julia_sciml_vs_python_diffrax_ode",
+          "comparison_scope": "bounded_real_workload_tolerance_only",
+          "grants_authority": false,
+          "languages": [
+            "julia",
+            "python"
+          ],
+          "observed_delta": 2.341763449820178e-10,
+          "receipt_id": "sha256:f2c0fdb296219717dc7e6802e49f0a7320136dec8294b28e7722cd4d3c51671e",
+          "receipt_ids": [
+            "sha256:d65f9c8e422a204efb792522feee47622a6713e506e1b0892c014395290214f3",
+            "sha256:75f5f4584f6ccf6e48873473de4a2f03f831b85d4adf3791a61020a5852adecd"
+          ],
+          "schema_version": "A14CrossLanguageToleranceReceipt/v1",
+          "solver_families": [
+            "ode_explicit_runge_kutta"
+          ],
+          "tolerance_abs": 5e-07,
+          "tolerance_rel": 5e-06
+        },
+        "formally_replaced_pack_ids": [
+          "julia_modelingtoolkit",
+          "julia_datadrivendiffeq",
+          "python_cadabra",
+          "python_pybamm"
+        ],
+        "grants_authority": false,
+        "promotion_allowed": false,
+        "receipt_id": "sha256:0b42eb16428e0186baa2ba5b9667de785955da1e4cd26a8d6bdab9f6cf4dc6e5",
+        "schema_version": "SciMLDomainActivationReceipt/v1",
+        "stage_id": "A14",
+        "tolerance_policy": "absolute_or_relative_tolerance_required_no_bitwise_claims",
+        "unit_policy": "unit_bindings_required_no_unit_loss",
+        "workload_receipts": [
+          {
+            "automatic_scientific_promotion": false,
+            "backend_versions": {
+              "julia": "julia version 1.12.6",
+              "julia_depot_role": "explicit_env",
+              "sciml_manifest_toml_sha256": "e7c1efe13361cdb8d060a2dc972c6f1d76ff5c1ff6d81b691f10b0a44ef87f2f",
+              "sciml_project_toml_sha256": "662647b18f2149d44c2eee9eee2b92122aeae2bb6298e3750be7787165ad576b"
+            },
+            "bitwise_identity_claimed": false,
+            "canonical_writes": 0,
+            "dataset": {
+              "initial_state": 1.0,
+              "kind": "synthetic",
+              "model": "du/dt=-2u"
+            },
+            "diagnostics": {
+              "abs_error": 1.9195950384798266e-11,
+              "expected": 0.1353352832366127,
+              "terminal": 0.13533528325580865
+            },
+            "family": "sciml",
+            "grants_authority": false,
+            "language": "julia",
+            "pack_id": "julia_sciml_ode",
+            "promotion_allowed": false,
+            "receipt_id": "sha256:d65f9c8e422a204efb792522feee47622a6713e506e1b0892c014395290214f3",
+            "resource_envelope": {
+              "bounded": true,
+              "canonical_writes": 0,
+              "elapsed_seconds": 9.924
+            },
+            "solver": {
+              "family": "ode_explicit_runge_kutta",
+              "name": "Tsit5"
+            },
+            "status": "ACTIVE",
+            "tolerance": {
+              "abs": 5e-07,
+              "rel": 5e-06
+            },
+            "trace_digest_algorithm": "sha256",
+            "trace_sha256": "d3529bc55353e32bf8f2c5cde5cbe82e4a60ee03a14a18add7277fe6cfca9556",
+            "unit_bindings": [
+              "time:s",
+              "state:dimensionless"
+            ]
+          },
+          {
+            "automatic_scientific_promotion": false,
+            "backend_versions": {
+              "diffrax": "0.7.2",
+              "jax": "0.11.0",
+              "jaxlib": "0.11.0"
+            },
+            "bitwise_identity_claimed": false,
+            "canonical_writes": 0,
+            "dataset": {
+              "initial_state": 1.0,
+              "kind": "synthetic",
+              "model": "dy/dt=-2y"
+            },
+            "diagnostics": {
+              "abs_error": 2.5337229536681605e-10,
+              "expected": 0.1353352832366127,
+              "terminal": 0.135335283489985
+            },
+            "family": "sciml",
+            "grants_authority": false,
+            "language": "python",
+            "pack_id": "python_diffrax_ode",
+            "promotion_allowed": false,
+            "receipt_id": "sha256:75f5f4584f6ccf6e48873473de4a2f03f831b85d4adf3791a61020a5852adecd",
+            "resource_envelope": {
+              "bounded": true,
+              "canonical_writes": 0,
+              "elapsed_seconds": 4.222
+            },
+            "solver": {
+              "family": "ode_explicit_runge_kutta",
+              "name": "Tsit5"
+            },
+            "status": "ACTIVE",
+            "tolerance": {
+              "abs": 5e-07,
+              "rel": 5e-06
+            },
+            "trace_digest_algorithm": "sha256",
+            "trace_sha256": "e5034e7b3a2d0103fa2948b6f2b6e8a7d7b48cf7f6622eb0b88ccfb1897602d6",
+            "unit_bindings": [
+              "time:s",
+              "state:dimensionless"
+            ]
+          },
+          {
+            "automatic_scientific_promotion": false,
+            "backend_versions": {
+              "qutip": "5.3.0"
+            },
+            "bitwise_identity_claimed": false,
+            "canonical_writes": 0,
+            "dataset": {
+              "kind": "synthetic",
+              "model": "two_level_pi_pulse"
+            },
+            "diagnostics": {
+              "terminal_probability_one": 0.9999999999996754
+            },
+            "family": "quantum",
+            "grants_authority": false,
+            "language": "python",
+            "pack_id": "python_qutip_quantum",
+            "promotion_allowed": false,
+            "receipt_id": "sha256:44c5e825b9a5a8a21a8be14d604d0a245532d6d6affec4adf8a71535e83da773",
+            "resource_envelope": {
+              "bounded": true,
+              "canonical_writes": 0,
+              "elapsed_seconds": 3.414
+            },
+            "solver": {
+              "family": "schrodinger_ode",
+              "name": "sesolve"
+            },
+            "status": "ACTIVE",
+            "tolerance": {
+              "abs": 1e-06,
+              "rel": 1e-06
+            },
+            "trace_digest_algorithm": "sha256",
+            "trace_sha256": "f2562f6bbd75b0685dbefa11614b0af1b4c05368d7b521b4498bc0f9bf136135",
+            "unit_bindings": [
+              "time:s",
+              "hamiltonian:rad/s",
+              "probability:dimensionless"
+            ]
+          },
+          {
+            "automatic_scientific_promotion": false,
+            "backend_versions": {
+              "astropy": "7.2.2"
+            },
+            "bitwise_identity_claimed": false,
+            "canonical_writes": 0,
+            "dataset": {
+              "frame": "icrs_single_coordinate",
+              "kind": "synthetic"
+            },
+            "diagnostics": {
+              "galactic_b_deg": -42.79039286460447,
+              "galactic_l_deg": 119.26936773760173
+            },
+            "family": "astronomy",
+            "grants_authority": false,
+            "language": "python",
+            "pack_id": "python_astropy_astronomy",
+            "promotion_allowed": false,
+            "receipt_id": "sha256:cea178b5f92819182aa9fc2a88f1fb96279cf087414663c60a09b284bf506f5a",
+            "resource_envelope": {
+              "bounded": true,
+              "canonical_writes": 0,
+              "elapsed_seconds": 0.769
+            },
+            "solver": {
+              "family": "coordinate_transform",
+              "name": "SkyCoord.transform_to"
+            },
+            "status": "ACTIVE",
+            "tolerance": {
+              "abs": 1e-10,
+              "rel": 1e-10
+            },
+            "trace_digest_algorithm": "sha256",
+            "trace_sha256": "dc2d56245a7779640bbb0735a699fb81bc0f7fd965e52a39a4ce2767d94204a1",
+            "unit_bindings": [
+              "right_ascension:deg",
+              "declination:deg",
+              "galactic_longitude:deg"
+            ]
+          },
+          {
+            "automatic_scientific_promotion": false,
+            "backend_versions": {
+              "cantera": "3.2.0"
+            },
+            "bitwise_identity_claimed": false,
+            "canonical_writes": 0,
+            "dataset": {
+              "kind": "synthetic",
+              "mechanism": "gri30",
+              "mixture": "CH4/O2/N2"
+            },
+            "diagnostics": {
+              "co2_mole_fraction": 0.06613901862488529,
+              "flame_temperature_K": 2541.146470975832,
+              "h2o_mole_fraction": 0.1678892183266278
+            },
+            "family": "combustion",
+            "grants_authority": false,
+            "language": "python",
+            "pack_id": "python_cantera_combustion",
+            "promotion_allowed": false,
+            "receipt_id": "sha256:4ce22c74be185b8cdc5784de3048d3ec0e96d81dd95356e1352ed4eee6a749e7",
+            "resource_envelope": {
+              "bounded": true,
+              "canonical_writes": 0,
+              "elapsed_seconds": 0.359
+            },
+            "solver": {
+              "family": "chemical_equilibrium",
+              "name": "equilibrate_HP"
+            },
+            "status": "ACTIVE",
+            "tolerance": {
+              "abs": 1e-08,
+              "rel": 1e-08
+            },
+            "trace_digest_algorithm": "sha256",
+            "trace_sha256": "7b17d1a651286d1f65195498e5b2d22e3dd57a68f5be8b13e4800ff04ee00830",
+            "unit_bindings": [
+              "temperature:K",
+              "pressure:Pa",
+              "composition:mole_fraction"
+            ]
+          },
+          {
+            "automatic_scientific_promotion": false,
+            "backend_versions": {
+              "native": "srl-a14-rc-battery-v1"
+            },
+            "bitwise_identity_claimed": false,
+            "canonical_writes": 0,
+            "dataset": {
+              "kind": "synthetic",
+              "model": "single_cell_rc_discharge"
+            },
+            "diagnostics": {
+              "final_soc": 0.800000000000002,
+              "terminal_voltage": 3.950000000000003
+            },
+            "family": "battery",
+            "grants_authority": false,
+            "language": "python",
+            "pack_id": "native_battery_rc",
+            "promotion_allowed": false,
+            "receipt_id": "sha256:d8228f59c661d17d44b42ee97033d698fbd5faac43bb597969a60a8d3f458948",
+            "resource_envelope": {
+              "bounded": true,
+              "canonical_writes": 0,
+              "elapsed_seconds": 0.0
+            },
+            "solver": {
+              "family": "bounded_state_space_model",
+              "name": "explicit_euler"
+            },
+            "status": "ACTIVE",
+            "tolerance": {
+              "abs": 1e-12,
+              "rel": 1e-12
+            },
+            "trace_digest_algorithm": "sha256",
+            "trace_sha256": "1059f9f71073a86837c53da8c8d9f51dc64458175cc1b3e1d5cc23b6bf2add7f",
+            "unit_bindings": [
+              "time:s",
+              "current:A",
+              "capacity:C",
+              "voltage:V",
+              "resistance:ohm"
+            ]
+          },
+          {
+            "automatic_scientific_promotion": false,
+            "backend_versions": {
+              "quimb": "1.14.0"
+            },
+            "bitwise_identity_claimed": false,
+            "canonical_writes": 0,
+            "dataset": {
+              "kind": "synthetic",
+              "model": "two_site_heisenberg_chain"
+            },
+            "diagnostics": {
+              "ground_state_energy": -0.75
+            },
+            "family": "quantum_many_body",
+            "grants_authority": false,
+            "language": "python",
+            "pack_id": "python_quimb_many_body",
+            "promotion_allowed": false,
+            "receipt_id": "sha256:e328e71cd2786b863517e9504c23e8b37ce179ab7f32dcdf631bbfb8f9955fa1",
+            "resource_envelope": {
+              "bounded": true,
+              "canonical_writes": 0,
+              "elapsed_seconds": 1.03
+            },
+            "solver": {
+              "family": "exact_diagonalization",
+              "name": "eigvalsh"
+            },
+            "status": "ACTIVE",
+            "tolerance": {
+              "abs": 1e-09,
+              "rel": 1e-09
+            },
+            "trace_digest_algorithm": "sha256",
+            "trace_sha256": "a41931dd737f7ad3b9960820d6ab573c53025fa1900d7eef475777add3d5d1de",
+            "unit_bindings": [
+              "energy:dimensionless",
+              "spin:dimensionless"
+            ]
+          },
+          {
+            "automatic_scientific_promotion": false,
+            "backend_versions": {
+              "cotengra": "0.8.2"
+            },
+            "bitwise_identity_claimed": false,
+            "canonical_writes": 0,
+            "dataset": {
+              "kind": "synthetic",
+              "network": "three_tensor_chain"
+            },
+            "diagnostics": {
+              "contraction_cost": 90.0,
+              "contraction_width": 3.9068905956085187
+            },
+            "family": "tensor_networks",
+            "grants_authority": false,
+            "language": "python",
+            "pack_id": "python_cotengra_tensor_network",
+            "promotion_allowed": false,
+            "receipt_id": "sha256:b35302547529231d48fdf7735ef68351d8e8ba08971bc19f964cb2719d1e08e2",
+            "resource_envelope": {
+              "bounded": true,
+              "canonical_writes": 0,
+              "elapsed_seconds": 0.001
+            },
+            "solver": {
+              "family": "tensor_contraction_path",
+              "name": "array_contract_tree_greedy"
+            },
+            "status": "ACTIVE",
+            "tolerance": {
+              "abs": 0.0,
+              "rel": 1e-12
+            },
+            "trace_digest_algorithm": "sha256",
+            "trace_sha256": "7f0b0466bacc65c909ae74bd573a7e3309eb036de779658cfd1ba6bcb661cee5",
+            "unit_bindings": [
+              "bond_dimension:count",
+              "flop_cost:operation_count"
+            ]
+          }
+        ]
+      },
+      "check_id": "A14-01-real-sciml-domain-workloads",
+      "detail": "Julia SciML, Python diffrax, quantum, astronomy, combustion, battery and tensor-network workloads executed",
+      "julia_project_role": "explicit_env",
+      "status": "PASS"
+    },
+    {
+      "check_id": "A14-02-units-tolerances-domain-diagnostics-and-no-bitwise-claim",
+      "detail": "A14 diagnostics cover ODE tolerance, quantum transfer, combustion equilibrium, battery state and tensor-network path metrics",
+      "status": "PASS"
+    }
+  ],
+  "formally_replaced_packs": [
+    "julia_modelingtoolkit",
+    "julia_datadrivendiffeq",
+    "python_cadabra",
+    "python_pybamm"
+  ],
+  "grants_authority": false,
+  "live_actions": 0,
+  "receipt_id": "sha256:2ab6c81a418700072a1330008290304cd24fe74993efd65c22b4fd43397080ae",
+  "remaining_external_waits": [],
+  "remaining_internal_waits": [],
+  "result": "PASS",
+  "schema_version": "StageCompletionReceipt/v1",
+  "stage_closure": "A14_ACTIVE",
+  "stage_id": "A14"
+}

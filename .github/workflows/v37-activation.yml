@@ -351,3 +351,57 @@ jobs:
         run: uv sync --locked
       - name: V3.7 A13 applied science gate
         run: uv run python scripts/checks/srf-v37-a13-gate.py
+
+  a14-sciml-domain:
+    name: A14 SciML and domain-science gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Set up Julia 1.12.6
+        uses: julia-actions/setup-julia@4c0cb0fce8556fdb04a90347310e5db8b1f98fb9  # v2.7.0
+        with:
+          version: "1.12.6"
+      - name: Restore exact A14 Julia SciML cache
+        id: a14-julia-cache-restore
+        uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809  # v4.2.4
+        with:
+          path: |
+            .cache/srl-a14-julia-depot
+            .cache/srl-a14-julia-project
+          key: >-
+            a14-${{ runner.os }}-${{ runner.arch }}-julia-1.12.6-${{ hashFiles('pyproject.toml', 'uv.lock', 'src/srl/products/sciml_domain.py', 'scripts/checks/srf-v37-a14-prepare-julia.py', 'scripts/checks/srf-v37-a14-gate.py') }}
+          restore-keys: |
+            a14-${{ runner.os }}-${{ runner.arch }}-julia-1.12.6-
+      - name: Setup uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9  # v9.0.0
+        with:
+          enable-cache: true
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+      - name: Install SciML/domain dependencies (locked)
+        run: uv sync --locked --extra sciml-domain
+      - name: Prepare A14 Julia SciML project
+        timeout-minutes: 35
+        env:
+          JULIA_DEPOT_PATH: .cache/srl-a14-julia-depot
+          SRL_A14_JULIA_PROJECT_DIR: .cache/srl-a14-julia-project
+        run: uv run --extra sciml-domain python scripts/checks/srf-v37-a14-prepare-julia.py
+      - name: V3.7 A14 SciML and domain-science gate
+        timeout-minutes: 10
+        env:
+          JULIA_DEPOT_PATH: .cache/srl-a14-julia-depot
+          SRL_A14_JULIA_PROJECT_DIR: .cache/srl-a14-julia-project
+        run: uv run --extra sciml-domain python scripts/checks/srf-v37-a14-gate.py
+      - name: Save exact A14 Julia SciML cache
+        if: always() && steps.a14-julia-cache-restore.outputs.cache-hit != 'true'
+        uses: actions/cache/save@0400d5f644dc74513175e3cd8d07132dd4860809  # v4.2.4
+        with:
+          path: |
+            .cache/srl-a14-julia-depot
+            .cache/srl-a14-julia-project
+          key: >-
+            a14-${{ runner.os }}-${{ runner.arch }}-julia-1.12.6-${{ hashFiles('pyproject.toml', 'uv.lock', 'src/srl/products/sciml_domain.py', 'scripts/checks/srf-v37-a14-prepare-julia.py', 'scripts/checks/srf-v37-a14-gate.py') }}

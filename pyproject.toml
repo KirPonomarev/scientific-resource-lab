@@ -113,8 +113,13 @@ Changelog = "https://github.com/KirPonomarev/scientific-resource-lab/blob/main/C
 # PySR/PySINDy/PyDMD activation engines and still requires an explicit Julia
 # executable for the PySR smoke gate. These are NOT default runtime deps: their
 # broader transitive closures stay opt-in so the default install closure (and
-# ``license_inventory``) remains clean. Install with ``uv sync --extra bayesian``
-# or ``uv sync --extra discovery`` to build/test those adapters. See ADR-0008.
+# ``license_inventory``) remains clean. The ``sciml-domain`` extra (A14) pulls
+# bounded Python domain engines for the V3.7 SciML/domain gate; PyBaMM is not
+# included because its battery closure is heavier and carries unresolved
+# third-party license/weight review for v2, so A14 uses a native bounded battery
+# workload instead. Install with ``uv sync --extra bayesian``,
+# ``uv sync --extra discovery`` or ``uv sync --extra sciml-domain`` to
+# build/test those adapters. See ADR-0008.
 [project.optional-dependencies]
 bayesian = [
     "arviz>=0.20,<1",
@@ -124,6 +129,14 @@ discovery = [
     "pydmd>=2025.8,<2026",
     "pysindy>=2.0,<3",
     "pysr>=1.5,<2",
+]
+sciml-domain = [
+    "astropy>=7,<8",
+    "cantera>=3.1,<4",
+    "cotengra>=0.7,<1",
+    "diffrax>=0.7,<0.8",
+    "quimb>=1.11,<2",
+    "qutip>=5.2,<6",
 ]
 
 # Hatchling build targets. The import package (srl) differs from the
