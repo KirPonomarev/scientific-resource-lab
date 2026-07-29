@@ -1,0 +1,12 @@
+{
+  "schema_version": "A01NegativeFixture/v1",
+  "candidate": {
+    "target_release": "v2.0.0",
+    "target_result": "DONE",
+    "production_signer": "ed25519_native",
+    "sandbox": "policy_only",
+    "t7_binding": "ACTIVE"
+  },
+  "component_overrides": [],
+  "expected_verdict": "REJECT"
+}

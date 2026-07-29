@@ -20,10 +20,16 @@ jobs:
       - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
         with:
           enable-cache: false
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+      - name: Install dependencies (locked)
+        run: uv sync --locked
       - name: verify tag points at main history
         run: |
           git fetch --depth=50 origin main
           git merge-base --is-ancestor HEAD origin/main
+      - name: V3.7 A01 truth-ledger gate
+        run: uv run python scripts/checks/srf-v37-a01-gate.py
       - name: build evidence
         run: python3 scripts/release/build-evidence.py
       - name: verify evidence schema
