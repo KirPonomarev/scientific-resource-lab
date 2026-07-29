@@ -1038,16 +1038,16 @@ terminal_result PASS запрещён, если remaining_internal_waits не п
 <!-- END_PLAN_CONTRACT_V3_7 -->
 
 <!-- BEGIN_MUTABLE_STATE_V3_7 -->
-STATE_REVISION: 6
-PREVIOUS_STATE_SHA256: e06e6dff-48b499f1-4a9c9423-fbefb69c-2d72361c-8ffd70be-96d7eaef-e733cdee
-CURRENT_STATE_SHA256: 523976b2-7e980d0c-8576a7ed-4b8babe7-4f0593ad-2bff55e8-566c5aca-6cad4621
+STATE_REVISION: 7
+PREVIOUS_STATE_SHA256: 523976b2-7e980d0c-8576a7ed-4b8babe7-4f0593ad-2bff55e8-566c5aca-6cad4621
+CURRENT_STATE_SHA256: aa08490c-d2b88ee5-4605ac9d-5eb1a6fa-76fde674-a0578076-1de89fbb-5abab857
 
 ## CURRENT_FACTS
 
 ~~~yaml
 current_facts:
   observed_at: 2026-07-29
-  repository_head: 071e5a06c9fedec85c1c7021171361f8c67f75b0
+  repository_head: 96f2910b0ab01dfb15d763f3f80fa0e1579ac179
   predecessor_release: v1.0.1
   predecessor_result: RELEASED_WITH_DECLARED_WAITS
   current_active_default_packs:
@@ -1063,7 +1063,10 @@ current_facts:
   production_ed25519_transport_interface: ACTIVE
   fixture_hmac_production_path: REJECTED
   transport_crash_reconciliation: ACTIVE
-  enforced_t2_t3_sandbox: missing
+  t0_t1_subprocess_sandbox: ACTIVE
+  sandbox_adversarial_suite: ACTIVE
+  sandbox_output_and_scratch_limits: ACTIVE
+  enforced_t2_t3_sandbox: WAIT_COMPUTE_TARGET
   t7_binding: WAIT_T7_BINDING
   a02_t7_binding_gate: ACTIVE
   a02_physical_binding: WAIT_AUTHORITY
@@ -1081,25 +1084,28 @@ current_facts:
 
 ~~~yaml
 execution_state:
-  status: A04_ACCEPTED
-  current_stage: A05
-  next_stage: A05_enforced_sandbox
+  status: A05_ACCEPTED_WAIT_NATIVE_T2_T3_TARGET
+  current_stage: A06
+  next_stage: A06_durable_executor_and_scheduler
   completed_stages:
     - A00
     - A01
     - A03
     - A04
+    - A05
   parked_stages:
     - A02_non_destructive_t7_binding
     - A04_native_production_key_binding
+    - A05_native_t2_t3_compute_binding
   parked_blockers:
     - WAIT_AUTHORITY:A02_BIND_T7_NATIVE_TARGET
     - WAIT_AUTHORITY:A04_BIND_PRODUCTION_ED25519_KEYRING
-  active_branch_or_null: codex/srf-a04-signing-transport
+    - WAIT_COMPUTE_TARGET:A05_BIND_NATIVE_SANDBOX_COMPUTE_TARGET
+  active_branch_or_null: codex/srf-a05-enforced-sandbox
   active_pr_or_null: null
   writer_lease_or_null: null
   blocker_or_null: null
-  next_executable_action: start A05 enforced sandbox without weakening T2/T3 isolation or touching protected compute targets absent authority
+  next_executable_action: start A06 durable executor software lane while keeping T7-backed persistence and native compute binding parked until exact authority/evidence exists
   updated_at: 2026-07-29
 ~~~
 
@@ -1129,6 +1135,8 @@ decision_log:
     decision: A03 environment factory produces deterministic isolated profile manifests and rejects revoked dependencies, global depots and unknown-license ACTIVE claims
   - id: V37-D011
     decision: A04 Ed25519 transport interface is active with fixture-HMAC production rejection, revoked-key/replay guards and crash reconciliation; native production key binding remains WAIT_AUTHORITY
+  - id: V37-D012
+    decision: A05 local T0/T1 subprocess sandbox is enforced with adversarial, canary, output and scratch-limit evidence; native T2/T3 compute target remains WAIT_COMPUTE_TARGET
 ~~~
 
 ## EVIDENCE_INDEX
@@ -1156,6 +1164,10 @@ evidence_index:
   - docs/target-binding/ed25519-native-key-operator-action.json
   - scripts/checks/srf-v37-a04-gate.py
   - docs/verification/srf-v3-7-a04-signing-transport-receipt.json
+  - docs/security/sandbox-boundary.md
+  - docs/target-binding/native-sandbox-compute-operator-action.json
+  - scripts/checks/srf-v37-a05-gate.py
+  - docs/verification/srf-v3-7-a05-enforced-sandbox-receipt.json
 ~~~
 
 <!-- END_MUTABLE_STATE_V3_7 -->

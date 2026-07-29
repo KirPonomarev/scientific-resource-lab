@@ -292,6 +292,7 @@ def run_adapter(  # noqa: PLR0913 (kw-only set IS the run's tunable set)
     *,
     wall_seconds: int | None = None,
     output_cap_bytes: int = sandbox.DEFAULT_OUTPUT_CAP_BYTES,
+    scratch_cap_bytes: int | None = None,
     deps: _SpawnDeps | None = None,
 ) -> RunOutcome:
     """Run ``adapter_id`` on ``input_payload`` under ``policy``; return the outcome.
@@ -320,6 +321,11 @@ def run_adapter(  # noqa: PLR0913 (kw-only set IS the run's tunable set)
         ``policy.default.wall_seconds``). Tests pass a short value (2-5 s).
     output_cap_bytes:
         Per-stream byte cap for stdout/stderr (default 1 MiB).
+    scratch_cap_bytes:
+        Aggregate byte cap for the private scratch tree. Defaults to
+        ``policy.default.scratch_bytes``. A run that exits cleanly after writing
+        more than this cap is classified as ``resource_limit`` and writes no
+        receipt.
     deps:
         Injectable spawn dependencies for tests.
 
@@ -344,6 +350,12 @@ def run_adapter(  # noqa: PLR0913 (kw-only set IS the run's tunable set)
     wall = wall_seconds if wall_seconds is not None else policy.default.wall_seconds
     if wall <= 0:
         msg = f"policy wall_seconds must be > 0, got {wall}"
+        raise PolicyError(msg)
+    scratch_cap = (
+        scratch_cap_bytes if scratch_cap_bytes is not None else policy.default.scratch_bytes
+    )
+    if scratch_cap <= 0:
+        msg = f"scratch_cap_bytes must be > 0, got {scratch_cap}"
         raise PolicyError(msg)
 
     # 2. Materialise input as a read-only canonical JSON file in scratch.
@@ -432,6 +444,7 @@ def run_adapter(  # noqa: PLR0913 (kw-only set IS the run's tunable set)
         started=started,
         wall=wall,
         cap=output_cap_bytes,
+        scratch_cap=scratch_cap,
         adapter_id=adapter_id,
         output_path=output_path,
         scratch=scratch,
@@ -457,6 +470,8 @@ class _RunContext:
         The wall cap in seconds.
     cap:
         The per-stream output byte cap.
+    scratch_cap:
+        The aggregate private scratch-tree byte cap.
     adapter_id:
         The adapter id that ran.
     output_path:
@@ -469,6 +484,7 @@ class _RunContext:
     started: float
     wall: int
     cap: int
+    scratch_cap: int
     adapter_id: str
     output_path: Path
     scratch: Path
@@ -525,6 +541,28 @@ def _build_usage(captured: sandbox.CapturedOutput, started: float) -> RunUsage:
     )
 
 
+def _scratch_usage_bytes(path: Path) -> int:
+    """Return total regular-file bytes under ``path``.
+
+    Directories, sockets, fifos and disappearing files do not count. The
+    scratch tree is owned by this UID and created ``0o700``, so unreadable
+    regular files are unexpected; if one disappears during traversal, it is
+    ignored as a race with cleanup.
+    """
+    total = 0
+    try:
+        entries = list(path.rglob("*"))
+    except OSError:
+        return 0
+    for entry in entries:
+        try:
+            if entry.is_file():
+                total += entry.stat().st_size
+        except OSError:
+            continue
+    return total
+
+
 def _classify(ctx: _RunContext, timed_out: bool, captured: sandbox.CapturedOutput) -> RunOutcome:
     """Classify the drained run into a :class:`RunOutcome` (receipt-last).
 
@@ -572,6 +610,17 @@ def _classify(ctx: _RunContext, timed_out: bool, captured: sandbox.CapturedOutpu
             receipt_written=False,
             fail_reason=sandbox.RESOURCE_LIMIT_FAIL_REASON,
             detail=f"wall timeout after {ctx.wall}s (elapsed {elapsed:.3f}s)",
+        )
+    scratch_bytes = _scratch_usage_bytes(ctx.scratch)
+    if scratch_bytes > ctx.scratch_cap:
+        return RunOutcome(
+            adapter_id=ctx.adapter_id,
+            status=RunStatus.RESOURCE_LIMIT,
+            output=None,
+            usage=usage,
+            receipt_written=False,
+            fail_reason=sandbox.RESOURCE_LIMIT_FAIL_REASON,
+            detail=(f"scratch usage {scratch_bytes} bytes exceeded the {ctx.scratch_cap}-byte cap"),
         )
     return _classify_exit(ctx, captured, usage)
 

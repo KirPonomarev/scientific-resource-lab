@@ -2,7 +2,7 @@
 # Portable: no absolute paths or usernames. Uses uv for everything.
 # Targets run via `uv run` so contributors only need uv installed.
 
-.PHONY: bootstrap lint format typecheck test build verify repro-check gate-a01 gate-a02 gate-a03 gate-a04 gate-wp03 gate-wp10 gate-wp11 gate-wp12 gate-wp13 gate-wp14 gate-wp45 corpus router-determinism clean help
+.PHONY: bootstrap lint format typecheck test build verify repro-check gate-a01 gate-a02 gate-a03 gate-a04 gate-a05 gate-wp03 gate-wp10 gate-wp11 gate-wp12 gate-wp13 gate-wp14 gate-wp45 corpus router-determinism clean help
 
 help: ## Show this help.
 	@awk 'BEGIN {FS = ":.*##"; printf "Usage:\n  make <target>\n\nTargets:\n"} \
@@ -34,7 +34,7 @@ build: ## Clean dist/ and build sdist + wheel (uv build).
 repro-check: ## Run the reproducible-wheel check and print the manifest.
 	uv run python scripts/build/reproducible-check.py
 
-verify: lint typecheck test gate-a01 gate-a02 gate-a03 gate-a04 build ## Run lint, typecheck, tests, V3.7 gates, and build.
+verify: lint typecheck test gate-a01 gate-a02 gate-a03 gate-a04 gate-a05 build ## Run lint, typecheck, tests, V3.7 gates, and build.
 
 gate-a01: ## Run the V3.7 A01 truth-ledger acceptance gate.
 	uv run python scripts/checks/srf-v37-a01-gate.py
@@ -47,6 +47,9 @@ gate-a03: ## Run the V3.7 A03 environment factory gate.
 
 gate-a04: ## Run the V3.7 A04 signing and transport gate.
 	uv run python scripts/checks/srf-v37-a04-gate.py
+
+gate-a05: ## Run the V3.7 A05 enforced sandbox gate.
+	uv run python scripts/checks/srf-v37-a05-gate.py
 
 # WP-A03 autonomy-contracts gate. Runs the five acceptance checks and prints a
 # GateReceipt/v1 JSON receipt; non-zero exit on any FAIL. Pure stdlib + the

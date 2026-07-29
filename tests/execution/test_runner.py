@@ -222,6 +222,48 @@ def test_run_output_cap_resource_limit_no_receipt(
     assert _receipts(scratch) == []
 
 
+def test_run_scratch_cap_resource_limit_no_receipt(
+    policy: Any, scratch: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """An over-cap scratch write yields resource_limit before any receipt."""
+    monkeypatch.setenv(_GATE, "1")
+    outcome = run_adapter(
+        "scratchfiller.v1",
+        {"bytes": 256 * 1024},
+        policy,
+        scratch,
+        wall_seconds=10,
+        output_cap_bytes=1024 * 1024,
+        scratch_cap_bytes=64 * 1024,
+    )
+    assert outcome.status is RunStatus.RESOURCE_LIMIT
+    assert outcome.receipt_written is False
+    assert outcome.fail_reason == RESOURCE_LIMIT_FAIL_REASON
+    assert "scratch usage" in outcome.detail
+    assert _receipts(scratch) == []
+
+
+def test_child_envprobe_cannot_see_parent_canary(
+    policy: Any, scratch: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A live child cannot read a parent-only canary env var."""
+    monkeypatch.setenv(_GATE, "1")
+    monkeypatch.setenv("SRL_TEST_A05_CANARY", "parent-only-value")
+    outcome = run_adapter(
+        "envprobe.v1",
+        {"name": "SRL_TEST_A05_CANARY"},
+        policy,
+        scratch,
+        wall_seconds=10,
+    )
+    assert outcome.status is RunStatus.COMPLETED
+    assert outcome.output == {
+        "name": "SRL_TEST_A05_CANARY",
+        "present": False,
+        "value_length": 0,
+    }
+
+
 # ---------------------------------------------------------------------------
 # Failed limit setup: preexec failure -> resource_limit, no receipt.
 # ---------------------------------------------------------------------------

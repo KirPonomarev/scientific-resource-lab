@@ -33,6 +33,14 @@ The adapters here exist to exercise the sandbox's enforcement paths:
     Returns the child's current working directory and platform. Used by the
     WP-D34 hardening check to assert the child CWD is the scratch dir, not the
     parent repo root.
+``envprobe.v1``
+    Looks up a named environment variable and returns only a presence boolean
+    plus value length. Used by the V3.7 A05 credential-canary check to prove the
+    canary is absent inside the child without echoing any secret value.
+``scratchfiller.v1``
+    Writes bytes into the sandbox-local current working directory. Used by the
+    V3.7 A05 scratch quota check; the runner must classify an over-quota run as
+    ``resource_limit`` and write no receipt.
 ``setsiddler.v1``
     Forks a child that calls :func:`os.setsid` to escape the process group, then
     lingers briefly. Used by the WP-D34 setsid-evasion detector: a final
@@ -54,6 +62,7 @@ import os
 import socket
 import sys
 import time
+from pathlib import Path
 from typing import Any, Final
 
 from srl.execution.entrypoints import AdapterDescriptor
@@ -217,6 +226,30 @@ def _cwdprobe_handler(payload: dict[str, Any]) -> dict[str, Any]:
     return {"cwd": os.getcwd(), "platform": sys.platform, "pid": os.getpid()}
 
 
+def _envprobe_handler(payload: dict[str, Any]) -> dict[str, Any]:
+    """Return whether an env var is visible, without returning its value."""
+    name = payload.get("name", "")
+    if not isinstance(name, str) or not name:
+        name = "SRL_TEST_CREDENTIAL_CANARY"
+    value = os.environ.get(name)
+    return {"name": name, "present": value is not None, "value_length": len(value or "")}
+
+
+def _scratchfiller_handler(payload: dict[str, Any]) -> dict[str, Any]:
+    """Write ``payload['bytes']`` bytes into the sandbox-local scratch cwd."""
+    size = payload.get("bytes", 4 * 1024 * 1024)
+    if not isinstance(size, int) or size < 0:
+        size = 4 * 1024 * 1024
+    chunk = b"s" * 4096
+    written = 0
+    with Path("scratch-fill.bin").open("wb") as out:
+        while written < size:
+            n = min(len(chunk), size - written)
+            out.write(chunk[:n])
+            written += n
+    return {"wrote": written}
+
+
 def _setsiddler_handler(payload: dict[str, Any]) -> dict[str, Any]:
     """Fork a child that escapes the process group via :func:`os.setsid`.
 
@@ -324,6 +357,26 @@ _CWDPROBE_V1: Final[AdapterDescriptor] = AdapterDescriptor(
     output_schema={"required": [], "optional": ["cwd", "platform", "pid"]},
     deterministic=True,
 )
+_ENVPROBE_V1: Final[AdapterDescriptor] = AdapterDescriptor(
+    adapter_id="envprobe.v1",
+    version="v1",
+    handler=_envprobe_handler,
+    input_schema={"required": ["name"], "optional": [], "types": {"name": "str"}},
+    output_schema={
+        "required": ["name", "present", "value_length"],
+        "optional": [],
+        "types": {"name": "str", "present": "bool", "value_length": "int"},
+    },
+    deterministic=True,
+)
+_SCRATCHFILLER_V1: Final[AdapterDescriptor] = AdapterDescriptor(
+    adapter_id="scratchfiller.v1",
+    version="v1",
+    handler=_scratchfiller_handler,
+    input_schema={"required": [], "optional": ["bytes"]},
+    output_schema={"required": [], "optional": ["wrote"]},
+    deterministic=True,
+)
 _SETSIDDLER_V1: Final[AdapterDescriptor] = AdapterDescriptor(
     adapter_id="setsiddler.v1",
     version="v1",
@@ -352,6 +405,8 @@ ADAPTERS.update(
         _CHATTER_V1.adapter_id: _CHATTER_V1,
         _NETCANARY_V1.adapter_id: _NETCANARY_V1,
         _CWDPROBE_V1.adapter_id: _CWDPROBE_V1,
+        _ENVPROBE_V1.adapter_id: _ENVPROBE_V1,
+        _SCRATCHFILLER_V1.adapter_id: _SCRATCHFILLER_V1,
         _SETSIDDLER_V1.adapter_id: _SETSIDDLER_V1,
         _INVALIDOUT_V1.adapter_id: _INVALIDOUT_V1,
     }

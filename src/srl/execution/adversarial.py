@@ -515,32 +515,41 @@ def credential_canary_check(policy: ResourcePolicy) -> dict[str, Any]:
     try:
         env = build_child_env(home_dir="/srv/srl/home", tmp_dir="/srv/srl/tmp")
         canary_in_dict = _CREDENTIAL_CANARY_NAME in env
-        # Run echo.v1 to confirm the child boots under the sanitized env. The
-        # child's env is built by build_child_env (the exact dict handed to
-        # Popen), so the absence of the canary in that dict is the assertion.
+        # Run envprobe.v1 to confirm a live child cannot see the canary. The
+        # adapter returns only presence metadata, never the canary value.
         scratch = prepare_scratch()
         booted = False
+        child_saw_canary = True
         try:
             outcome = run_adapter(
-                "echo.v1", {"value": "canary-probe"}, policy, scratch, wall_seconds=10
+                "envprobe.v1",
+                {"name": _CREDENTIAL_CANARY_NAME},
+                policy,
+                scratch,
+                wall_seconds=10,
             )
             booted = outcome.status is RunStatus.COMPLETED
+            if booted and outcome.output:
+                child_saw_canary = bool(outcome.output.get("present"))
         finally:
             shutil.rmtree(scratch, ignore_errors=True)
     finally:
         os.environ.pop(_CREDENTIAL_CANARY_NAME, None)
 
-    passed = (not canary_in_dict) and booted
+    passed = (not canary_in_dict) and booted and not child_saw_canary
     return {
         "canary_name": _CREDENTIAL_CANARY_NAME,
         "canary_present_in_env_dict": canary_in_dict,
         "child_booted_under_sanitized_env": booted,
+        "child_observed_canary": child_saw_canary,
         "passed": passed,
         "detail": (
             "build_child_env excludes the parent-only canary; the child boots "
-            "under the sanitized env and cannot read the canary"
+            "under the sanitized env and envprobe cannot read the canary"
             if passed
-            else "the canary leaked into the child env dict or the child failed to boot"
+            else (
+                "the canary leaked into the env dict, the child saw it, or the child failed to boot"
+            )
         ),
     }
 
