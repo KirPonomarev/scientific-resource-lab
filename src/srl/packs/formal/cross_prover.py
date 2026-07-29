@@ -218,10 +218,10 @@ def _lean_contour(active: bool) -> FormalContour:
         logic="dependent_type_theory_calculus_of_inductive_constructions_family",
         status=FormalContourStatus.ACTIVE if active else FormalContourStatus.WAIT_TOOLCHAIN,
         executable_candidates=("lean", "lake"),
-        version_output="S12 LeanAdmissionReceipt/v1",
+        version_output="A09 LeanAdmissionReceipt/v1",
         semantic_scope="declared_statement_only",
         assumptions=("formalization_correctness_not_implied",),
-        reason="S12_lean_primary_proven" if active else "S12_lean_primary_not_active",
+        reason="A09_lean_primary_proven" if active else "A09_lean_primary_not_active",
     )
 
 

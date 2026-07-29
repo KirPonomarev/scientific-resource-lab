@@ -12,7 +12,7 @@ jobs:
   build-evidence:
     name: release evidence
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
@@ -24,6 +24,14 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends pari-gp maxima gap singular cvc5 z3
+      - name: Install native A09 Lean/mathlib toolchain
+        run: scripts/ci/install-lean-toolchain.sh
+      - name: Restore exact A09 mathlib cache
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: .cache/srl-a09
+          key: >-
+            a09-${{ runner.os }}-${{ runner.arch }}-lean-4.32.2-mathlib-905b95818eb32af7874a58b427f50c1711a5e96c-${{ hashFiles('scripts/ci/install-lean-toolchain.sh', 'scripts/ci/prepare_a09_mathlib.py', 'src/srl/packs/formal/lean/adapter.py', 'configs/packs/formal/lean/corpus-pins.json') }}
       - name: Set up Python 3.12
         run: uv python install 3.12
       - name: Install dependencies (locked)
@@ -36,6 +44,16 @@ jobs:
         run: uv run python scripts/checks/srf-v37-a01-gate.py
       - name: V3.7 A08 native algebra and SMT gate
         run: uv run python scripts/checks/srf-v37-a08-gate.py
+      - name: Prepare pinned A09 mathlib project once
+        env:
+          SRL_A09_CACHE_ROOT: .cache/srl-a09
+        run: |
+          uv run python scripts/ci/prepare_a09_mathlib.py --cache-root .cache/srl-a09 --report .tmp/a09-prepare-report.json
+          project_dir="$(python3 -c 'import json; print(json.load(open(".tmp/a09-prepare-report.json"))["project_dir"])')"
+          echo "SRL_A09_MATHLIB_PROJECT_DIR=${project_dir}" >> "$GITHUB_ENV"
+          python3 -c 'import json; r=json.load(open(".tmp/a09-prepare-report.json")); assert r["prepare_count"] <= 1; print("A09 prepare_count", r["prepare_count"], "fetch_count", r["fetch_count"], "cache_status", r["cache_status"])'
+      - name: V3.7 A09 Lean/mathlib and corpus gate
+        run: uv run python scripts/checks/srf-v37-a09-gate.py
       - name: build evidence
         run: python3 scripts/release/build-evidence.py
       - name: verify evidence schema

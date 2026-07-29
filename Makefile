@@ -2,7 +2,7 @@
 # Portable: no absolute paths or usernames. Uses uv for everything.
 # Targets run via `uv run` so contributors only need uv installed.
 
-.PHONY: bootstrap lint format typecheck test build verify repro-check gate-a01 gate-a02 gate-a03 gate-a04 gate-a05 gate-a06 gate-a07 gate-a08 gate-wp03 gate-wp10 gate-wp11 gate-wp12 gate-wp13 gate-wp14 gate-wp45 corpus router-determinism clean help
+.PHONY: bootstrap lint format typecheck test build verify repro-check gate-a01 gate-a02 gate-a03 gate-a04 gate-a05 gate-a06 gate-a07 gate-a08 gate-a09 gate-wp03 gate-wp10 gate-wp11 gate-wp12 gate-wp13 gate-wp14 gate-wp45 corpus router-determinism clean help
 
 help: ## Show this help.
 	@awk 'BEGIN {FS = ":.*##"; printf "Usage:\n  make <target>\n\nTargets:\n"} \
@@ -34,7 +34,9 @@ build: ## Clean dist/ and build sdist + wheel (uv build).
 repro-check: ## Run the reproducible-wheel check and print the manifest.
 	uv run python scripts/build/reproducible-check.py
 
-verify: lint typecheck test gate-a01 gate-a02 gate-a03 gate-a04 gate-a05 gate-a06 gate-a07 gate-a08 build ## Run lint, typecheck, tests, V3.7 gates, and build.
+
+verify: ## Run lint, typecheck, tests, V3.7 gates, one A09 prepare, and build.
+	uv run python scripts/ci/verify-v37.py
 
 gate-a01: ## Run the V3.7 A01 truth-ledger acceptance gate.
 	uv run python scripts/checks/srf-v37-a01-gate.py
@@ -59,6 +61,9 @@ gate-a07: ## Run the V3.7 A07 P0 Python core activation gate.
 
 gate-a08: ## Run the V3.7 A08 native algebra and SMT activation gate.
 	uv run python scripts/checks/srf-v37-a08-gate.py
+
+gate-a09: ## Run the V3.7 A09 Lean/mathlib and corpus activation gate.
+	uv run python scripts/checks/srf-v37-a09-gate.py
 
 # WP-A03 autonomy-contracts gate. Runs the five acceptance checks and prints a
 # GateReceipt/v1 JSON receipt; non-zero exit on any FAIL. Pure stdlib + the
