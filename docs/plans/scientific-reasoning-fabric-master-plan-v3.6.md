@@ -1900,9 +1900,9 @@ The final report must list exact IDs and hashes, never subjective percentages.
 
 <!-- BEGIN_MUTABLE_STATE_V3_6 -->
 
-STATE_REVISION: 24
-PREVIOUS_STATE_SHA256: db8146a7-f496c4ce-a1542f12-ad725e51-1a33703c-9fb75a1f-b4613580-2211c39c
-CURRENT_STATE_SHA256: 42282136-960357c4-b9649a84-d63f2a6c-ad55a70f-89339046-19a409c6-08968fcc
+STATE_REVISION: 25
+PREVIOUS_STATE_SHA256: 42282136-960357c4-b9649a84-d63f2a6c-ad55a70f-89339046-19a409c6-08968fcc
+CURRENT_STATE_SHA256: d327d950-df4ba2a6-ade5159e-d89966d5-0c3c6a42-69ab9529-914aade7-b41238c4
 
 ## CURRENT_FACTS
 
@@ -1927,20 +1927,20 @@ current_facts:
 ~~~yaml
 execution_state:
   status: IN_PROGRESS
-  current_stage: S23
-  next_stage: S24_after_security_native_child
-  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven, S09_health_recovery_proven, S10_interface_convergence_proven, S11_p0_core_proven, S12_lean_primary_proven, S13_cross_prover_proven, S14_knowledge_layer_proven, S15_lawminer_proven, S16_applied_science_proven, S17_sciml_domain_proven, S18_heavy_capability_routing_proven, S19_shared_contract_child_request_prepared, S20_market_bridge_inactive_proven, S21_security_bridge_inactive_proven, S22_market_native_child_wait_recorded]
+  current_stage: S24
+  next_stage: S25_after_t7_profile
+  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven, S09_health_recovery_proven, S10_interface_convergence_proven, S11_p0_core_proven, S12_lean_primary_proven, S13_cross_prover_proven, S14_knowledge_layer_proven, S15_lawminer_proven, S16_applied_science_proven, S17_sciml_domain_proven, S18_heavy_capability_routing_proven, S19_shared_contract_child_request_prepared, S20_market_bridge_inactive_proven, S21_security_bridge_inactive_proven, S22_market_native_child_wait_recorded, S23_security_native_child_wait_recorded]
   invalidated_stages: []
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: market_native_child_wait_runtime_health_recorded
+  last_proven_transition: security_native_child_wait_health_recorded
   active_branch_or_null: codex/srf-fabric-v1
   active_pr_or_null: null
   active_worktree_or_null: isolated_codex_worktree
   writer_lease_or_null: srf-fabric-v1-single-writer
-  active_operation_or_null: S23_security_native_child_mission
+  active_operation_or_null: S24_t7_physical_profile
   active_process_or_job_or_null: null
-  next_checkpoint: after_S23_security_child_request_or_wait_receipt
-  next_executable_action: prepare Security native child packet and park exact WAIT_SECURITY_HEALTH if native health blocks child work
+  next_checkpoint: after_S24_t7_profile_or_wait_receipt
+  next_executable_action: prepare physical T7 profile and optional Science Compute Node preflight without storage writes
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -1952,30 +1952,30 @@ state_capsule:
   project_id: scientific-resource-lab
   project_fingerprint: d56e03d0-d5e1a9bb-9c33a008-ab989510-2d8e41e8-bfd001df-bfc8e1c8-0b9df0b3
   mission_id: build-scientific-reasoning-fabric-v1
-  stage_id: S23
-  state_revision: 24
+  stage_id: S24
+  state_revision: 25
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: market_native_child_wait_runtime_health_recorded
-  active_operation: S23_security_native_child_mission
+  last_proven_transition: security_native_child_wait_health_recorded
+  active_operation: S24_t7_physical_profile
   active_process_or_job: null
   frozen_preimages:
     - baseline HEAD
     - repository governance
     - operator-supplied V3.6 protocol
   new_primary_evidence:
-    - MarketBridgeChildWaitReceipt 798ef5f6-0e7f65d1-45902df2-d18f0da4-f9d6194a-0338b8ff-a28217bb-ba69bf67
-    - Market child request sha256:31d335b9-e2f58c38-c1121a9a-f1a7559b-9f94afd0-8575f23c-785d297f-58c6814d
-    - Market child wait receipt sha256:7d997e9f-b54ab820-a856cd0e-cbcc650e-13c58c31-97aa01cb-eecbcb76-ec3e9817
-    - native Market bootstrap observed ORGANISM=RED, NEXT=F8/resume_interrupted_durable_job, LIVE_TRADING=false
-    - child request asks only for native inactive bridge validation and merge; activation remains a separate protected native action
-    - parent_direct_external_writes=0, live_actions=0 and all S22 artifacts remain authority-negative
-    - secret-scan allowlist updated with SHA-256-of-literal entries for S22 public Market child mission hash/signature false positives
+    - SecurityBridgeChildWaitReceipt a7bbccf2-db4ee9f5-a2f568d0-ef2ea46b-ac2ecc35-7256577a-268d29ef-9fc2ac73
+    - Security child request sha256:d2f56da7-c9b47d52-45c28288-397fb176-2018a6b5-220a3147-f0ed6f5a-9aa7bcd1
+    - Security child wait receipt sha256:59e8ead1-5918bba4-e4af0ba7-61f7393e-54f6566a-7dd35147-db825323-108002b7
+    - native Security HEAD c5e8349b05b601c3d2976da7bad58bf756600185 observed clean detached; bootstrap target unavailable
+    - child request asks only for native inactive bridge validation and merge; target actions remain native protected actions through ebashim
+    - parent_direct_external_writes=0, live_actions=0 and all S23 artifacts remain authority-negative
+    - secret-scan allowlist updated with SHA-256-of-literal entries for S23 public Security child mission hash/signature false positives
     - focused native child tests PASS with 3 passed
     - make test PASS with 1903 passed and 1 skipped
     - make lint PASS
     - make typecheck PASS
     - secret scan PASS
-  next_executable_action: S23 Security native child mission or exact wait
+  next_executable_action: S24 physical T7 profile and optional Science Compute Node
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -2062,6 +2062,9 @@ evidence_index:
   - claim: S22 Market native child lane parked on native RED
     source: MarketBridgeChildWaitReceipt/v1
     identity: 798ef5f6-0e7f65d1-45902df2-d18f0da4-f9d6194a-0338b8ff-a28217bb-ba69bf67
+  - claim: S23 Security native child lane parked on unavailable native bootstrap
+    source: SecurityBridgeChildWaitReceipt/v1
+    identity: a7bbccf2-db4ee9f5-a2f568d0-ef2ea46b-ac2ecc35-7256577a-268d29ef-9fc2ac73
   - claim: Market mutation currently forbidden
     source: native operator bootstrap
     identity: 59ce6ff4c8b514c93d8d4b26d648ba6e7dd7b764
@@ -2074,7 +2077,7 @@ evidence_index:
 authority_ledger:
   routine_safe_plan_creation: exercised
   exact_hash_review_authority: exercised
-  implementation_authority: exercised_routine_safe_S01_S22_with_declared_waits
+  implementation_authority: exercised_routine_safe_S01_S23_with_declared_waits
   market_mutation_authority: absent
   security_mutation_authority: absent
   physical_t7_authority: absent
@@ -2151,6 +2154,8 @@ decision_log:
     decision: S21 implements only an inactive SRF-side Security bridge over sanitized shared envelopes with ebashim as native executor boundary and explicit rejection of D2/D3, target, exploit, prompt-injection, authority and executor-bypass material
   - id: D033
     decision: S22 records a signed Market native child request and exact WAIT_RUNTIME_HEALTH because Market bootstrap is RED at F8; parent performs no Market writes, no activation and no live trading
+  - id: D034
+    decision: S23 records a signed Security native child request and exact WAIT_SECURITY_HEALTH because native bootstrap is unavailable; parent performs no Security writes, target actions, scanner control or activation
 ~~~
 
 ## PROGRESS_LOG
@@ -2252,6 +2257,10 @@ progress_log:
   - revision: 24
     stage: S22
     result: Market native child request prepared and parked as WAIT_RUNTIME_HEALTH:RED_F8 with no parent Market writes, live actions or activation
+    observed_at: 2026-07-29
+  - revision: 25
+    stage: S23
+    result: Security native child request prepared and parked as WAIT_SECURITY_HEALTH:BOOTSTRAP_UNAVAILABLE with no parent Security writes, target actions, scanner control or activation
     observed_at: 2026-07-29
 ~~~
 
