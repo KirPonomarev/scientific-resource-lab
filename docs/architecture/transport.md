@@ -43,23 +43,33 @@ terminal delivery failures go to `dlq/` with `DeadLetterRecord/v1`.
 
 ## Signatures
 
-The transport module exposes a verifier interface for native Ed25519 keyrings.
-No repository secret or production key is stored here. Local conformance tests
-use a deliberately labelled `test-hmac-sha256` fixture signer to prove the core
-property: unsigned or tampered messages are never accepted. A deployment without
-a native verifier uses a null verifier and quarantines messages.
+The transport module exposes a native Ed25519 signer/verifier interface.
+Production verification uses `Ed25519Verifier`, a public-key keyring and an
+explicit revoked-key set. No repository secret or production private key is
+stored here. Local conformance tests use ephemeral in-memory Ed25519 keys.
+
+The legacy `test-hmac-sha256` fixture signer remains available only for
+test/conformance namespaces. It is deliberately labelled and is rejected by the
+production Ed25519 verifier.
 
 Each detached signature records:
 
 - signer cell;
+- key id;
 - message identity;
 - monotonic sequence;
 - previous signature file hash;
 - signature value.
 
-This provides deterministic key-rotation and replay fixtures without creating
-authority. A signature proves transport authenticity only; it never grants
+The receiver enforces the monotonic hash chain against the latest imported
+signature. Replays, sequence rollback, stale predecessors and revoked keys are
+quarantined. A signature proves transport authenticity only; it never grants
 canonical write permission.
+
+Native production key binding is a protected operator action:
+`docs/target-binding/ed25519-native-key-operator-action.json`. Until that
+authority-backed receipt exists, release closure must keep
+`production-ed25519-signer` parked at `WAIT_AUTHORITY`.
 
 ## Replay and Retry
 
@@ -67,6 +77,11 @@ Replay is deterministic: files are parsed and returned sorted by exact message
 identity. Retry is a pure bounded exponential schedule with deterministic jitter
 derived from the message id. The function produces retry delays; it does not
 start a timer, daemon, service, or background loop.
+
+If a process dies after importing a message but before writing its ACK,
+`reconcile_acknowledgements()` rebuilds the missing `ACKNOWLEDGED` record from
+the imported message on restart. Duplicate delivery returns `DUPLICATE` without
+overwriting the original persisted `ACKNOWLEDGED` receipt.
 
 ## State Model
 
