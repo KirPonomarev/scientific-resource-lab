@@ -8,7 +8,7 @@ from typing import Any
 RECEIPT_PATH = Path("docs/verification/system-acceptance-receipt.json")
 
 _PLAN_HASH = "947d1858c8cf110f3c6bdb07c70a8ff132459f9e7b6448d1afbf84d4270c1ff0"
-_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+_SHA256_RE = re.compile(r"^[0-9a-f]{64}$|^[0-9a-f]{8}(-[0-9a-f]{8}){7}$")
 _REQUIRED_COMMANDS = {
     "exact_hash_review",
     "lint",
@@ -67,13 +67,17 @@ def _receipt() -> dict[str, Any]:
     return json.loads(RECEIPT_PATH.read_text(encoding="utf-8"))
 
 
+def _normalize_digest(value: str) -> str:
+    return value.replace("-", "")
+
+
 def test_system_acceptance_receipt_identity_and_authority_negative() -> None:
     receipt = _receipt()
 
     assert receipt["schema_version"] == "SystemAcceptanceReceipt/v1"
     assert receipt["stage_id"] == "S25"
     assert receipt["result"] == "PASS_WITH_DECLARED_WAITS"
-    assert receipt["plan_hash"] == _PLAN_HASH
+    assert _normalize_digest(receipt["plan_hash"]) == _PLAN_HASH
     assert _SHA256_RE.fullmatch(receipt["receipt_id"])
     assert receipt["canonical_writes"] == 0
     assert receipt["grants_authority"] is False

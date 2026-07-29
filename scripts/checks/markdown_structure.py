@@ -143,6 +143,9 @@ def scan() -> Report:
     for path in sorted(Path.cwd().rglob("*.md")):
         if ".git" in path.parts:
             continue
+        ignored_dirs = {".tmp", ".venv", ".mypy_cache", ".pytest_cache", ".ruff_cache"}
+        if any(part in ignored_dirs for part in path.parts):
+            continue
         # GitHub issue/PR templates use their own required YAML frontmatter and
         # section structure; they are not ordinary project documentation.
         if ".github/ISSUE_TEMPLATE" in str(path) or path.name == "pull_request_template.md":

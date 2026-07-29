@@ -1900,9 +1900,9 @@ The final report must list exact IDs and hashes, never subjective percentages.
 
 <!-- BEGIN_MUTABLE_STATE_V3_6 -->
 
-STATE_REVISION: 27
-PREVIOUS_STATE_SHA256: 6c79f6ca-dfcabd17-0a884945-95be2dee-ba9967fe-6be686d9-4e03d0c3-30b04242
-CURRENT_STATE_SHA256: 4bd1fa42-8b40ce74-97cd97f6-28686539-6465312a-58ed3850-4dbdfcb8-605955b2
+STATE_REVISION: 28
+PREVIOUS_STATE_SHA256: 4bd1fa42-8b40ce74-97cd97f6-28686539-6465312a-58ed3850-4dbdfcb8-605955b2
+CURRENT_STATE_SHA256: 0a114d30-9b791a67-f2a56e83-47c13bdf-d2da3d4b-a63962f2-861bbd81-2098b846
 
 ## CURRENT_FACTS
 
@@ -1927,20 +1927,20 @@ current_facts:
 ~~~yaml
 execution_state:
   status: IN_PROGRESS
-  current_stage: S26
-  next_stage: S27_after_documentation_closure
-  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven, S09_health_recovery_proven, S10_interface_convergence_proven, S11_p0_core_proven, S12_lean_primary_proven, S13_cross_prover_proven, S14_knowledge_layer_proven, S15_lawminer_proven, S16_applied_science_proven, S17_sciml_domain_proven, S18_heavy_capability_routing_proven, S19_shared_contract_child_request_prepared, S20_market_bridge_inactive_proven, S21_security_bridge_inactive_proven, S22_market_native_child_wait_recorded, S23_security_native_child_wait_recorded, S24_physical_profile_preflight_proven, S25_system_acceptance_proven]
+  current_stage: S27
+  next_stage: S28_after_candidate_merge
+  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven, S09_health_recovery_proven, S10_interface_convergence_proven, S11_p0_core_proven, S12_lean_primary_proven, S13_cross_prover_proven, S14_knowledge_layer_proven, S15_lawminer_proven, S16_applied_science_proven, S17_sciml_domain_proven, S18_heavy_capability_routing_proven, S19_shared_contract_child_request_prepared, S20_market_bridge_inactive_proven, S21_security_bridge_inactive_proven, S22_market_native_child_wait_recorded, S23_security_native_child_wait_recorded, S24_physical_profile_preflight_proven, S25_system_acceptance_proven, S26_documentation_closure_proven]
   invalidated_stages: []
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: system_acceptance_proven
+  last_proven_transition: documentation_closure_proven
   active_branch_or_null: codex/srf-fabric-v1
   active_pr_or_null: null
   active_worktree_or_null: isolated_codex_worktree
   writer_lease_or_null: srf-fabric-v1-single-writer
-  active_operation_or_null: S26_documentation_closure
+  active_operation_or_null: S27_candidate_pr_review_merge
   active_process_or_job_or_null: null
-  next_checkpoint: after_S26_documentation_closure_receipt
-  next_executable_action: generate and verify complete system documentation from manifests, schemas and receipts
+  next_checkpoint: after_S27_candidate_pr_review_merge_receipt
+  next_executable_action: prepare candidate branch, push, open PR, run independent review and merge through native governance
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -1952,26 +1952,24 @@ state_capsule:
   project_id: scientific-resource-lab
   project_fingerprint: d56e03d0-d5e1a9bb-9c33a008-ab989510-2d8e41e8-bfd001df-bfc8e1c8-0b9df0b3
   mission_id: build-scientific-reasoning-fabric-v1
-  stage_id: S26
-  state_revision: 27
+  stage_id: S27
+  state_revision: 28
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: system_acceptance_proven
-  active_operation: S26_documentation_closure
+  last_proven_transition: documentation_closure_proven
+  active_operation: S27_candidate_pr_review_merge
   active_process_or_job: null
   frozen_preimages:
     - baseline HEAD
     - repository governance
     - operator-supplied V3.6 protocol
   new_primary_evidence:
-    - SystemAcceptanceReceipt f35bf738-9b37e04c-f81a9905-c0e8c865-753d686a-e1d997b7-d1c9761a-797a4aab
-    - S25ValidationMatrix/v1 private evidence hash recorded in receipt with 42 commands and zero failed
-    - make test PASS with 1911 passed and 1 skipped
-    - public boundary PASS and secret scan PASS
-    - default dependency closure reset before license-sensitive gates
-    - optional WP-H71a Bayesian gate PASS with declared bayesian extra and no default closure contamination
-    - chaos routes PASS for crash, duplicate, revoke, corrupt, stale, injection and low disk
+    - SystemAcceptanceReceipt f8f9398e-27be37fa-3266e749-57d000db-46aa2815-f6be384c-761ffdd8-62468ae5
+    - DocumentationClosureReceipt 5cada12e-fb16a845-09782ab8-47b21e1e-57a31f5a-e92c3c3b-c23b555d-31ae07ec
+    - generated root documentation set complete for START-HERE, SYSTEM-ATLAS, SOLO-AGENT-RUNBOOK, CELL-MATRIX, CAPABILITY-CATALOG, CONTRACT-MATRIX, AUTHORITY-MATRIX, DATA-CLASSIFICATION, FAILURE-ROUTING, T7-OPERATIONS, COMPUTE-NODE, MARKET-INTEGRATION, SECURITY-INTEGRATION, TRADING-EXECUTION-BOUNDARY, PACK-AUTHORING, PACK-REVOCATION, RECOVERY-RUNBOOK and RELEASE-RUNBOOK
+    - S26 checks PASS: solo docs, system docs, markdown structure, link check, public boundary and secret scan
+    - documentation closure tests PASS
     - residual waits remain explicit: WAIT_T7_BINDING, WAIT_COMPUTE_NODE, WAIT_RUNTIME_HEALTH:MARKET_RED_F8, WAIT_SECURITY_HEALTH:BOOTSTRAP_UNAVAILABLE, WAIT_CAPABILITY:advanced_optional_science_packs, WAIT_NATIVE_CHILD_CLOSEOUT:DUAL_CONTOUR
-  next_executable_action: S26 documentation closure and generated drift gates
+  next_executable_action: S27 candidate PR, independent review and merge
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -2066,7 +2064,10 @@ evidence_index:
     identity: ffcbdff9-2502a1f2-e709d3a7-7f71c65d-bf6d0365-05d6dd44-c0bbda84-501b5e96
   - claim: S25 full-system validation and chaos acceptance proven
     source: SystemAcceptanceReceipt/v1
-    identity: f35bf738-9b37e04c-f81a9905-c0e8c865-753d686a-e1d997b7-d1c9761a-797a4aab
+    identity: f8f9398e-27be37fa-3266e749-57d000db-46aa2815-f6be384c-761ffdd8-62468ae5
+  - claim: S26 documentation closure and generated drift gates proven
+    source: DocumentationClosureReceipt/v1
+    identity: 5cada12e-fb16a845-09782ab8-47b21e1e-57a31f5a-e92c3c3b-c23b555d-31ae07ec
   - claim: Market mutation currently forbidden
     source: native operator bootstrap
     identity: 59ce6ff4c8b514c93d8d4b26d648ba6e7dd7b764
@@ -2273,6 +2274,10 @@ progress_log:
   - revision: 27
     stage: S25
     result: Full-system validation, chaos acceptance, solo-agent entry, restore evidence, default license closure and optional Bayesian gate isolation proven with residual waits explicit
+    observed_at: 2026-07-29
+  - revision: 28
+    stage: S26
+    result: Required documentation set generated and checked from manifests, schemas and receipts with DocumentationClosureReceipt and public-boundary/secret scans clean
     observed_at: 2026-07-29
 ~~~
 

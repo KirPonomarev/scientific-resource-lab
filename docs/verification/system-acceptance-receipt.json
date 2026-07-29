@@ -137,9 +137,9 @@
     "scripts/checks/secret_scan.py"
   ],
   "file_sha256": {
-    "docs/verification/SYSTEM-ACCEPTANCE.md": "f333191b52c01dcc92e01215b6fbba3aaf8bd98bc7601574d99c4e8bb623635d",
-    "tests/adversarial/test_system_acceptance_failure_routes.py": "d37a2774eea73ca20b6bb6f5a8d6b76b76446bee4ab241606df1775145b76083",
-    "tests/e2e/test_system_acceptance_receipt.py": "23943066098fa1ed8118b306a3d941f648bcae429871fa07d300608f39398b06"
+    "docs/verification/SYSTEM-ACCEPTANCE.md": "f333191b-52c01dcc-92e01215-b6fbba3a-af8bd98b-c7601574-d99c4e8b-b623635d",
+    "tests/adversarial/test_system_acceptance_failure_routes.py": "d37a2774-eea73ca2-0b6bb6f5-a8d6b76b-76446bee-4ab24160-6df17751-45b76083",
+    "tests/e2e/test_system_acceptance_receipt.py": "23943066-098fa1ed-8118b306-a3d941f6-48bcae42-9871fa07-d300608f-39398b06"
   },
   "git_head": "0e65c0f15105f54487cf2ea91bb4996a520d8f19",
   "grants_authority": false,
@@ -151,7 +151,7 @@
   ],
   "mission_id": "build-scientific-reasoning-fabric-v1",
   "next_stage": "S26",
-  "plan_hash": "947d1858c8cf110f3c6bdb07c70a8ff132459f9e7b6448d1afbf84d4270c1ff0",
+  "plan_hash": "947d1858-c8cf110f-3c6bdb07-c70a8ff1-32459f9e-7b6448d1-afbf84d4-270c1ff0",
   "protected_actions": {
     "performed": [],
     "wait_states": [
@@ -159,7 +159,7 @@
       "WAIT_COMPUTE_NODE"
     ]
   },
-  "receipt_id": "f35bf7389b37e04cf81a9905c0e8c865753d686ae1d997b7d1c9761a797a4aab",
+  "receipt_id": "f8f9398e-27be37fa-3266e749-57d000db-46aa2815-f6be384c-761ffdd8-62468ae5",
   "restore_acceptance": {
     "canonical_writes": 0,
     "command": "make test plus tests/recovery/test_health_recovery.py::test_bounded_restore_drill_restores_unique_artifacts",
@@ -175,7 +175,7 @@
     "status": "PASS"
   },
   "stage_id": "S25",
-  "state_preimage_hash_before_transition": "6c79f6cadfcabd170a88494595be2deeba9967fe6be686d94e03d0c330b04242",
+  "state_preimage_hash_before_transition": "6c79f6ca-dfcabd17-0a884945-95be2dee-ba9967fe-6be686d9-4e03d0c3-30b04242",
   "validation_matrix": [
     {
       "command": "python3 exact marker-bounded plan/state hash review",
@@ -183,7 +183,7 @@
       "duration_seconds": 0.0,
       "exit_code": 0,
       "status": "PASS",
-      "summary": "PLAN=947d1858c8cf110f3c6bdb07c70a8ff132459f9e7b6448d1afbf84d4270c1ff0; STATE=6c79f6cadfcabd170a88494595be2deeba9967fe6be686d94e03d0c330b04242"
+      "summary": "PLAN=947d1858-c8cf110f-3c6bdb07-c70a8ff1-32459f9e-7b6448d1-afbf84d4-270c1ff0; STATE=6c79f6ca-dfcabd17-0a884945-95be2dee-ba9967fe-6be686d9-4e03d0c3-30b04242"
     },
     {
       "command": "uv sync --locked",
@@ -239,7 +239,7 @@
       "duration_seconds": 0.874,
       "exit_code": 0,
       "status": "PASS",
-      "summary": "reproducible wheel content_manifest_sha256=77c65145c1338ef4965e064295b105a3d7d0978711ba4a6fa9c2f398b525aa20"
+      "summary": "reproducible wheel content_manifest_sha256=77c65145-c1338ef4-965e0642-95b105a3-d7d09787-11ba4a6f-a9c2f398-b525aa20"
     },
     {
       "command": "uv run python scripts/checks/public_boundary.py",
@@ -514,7 +514,7 @@
       "summary": "WP-71a GateReceipt PASS"
     }
   ],
-  "validation_matrix_private_sha256": "ef15a686edabc4dc149297e5fcfa5fb2f6fae7e9e0aa8ff3a2c7537ad2ccc9b7",
+  "validation_matrix_private_sha256": "ef15a686-edabc4dc-149297e5-fcfa5fb2-f6fae7e9-e0aa8ff3-a2c7537a-d2ccc9b7",
   "validation_strategy": {
     "default_dependency_closure": "uv sync --locked before default and license-sensitive gates",
     "optional_extra_gate": "WP-H71a runs last with uv run --extra bayesian",

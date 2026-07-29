@@ -1,0 +1,105 @@
+from __future__ import annotations
+
+import hashlib
+import json
+import subprocess
+import sys
+from pathlib import Path
+from typing import Any
+
+REQUIRED_DOCS = (
+    "START-HERE.md",
+    "SYSTEM-ATLAS.md",
+    "SOLO-AGENT-RUNBOOK.md",
+    "CELL-MATRIX.md",
+    "CAPABILITY-CATALOG.md",
+    "CONTRACT-MATRIX.md",
+    "AUTHORITY-MATRIX.md",
+    "DATA-CLASSIFICATION.md",
+    "FAILURE-ROUTING.md",
+    "T7-OPERATIONS.md",
+    "COMPUTE-NODE.md",
+    "MARKET-INTEGRATION.md",
+    "SECURITY-INTEGRATION.md",
+    "TRADING-EXECUTION-BOUNDARY.md",
+    "PACK-AUTHORING.md",
+    "PACK-REVOCATION.md",
+    "RECOVERY-RUNBOOK.md",
+    "RELEASE-RUNBOOK.md",
+)
+RECEIPT_PATH = Path("docs/verification/documentation-closure-receipt.json")
+_SYSTEM_ACCEPTANCE_RECEIPT = "f8f9398e27be37fa3266e74957d000db46aa2815f6be384c761ffdd862468ae5"
+
+
+def _run(*args: str) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(  # noqa: S603
+        [sys.executable, *args],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+
+def _receipt() -> dict[str, Any]:
+    return json.loads(RECEIPT_PATH.read_text(encoding="utf-8"))
+
+
+def _normalize_digest(value: str) -> str:
+    return value.removeprefix("sha256:").replace("-", "")
+
+
+def test_generated_documentation_is_current() -> None:
+    solo = _run("scripts/docs/generate_solo_agent_docs.py", "--check")
+    system = _run("scripts/docs/generate_system_docs.py", "--check")
+
+    assert solo.returncode == 0, solo.stdout
+    assert system.returncode == 0, system.stdout
+
+
+def test_required_document_set_exists() -> None:
+    for doc in REQUIRED_DOCS:
+        path = Path(doc)
+        assert path.is_file(), doc
+        text = path.read_text(encoding="utf-8")
+        assert text.startswith(f"# {Path(doc).stem}")
+        assert text.endswith("\n")
+
+
+def test_documentation_closure_receipt_is_authority_negative() -> None:
+    receipt = _receipt()
+
+    assert receipt["schema_version"] == "DocumentationClosureReceipt/v1"
+    assert receipt["stage_id"] == "S26"
+    assert receipt["result"] == "PASS"
+    assert receipt["canonical_writes"] == 0
+    assert receipt["grants_authority"] is False
+    assert receipt["live_actions"] == 0
+    assert _normalize_digest(receipt["source_system_acceptance_receipt"]) == (
+        _SYSTEM_ACCEPTANCE_RECEIPT
+    )
+
+
+def test_documentation_closure_receipt_hashes_required_docs() -> None:
+    receipt = _receipt()
+    doc_hashes = receipt["required_doc_sha256"]
+
+    assert set(doc_hashes) == set(REQUIRED_DOCS)
+    for doc, expected in doc_hashes.items():
+        actual = hashlib.sha256(Path(doc).read_bytes()).hexdigest()
+        assert actual == _normalize_digest(expected), doc
+
+
+def test_documentation_checks_all_passed() -> None:
+    receipt = _receipt()
+    checks = {item["check_id"]: item for item in receipt["checks"]}
+
+    for check_id in (
+        "solo_docs_check",
+        "system_docs_check",
+        "markdown_structure",
+        "link_check",
+        "public_boundary",
+        "secret_scan",
+    ):
+        assert checks[check_id]["status"] == "PASS"
+        assert checks[check_id]["exit_code"] == 0

@@ -1,0 +1,127 @@
+{
+  "branch": "codex/srf-fabric-v1",
+  "canonical_writes": 0,
+  "checks": [
+    {
+      "check_id": "solo_docs_check",
+      "command": "uv run python scripts/docs/generate_solo_agent_docs.py --check",
+      "duration_seconds": 0.211,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "PASS"
+    },
+    {
+      "check_id": "system_docs_check",
+      "command": "uv run python scripts/docs/generate_system_docs.py --check",
+      "duration_seconds": 0.071,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "PASS"
+    },
+    {
+      "check_id": "markdown_structure",
+      "command": "uv run python scripts/checks/markdown_structure.py",
+      "duration_seconds": 1.411,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "PASS"
+    },
+    {
+      "check_id": "link_check",
+      "command": "uv run python scripts/checks/link_check.py",
+      "duration_seconds": 0.094,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "PASS"
+    },
+    {
+      "check_id": "public_boundary",
+      "command": "uv run python scripts/checks/public_boundary.py",
+      "duration_seconds": 0.548,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "PASS"
+    },
+    {
+      "check_id": "secret_scan",
+      "command": "uv run python scripts/checks/secret_scan.py",
+      "duration_seconds": 0.466,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "PASS"
+    }
+  ],
+  "declared_wait_states": [
+    "WAIT_T7_BINDING",
+    "WAIT_COMPUTE_NODE",
+    "WAIT_RUNTIME_HEALTH:MARKET_RED_F8",
+    "WAIT_SECURITY_HEALTH:BOOTSTRAP_UNAVAILABLE",
+    "WAIT_CAPABILITY:advanced_optional_science_packs",
+    "WAIT_NATIVE_CHILD_CLOSEOUT:DUAL_CONTOUR"
+  ],
+  "generated_sources": [
+    "scripts/docs/generate_solo_agent_docs.py",
+    "scripts/docs/generate_system_docs.py",
+    "src/srl/planning/catalog_data.json",
+    "src/srl/contracts/schemas/v1",
+    "automation/fail-reasons.json",
+    "packs/*/manifest.json"
+  ],
+  "git_head": "189669f6430dbf6a0cd7c93eb2f4a12b3ae8b62a",
+  "grants_authority": false,
+  "limitations_machine_visible": true,
+  "live_actions": 0,
+  "mission_id": "build-scientific-reasoning-fabric-v1",
+  "next_stage": "S27",
+  "plan_hash": "947d1858-c8cf110f-3c6bdb07-c70a8ff1-32459f9e-7b6448d1-afbf84d4-270c1ff0",
+  "protected_actions": {
+    "performed": [],
+    "wait_states": []
+  },
+  "receipt_id": "5cada12e-fb16a845-09782ab8-47b21e1e-57a31f5a-e92c3c3b-c23b555d-31ae07ec",
+  "required_doc_sha256": {
+    "AUTHORITY-MATRIX.md": "67d84c99-3fb300d6-545aa7fd-6d074290-f4d0394c-74621f5a-8c760d85-abdcf2fd",
+    "CAPABILITY-CATALOG.md": "58228411-adc12e5b-217b0542-13b0a59f-ac3e6947-2a724d06-c7ab790f-bbeac55e",
+    "CELL-MATRIX.md": "a26067d0-203f1e9f-cb2e0bd9-88a2a5d2-1111e703-c37b0db5-84b79e5d-32b6e05e",
+    "COMPUTE-NODE.md": "e478d79c-f14701a6-67a3c9f7-3d315e60-00b43a2a-1f4fcab0-2422699c-4c8de597",
+    "CONTRACT-MATRIX.md": "a5a58a6f-821fd320-4c58e042-151c9e45-c469d74f-4fd2ce1e-bf7b266e-ade8b806",
+    "DATA-CLASSIFICATION.md": "e3b511d6-6e208c06-2b17d73a-31591dc2-6d6b4801-8925b646-4055b67b-2250136a",
+    "FAILURE-ROUTING.md": "81e48c1c-e5bdba23-8b5909dc-15adfb9f-afa9ce84-c227849f-29549e00-cc6f753c",
+    "MARKET-INTEGRATION.md": "9b2d0e2b-cc2a0120-98d7be47-c523d4ea-268ae4d3-6b0389ee-ececd01c-5c5f86e6",
+    "PACK-AUTHORING.md": "c5f046a6-e5d6d4c6-8c71d938-3700e8ff-73fdbdb1-ed778c75-c46bcca7-03b6e525",
+    "PACK-REVOCATION.md": "21b66705-5d052adf-45c0a449-8367097c-7868c7f9-16ffe77a-9585785c-00687d32",
+    "RECOVERY-RUNBOOK.md": "b64ea3d4-427b0c6a-197c33ce-3ad70ee0-857d5197-5fa7fa4c-41c40fad-9f641295",
+    "RELEASE-RUNBOOK.md": "26499eca-289fd58a-81f7da1d-37183d12-21fff4fc-4dd21c3d-6a2273e5-c2bc4e39",
+    "SECURITY-INTEGRATION.md": "cb171078-9efc72a0-c72128f6-1fd1b65e-11c0dc78-dc1493d4-d70ec0c3-c36e39ac",
+    "SOLO-AGENT-RUNBOOK.md": "86b0ada5-02d9cbe3-8417d08a-d450c4cb-030c8ca0-94bb4875-c8fca194-79f12e7e",
+    "START-HERE.md": "e2780d5b-4e43a33f-e68dab85-ce879423-06de30bc-ef4a5eb5-d212361c-5ec564d3",
+    "SYSTEM-ATLAS.md": "79a659a5-33724ef8-42db727c-2614e8ff-a773b8d2-b836da71-103fae93-ecd876e5",
+    "T7-OPERATIONS.md": "5d56d8fb-ee87a208-6b4a6be1-1e87e97f-a2c987cc-690e5fec-e4a2c407-a99e3afa",
+    "TRADING-EXECUTION-BOUNDARY.md": "9a20599b-c03d1464-82293e82-0b58c11d-c8a5b9ee-d1bebcc4-c46c1072-920b8103"
+  },
+  "required_docs": [
+    "START-HERE.md",
+    "SYSTEM-ATLAS.md",
+    "SOLO-AGENT-RUNBOOK.md",
+    "CELL-MATRIX.md",
+    "CAPABILITY-CATALOG.md",
+    "CONTRACT-MATRIX.md",
+    "AUTHORITY-MATRIX.md",
+    "DATA-CLASSIFICATION.md",
+    "FAILURE-ROUTING.md",
+    "T7-OPERATIONS.md",
+    "COMPUTE-NODE.md",
+    "MARKET-INTEGRATION.md",
+    "SECURITY-INTEGRATION.md",
+    "TRADING-EXECUTION-BOUNDARY.md",
+    "PACK-AUTHORING.md",
+    "PACK-REVOCATION.md",
+    "RECOVERY-RUNBOOK.md",
+    "RELEASE-RUNBOOK.md"
+  ],
+  "result": "PASS",
+  "schema_version": "DocumentationClosureReceipt/v1",
+  "source_system_acceptance_receipt": "sha256:f8f9398e-27be37fa-3266e749-57d000db-46aa2815-f6be384c-761ffdd8-62468ae5",
+  "stage_id": "S26",
+  "state_preimage_hash_before_transition": "4bd1fa42-8b40ce74-97cd97f6-28686539-6465312a-58ed3850-4dbdfcb8-605955b2"
+}
