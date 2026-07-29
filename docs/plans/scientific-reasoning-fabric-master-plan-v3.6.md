@@ -1900,9 +1900,9 @@ The final report must list exact IDs and hashes, never subjective percentages.
 
 <!-- BEGIN_MUTABLE_STATE_V3_6 -->
 
-STATE_REVISION: 20
-PREVIOUS_STATE_SHA256: 29b38821-f93809bb-6c918649-36c4f1a7-cc3c578b-5fa51310-4974f46c-fde28e55
-CURRENT_STATE_SHA256: e0d6b9fe-dde069cf-a4e2a136-36404ca3-7a2b31d2-de58b54a-e88c8537-3829dac6
+STATE_REVISION: 21
+PREVIOUS_STATE_SHA256: e0d6b9fe-dde069cf-a4e2a136-36404ca3-7a2b31d2-de58b54a-e88c8537-3829dac6
+CURRENT_STATE_SHA256: f76cc6ef-758ec5a7-77fcfacf-4a131b4c-a820f663-4bc7c123-f62be8cd-a1ff04b3
 
 ## CURRENT_FACTS
 
@@ -1927,20 +1927,20 @@ current_facts:
 ~~~yaml
 execution_state:
   status: IN_PROGRESS
-  current_stage: S19
-  next_stage: S20_after_shared_contract_child
-  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven, S09_health_recovery_proven, S10_interface_convergence_proven, S11_p0_core_proven, S12_lean_primary_proven, S13_cross_prover_proven, S14_knowledge_layer_proven, S15_lawminer_proven, S16_applied_science_proven, S17_sciml_domain_proven, S18_heavy_capability_routing_proven]
+  current_stage: S20
+  next_stage: S21_after_market_bridge
+  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven, S09_health_recovery_proven, S10_interface_convergence_proven, S11_p0_core_proven, S12_lean_primary_proven, S13_cross_prover_proven, S14_knowledge_layer_proven, S15_lawminer_proven, S16_applied_science_proven, S17_sciml_domain_proven, S18_heavy_capability_routing_proven, S19_shared_contract_child_request_prepared]
   invalidated_stages: []
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: heavy_capability_routing_proven
+  last_proven_transition: shared_contract_child_request_prepared_wait_native
   active_branch_or_null: codex/srf-fabric-v1
   active_pr_or_null: null
   active_worktree_or_null: isolated_codex_worktree
   writer_lease_or_null: srf-fabric-v1-single-writer
-  active_operation_or_null: S19_shared_contract_child_mission
+  active_operation_or_null: S20_market_bridge_inactive
   active_process_or_job_or_null: null
-  next_checkpoint: after_S19_shared_contract_child_request_or_wait_receipt
-  next_executable_action: emit signed child mission request for DualContour shared schemas and conformance vectors
+  next_checkpoint: after_S20_market_bridge_inactive_receipt
+  next_executable_action: implement inactive SRF-side Market adapter with C3 semantics and no trading authority
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -1952,30 +1952,29 @@ state_capsule:
   project_id: scientific-resource-lab
   project_fingerprint: d56e03d0-d5e1a9bb-9c33a008-ab989510-2d8e41e8-bfd001df-bfc8e1c8-0b9df0b3
   mission_id: build-scientific-reasoning-fabric-v1
-  stage_id: S19
-  state_revision: 20
+  stage_id: S20
+  state_revision: 21
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: heavy_capability_routing_proven
-  active_operation: S19_shared_contract_child_mission
+  last_proven_transition: shared_contract_child_request_prepared_wait_native
+  active_operation: S20_market_bridge_inactive
   active_process_or_job: null
   frozen_preimages:
     - baseline HEAD
     - repository governance
     - operator-supplied V3.6 protocol
   new_primary_evidence:
-    - HeavyCapabilityRoutingReceipt faca13a3-09d5a54c-02e4553f-8f2ca54a-24737066-8605e93b-89b61318-40d36b23
-    - HeavyCapabilityRoutingBundle sha256:a496c01f-30f4b3b0-a182e712-5c342c23-c2020381-1a5e33d0-8f08a476-283e85a4
-    - PETSc, FEniCSx, pyMOR, scikit-fem, Dedalus, Modulus, neuralop and Sage route to WAIT_COMPUTE_NODE under absent runtime/node evidence
-    - Wolfram oracle routes to WAIT_AUTHORITY without credential and budget authority
-    - compatible fixture node routing returns ROUTABLE_REMOTE without launching a remote job
-    - architecture mismatch, absent node, revoked image and exhausted budget produce exact WAIT or REJECTED decisions
-    - signed remote job packet fixture verifies exact bytes and detects tamper
-    - implicit_spend=0, unbounded_local_runs=0 and all S18 receipts remain authority-negative
-    - focused S18 tests PASS with 8 passed
-    - make test PASS with 1874 passed and 1 skipped
+    - SharedContractChildRequestReceipt f0cc9275-716e3fae-5ea9fa6e-92ac45ca-3d9d1b09-4190d5aa-5e4a5b61-c3530942
+    - ChildMissionRequest sha256:00253ea5-29a03583-b2c969be-ca4b26d1-00f1a323-7ec80163-aa85816e-7163aab5
+    - ChildMissionRequest artifact sha256:a786c38e-8c789a4f-5cbfeb8d-989e3edb-a0c192e-1d1c90d0-5bf44b35-53d78e390
+    - DualContour read-only HEAD a3cc68227387954417931fe08f9d66b6212f3308 observed clean
+    - local ScientificRequestEnvelope and ScientificResultEnvelope conformance vectors accept and reject as declared
+    - native DualContour closeout remains WAIT_NATIVE_CHILD_CLOSEOUT
+    - parent_direct_external_writes=0 and all S19 artifacts remain authority-negative
+    - focused S19 tests PASS with 4 passed
+    - make test PASS with 1878 passed and 1 skipped
     - make lint PASS
     - make typecheck PASS
-  next_executable_action: S19 shared contract child mission
+  next_executable_action: S20 inactive Market bridge implementation
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -2050,6 +2049,9 @@ evidence_index:
   - claim: S18 heavy capability routing proven with declared waits
     source: HeavyCapabilityRoutingReceipt/v1
     identity: faca13a3-09d5a54c-02e4553f-8f2ca54a-24737066-8605e93b-89b61318-40d36b23
+  - claim: S19 shared contract child request prepared with native closeout wait
+    source: SharedContractChildRequestReceipt/v1
+    identity: f0cc9275-716e3fae-5ea9fa6e-92ac45ca-3d9d1b09-4190d5aa-5e4a5b61-c3530942
   - claim: Market mutation currently forbidden
     source: native operator bootstrap
     identity: 59ce6ff4c8b514c93d8d4b26d648ba6e7dd7b764
@@ -2062,7 +2064,7 @@ evidence_index:
 authority_ledger:
   routine_safe_plan_creation: exercised
   exact_hash_review_authority: exercised
-  implementation_authority: exercised_routine_safe_S01_S18
+  implementation_authority: exercised_routine_safe_S01_S19_with_declared_wait
   market_mutation_authority: absent
   security_mutation_authority: absent
   physical_t7_authority: absent
@@ -2131,6 +2133,8 @@ decision_log:
     decision: S17 records Julia/Python SciML and domain engines as reproducible profile cards, keeps all missing runtimes in WAIT_CAPABILITY, and proves unit, solver, tolerance and cross-runtime bitwise-identity guards without adding a mutable Julia depot or heavy dependency closure
   - id: D029
     decision: S18 implements WAIT-safe heavy routing with fixture-node conformance and test-HMAC packet verification while leaving real node launch, credential installation, paid Wolfram calls and image execution behind native authority gates
+  - id: D030
+    decision: S19 emits only an SRF-side signed child mission request and local conformance vectors; native DualContour validation remains WAIT_NATIVE_CHILD_CLOSEOUT and no parent direct external write or domain-truth claim is made
 ~~~
 
 ## PROGRESS_LOG
@@ -2216,6 +2220,10 @@ progress_log:
   - revision: 20
     stage: S18
     result: Heavy capability routing proven with explicit WAIT_COMPUTE_NODE and WAIT_AUTHORITY states, fixture-node routing, checkpoint, budget, architecture, image-revocation and signature-tamper guards
+    observed_at: 2026-07-29
+  - revision: 21
+    stage: S19
+    result: Shared contract child mission request prepared with local conformance vectors green and native DualContour closeout parked as WAIT_NATIVE_CHILD_CLOSEOUT
     observed_at: 2026-07-29
 ~~~
 
