@@ -87,10 +87,21 @@ class _ErrorThenSuccessTransport:
 # ---------------------------------------------------------------------------
 
 
-def test_p0_registry_has_four_https_endpoints() -> None:
-    """The P0 registry contains exactly the four expected HTTPS endpoints."""
+def test_p0_registry_has_a11_https_endpoints() -> None:
+    """The registry contains the A11 public-source HTTPS allowlist."""
     registry = p0_registry()
-    assert set(registry.policies) == {"openalex", "crossref", "arxiv", "oeis"}
+    assert set(registry.policies) == {
+        "openalex",
+        "crossref",
+        "arxiv",
+        "oeis",
+        "opencitations",
+        "zbmath",
+        "lmfdb",
+        "cslib",
+        "erdos_problems",
+        "formal_conjectures",
+    }
     for policy in registry.policies.values():
         assert policy.base_url.startswith("https://")
         assert policy.rate_limit_per_minute == 10

@@ -160,6 +160,82 @@ def test_a10_truth_projection_is_offline_and_receipt_backed(
     assert {item["probe_kind"] for item in first["components"]} == {"stage_receipt"}
 
 
+def test_a11_truth_projection_is_offline_and_receipt_backed(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    sources = [
+        "openalex",
+        "crossref",
+        "arxiv",
+        "oeis",
+        "opencitations",
+        "zbmath",
+        "lmfdb",
+        "cslib",
+        "erdos_problems",
+        "formal_conjectures",
+    ]
+    source_results = [_a11_source_result(source_id) for source_id in sources]
+    receipt = {
+        "schema_version": "StageCompletionReceipt/v1",
+        "stage_id": "A11",
+        "result": "PASS",
+        "stage_closure": "A11_ACTIVE",
+        "active_packs": sources,
+        "parked_packs": [],
+        "remaining_internal_waits": [],
+        "remaining_external_waits": [],
+        "checks": [
+            {
+                "check_id": "A11-00-receipt-projects-truth-ledger-active",
+                "status": "PASS",
+            },
+            {
+                "check_id": "A11-01-source-policy-admission",
+                "status": "PASS",
+                "active_sources": sources,
+            },
+            {
+                "check_id": "A11-02-live-source-probes-and-replay",
+                "status": "PASS",
+                "source_results": source_results,
+            },
+            {
+                "check_id": "A11-03-knowledge-graph-taint-and-citation-contract",
+                "status": "PASS",
+                "manifest": {
+                    "active_source_ids": sources,
+                    "wait_source_ids": [],
+                    "prompt_injection_fact_ids": ["sha256:fixture"],
+                    "raw_corpus_in_privileged_prompt": 0,
+                },
+            },
+        ],
+        "canonical_writes": 0,
+        "grants_authority": False,
+        "receipt_id": "sha256:fixture-a11-receipt",
+    }
+    receipt_path = tmp_path / "a11-receipt.json"
+    receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+    a11_specs = tuple(item for item in truth._SPECS if item.stage == "A11")
+
+    def forbidden(*_args: object, **_kwargs: object) -> object:
+        raise AssertionError("A11 truth projection must not fetch network or spawn subprocesses")
+
+    monkeypatch.setattr(truth, "_SPECS", a11_specs)
+    monkeypatch.setattr(truth, "_A11_RECEIPT_PATH", receipt_path)
+    monkeypatch.setattr(truth.shutil, "which", forbidden)
+    monkeypatch.setattr(subprocess, "run", forbidden)
+
+    first = truth.build_truth_ledger()
+    second = truth.build_truth_ledger()
+
+    assert first["a11_active_inventory_observed"] == sources
+    assert second["a11_active_inventory_observed"] == first["a11_active_inventory_observed"]
+    assert {item["probe_kind"] for item in first["components"]} == {"stage_receipt"}
+
+
 def _a10_proof_check(check_id: str, prover_id: str) -> dict[str, object]:
     return {
         "check_id": check_id,
@@ -173,6 +249,25 @@ def _a10_proof_check(check_id: str, prover_id: str) -> dict[str, object]:
             "version_probe": {"returncode": 0},
             "proof_probe": {"returncode": 0},
         },
+    }
+
+
+def _a11_source_result(endpoint_id: str) -> dict[str, object]:
+    return {
+        "endpoint_id": endpoint_id,
+        "status": "PASS",
+        "live_query_receipt": {
+            "endpoint_id": endpoint_id,
+            "cached": False,
+            "response_sha256": "sha256:" + "ab" * 32,
+        },
+        "offline_replay_receipt": {
+            "endpoint_id": endpoint_id,
+            "cached": True,
+            "response_sha256": "sha256:" + "ab" * 32,
+        },
+        "record_ids": ["sha256:" + "cd" * 32],
+        "source_uris": [f"https://example.org/{endpoint_id}"],
     }
 
 

@@ -43,6 +43,16 @@ Current v1.0.1 active inventory reproduced by the ledger:
 | `rocq` | `a10_formal` | `A10` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
 | `isabelle` | `a10_formal` | `A10` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
 | `hol4` | `a10_formal` | `A10` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
+| `openalex` | `a11_knowledge_graph` | `A11` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
+| `crossref` | `a11_knowledge_graph` | `A11` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
+| `arxiv` | `a11_knowledge_graph` | `A11` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
+| `oeis` | `a11_knowledge_graph` | `A11` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
+| `opencitations` | `a11_knowledge_graph` | `A11` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
+| `zbmath` | `a11_knowledge_graph` | `A11` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
+| `lmfdb` | `a11_knowledge_graph` | `A11` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
+| `cslib` | `a11_knowledge_graph` | `A11` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
+| `erdos_problems` | `a11_knowledge_graph` | `A11` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
+| `formal_conjectures` | `a11_knowledge_graph` | `A11` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
 | `production-ed25519-signer` | `a04_transport` | `A04` | `WAIT_AUTHORITY` | `missing_or_protected_capability` |
 | `t2-t3-enforced-sandbox` | `a05_sandbox` | `A05` | `WAIT_COMPUTE_TARGET` | `missing_or_protected_capability` |
 | `t7-binding` | `a02_t7` | `A02` | `WAIT_T7_BINDING` | `missing_or_protected_capability` |
