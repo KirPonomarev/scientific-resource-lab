@@ -1038,16 +1038,16 @@ terminal_result PASS запрещён, если remaining_internal_waits не п
 <!-- END_PLAN_CONTRACT_V3_7 -->
 
 <!-- BEGIN_MUTABLE_STATE_V3_7 -->
-STATE_REVISION: 7
-PREVIOUS_STATE_SHA256: 523976b2-7e980d0c-8576a7ed-4b8babe7-4f0593ad-2bff55e8-566c5aca-6cad4621
-CURRENT_STATE_SHA256: aa08490c-d2b88ee5-4605ac9d-5eb1a6fa-76fde674-a0578076-1de89fbb-5abab857
+STATE_REVISION: 8
+PREVIOUS_STATE_SHA256: aa08490c-d2b88ee5-4605ac9d-5eb1a6fa-76fde674-a0578076-1de89fbb-5abab857
+CURRENT_STATE_SHA256: dba3d9db-1b976c7d-b57db8d8-0173d281-e5cd0670-ef91d24a-1599148d-deeca4d5
 
 ## CURRENT_FACTS
 
 ~~~yaml
 current_facts:
   observed_at: 2026-07-29
-  repository_head: 96f2910b0ab01dfb15d763f3f80fa0e1579ac179
+  repository_head: 09c2d1db7556ca93ce7205b38b7c888779b11632
   predecessor_release: v1.0.1
   predecessor_result: RELEASED_WITH_DECLARED_WAITS
   current_active_default_packs:
@@ -1067,6 +1067,10 @@ current_facts:
   sandbox_adversarial_suite: ACTIVE
   sandbox_output_and_scratch_limits: ACTIVE
   enforced_t2_t3_sandbox: WAIT_COMPUTE_TARGET
+  durable_scheduler_software: ACTIVE
+  scheduler_real_subprocess_dispatch: ACTIVE
+  scheduler_terminal_receipt_binding: ACTIVE
+  scheduler_t7_native_persistence: WAIT_T7_BINDING
   t7_binding: WAIT_T7_BINDING
   a02_t7_binding_gate: ACTIVE
   a02_physical_binding: WAIT_AUTHORITY
@@ -1084,28 +1088,30 @@ current_facts:
 
 ~~~yaml
 execution_state:
-  status: A05_ACCEPTED_WAIT_NATIVE_T2_T3_TARGET
-  current_stage: A06
-  next_stage: A06_durable_executor_and_scheduler
+  status: A06_ACCEPTED_WAIT_T7_NATIVE_PERSISTENCE
+  current_stage: A07
+  next_stage: A07_activate_p0_python_core
   completed_stages:
     - A00
     - A01
     - A03
     - A04
     - A05
+    - A06
   parked_stages:
     - A02_non_destructive_t7_binding
     - A04_native_production_key_binding
     - A05_native_t2_t3_compute_binding
+    - A06_native_t7_persistence_binding
   parked_blockers:
     - WAIT_AUTHORITY:A02_BIND_T7_NATIVE_TARGET
     - WAIT_AUTHORITY:A04_BIND_PRODUCTION_ED25519_KEYRING
     - WAIT_COMPUTE_TARGET:A05_BIND_NATIVE_SANDBOX_COMPUTE_TARGET
-  active_branch_or_null: codex/srf-a05-enforced-sandbox
+  active_branch_or_null: codex/srf-a06-durable-executor
   active_pr_or_null: null
   writer_lease_or_null: null
   blocker_or_null: null
-  next_executable_action: start A06 durable executor software lane while keeping T7-backed persistence and native compute binding parked until exact authority/evidence exists
+  next_executable_action: start A07 P0 Python core activation while keeping T7-backed persistence and native compute binding parked until exact authority/evidence exists
   updated_at: 2026-07-29
 ~~~
 
@@ -1137,6 +1143,8 @@ decision_log:
     decision: A04 Ed25519 transport interface is active with fixture-HMAC production rejection, revoked-key/replay guards and crash reconciliation; native production key binding remains WAIT_AUTHORITY
   - id: V37-D012
     decision: A05 local T0/T1 subprocess sandbox is enforced with adversarial, canary, output and scratch-limit evidence; native T2/T3 compute target remains WAIT_COMPUTE_TARGET
+  - id: V37-D013
+    decision: A06 durable scheduler software lane is active with T7-work namespace contract, crash/restart exact-once recovery, pool/backpressure controls and bound terminal receipts; native T7 persistence remains WAIT_T7_BINDING
 ~~~
 
 ## EVIDENCE_INDEX
@@ -1168,6 +1176,9 @@ evidence_index:
   - docs/target-binding/native-sandbox-compute-operator-action.json
   - scripts/checks/srf-v37-a05-gate.py
   - docs/verification/srf-v3-7-a05-enforced-sandbox-receipt.json
+  - docs/operations/runner.md
+  - scripts/checks/srf-v37-a06-gate.py
+  - docs/verification/srf-v3-7-a06-durable-executor-receipt.json
 ~~~
 
 <!-- END_MUTABLE_STATE_V3_7 -->

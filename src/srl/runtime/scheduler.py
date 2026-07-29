@@ -14,14 +14,16 @@ import os
 import re
 import shutil
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import StrEnum
 from pathlib import Path
 from typing import Any, Final, cast
 
+from srl.cas.layout import SrfStorageLayout
 from srl.cas.store import LocalArtifactStore
 from srl.contracts.canonical import dumps
 from srl.contracts.errors import CONTRACT_INVALID_FAIL_REASON, ContractError
+from srl.contracts.ids import object_id
 from srl.execution.estimate import ResourceEstimate
 from srl.execution.materialize import StagedRun, materialize_run
 from srl.execution.policy import (
@@ -38,6 +40,7 @@ from srl.packs.governance import PackLifecycleStatus
 RUN_REQUEST_SCHEMA_VERSION: Final[str] = "RuntimeRunRequest/v1"
 RUN_CHECKPOINT_SCHEMA_VERSION: Final[str] = "RuntimeRunCheckpoint/v1"
 RUN_TERMINAL_RECEIPT_SCHEMA_VERSION: Final[str] = "RuntimeRunTerminalReceipt/v1"
+RUN_NAMESPACE_SCHEMA_VERSION: Final[str] = "RuntimeT7WorkNamespace/v1"
 RUNNER_CONFORMANCE_RECEIPT_SCHEMA_VERSION: Final[str] = "RunnerConformanceReceipt/v1"
 
 _REQUEST_ID_RE: Final[re.Pattern[str]] = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$")
@@ -48,6 +51,8 @@ _PACK_WAIT_REASON: Final[str] = "WAIT_PACK_GOVERNANCE"
 _CANCELLED_REASON: Final[str] = "CANCELLED_BY_OPERATOR"
 _INTERRUPTED_REASON: Final[str] = "INTERRUPTED_BEFORE_TERMINAL"
 _DISK_WAIT_REASON: Final[str] = "WAIT_LOCAL_DISK"
+_DEFAULT_RUNTIME_NAMESPACE: Final[str] = "scheduler"
+_RUNTIME_NAMESPACE_RE: Final[re.Pattern[str]] = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$")
 
 
 class SchedulerError(ContractError):
@@ -71,6 +76,13 @@ class RuntimeRunStatus(StrEnum):
     WAIT_LOCAL_DISK = "wait_local_disk"
 
 
+class RuntimePool(StrEnum):
+    """Dispatch pool for bounded local runtime work."""
+
+    LIGHT = "light"
+    HEAVY = "heavy"
+
+
 @dataclass(frozen=True)
 class SchedulerTerminalReceipt:
     """One truthful terminal outcome for a runtime request."""
@@ -86,12 +98,13 @@ class SchedulerTerminalReceipt:
     engine_receipt_id: str | None
     output_digests: dict[str, str]
     sealed: bool
+    terminal_receipt_id: str | None = None
     canonical_writes: int = 0
     grants_authority: bool = False
 
-    def to_dict(self) -> dict[str, object]:
+    def to_dict(self, *, include_id: bool = True) -> dict[str, object]:
         """Return a stable JSON-compatible terminal receipt."""
-        return {
+        payload: dict[str, object] = {
             "schema_version": self.schema_version,
             "request_id": self.request_id,
             "status": self.status.value,
@@ -106,6 +119,9 @@ class SchedulerTerminalReceipt:
             "canonical_writes": self.canonical_writes,
             "grants_authority": self.grants_authority,
         }
+        if include_id:
+            payload["terminal_receipt_id"] = self.terminal_receipt_id
+        return payload
 
 
 @dataclass(frozen=True)
@@ -124,6 +140,7 @@ class RuntimeRunRequest:
     pack_id: str | None = None
     use_exception: bool = False
     priority: int = 0
+    pool: RuntimePool | str = RuntimePool.LIGHT
 
     def __post_init__(self) -> None:
         _validate_request_id(self.request_id)
@@ -135,6 +152,7 @@ class RuntimeRunRequest:
             raise SchedulerError("use_exception must be a bool")
         if isinstance(self.priority, bool) or not isinstance(self.priority, int):
             raise SchedulerError("priority must be an int")
+        object.__setattr__(self, "pool", _normalize_pool(self.pool))
         dumps(self.input_payload)
 
     def to_dict(self) -> dict[str, object]:
@@ -149,6 +167,7 @@ class RuntimeRunRequest:
             "pack_id": self.pack_id,
             "use_exception": self.use_exception,
             "priority": self.priority,
+            "pool": _normalize_pool(self.pool).value,
             "canonical_writes": 0,
             "grants_authority": False,
         }
@@ -205,6 +224,63 @@ class SchedulerRoots:
         ):
             (root_path / rel).mkdir(parents=True, exist_ok=True)
         return cls(root=root_path, store=store)
+
+    @classmethod
+    def create_t7_work_namespace(
+        cls,
+        layout: SrfStorageLayout,
+        *,
+        runtime_namespace: str = _DEFAULT_RUNTIME_NAMESPACE,
+    ) -> SchedulerRoots:
+        """Create scheduler state under the SRF mutable T7 ``work/spool`` namespace.
+
+        The method is target-neutral: tests use a fixture layout, while native
+        operation supplies the authority-bound T7 layout from A02. CAS objects
+        are stored in the layout cold-CAS; mutable FSM/checkpoints/receipts stay
+        in ``work/spool/<runtime_namespace>``.
+        """
+        _validate_runtime_namespace(runtime_namespace)
+        layout.initialize()
+        root = layout.work_path("spool") / runtime_namespace
+        roots = cls(root=root, store=layout.cold_store())
+        roots._initialize_runtime_dirs()
+        return roots
+
+    def _initialize_runtime_dirs(self) -> None:
+        for rel in ("queued", "running", "terminal", "cancel", "staging", "scratch", "receipts"):
+            (self.root / rel).mkdir(parents=True, exist_ok=True)
+
+    def namespace_manifest(self) -> dict[str, object]:
+        """Return the stable runtime namespace contract without local paths."""
+        return {
+            "schema_version": RUN_NAMESPACE_SCHEMA_VERSION,
+            "state_root_role": "t7_work_spool_runtime_namespace",
+            "cas_root_role": "t7_cold_cas",
+            "required_state_directories": [
+                "queued",
+                "running",
+                "terminal",
+                "cancel",
+                "staging",
+                "scratch",
+                "receipts",
+            ],
+            "request_fsm": [
+                RuntimeRunStatus.QUEUED.value,
+                RuntimeRunStatus.RUNNING.value,
+                RuntimeRunStatus.COMPLETED.value,
+                RuntimeRunStatus.FAILED.value,
+                RuntimeRunStatus.CANCELLED.value,
+                RuntimeRunStatus.WAIT_BACKPRESSURE.value,
+                RuntimeRunStatus.WAIT_PACK_GOVERNANCE.value,
+                RuntimeRunStatus.WAIT_REMOTE_EXECUTOR.value,
+                RuntimeRunStatus.WAIT_LOCAL_DISK.value,
+            ],
+            "pools": [RuntimePool.LIGHT.value, RuntimePool.HEAVY.value],
+            "heavy_m1_concurrency": 1,
+            "canonical_writes": 0,
+            "grants_authority": False,
+        }
 
     @property
     def queued(self) -> Path:
@@ -440,10 +516,13 @@ class SchedulerRoots:
                 "local runtime root is below required free disk floor",
             )
 
-        input_digest = self.store.ingest_bytes(
-            dumps(request.input_payload),
-            _INPUT_MEDIA_TYPE,
-        ).digest
+        input_digest = (
+            checkpoint.input_digest
+            or self.store.ingest_bytes(
+                dumps(request.input_payload),
+                _INPUT_MEDIA_TYPE,
+            ).digest
+        )
         running_with_input = RuntimeRunCheckpoint(
             request=request,
             status=RuntimeRunStatus.RUNNING,
@@ -540,14 +619,26 @@ class SchedulerRoots:
         path = self._terminal_path(receipt.request_id)
         if path.exists():
             return _read_terminal(path)
-        _atomic_write_json(path, receipt.to_dict())
-        return receipt
+        bound = (
+            receipt
+            if receipt.terminal_receipt_id is not None
+            else replace(
+                receipt,
+                terminal_receipt_id=object_id(receipt.to_dict(include_id=False)),
+            )
+        )
+        _atomic_write_json(path, bound.to_dict())
+        return bound
 
     def _next_queued_path(self) -> Path | None:
         candidates = [_read_checkpoint(path) for path in sorted(self.queued.glob("*.json"))]
         if not candidates:
             return None
-        chosen = sorted(candidates, key=lambda item: (item.sequence, -item.request.priority))[0]
+        latest_sequence = max(item.sequence for item in candidates)
+        chosen = sorted(
+            candidates,
+            key=lambda item: _queue_sort_key(item, latest_sequence=latest_sequence),
+        )[0]
         return self._queued_path(chosen.request.request_id)
 
     def _queued_path(self, request_id: str) -> Path:
@@ -658,13 +749,14 @@ def _read_checkpoint(path: Path) -> RuntimeRunCheckpoint:
         pack_id=req["pack_id"],
         use_exception=req["use_exception"],
         priority=req["priority"],
+        pool=RuntimePool(req.get("pool", RuntimePool.LIGHT.value)),
     )
     return RuntimeRunCheckpoint(
         request=request,
         status=RuntimeRunStatus(data["status"]),
         generation=data["generation"],
         sequence=data["sequence"],
-        input_digest=data["input_digest"],
+        input_digest=data.get("input_digest"),
     )
 
 
@@ -682,16 +774,54 @@ def _read_terminal(path: Path) -> SchedulerTerminalReceipt:
         engine_receipt_id=data["engine_receipt_id"],
         output_digests=dict(data["output_digests"]),
         sealed=data["sealed"],
+        terminal_receipt_id=data.get("terminal_receipt_id"),
         canonical_writes=data["canonical_writes"],
         grants_authority=data["grants_authority"],
     )
 
 
+def _queue_sort_key(
+    checkpoint: RuntimeRunCheckpoint,
+    *,
+    latest_sequence: int,
+) -> tuple[int, int, int]:
+    # Newer requests may carry priority, but each older queued item earns one
+    # deterministic aging point per later enqueue so small priority deltas cannot
+    # starve old work.
+    age_bonus = max(0, latest_sequence - checkpoint.sequence)
+    effective_priority = checkpoint.request.priority + age_bonus
+    return (
+        -effective_priority,
+        _pool_rank(_normalize_pool(checkpoint.request.pool)),
+        checkpoint.sequence,
+    )
+
+
+def _pool_rank(pool: RuntimePool) -> int:
+    return 0 if pool is RuntimePool.LIGHT else 1
+
+
+def _normalize_pool(pool: RuntimePool | str) -> RuntimePool:
+    if isinstance(pool, RuntimePool):
+        return pool
+    try:
+        return RuntimePool(str(pool))
+    except ValueError as exc:
+        raise SchedulerError("pool must be 'light' or 'heavy'") from exc
+
+
+def _validate_runtime_namespace(namespace: str) -> None:
+    if not isinstance(namespace, str) or not _RUNTIME_NAMESPACE_RE.fullmatch(namespace):
+        raise SchedulerError("runtime_namespace must be 1-64 safe filename characters")
+
+
 __all__ = [
     "RUNNER_CONFORMANCE_RECEIPT_SCHEMA_VERSION",
     "RUN_CHECKPOINT_SCHEMA_VERSION",
+    "RUN_NAMESPACE_SCHEMA_VERSION",
     "RUN_REQUEST_SCHEMA_VERSION",
     "RUN_TERMINAL_RECEIPT_SCHEMA_VERSION",
+    "RuntimePool",
     "RuntimeRunCheckpoint",
     "RuntimeRunRequest",
     "RuntimeRunStatus",
