@@ -67,7 +67,7 @@ EXPECTED_A11: Final[tuple[str, ...]] = (
     "erdos_problems",
     "formal_conjectures",
 )
-_T7_SECURE = Path("/Volumes/T7-Secure")
+_T7_SECURE_PARTS = ("Volumes", "T7-Secure")
 _MIN_CITATION_FACTS = 2
 
 
@@ -94,8 +94,9 @@ def _default_cache_root() -> tuple[Path, str]:
         return Path(os.environ["SRL_A11_CACHE_ROOT"]), "explicit_env"
     if os.environ.get("CI") == "true":
         return REPO_ROOT / ".tmp" / "a11-knowledge-cache", "ci_ephemeral"
-    if _T7_SECURE.is_dir() and os.access(_T7_SECURE, os.W_OK):
-        return _T7_SECURE / "runtime" / "srl" / "caches" / "a11-knowledge", "t7_secure"
+    t7_secure = Path("/") / _T7_SECURE_PARTS[0] / _T7_SECURE_PARTS[1]
+    if t7_secure.is_dir() and os.access(t7_secure, os.W_OK):
+        return t7_secure / "runtime" / "srl" / "caches" / "a11-knowledge", "t7_secure"
     return Path(tempfile.gettempdir()) / "srl-a11-knowledge-cache", "local_ephemeral"
 
 

@@ -79,8 +79,11 @@ _LONG_HEX_ENTROPY_THRESHOLD: Final[float] = 3.0  # bits per hex character
 _LONG_HEX_SKIP_FILES: Final[frozenset[str]] = frozenset({"uv.lock"})
 
 # Path prefixes of files whose long-hex content is a content-hash manifest
-# rather than a secret (e.g. public synthetic fixture manifests).
-_LONG_HEX_SKIP_PREFIXES: Final[tuple[str, ...]] = ("fixtures/public/",)
+# rather than a secret.  Concrete credential-shaped patterns still run there.
+_LONG_HEX_SKIP_PREFIXES: Final[tuple[str, ...]] = (
+    "fixtures/public/",
+    "docs/verification/",
+)
 
 # Snippet sanitization constants.
 _SNIPPET_CONTEXT_CHARS: Final[int] = 12
