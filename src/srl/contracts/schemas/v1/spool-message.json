@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srlab.dev/v1/SpoolMessage.json",
+  "title": "SpoolMessage/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "message_id", "idempotency_key", "source_cell", "target_cell", "payload_ref", "classification", "created_utc", "canonical_writes", "grants_authority"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "SpoolMessage/v1"},
+    "message_id": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "idempotency_key": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "source_cell": {"type": "string", "minLength": 1},
+    "target_cell": {"type": "string", "minLength": 1},
+    "payload_ref": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "classification": {"type": "string", "enum": ["D0", "D1"]},
+    "created_utc": {"type": "string", "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]Z$"},
+    "canonical_writes": {"type": "integer", "const": 0},
+    "grants_authority": {"type": "boolean", "const": false}
+  }
+}

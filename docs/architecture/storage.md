@@ -42,6 +42,38 @@ fall back to the Mac plane, because a local copy is not the authoritative
 record. The fallback exists *only* for public tiny fixtures that are not
 T7-bound.
 
+## SRF namespace layout
+
+S04 adds a filesystem-neutral SRF layout contract in `srl.cas.layout`. It is
+tested only on fixture roots and does not format, mount, erase, or bind a real
+T7 volume.
+
+```text
+SRF/
+  cold-cas/
+  work/
+    envs/
+    caches/
+    scratch/
+    spool/
+    indexes/
+  quarantine/
+  restore-tests/
+```
+
+`cold-cas/` is the immutable content-addressed namespace. A
+`SrfStorageLayout.cold_store()` is a real `LocalArtifactStore` rooted there, so
+all object writes still use the existing receipt-last CAS transaction engine.
+The layout refuses active database/WAL-style artifacts (`*.db`, `*.sqlite`,
+`*.sqlite3`, `*.wal`, `*.sqlite-wal`) inside `cold-cas/`; those belong under
+`work/`, where package-manager databases, caches, scratch files, spool state and
+indexes are explicitly mutable and rebuildable.
+
+`check_srf_storage_quota()` pins the physical target admission numbers from the
+master plan: 400 GiB SRF allocation and 100 GiB minimum free reserve. Exceeding
+the allocation returns `T7_QUOTA_EXCEEDED`; falling below reserve returns
+`WAIT_T7_BINDING`. Both are admission decisions, not cleanup commands.
+
 ## Content addressing
 
 Every object stored via `ArtifactStore.put` is keyed by the SHA-256 of its
@@ -202,18 +234,18 @@ routes through `redact_store_path`. The WP-C20 gate (`scripts/checks/wp20-gate.p
 check C20-03) asserts no public-API string output ever begins with `/Volumes/`
 or `/Users/`.
 
-## The T7 store stub
+## The physical T7 store stub
 
-`T7ArtifactStore` is a **stub**: its identity guard, capacity policy, and
-mount-state probe are real (and exercised in tests and the gate), but the byte
-path refuses every operation with `WAIT_STORAGE` until WP-C21 implements the
-transaction engine.
+`T7ArtifactStore` remains a **physical binding stub**: its identity guard,
+capacity policy, and mount-state probe are real (and exercised in tests and the
+gate), but direct operations against a real T7 target refuse with
+`WAIT_STORAGE` until a native target receipt authorizes physical binding.
 
-The stub exists to make the contract explicit: the store is *known* and *named*,
-its identity and capacity are *verified*, but it does not write. Callers
-fail-fast toward the wait path rather than discovering a silent no-op. WP-C21
-will implement the atomic cross-object writes (with a write-ahead log) that make
-the byte path safe.
+The fixture layout described above is the production code path for filesystem
+semantics and quota checks; it is deliberately target-neutral. The physical T7
+stub exists to keep the external authority boundary explicit: the store is
+*known* and *named*, but no bytes are written to operator storage without a
+native target binding.
 
 ## Testing posture
 

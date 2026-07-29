@@ -1,0 +1,83 @@
+{
+  "authority_boundary": "proposal_only_no_domain_truth_no_target_write_by_parent",
+  "canonical_writes": 0,
+  "classification": "D0",
+  "conformance_vectors": [
+    {
+      "expected": "ACCEPT",
+      "instance": {
+        "canonical_writes": 0,
+        "classification": "D0",
+        "created_utc": "2026-07-29T00:00:00Z",
+        "grants_authority": false,
+        "payload": {
+          "kind": "synthetic-domain-neutral",
+          "value": 1
+        },
+        "request_id": "sha256:f9a37e7cde73107c55d49dce635c7071f5e90009d88aea6d1e744d939c42af8c",
+        "schema_version": "ScientificRequestEnvelope/v1",
+        "trace_id": "sha256:eafe895eb8119e6e5d06463590b2ef81b3651c157d5c8e18f1889186c7fd0ac0"
+      },
+      "schema_name": "ScientificRequestEnvelope",
+      "vector_id": "request.accept.basic"
+    },
+    {
+      "expected": "ACCEPT",
+      "instance": {
+        "canonical_writes": 0,
+        "classification": "D0",
+        "created_utc": "2026-07-29T00:00:01Z",
+        "grants_authority": false,
+        "payload": {
+          "authority": "none",
+          "observed": "synthetic"
+        },
+        "request_id": "sha256:f9a37e7cde73107c55d49dce635c7071f5e90009d88aea6d1e744d939c42af8c",
+        "result_id": "sha256:233c906a64eee6f73435ccb29e8e4c51f1b3ead25aedf47bf903122bc6a6a4df",
+        "schema_version": "ScientificResultEnvelope/v1",
+        "status": "WAIT_CAPABILITY"
+      },
+      "schema_name": "ScientificResultEnvelope",
+      "vector_id": "result.accept.wait"
+    },
+    {
+      "expected": "REJECT",
+      "instance": {
+        "canonical_writes": 0,
+        "classification": "D0",
+        "created_utc": "2026-07-29T00:00:01Z",
+        "grants_authority": true,
+        "payload": {
+          "authority": "none",
+          "observed": "synthetic"
+        },
+        "request_id": "sha256:f9a37e7cde73107c55d49dce635c7071f5e90009d88aea6d1e744d939c42af8c",
+        "result_id": "sha256:3cb776ed01051699ce7782dd731045a17397514f09c3c5d047b444d2595c3647",
+        "schema_version": "ScientificResultEnvelope/v1",
+        "status": "WAIT_CAPABILITY"
+      },
+      "schema_name": "ScientificResultEnvelope",
+      "vector_id": "result.reject.authority"
+    }
+  ],
+  "grants_authority": false,
+  "local_conformance_receipt_id": "sha256:0dac51cb95fff20172328de31deddcf0406d7b18815b883cd2b11493bc3915ed",
+  "mission_id": "srf-dualcontour-shared-contracts-v1",
+  "native_closeout_status": "WAIT_NATIVE_CHILD_CLOSEOUT",
+  "parent_direct_external_writes": 0,
+  "request_id": "sha256:00253ea529a03583b2c969beca4b26d100f1a3237ec80163aa85816e7163aab5",
+  "requested_action": "native validate shared schemas and conformance vectors",
+  "schema_hashes": {
+    "ScientificRequestEnvelope": "e0ec0e4de832e7311f25d8dde69b819f30671503b2eeb37feca4f0675853e2d5",
+    "ScientificResultEnvelope": "36d1108ea43861ff245a07914fb1e86398d82a586dc05aa2051694379cd34c93"
+  },
+  "schema_version": "SharedContractChildMissionRequest/v1",
+  "signature": "72bfbda03c2aab21aad34caafd80288467150aa7453808f5881273189967dc3a",
+  "signature_algorithm": "test-hmac-sha256",
+  "signer_key_id": "srf-fixture-key",
+  "source_head": "510548ccf10a5ca556f72fe4c6b05d189c103c36",
+  "source_project": "scientific-resource-lab",
+  "target_head": "a3cc68227387954417931fe08f9d66b6212f3308",
+  "target_project": "dual-contour-research-os",
+  "target_status": "clean"
+}

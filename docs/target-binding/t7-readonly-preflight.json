@@ -1,0 +1,22 @@
+{
+  "available_gib": 544,
+  "canonical_writes": 0,
+  "capacity_gib": 931,
+  "compute_node_status": "WAIT_COMPUTE_NODE",
+  "destructive_actions_performed": [],
+  "external_physical_disk_observed": true,
+  "filesystem": "APFS",
+  "grants_authority": false,
+  "host_architecture": "arm64",
+  "host_memory_bytes": 8589934592,
+  "minimum_free_reserve_gib": 100,
+  "native_binding_status": "WAIT_T7_BINDING",
+  "observed_volume_label": "T7",
+  "observed_volume_locator": "mount_label:T7",
+  "parent_direct_storage_writes": 0,
+  "preflight_id_grouped_sha256": "fed4f43e-0863069f-eb0723f4-8bead52e-9443dcd9-1c21f780-70270676-090e6e5b",
+  "request_id_grouped_sha256": "4f4cc9c8-98be9220-62ba30a4-e5fc431a-5800561e-054c5831-b38d5593-c498be81",
+  "reserve_check": "PASS",
+  "schema_version": "PhysicalCapabilityReadOnlyPreflight/v1",
+  "used_gib": 387
+}

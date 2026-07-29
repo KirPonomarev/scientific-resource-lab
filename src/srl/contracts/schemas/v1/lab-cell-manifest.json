@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srlab.dev/v1/LabCellManifest.json",
+  "title": "LabCellManifest/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "cell_id", "project_fingerprint", "native_bootstrap", "proposal_only", "canonical_writes", "grants_authority"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "LabCellManifest/v1"},
+    "cell_id": {"type": "string", "minLength": 1},
+    "project_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "native_bootstrap": {"type": "string", "minLength": 1},
+    "proposal_only": {"type": "boolean"},
+    "canonical_writes": {"type": "integer", "const": 0},
+    "grants_authority": {"type": "boolean", "const": false}
+  }
+}

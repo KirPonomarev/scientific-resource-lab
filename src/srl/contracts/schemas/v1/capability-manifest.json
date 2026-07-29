@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srlab.dev/v1/CapabilityManifest.json",
+  "title": "CapabilityManifest/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "manifest_id", "capabilities", "canonical_writes", "grants_authority"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "CapabilityManifest/v1"},
+    "manifest_id": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "capabilities": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "canonical_writes": {"type": "integer", "const": 0},
+    "grants_authority": {"type": "boolean", "const": false}
+  }
+}

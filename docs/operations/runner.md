@@ -194,3 +194,24 @@ module docstring). The gate enables the test-only adapter hook
 (`SRL_RUNNER_TEST_ADAPTERS=1`) internally to exercise the timeout/output-cap/
 fork/bomb paths; this env var is a test signal (it loads a fixed in-repo module,
 not caller data) and is never set in production.
+
+## S08 durable scheduler
+
+S08 adds `srl.runtime.scheduler` above the bounded runner. It is a file-backed,
+explicit-dispatch scheduler, not a daemon:
+
+- `queued/`, `running/`, `terminal/` and `cancel/` are ordinary JSON checkpoint
+  directories under a caller-supplied runtime root.
+- `dispatch_next` runs at most one request. If a `running/` checkpoint already
+  exists, it returns without starting another child.
+- Every submitted request reaches exactly one terminal receipt:
+  `completed`, `failed`, `cancelled`, `wait_backpressure`,
+  `wait_pack_governance`, `wait_remote_executor` or `wait_local_disk`.
+- Execution still flows through the existing stack: input payload bytes are
+  ingested into CAS, `materialize_run` stages exact refs, `run_adapter` invokes
+  the fixed child, and `seal_run` writes the final run receipt last.
+- Interrupted `running/` checkpoints can be recovered explicitly with
+  `recover_interrupted`; they are requeued unless a cancel marker is present.
+
+This keeps the Mac-off invariant intact. There is no timer, listener, launchd
+job, autonomous loop or arbitrary command execution path.

@@ -124,3 +124,18 @@ WP-E44 is gated by `scripts/checks/wp44-gate.py` and the hermetic tests under
 
 Run them with `uv run pytest tests/knowledge/sources` and
 `uv run python3 scripts/checks/wp44-gate.py`.
+
+## S14 knowledge graph and taint layer
+
+`srl.knowledge.graph` builds a `KnowledgeLayerManifest/v1` above the existing
+retriever and source adapters. It records:
+
+- ACTIVE source cards for OpenAlex, Crossref, arXiv and OEIS.
+- WAIT cards for OpenCitations, zbMATH, LMFDB, CSLib, Erdos Problems and Formal
+  Conjectures until source-specific terms fixtures and bounded adapters exist.
+- Content-addressed fact nodes with offsets, payload digests, attribution,
+  taint labels and citation edges.
+- Prompt-injection findings for untrusted corpus spans.
+
+The manifest keeps `raw_corpus_in_privileged_prompt=0`, performs no live network
+calls in tests, grants no authority and never treats retrieval as truth.

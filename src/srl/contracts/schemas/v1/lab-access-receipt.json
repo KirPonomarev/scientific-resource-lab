@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srlab.dev/v1/LabAccessReceipt.json",
+  "title": "LabAccessReceipt/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "project_id", "project_fingerprint", "mission_id", "plan_id", "cell", "scope", "grants_authority", "canonical_writes", "live_actions", "orders_allowed", "security_actions_allowed"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "LabAccessReceipt/v1"},
+    "project_id": {"type": "string", "minLength": 1},
+    "project_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "mission_id": {"type": "string", "minLength": 1},
+    "plan_id": {"type": "string", "minLength": 1},
+    "cell": {"type": "object"},
+    "scope": {"type": "object"},
+    "grants_authority": {"type": "boolean", "const": false},
+    "canonical_writes": {"type": "integer", "const": 0},
+    "live_actions": {"type": "integer", "const": 0},
+    "orders_allowed": {"type": "boolean", "const": false},
+    "security_actions_allowed": {"type": "boolean", "const": false}
+  }
+}

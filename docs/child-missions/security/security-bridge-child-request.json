@@ -1,0 +1,22 @@
+{
+  "activation_state": "INACTIVE",
+  "adapter_receipt_id": "sha256:e1665e83fe1ff945d3a6c922634a94f8e96685eb98bead5c90590e3cff47ad0d",
+  "authority_boundary": "proposal_only_no_parent_target_write_no_activation",
+  "canonical_writes": 0,
+  "dependency_status": "WAIT_SECURITY_HEALTH:BOOTSTRAP_UNAVAILABLE",
+  "grants_authority": false,
+  "live_actions": 0,
+  "mission_id": "security-bridge-child-v1",
+  "native_closeout_status": "WAIT_NATIVE_CHILD_CLOSEOUT",
+  "parent_direct_external_writes": 0,
+  "request_id": "sha256:d2f56da7c9b47d5245c28288397fb1762018a6b5220a3147f0ed6f5a9aa7bcd1",
+  "requested_action": "native validate and merge inactive Security bridge only; target actions stay native protected actions through ebashim",
+  "schema_version": "NativeBridgeChildRequest/v1",
+  "signature": "8b3c367dca0af9c1921113aed1f0b6820edccbb2354a21b640cc8c266ba649e4",
+  "signature_algorithm": "test-hmac-sha256",
+  "signer_key_id": "srf-security-child-fixture-key",
+  "source_head": "08492355ae5a19bfc1b078468c45496883c920d8",
+  "source_project": "scientific-resource-lab",
+  "target_head": "c5e8349b05b601c3d2976da7bad58bf756600185",
+  "target_project": "security-research-os"
+}

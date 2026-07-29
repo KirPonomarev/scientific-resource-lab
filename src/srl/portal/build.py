@@ -19,6 +19,8 @@ from pathlib import Path
 from string import Template
 from typing import Any, Final
 
+from srl.interfaces import InterfaceService
+
 # ---------------------------------------------------------------------------
 # Public API types
 # ---------------------------------------------------------------------------
@@ -44,6 +46,7 @@ class PortalBuildReport:
     leak_detected: bool
     refusals: list[dict[str, Any]] = field(default_factory=list)
     pages: list[str] = field(default_factory=list)
+    interface_manifest: dict[str, Any] = field(default_factory=dict)
     generator_version: str = ""
     built_at: str = ""
 
@@ -661,6 +664,7 @@ def build_portal(
         leak_detected=leak_detected,
         refusals=refusals,
         pages=pages,
+        interface_manifest=InterfaceService().portal_manifest(surface=f"portal:{mode.value}"),
         generator_version=generator_version,
         built_at=built_at,
     )

@@ -1,0 +1,1 @@
+{"schema_version":"KnowledgeLayerConfig/v1","active_sources":["openalex","crossref","arxiv","oeis"],"wait_sources":["opencitations","zbmath","lmfdb","cslib","erdos_problems","formal_conjectures"],"taint_policy":"raw_corpus_never_enters_privileged_prompt","live_network_calls_in_tests":0,"canonical_writes":0,"grants_authority":false}

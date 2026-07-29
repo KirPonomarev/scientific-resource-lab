@@ -1,0 +1,13 @@
+{
+  "canonical_writes": 0,
+  "child_request_id": "sha256:d2f56da7c9b47d5245c28288397fb1762018a6b5220a3147f0ed6f5a9aa7bcd1",
+  "grants_authority": false,
+  "live_actions": 0,
+  "next_native_gate": "native bootstrap or superbrain health receipt required",
+  "parent_direct_external_writes": 0,
+  "receipt_id": "sha256:59e8ead15918bba4e4af0ba761f7393e54f6566a7dd35147db825323108002b7",
+  "schema_version": "NativeBridgeWaitReceipt/v1",
+  "target_head": "c5e8349b05b601c3d2976da7bad58bf756600185",
+  "target_project": "security-research-os",
+  "wait_state": "WAIT_SECURITY_HEALTH:BOOTSTRAP_UNAVAILABLE"
+}
