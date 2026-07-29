@@ -383,6 +383,97 @@ def test_a13_truth_projection_is_offline_and_receipt_backed(
     assert {item["probe_kind"] for item in first["components"]} == {"stage_receipt"}
 
 
+def test_a14_truth_projection_is_offline_and_receipt_backed(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    packs = [
+        "julia_sciml_ode",
+        "python_diffrax_ode",
+        "python_qutip_quantum",
+        "python_astropy_astronomy",
+        "python_cantera_combustion",
+        "native_battery_rc",
+        "python_quimb_many_body",
+        "python_cotengra_tensor_network",
+    ]
+    replaced = [
+        "julia_modelingtoolkit",
+        "julia_datadrivendiffeq",
+        "python_cadabra",
+        "python_pybamm",
+    ]
+    activation = {
+        "schema_version": "SciMLDomainActivationReceipt/v1",
+        "stage_id": "A14",
+        "active_pack_ids": packs,
+        "formally_replaced_pack_ids": replaced,
+        "workload_receipts": [_a14_workload_receipt(pack_id) for pack_id in packs],
+        "cross_language_receipt": {
+            "comparison_label": "julia_sciml_vs_python_diffrax_ode",
+            "receipt_ids": ["sha256:fixture-julia", "sha256:fixture-python"],
+            "languages": ["julia", "python"],
+            "solver_families": ["ode_explicit_runge_kutta"],
+            "tolerance_abs": 5e-7,
+            "tolerance_rel": 5e-6,
+            "observed_delta": 0.0,
+            "comparison_scope": "bounded_real_workload_tolerance_only",
+            "bitwise_identity_claimed": False,
+            "canonical_writes": 0,
+            "grants_authority": False,
+        },
+        "promotion_allowed": False,
+        "automatic_scientific_promotion": False,
+        "canonical_writes": 0,
+        "grants_authority": False,
+    }
+    receipt = {
+        "schema_version": "StageCompletionReceipt/v1",
+        "stage_id": "A14",
+        "result": "PASS",
+        "stage_closure": "A14_ACTIVE",
+        "active_packs": packs,
+        "formally_replaced_packs": replaced,
+        "remaining_internal_waits": [],
+        "remaining_external_waits": [],
+        "checks": [
+            {
+                "check_id": "A14-01-real-sciml-domain-workloads",
+                "status": "PASS",
+                "activation_receipt": activation,
+            },
+            {
+                "check_id": "A14-02-units-tolerances-domain-diagnostics-and-no-bitwise-claim",
+                "status": "PASS",
+            },
+        ],
+        "canonical_writes": 0,
+        "grants_authority": False,
+        "receipt_id": "sha256:fixture-a14-receipt",
+    }
+    receipt_path = tmp_path / "a14-receipt.json"
+    receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+    a14_specs = tuple(item for item in truth._SPECS if item.stage == "A14")
+
+    def forbidden(*_args: object, **_kwargs: object) -> object:
+        raise AssertionError(
+            "A14 truth projection must not import SciML/domain engines or spawn subprocesses"
+        )
+
+    monkeypatch.setattr(truth, "_SPECS", a14_specs)
+    monkeypatch.setattr(truth, "_A14_RECEIPT_PATH", receipt_path)
+    monkeypatch.setattr(cast(Any, truth).importlib, "import_module", forbidden)
+    monkeypatch.setattr(cast(Any, truth).shutil, "which", forbidden)
+    monkeypatch.setattr(subprocess, "run", forbidden)
+
+    first = truth.build_truth_ledger()
+    second = truth.build_truth_ledger()
+
+    assert first["a14_active_inventory_observed"] == packs
+    assert second["a14_active_inventory_observed"] == first["a14_active_inventory_observed"]
+    assert {item["probe_kind"] for item in first["components"]} == {"stage_receipt"}
+
+
 def _a10_proof_check(check_id: str, prover_id: str) -> dict[str, object]:
     return {
         "check_id": check_id,
@@ -457,6 +548,40 @@ def _a13_workload_receipt(pack_id: str) -> dict[str, object]:
             "denied_solvers": ["cbc", "glpk"],
         }
     return base
+
+
+def _a14_workload_receipt(pack_id: str) -> dict[str, object]:
+    language = "julia" if pack_id == "julia_sciml_ode" else "python"
+    family_by_pack = {
+        "julia_sciml_ode": "sciml",
+        "python_diffrax_ode": "sciml",
+        "python_qutip_quantum": "quantum",
+        "python_astropy_astronomy": "astronomy",
+        "python_cantera_combustion": "combustion",
+        "native_battery_rc": "battery",
+        "python_quimb_many_body": "quantum_many_body",
+        "python_cotengra_tensor_network": "tensor_networks",
+    }
+    return {
+        "pack_id": pack_id,
+        "status": "ACTIVE",
+        "family": family_by_pack[pack_id],
+        "language": language,
+        "backend_versions": {"backend": "fixture"},
+        "solver": {"name": "fixture", "family": "ode_explicit_runge_kutta"},
+        "unit_bindings": ["time:s"],
+        "tolerance": {"abs": 1e-6, "rel": 1e-6},
+        "dataset": {"kind": "fixture"},
+        "diagnostics": {"terminal": 0.1},
+        "trace_sha256": "a" * 64,
+        "trace_digest_algorithm": "sha256",
+        "bitwise_identity_claimed": False,
+        "promotion_allowed": False,
+        "automatic_scientific_promotion": False,
+        "canonical_writes": 0,
+        "grants_authority": False,
+        "resource_envelope": {"bounded": True},
+    }
 
 
 def _a11_source_result(endpoint_id: str) -> dict[str, object]:

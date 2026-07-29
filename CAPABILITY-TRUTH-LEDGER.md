@@ -61,6 +61,14 @@ Current v1.0.1 active inventory reproduced by the ledger:
 | `cvxpy` | `a13_applied_science` | `A13` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
 | `native_bayesian_conjugate` | `a13_applied_science` | `A13` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
 | `native_causal_backdoor` | `a13_applied_science` | `A13` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
+| `julia_sciml_ode` | `a14_sciml_domain` | `A14` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
+| `python_diffrax_ode` | `a14_sciml_domain` | `A14` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
+| `python_qutip_quantum` | `a14_sciml_domain` | `A14` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
+| `python_astropy_astronomy` | `a14_sciml_domain` | `A14` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
+| `python_cantera_combustion` | `a14_sciml_domain` | `A14` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
+| `native_battery_rc` | `a14_sciml_domain` | `A14` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
+| `python_quimb_many_body` | `a14_sciml_domain` | `A14` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
+| `python_cotengra_tensor_network` | `a14_sciml_domain` | `A14` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
 | `production-ed25519-signer` | `a04_transport` | `A04` | `WAIT_AUTHORITY` | `missing_or_protected_capability` |
 | `t2-t3-enforced-sandbox` | `a05_sandbox` | `A05` | `WAIT_COMPUTE_TARGET` | `missing_or_protected_capability` |
 | `t7-binding` | `a02_t7` | `A02` | `WAIT_T7_BINDING` | `missing_or_protected_capability` |

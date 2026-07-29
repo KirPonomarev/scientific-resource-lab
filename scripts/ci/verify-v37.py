@@ -32,6 +32,7 @@ from scripts.ci.prepare_a09_mathlib import prepare_session_project  # noqa: E402
 from scripts.ci.prepare_a10_hol4 import prepare_hol4  # noqa: E402
 
 from srl.packs.formal import load_independent_prover_pins  # noqa: E402
+from srl.products.sciml_domain import prepare_a14_julia_project  # noqa: E402
 
 SUMMARY_PATH: Final[Path] = REPO_ROOT / ".tmp" / "verify-v37-summary.json"
 
@@ -102,6 +103,21 @@ def main() -> int:
     steps.append(_run([sys.executable, "scripts/checks/srf-v37-a11-gate.py"], env=env))
     steps.append(_run([sys.executable, "scripts/checks/srf-v37-a12-gate.py"], env=env))
     steps.append(_run([sys.executable, "scripts/checks/srf-v37-a13-gate.py"], env=env))
+
+    a14_project = Path(
+        env.get(
+            "SRL_A14_JULIA_PROJECT_DIR",
+            str(REPO_ROOT / ".cache" / "srl-a14-julia-project"),
+        )
+    )
+    a14_depot = Path(env.get("JULIA_DEPOT_PATH", str(REPO_ROOT / ".cache" / "srl-a14-julia-depot")))
+    a14_prepare_report = prepare_a14_julia_project(
+        julia_project_dir=a14_project,
+        julia_depot_path=str(a14_depot),
+    )
+    env["SRL_A14_JULIA_PROJECT_DIR"] = str(a14_project)
+    env["JULIA_DEPOT_PATH"] = str(a14_depot)
+    steps.append(_run([sys.executable, "scripts/checks/srf-v37-a14-gate.py"], env=env))
     if (REPO_ROOT / "dist").exists():
         shutil.rmtree(REPO_ROOT / "dist")
     steps.append(_run(["uv", "build"], env=env))
@@ -129,6 +145,16 @@ def main() -> int:
                 "prepare_count",
                 "fetch_count",
                 "cache_status",
+            )
+        },
+        "a14_julia_prepare": {
+            key: a14_prepare_report[key]
+            for key in (
+                "julia_version",
+                "julia_project_role",
+                "julia_depot_role",
+                "project_toml_sha256",
+                "manifest_toml_sha256",
             )
         },
     }

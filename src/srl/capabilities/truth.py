@@ -85,6 +85,9 @@ _A12_RECEIPT_PATH: Final[Path] = (
 _A13_RECEIPT_PATH: Final[Path] = (
     _REPO_ROOT / "docs" / "verification" / "srf-v3-7-a13-applied-science-receipt.json"
 )
+_A14_RECEIPT_PATH: Final[Path] = (
+    _REPO_ROOT / "docs" / "verification" / "srf-v3-7-a14-sciml-domain-receipt.json"
+)
 _EXPECTED_A09_COMPONENTS: Final[tuple[str, ...]] = (
     "lean",
     "lake",
@@ -138,6 +141,22 @@ _EXPECTED_A13_REPLACED: Final[tuple[str, ...]] = (
     "econml",
     "jaxopt",
     "botorch",
+)
+_EXPECTED_A14_COMPONENTS: Final[tuple[str, ...]] = (
+    "julia_sciml_ode",
+    "python_diffrax_ode",
+    "python_qutip_quantum",
+    "python_astropy_astronomy",
+    "python_cantera_combustion",
+    "native_battery_rc",
+    "python_quimb_many_body",
+    "python_cotengra_tensor_network",
+)
+_EXPECTED_A14_REPLACED: Final[tuple[str, ...]] = (
+    "julia_modelingtoolkit",
+    "julia_datadrivendiffeq",
+    "python_cadabra",
+    "python_pybamm",
 )
 
 
@@ -861,6 +880,133 @@ def _make_a13_smoke(component_id: str) -> Callable[[], str]:
     return _smoke
 
 
+def _load_a14_receipt() -> dict[str, Any]:
+    if not _A14_RECEIPT_PATH.exists():
+        raise RuntimeError(f"A14 receipt missing: {_A14_RECEIPT_PATH.relative_to(_REPO_ROOT)}")
+    receipt = json.loads(_A14_RECEIPT_PATH.read_text(encoding="utf-8"))
+    if not isinstance(receipt, dict):
+        raise RuntimeError("A14 receipt must be a JSON object")
+    return receipt
+
+
+def _validated_a14_receipt(component_id: str) -> dict[str, Any]:  # noqa: C901, PLR0912, PLR0915
+    receipt = _load_a14_receipt()
+    if receipt.get("schema_version") != "StageCompletionReceipt/v1":
+        raise RuntimeError("A14 receipt schema drifted")
+    if receipt.get("stage_id") != "A14" or receipt.get("result") != "PASS":
+        raise RuntimeError("A14 receipt is not a PASS receipt for stage A14")
+    if receipt.get("stage_closure") != "A14_ACTIVE":
+        raise RuntimeError("A14 receipt does not close A14_ACTIVE")
+    if receipt.get("remaining_internal_waits") != []:
+        raise RuntimeError("A14 receipt contains internal waits")
+    active = receipt.get("active_packs")
+    if active != list(_EXPECTED_A14_COMPONENTS):
+        raise RuntimeError("A14 active_packs do not match expected packs")
+    if component_id not in active:
+        raise RuntimeError(f"{component_id} is absent from A14 active_packs")
+    if receipt.get("formally_replaced_packs") != list(_EXPECTED_A14_REPLACED):
+        raise RuntimeError("A14 replacement packs do not match expected packs")
+
+    checks = {
+        str(item.get("check_id")): item
+        for item in receipt.get("checks", [])
+        if isinstance(item, dict)
+    }
+    if any(item.get("status") != "PASS" for item in checks.values()):
+        raise RuntimeError("A14 receipt contains a non-PASS check")
+    activation = checks.get("A14-01-real-sciml-domain-workloads")
+    if not isinstance(activation, dict) or not isinstance(
+        activation.get("activation_receipt"), dict
+    ):
+        raise RuntimeError("A14 activation receipt missing")
+    activation_receipt = activation["activation_receipt"]
+    if activation_receipt.get("schema_version") != "SciMLDomainActivationReceipt/v1":
+        raise RuntimeError("A14 activation receipt schema drifted")
+    if activation_receipt.get("active_pack_ids") != list(_EXPECTED_A14_COMPONENTS):
+        raise RuntimeError("A14 activation active pack ids mismatch")
+    if activation_receipt.get("formally_replaced_pack_ids") != list(_EXPECTED_A14_REPLACED):
+        raise RuntimeError("A14 formal replacement ids mismatch")
+    if (
+        activation_receipt.get("promotion_allowed") is not False
+        or activation_receipt.get("automatic_scientific_promotion") is not False
+        or activation_receipt.get("canonical_writes") != 0
+        or activation_receipt.get("grants_authority") is not False
+    ):
+        raise RuntimeError("A14 activation receipt is not authority-negative")
+
+    workload_receipts = activation_receipt.get("workload_receipts")
+    if not isinstance(workload_receipts, list) or len(workload_receipts) != len(
+        _EXPECTED_A14_COMPONENTS
+    ):
+        raise RuntimeError("A14 workload receipt count mismatch")
+    by_id = {item.get("pack_id"): item for item in workload_receipts if isinstance(item, dict)}
+    if tuple(by_id) != _EXPECTED_A14_COMPONENTS:
+        raise RuntimeError("A14 workload receipts do not match expected order")
+    for pack_id, item in by_id.items():
+        if item.get("status") != "ACTIVE":
+            raise RuntimeError(f"A14 {pack_id} did not reach ACTIVE")
+        if item.get("bitwise_identity_claimed") is not False:
+            raise RuntimeError(f"A14 {pack_id} claimed bitwise identity")
+        if (
+            item.get("promotion_allowed") is not False
+            or item.get("automatic_scientific_promotion") is not False
+            or item.get("canonical_writes") != 0
+            or item.get("grants_authority") is not False
+        ):
+            raise RuntimeError(f"A14 {pack_id} receipt is not authority-negative")
+        envelope = item.get("resource_envelope")
+        if not isinstance(envelope, dict) or envelope.get("bounded") is not True:
+            raise RuntimeError(f"A14 {pack_id} missing bounded resource envelope")
+        if not isinstance(item.get("backend_versions"), dict) or not item.get("backend_versions"):
+            raise RuntimeError(f"A14 {pack_id} missing backend version binding")
+        if not isinstance(item.get("solver"), dict):
+            raise RuntimeError(f"A14 {pack_id} missing solver provenance")
+        if not item.get("unit_bindings"):
+            raise RuntimeError(f"A14 {pack_id} missing unit bindings")
+        tolerance = item.get("tolerance")
+        if not isinstance(tolerance, dict):
+            raise RuntimeError(f"A14 {pack_id} missing tolerance")
+        if not isinstance(item.get("dataset"), dict) or not isinstance(
+            item.get("diagnostics"), dict
+        ):
+            raise RuntimeError(f"A14 {pack_id} missing dataset or diagnostics")
+        if not isinstance(item.get("trace_sha256"), str):
+            raise RuntimeError(f"A14 {pack_id} missing trace digest")
+
+    cross_language = activation_receipt.get("cross_language_receipt")
+    if not isinstance(cross_language, dict):
+        raise RuntimeError("A14 cross-language receipt missing")
+    if cross_language.get("bitwise_identity_claimed") is not False:
+        raise RuntimeError("A14 cross-language receipt claimed bitwise identity")
+    if cross_language.get("comparison_scope") != "bounded_real_workload_tolerance_only":
+        raise RuntimeError("A14 cross-language scope drifted")
+    if (
+        cross_language.get("canonical_writes") != 0
+        or cross_language.get("grants_authority") is not False
+    ):
+        raise RuntimeError("A14 cross-language receipt is not authority-negative")
+
+    diagnostics = checks.get("A14-02-units-tolerances-domain-diagnostics-and-no-bitwise-claim")
+    if not isinstance(diagnostics, dict) or diagnostics.get("status") != "PASS":
+        raise RuntimeError("A14 diagnostics/no-bitwise check missing or failed")
+    return receipt
+
+
+def _smoke_a14_receipt(component_id: str) -> str:
+    receipt = _validated_a14_receipt(component_id)
+    return (
+        f"A14 offline truth projection accepted {component_id} from "
+        f"{receipt['receipt_id']} with SciML/domain workload receipts and tolerances"
+    )
+
+
+def _make_a14_smoke(component_id: str) -> Callable[[], str]:
+    def _smoke() -> str:
+        return _smoke_a14_receipt(component_id)
+
+    return _smoke
+
+
 _SPECS: Final[tuple[ComponentSpec, ...]] = (
     ComponentSpec(
         "numpy",
@@ -1148,6 +1294,18 @@ _SPECS: Final[tuple[ComponentSpec, ...]] = (
         )
         for pack_id in _EXPECTED_A13_COMPONENTS
     ),
+    *(
+        ComponentSpec(
+            pack_id,
+            "a14_sciml_domain",
+            "A14",
+            "stage_receipt",
+            activation_wait_state="WAIT_CAPABILITY",
+            current_v101_active=True,
+            smoke=_make_a14_smoke(pack_id),
+        )
+        for pack_id in _EXPECTED_A14_COMPONENTS
+    ),
     ComponentSpec(
         "production-ed25519-signer",
         "a04_transport",
@@ -1215,6 +1373,9 @@ def _stage_receipt_probe(spec: ComponentSpec) -> tuple[bool, str | None, str | N
         elif spec.stage == "A13":
             receipt = _validated_a13_receipt(spec.component_id)
             receipt_path = _receipt_display_path(_A13_RECEIPT_PATH)
+        elif spec.stage == "A14":
+            receipt = _validated_a14_receipt(spec.component_id)
+            receipt_path = _receipt_display_path(_A14_RECEIPT_PATH)
         else:
             return False, None, f"stage receipt unsupported for {spec.stage}"
     except Exception as exc:
@@ -1365,6 +1526,16 @@ def build_truth_ledger() -> dict[str, Any]:
             f"{item['state']}:{item['component_id']}"
             for item in components
             if item["activation_stage"] == "A13" and item["state"] != "ACTIVE"
+        ],
+        "a14_active_inventory_observed": [
+            item["component_id"]
+            for item in components
+            if item["activation_stage"] == "A14" and item["state"] == "ACTIVE"
+        ],
+        "a14_parked_blockers": [
+            f"{item['state']}:{item['component_id']}"
+            for item in components
+            if item["activation_stage"] == "A14" and item["state"] != "ACTIVE"
         ],
         "a07_parked_blockers": [f"WAIT_LICENSE:python-flint:{FLINT_WAIT_REASON}"],
         "production_versus_fixture_axis": [

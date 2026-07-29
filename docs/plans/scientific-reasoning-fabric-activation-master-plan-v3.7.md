@@ -1169,9 +1169,9 @@ current_facts:
 
 ~~~yaml
 execution_state:
-  status: A13_ACTIVE_READY_FOR_A14_WITH_PARKED_PROTECTED_LANES
-  current_stage: A14
-  next_stage: A14_activate_sciml_and_domain_science
+  status: A14_ACTIVE_READY_FOR_A15_WITH_PARKED_PROTECTED_LANES
+  current_stage: A15
+  next_stage: A15_provision_and_activate_heavy_compute
   completed_stages:
     - A00
     - A01
@@ -1185,6 +1185,7 @@ execution_state:
     - A11
     - A12
     - A13
+    - A14
   completed_stage_lanes:
     - A07_sympy_mpmath_core
   parked_stages:
@@ -1200,11 +1201,11 @@ execution_state:
     - WAIT_COMPUTE_TARGET:A05_BIND_NATIVE_SANDBOX_COMPUTE_TARGET
     - WAIT_LICENSE:A07_PYTHON_FLINT_LGPL_CLOSURE
     - WAIT_AUTHORITY:A09_BIND_PINNED_LEAN_MATHLIB_PROJECT_TO_T7
-  active_branch_or_null: codex/srf-a13-applied-science
+  active_branch_or_null: codex/srf-a14-sciml-domain
   active_pr_or_null: null
   writer_lease_or_null: null
   blocker_or_null: WAIT_LICENSE:A07_PYTHON_FLINT_LGPL_CLOSURE
-  next_executable_action: start A14 SciML and domain science activation while keeping T7-backed persistence, native compute binding, native production signing, FLINT license closure and A09 T7 formal toolchain binding parked until exact authority/evidence exists
+  next_executable_action: start A15 heavy compute target provisioning analysis while keeping T7-backed persistence, native compute binding, native production signing, FLINT license closure and A09 T7 formal toolchain binding parked until exact authority/evidence exists
   updated_at: 2026-07-29
 ~~~
 
@@ -1252,6 +1253,8 @@ decision_log:
     decision: A12 PySR, PySINDy and PyDMD discovery/dynamics packs are ACTIVE with bounded real workloads, null controls, public benchmark receipt and no automatic scientific promotion; SR4MDL, Operon, gplearn, AI-Feynman, PyKoopman and Dysts are formally replaced for v2.0.0; truth-ledger A12 projection is offline from hash-bound receipt sha256:f76090d0a8bcbf72d986f9c7c32d125cc1624c80c7580b0aa3ea69f363ffc9a5
   - id: V37-D020
     decision: A13 applied-science packs are ACTIVE with ripser topology signal/null control, pyriemann SPD geometry diagnostics, CVXPY solver/license matrix, native analytic Bayesian diagnostics without MCMC convergence claims and native causal backdoor identification plus falsification; all broader catalog items are formally replaced for v2.0.0; truth-ledger A13 projection is offline from hash-bound receipt sha256:067abec4a2274b42e8e33122076045d9c67a6d1de6e51859505866adafdbca24
+  - id: V37-D021
+    decision: A14 SciML/domain packs are ACTIVE with a real Julia SciMLBase/OrdinaryDiffEq ODE solve, Python diffrax ODE solve, QuTiP quantum evolution, Astropy coordinate transform, Cantera combustion equilibrium, native bounded battery RC model, quimb many-body diagonalization and cotengra tensor-network contraction path; ModelingToolkit, DataDrivenDiffEq, Cadabra and PyBaMM are formally replaced for v2.0.0; cross-language ODE evidence is tolerance-only with no bitwise identity claim; truth-ledger A14 projection is offline from hash-bound receipt sha256:2ab6c81a418700072a1330008290304cd24fe74993efd65c22b4fd43397080ae
 ~~~
 
 ## EVIDENCE_INDEX
@@ -1315,6 +1318,11 @@ evidence_index:
   - docs/catalog/applied-science.md
   - scripts/checks/srf-v37-a13-gate.py
   - docs/verification/srf-v3-7-a13-applied-science-receipt.json
+  - docs/architecture/sciml-domain-a14.md
+  - docs/catalog/sciml-domain.md
+  - scripts/checks/srf-v37-a14-prepare-julia.py
+  - scripts/checks/srf-v37-a14-gate.py
+  - docs/verification/srf-v3-7-a14-sciml-domain-receipt.json
 ~~~
 
 <!-- END_MUTABLE_STATE_V3_7 -->
