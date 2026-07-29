@@ -1,0 +1,13 @@
+{
+  "canonical_writes": 0,
+  "gate_command": "uv run python scripts/checks/srf-v37-a05-gate.py",
+  "grants_authority": false,
+  "operator_action_grouped_sha256": "22fecec1-cbc5a51a-616c8456-b94bd07b-25d7edab-c460e881-8b89af4d-897cba80",
+  "protected_compute_binding": "WAIT_COMPUTE_TARGET:A05_BIND_NATIVE_SANDBOX_COMPUTE_TARGET",
+  "receipt_id_grouped_sha256": "9a33da5a-f0b217ca-a1165703-c9d28e3e-0c289825-c1b36af7-1e6dd1b9-54e35b3e",
+  "release_claim": "A05_SOFTWARE_T0_T1_ONLY",
+  "schema_version": "StageCompletionReceipt/v1",
+  "stage_closure": "SOFTWARE_T0_T1_ENFORCED_T2_T3_WAIT_COMPUTE_TARGET",
+  "stage_id": "A05",
+  "terminal_state": "A05_ACCEPTED_WAIT_NATIVE_T2_T3_TARGET"
+}

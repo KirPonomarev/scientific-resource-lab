@@ -149,6 +149,14 @@ is killed, and the run is classified `resource_limit` with no receipt. The cap
 is enforced reader-side (not by the kernel), so it is identical on every
 platform.
 
+### Aggregate scratch cap
+
+After a child exits cleanly and before output validation can write a receipt,
+the runner totals regular-file bytes under the private scratch tree. If usage
+exceeds `scratch_cap_bytes` (default `policy.default.scratch_bytes`), the run is
+classified `resource_limit` with no receipt. This catches an adapter that emits
+valid JSON output while filling scratch with side files.
+
 ## The receipt-last invariant
 
 A `RunReceipt/v1` is written to scratch **only after** the child's output

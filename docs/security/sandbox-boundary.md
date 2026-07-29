@@ -31,7 +31,17 @@ The existing execution runner still enforces the per-run cage:
 - scratch is unique and private;
 - child runs through the fixed `srl.execution.child` entrypoint;
 - POSIX limits, wall timeout, output caps and process-group reaping apply;
+- aggregate scratch usage is checked before any success receipt is written;
 - receipts are written only after successful output validation.
+
+V3.7 A05 adds a native target evidence evaluator for `T2`/`T3`. It validates
+only receipt fields that a compatible Linux rootless-container or microVM target
+must prove: Linux platform, rootless isolation, network deny, read-only pack
+image, no inherited credentials, CAS writer outside the sandbox, output and
+scratch limits, and an adversarial escape suite. `T3` additionally requires
+microVM isolation and taint tracking. Missing evidence returns
+`WAIT_COMPUTE_TARGET`; there is no local Mac fallback that can claim `T2` or
+`T3`.
 
 Sandbox admission is an execution safety decision, not scientific evidence and
 not canonical authority. Every admission receipt carries `canonical_writes=0`

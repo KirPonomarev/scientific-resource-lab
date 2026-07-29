@@ -169,6 +169,7 @@ def test_credential_canary_absent_from_child(policy: Any) -> None:
     assert result["passed"], result["detail"]
     assert result["canary_present_in_env_dict"] is False
     assert result["child_booted_under_sanitized_env"] is True
+    assert result["child_observed_canary"] is False
 
 
 def test_child_cwd_is_scratch_not_repo_root(policy: Any) -> None:

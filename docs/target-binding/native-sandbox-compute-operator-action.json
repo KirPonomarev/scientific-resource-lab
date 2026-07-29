@@ -1,0 +1,27 @@
+{
+  "action_id": "A05_BIND_NATIVE_SANDBOX_COMPUTE_TARGET",
+  "allowed_actions_after_authority": [
+    "select_compatible_linux_compute_target",
+    "install_or_verify_rootless_container_or_microvm_runtime",
+    "run_native_adversarial_escape_suite_on_target",
+    "prove_network_deny_default_inside_t2_t3",
+    "prove_read_only_pack_image_inside_t2_t3",
+    "prove_no_inherited_credentials_inside_t2_t3",
+    "prove_output_and_scratch_limits_inside_t2_t3",
+    "prove_cas_writer_runs_outside_sandbox",
+    "record_native_sandbox_evidence_without_secrets"
+  ],
+  "authority_required": true,
+  "expected_receipt_schema": "NativeSandboxReceipt/v1",
+  "forbidden_without_authority": [
+    "start_remote_compute_target",
+    "install_container_runtime_on_protected_host",
+    "start_microvm_or_privileged_runtime",
+    "copy_credentials_into_sandbox",
+    "claim_t2_t3_active",
+    "claim_done_or_v2_release"
+  ],
+  "grants_authority": false,
+  "schema_version": "ProtectedOperatorAction/v1",
+  "target": "compatible Linux rootless-container or microVM compute target"
+}
