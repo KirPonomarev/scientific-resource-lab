@@ -38,6 +38,12 @@ license = "Apache-2.0"
 # - cryptography (A04): Ed25519 detached signatures for production transport
 #   verification. Production private keys remain native/private config; tests
 #   use ephemeral in-memory keys only.
+# - sympy + mpmath (A07): P0 Python core exact symbolic algebra and
+#   high-precision/interval numerics. They are admitted into the default
+#   closure with permissive license metadata and real smoke/crosscheck gates.
+#   python-flint is deliberately not a default dependency: current PyPI metadata
+#   declares `MIT AND LGPL-3.0-or-later`, and the SRL license policy parks that
+#   FLINT/Arb/Calcium lane at WAIT_LICENSE until an explicit decision exists.
 # - pymc + arviz (WP-H71a): bounded one-chain Bayesian posterior fitting for the
 #   ``uncertainty`` capability profile, isolated behind the pymc adapter
 #   (docs/adr/0008-pymc.md). Both are Apache-2.0, BUT pytensor (pymc's backend)
@@ -64,11 +70,13 @@ dependencies = [
     "cryptography>=43",
     "cvxpy>=1.9.2",
     "jsonschema>=4.23",
+    "mpmath>=1.3.0",
     "numpy>=2.0",
     "pint>=0.25.3",
     "pyriemann>=0.12",
     "ripser>=0.6.15",
     "scipy>=1.14",
+    "sympy>=1.14.0",
     "z3-solver>=4.13.0",
 ]
 

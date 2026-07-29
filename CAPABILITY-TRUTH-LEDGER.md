@@ -25,9 +25,9 @@ Current v1.0.1 active inventory reproduced by the ledger:
 | `pyriemann` | `applied_geometry` | `v1.0.1` | `ACTIVE` | `nonfixture_executable_probe_and_scientific_smoke` |
 | `cvxpy` | `p1_optimization` | `v1.0.1` | `ACTIVE` | `nonfixture_executable_probe_and_scientific_smoke` |
 | `clarabel` | `p1_optimization_solver` | `v1.0.1` | `ACTIVE` | `nonfixture_executable_probe_and_scientific_smoke` |
-| `sympy` | `a07_p0_python_core` | `A07` | `WAIT_CAPABILITY` | `missing_or_protected_capability` |
-| `mpmath` | `a07_p0_python_core` | `A07` | `WAIT_CAPABILITY` | `missing_or_protected_capability` |
-| `python-flint` | `a07_p0_python_core` | `A07` | `WAIT_CAPABILITY` | `missing_or_protected_capability` |
+| `sympy` | `a07_p0_python_core` | `A07` | `ACTIVE` | `nonfixture_executable_probe_and_scientific_smoke` |
+| `mpmath` | `a07_p0_python_core` | `A07` | `ACTIVE` | `nonfixture_executable_probe_and_scientific_smoke` |
+| `python-flint` | `a07_p0_python_core` | `A07` | `WAIT_LICENSE` | `missing_or_protected_capability` |
 | `pari-gp` | `a08_native_algebra` | `A08` | `WAIT_TOOLCHAIN` | `missing_or_protected_capability` |
 | `maxima` | `a08_native_algebra` | `A08` | `WAIT_TOOLCHAIN` | `missing_or_protected_capability` |
 | `gap` | `a08_native_algebra` | `A08` | `WAIT_TOOLCHAIN` | `missing_or_protected_capability` |

@@ -15,6 +15,8 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, Final
 
+from srl.packs.adapters.p0_python_core import FLINT_WAIT_REASON, run_p0_python_core_smoke
+
 TRUTH_STATES: Final[tuple[str, ...]] = (
     "DECLARED",
     "CONFIGURED",
@@ -156,6 +158,16 @@ def _smoke_clarabel() -> str:
     return _smoke_cvxpy()
 
 
+def _smoke_sympy() -> str:
+    smoke = run_p0_python_core_smoke()
+    return smoke.exact_factorization_crosscheck
+
+
+def _smoke_mpmath() -> str:
+    smoke = run_p0_python_core_smoke()
+    return "; ".join((smoke.high_precision_crosscheck, smoke.interval_crosscheck))
+
+
 _SPECS: Final[tuple[ComponentSpec, ...]] = (
     ComponentSpec(
         "numpy",
@@ -244,6 +256,8 @@ _SPECS: Final[tuple[ComponentSpec, ...]] = (
         "python_import",
         "sympy",
         "sympy",
+        current_v101_active=True,
+        smoke=_smoke_sympy,
     ),
     ComponentSpec(
         "mpmath",
@@ -252,6 +266,8 @@ _SPECS: Final[tuple[ComponentSpec, ...]] = (
         "python_import",
         "mpmath",
         "mpmath",
+        current_v101_active=True,
+        smoke=_smoke_mpmath,
     ),
     ComponentSpec(
         "python-flint",
@@ -260,6 +276,7 @@ _SPECS: Final[tuple[ComponentSpec, ...]] = (
         "python_import",
         "flint",
         "python-flint",
+        activation_wait_state="WAIT_LICENSE",
     ),
     ComponentSpec(
         "pari-gp",
@@ -441,6 +458,11 @@ def _probe(spec: ComponentSpec) -> dict[str, Any]:
 def build_truth_ledger() -> dict[str, Any]:
     """Build the current executable-probe-backed CapabilityTruthLedger/v1."""
     components = [_probe(spec) for spec in _SPECS]
+    current_v101_active_inventory = [
+        item["component_id"]
+        for item in components
+        if item["activation_stage"] == "v1.0.1" and item["state"] == "ACTIVE"
+    ]
     active_inventory = [item["component_id"] for item in components if item["state"] == "ACTIVE"]
     return {
         "schema_version": "CapabilityTruthLedger/v1",
@@ -450,7 +472,14 @@ def build_truth_ledger() -> dict[str, Any]:
         "wait_states": list(WAIT_STATES),
         "capability_closure_chain": list(TRUTH_STATES),
         "current_v101_active_inventory_expected": list(CURRENT_V101_ACTIVE_INVENTORY),
-        "current_v101_active_inventory_observed": active_inventory,
+        "current_v101_active_inventory_observed": current_v101_active_inventory,
+        "all_active_inventory_observed": active_inventory,
+        "a07_active_inventory_observed": [
+            item["component_id"]
+            for item in components
+            if item["activation_stage"] == "A07" and item["state"] == "ACTIVE"
+        ],
+        "a07_parked_blockers": [f"WAIT_LICENSE:python-flint:{FLINT_WAIT_REASON}"],
         "production_versus_fixture_axis": [
             "fixture_only",
             "policy_only",
@@ -481,6 +510,9 @@ def _component_blockers(components: list[Any]) -> list[str]:
         component_id = str(item.get("component_id"))
         state = item.get("state")
         if state != "ACTIVE":
+            if item.get("component_id") == "python-flint" and state == "WAIT_LICENSE":
+                blockers.append(f"MANDATORY_WAIT_LICENSE:{component_id}")
+                continue
             blockers.append(f"MANDATORY_NOT_ACTIVE:{component_id}:{state}")
             continue
         if item.get("evidence_axis") in {"fixture_only", "policy_only", "executable_probe_only"}:
