@@ -20,6 +20,17 @@ def _load_prepare_module() -> ModuleType:
 prepare_a10_hol4 = _load_prepare_module()
 
 
+def test_resolve_cache_root_returns_absolute_path(tmp_path: Path, monkeypatch) -> None:
+    relative_root = Path("relative-a10-cache")
+
+    monkeypatch.chdir(tmp_path)
+
+    resolved = prepare_a10_hol4._resolve_cache_root(relative_root)
+
+    assert resolved.is_absolute()
+    assert resolved == (tmp_path / relative_root).resolve()
+
+
 def test_polyml_includes_written_from_env_override(
     tmp_path: Path,
     monkeypatch,

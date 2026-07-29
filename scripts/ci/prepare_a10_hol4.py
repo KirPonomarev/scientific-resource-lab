@@ -61,6 +61,12 @@ def _cache_key(pins: dict[str, Any]) -> str:
     return f"srl-a10-hol4-{payload['os']}-{payload['machine']}-{hol4['release_tag']}-{digest}"
 
 
+def _resolve_cache_root(cache_root: Path) -> Path:
+    """Create and return an absolute cache root path."""
+    cache_root.mkdir(parents=True, exist_ok=True)
+    return cache_root.resolve()
+
+
 def _validate_generated_script_bindings(path: Path) -> list[str]:
     failures: list[str] = []
     for rel in ("bin/hol", "bin/Holmake"):
@@ -212,7 +218,7 @@ def _download(url: str, target: Path, expected_sha256: str) -> None:
 def prepare_hol4(cache_root: Path = DEFAULT_CACHE_ROOT) -> dict[str, Any]:
     pins = load_independent_prover_pins()
     cache_key = _cache_key(pins)
-    cache_root.mkdir(parents=True, exist_ok=True)
+    cache_root = _resolve_cache_root(cache_root)
     final_dir = cache_root / cache_key
     lock_path = cache_root / ".a10-hol4.lock"
     prepare_count = 0
