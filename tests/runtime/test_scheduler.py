@@ -6,10 +6,13 @@ from typing import Any
 
 import pytest
 
+from srl.cas.layout import SrfStorageLayout
 from srl.execution import RunOutcome, RunStatus, RunUsage, load_policy
 from srl.execution.estimate import ResourceEstimate
 from srl.packs.governance import PackLifecycleStatus
 from srl.runtime import (
+    RUN_NAMESPACE_SCHEMA_VERSION,
+    RuntimePool,
     RuntimeRunCheckpoint,
     RuntimeRunRequest,
     RuntimeRunStatus,
@@ -85,6 +88,8 @@ def test_submit_and_dispatch_seals_exactly_one_terminal_receipt(
     }
     assert len(list(roots.terminal.glob("req-1.json"))) == 1
     assert not list(roots.running.glob("*.json"))
+    assert receipt.terminal_receipt_id is not None
+    assert receipt.terminal_receipt_id.startswith("sha256:")
 
 
 def test_backpressure_parks_request_without_queueing(roots: SchedulerRoots, policy: Any) -> None:
@@ -201,6 +206,122 @@ def test_dispatch_is_fifo_and_single_wip(roots: SchedulerRoots, policy: Any) -> 
     assert first is not None
     assert first.request_id == "req-a"
     assert (roots.queued / "req-b.json").exists()
+
+
+def test_t7_work_namespace_uses_spool_state_and_cold_cas(tmp_path: Path) -> None:
+    layout = SrfStorageLayout.at(tmp_path / "SRF")
+    roots = SchedulerRoots.create_t7_work_namespace(layout, runtime_namespace="a06")
+
+    manifest = roots.namespace_manifest()
+
+    assert roots.root == layout.work_path("spool") / "a06"
+    assert roots.store.objects_dir == layout.cold_cas / "objects"
+    assert manifest["schema_version"] == RUN_NAMESPACE_SCHEMA_VERSION
+    assert manifest["state_root_role"] == "t7_work_spool_runtime_namespace"
+    assert manifest["cas_root_role"] == "t7_cold_cas"
+    assert manifest["heavy_m1_concurrency"] == 1
+
+
+def test_priority_aging_prefers_older_small_delta(roots: SchedulerRoots, policy: Any) -> None:
+    roots.submit(_request("old", priority=0), max_queued=4)
+    roots.submit(_request("new", priority=1), max_queued=4)
+
+    first = roots.dispatch_next(policy=policy, max_queued=4, runner=_runner)
+
+    assert first is not None
+    assert first.request_id == "old"
+
+
+def test_heavy_pool_keeps_m1_single_concurrency(roots: SchedulerRoots, policy: Any) -> None:
+    roots.submit(_request("heavy-a", pool=RuntimePool.HEAVY), max_queued=4)
+    roots.submit(_request("heavy-b", pool=RuntimePool.HEAVY), max_queued=4)
+    active = RuntimeRunCheckpoint(
+        request=_request("heavy-running", pool=RuntimePool.HEAVY),
+        status=RuntimeRunStatus.RUNNING,
+        generation=2,
+        sequence=99,
+    )
+    (roots.running / "heavy-running.json").write_bytes(json.dumps(active.to_dict()).encode("utf-8"))
+
+    assert roots.dispatch_next(policy=policy, max_queued=4, runner=_runner) is None
+    assert len(list(roots.running.glob("*.json"))) == 1
+    assert len(list(roots.queued.glob("heavy-*.json"))) == 2
+
+
+def test_disk_reserve_waits_before_ingest_or_runner(
+    roots: SchedulerRoots, policy: Any, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    roots.submit(_request(), max_queued=2)
+    calls = {"runner": 0, "ingest": 0}
+
+    def counted_ingest(*args: Any, **kwargs: Any) -> Any:
+        calls["ingest"] += 1
+        return original_ingest(*args, **kwargs)
+
+    def counted_runner(request: RuntimeRunRequest, _policy: Any, _scratch: Path) -> RunOutcome:
+        calls["runner"] += 1
+        return _runner(request, _policy, _scratch)
+
+    original_ingest = roots.store.ingest_bytes
+    monkeypatch.setattr(roots.store, "ingest_bytes", counted_ingest)
+    reserve_policy = policy.__class__(
+        name=policy.name,
+        concurrency=policy.concurrency,
+        default=policy.default,
+        exception=policy.exception,
+        overflow_action=policy.overflow_action,
+        required_free_disk_bytes=10**30,
+        canonical_writes=policy.canonical_writes,
+        grants_authority=policy.grants_authority,
+    )
+
+    receipt = roots.dispatch_next(policy=reserve_policy, max_queued=2, runner=counted_runner)
+
+    assert receipt is not None
+    assert receipt.status is RuntimeRunStatus.WAIT_LOCAL_DISK
+    assert calls == {"runner": 0, "ingest": 0}
+
+
+def test_crash_recovery_reuses_input_digest_and_writes_one_terminal(
+    roots: SchedulerRoots, policy: Any, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    roots.submit(_request(), max_queued=2)
+
+    def crashing_runner(_request: RuntimeRunRequest, _policy: Any, _scratch: Path) -> RunOutcome:
+        raise RuntimeError("simulated process kill after input checkpoint")
+
+    with pytest.raises(RuntimeError, match="simulated process kill"):
+        roots.dispatch_next(policy=policy, max_queued=2, runner=crashing_runner)
+
+    running_payload = json.loads((roots.running / "req-1.json").read_text(encoding="utf-8"))
+    input_digest = running_payload["input_digest"]
+    assert input_digest.startswith("sha256:")
+    assert not list(roots.terminal.glob("*.json"))
+
+    recovered = roots.recover_interrupted()
+    assert len(recovered) == 1
+    assert recovered[0].input_digest == input_digest
+    assert not list(roots.running.glob("*.json"))
+
+    original_ingest = roots.store.ingest_bytes
+    application_json_ingests = 0
+
+    def counted_ingest(source_bytes: bytes, media_type: str, **kwargs: Any) -> Any:
+        nonlocal application_json_ingests
+        if media_type == "application/json":
+            application_json_ingests += 1
+        return original_ingest(source_bytes, media_type, **kwargs)
+
+    monkeypatch.setattr(roots.store, "ingest_bytes", counted_ingest)
+
+    receipt = roots.dispatch_next(policy=policy, max_queued=2, runner=_runner)
+
+    assert receipt is not None
+    assert receipt.status is RuntimeRunStatus.COMPLETED
+    assert receipt.staged_input_digests["input.json"] == input_digest
+    assert application_json_ingests == 0
+    assert len(list(roots.terminal.glob("req-1.json"))) == 1
+    assert not list(roots.running.glob("*.json"))
 
 
 def test_invalid_request_id_rejected() -> None:

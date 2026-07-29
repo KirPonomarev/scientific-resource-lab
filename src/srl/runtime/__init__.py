@@ -20,8 +20,10 @@ from srl.runtime.remote import (
 )
 from srl.runtime.scheduler import (
     RUN_CHECKPOINT_SCHEMA_VERSION,
+    RUN_NAMESPACE_SCHEMA_VERSION,
     RUN_TERMINAL_RECEIPT_SCHEMA_VERSION,
     RUNNER_CONFORMANCE_RECEIPT_SCHEMA_VERSION,
+    RuntimePool,
     RuntimeRunCheckpoint,
     RuntimeRunRequest,
     RuntimeRunStatus,
@@ -37,6 +39,7 @@ __all__ = [
     "HEAVY_REMOTE_ROUTING_DECISION_SCHEMA_VERSION",
     "RUNNER_CONFORMANCE_RECEIPT_SCHEMA_VERSION",
     "RUN_CHECKPOINT_SCHEMA_VERSION",
+    "RUN_NAMESPACE_SCHEMA_VERSION",
     "RUN_TERMINAL_RECEIPT_SCHEMA_VERSION",
     "BudgetReceipt",
     "ComputeNodeManifest",
@@ -44,6 +47,7 @@ __all__ = [
     "HeavyProfile",
     "HeavyRemoteJobSpec",
     "RemoteRoutingError",
+    "RuntimePool",
     "RuntimeRunCheckpoint",
     "RuntimeRunRequest",
     "RuntimeRunStatus",

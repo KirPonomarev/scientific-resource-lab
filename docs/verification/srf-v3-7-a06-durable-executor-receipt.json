@@ -1,0 +1,14 @@
+{
+  "canonical_writes": 0,
+  "gate_command": "uv run python scripts/checks/srf-v37-a06-gate.py",
+  "grants_authority": false,
+  "namespace_grouped_sha256": "c62db111-252df716-33b63dbd-1f64412a-87af31c4-4ca3554e-1109e116-331497c8",
+  "protected_t7_persistence_binding": "WAIT_T7_BINDING:A02_BIND_T7_NATIVE_TARGET",
+  "protected_compute_binding": "WAIT_COMPUTE_TARGET:A05_BIND_NATIVE_SANDBOX_COMPUTE_TARGET",
+  "receipt_id_grouped_sha256": "bfe3bfbf-17c61a77-edc57ca6-36f48f56-ca000b0b-07260d03-e0713c95-5089352c",
+  "release_claim": "A06_SOFTWARE_DURABLE_SCHEDULER_ONLY",
+  "schema_version": "StageCompletionReceipt/v1",
+  "stage_closure": "SOFTWARE_DURABLE_SCHEDULER_T7_NATIVE_WAIT",
+  "stage_id": "A06",
+  "terminal_state": "A06_ACCEPTED_WAIT_T7_NATIVE_PERSISTENCE"
+}

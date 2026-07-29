@@ -223,3 +223,38 @@ explicit-dispatch scheduler, not a daemon:
 
 This keeps the Mac-off invariant intact. There is no timer, listener, launchd
 job, autonomous loop or arbitrary command execution path.
+
+## A06 durable executor activation
+
+A06 strengthens the S08 scheduler contract for the V3.7 activation lane:
+
+- `SchedulerRoots.create_t7_work_namespace(layout, runtime_namespace=...)`
+  places mutable FSM state under the SRF `work/spool/<namespace>` tree and uses
+  the layout cold-CAS as the content-addressed store. In public tests this is a
+  fixture `SrfStorageLayout`; physical T7 persistence remains
+  `WAIT_T7_BINDING` until the protected A02 target receipt exists.
+- `RuntimePool` separates `light` and `heavy` queued requests. M1 still admits
+  one running checkpoint at a time, so heavy local concurrency remains one.
+- queued ordering applies deterministic aging: older queued work earns priority
+  credit as later work arrives, preventing small priority deltas from starving
+  an old request.
+- running checkpoints persist the input digest before adapter spawn. If the
+  process is interrupted before a terminal receipt, `recover_interrupted`
+  requeues the exact request with the same input digest; resumed dispatch reuses
+  that digest instead of importing input JSON again.
+- terminal scheduler receipts are self-bound with `terminal_receipt_id` and are
+  written once. If a terminal receipt already exists, stale `running/` state or
+  duplicate submit returns the existing receipt rather than creating a second
+  result.
+- disk reserve is checked before input ingest, materialization, or child spawn;
+  low disk produces `wait_local_disk`.
+
+The A06 activation gate is:
+
+```bash
+uv run python scripts/checks/srf-v37-a06-gate.py
+```
+
+The gate uses only bounded local fixture roots and the real `echo.v1`
+subprocess path. It does not start a daemon, mutate a native T7 volume, or grant
+operational authority.
