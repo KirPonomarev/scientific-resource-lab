@@ -1,0 +1,13 @@
+{
+  "canonical_writes": 0,
+  "child_request_id": "sha256:31d335b9e2f58c38c1121a9af1a7559b9f94afd08575f23c785d297f58c6814d",
+  "grants_authority": false,
+  "live_actions": 0,
+  "next_native_gate": "F8/resume_interrupted_durable_job",
+  "parent_direct_external_writes": 0,
+  "receipt_id": "sha256:7d997e9fb54ab820a856cd0ecbcc650e13c58c3197aa01cbeecbcb76ec3e9817",
+  "schema_version": "NativeBridgeWaitReceipt/v1",
+  "target_head": "448a47388ca31309e3dc2b263bf326ca90f234ae",
+  "target_project": "crypto-market-lab",
+  "wait_state": "WAIT_RUNTIME_HEALTH:RED_F8"
+}
