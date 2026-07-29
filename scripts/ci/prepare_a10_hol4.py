@@ -75,6 +75,86 @@ def _validate_generated_script_bindings(path: Path) -> list[str]:
     return failures
 
 
+def _polyml_lib_dir_candidates() -> tuple[Path, ...]:
+    """Return bounded candidate directories that may contain ``libpolymain.a``."""
+    candidates: list[Path] = []
+    env_dir = os.environ.get("SRL_A10_POLYML_LIB_DIR")
+    if env_dir:
+        candidates.append(Path(env_dir))
+    poly_executable = shutil.which("poly")
+    if poly_executable:
+        poly_path = Path(poly_executable).resolve()
+        candidates.extend(
+            (
+                poly_path.parent.parent / "lib",
+                poly_path.parent.parent / "lib64",
+            )
+        )
+    machine = platform.machine().lower()
+    multiarch = {
+        "x86_64": "x86_64-linux-gnu",
+        "amd64": "x86_64-linux-gnu",
+        "aarch64": "aarch64-linux-gnu",
+        "arm64": "aarch64-linux-gnu",
+    }.get(machine)
+    if multiarch:
+        candidates.append(Path("/usr/lib") / multiarch)
+    candidates.extend(
+        (
+            Path("/usr/lib"),
+            Path("/usr/local/lib"),
+            Path("/opt/homebrew/lib"),
+            Path("/opt/local/lib"),
+        )
+    )
+
+    deduped: list[Path] = []
+    seen: set[str] = set()
+    for candidate in candidates:
+        key = str(candidate)
+        if key not in seen:
+            seen.add(key)
+            deduped.append(candidate)
+    return tuple(deduped)
+
+
+def _polyml_search_roots() -> tuple[Path, ...]:
+    """Return bounded roots for fallback ``libpolymain.a`` discovery."""
+    return (
+        Path("/usr/lib"),
+        Path("/usr/local/lib"),
+        Path("/opt/homebrew/lib"),
+        Path("/opt/local/lib"),
+    )
+
+
+def _find_polyml_lib_dir() -> Path | None:
+    """Return the directory containing ``libpolymain.a`` if it is discoverable."""
+    for candidate in _polyml_lib_dir_candidates():
+        if (candidate / "libpolymain.a").exists():
+            return candidate
+    for root in _polyml_search_roots():
+        if not root.exists():
+            continue
+        for path in root.rglob("libpolymain.a"):
+            return path.parent
+    return None
+
+
+def _write_polyml_includes_if_found(hol4_home: Path) -> str | None:
+    """Write HOL4's Poly/ML include override when the static library is present."""
+    lib_dir = _find_polyml_lib_dir()
+    if lib_dir is None:
+        return None
+    includes_dir = hol4_home / "tools-poly"
+    includes_dir.mkdir(parents=True, exist_ok=True)
+    (includes_dir / "poly-includes.ML").write_text(
+        f'val polymllibdir = "{lib_dir}";\n',
+        encoding="utf-8",
+    )
+    return str(lib_dir)
+
+
 def _validate_hol4_home(path: Path, pins: dict[str, Any]) -> tuple[bool, list[str]]:
     failures: list[str] = []
     if not path.exists():
@@ -137,6 +217,7 @@ def prepare_hol4(cache_root: Path = DEFAULT_CACHE_ROOT) -> dict[str, Any]:
     lock_path = cache_root / ".a10-hol4.lock"
     prepare_count = 0
     fetch_count = 0
+    polyml_lib_dir: str | None = None
 
     with lock_path.open("w", encoding="utf-8") as lock:
         fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
@@ -163,6 +244,7 @@ def prepare_hol4(cache_root: Path = DEFAULT_CACHE_ROOT) -> dict[str, Any]:
                     raise RuntimeError("HOL4 tarball did not contain exactly one source root")
                 source = source_dirs[0]
                 source.rename(final_dir)
+                polyml_lib_dir = _write_polyml_includes_if_found(final_dir)
                 configure = (final_dir / "tools" / "smart-configure.sml").read_bytes()
                 _run(["poly"], cwd=final_dir, input_bytes=configure)
                 _run(["bin/build"], cwd=final_dir)
@@ -171,6 +253,7 @@ def prepare_hol4(cache_root: Path = DEFAULT_CACHE_ROOT) -> dict[str, Any]:
                     "release_tag": pins["hol4"]["release_tag"],
                     "release_tar_sha256": pins["hol4"]["release_tar_sha256"],
                     "pin_manifest_sha256": independent_prover_pin_manifest_hash(),
+                    "polyml_lib_dir": polyml_lib_dir,
                     "canonical_writes": 0,
                     "grants_authority": False,
                 }
@@ -197,6 +280,7 @@ def prepare_hol4(cache_root: Path = DEFAULT_CACHE_ROOT) -> dict[str, Any]:
         "prepare_count": prepare_count,
         "fetch_count": fetch_count,
         "hol4_home": str(final_dir),
+        "polyml_lib_dir": polyml_lib_dir,
         "pin_manifest_sha256": independent_prover_pin_manifest_hash(),
         "installer_sha256": _installer_hash(),
         "canonical_writes": 0,
