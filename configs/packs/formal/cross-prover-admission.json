@@ -1,0 +1,1 @@
+{"schema_version":"CrossProverAdmissionConfig/v1","contours":["lean.primary","rocq.primary","isabelle.hol","hol4.primary"],"semantic_policy":"compare_logics_and_assumptions_never_assert_equivalence","automatic_equivalence_claims":0,"canonical_writes":0,"grants_authority":false}

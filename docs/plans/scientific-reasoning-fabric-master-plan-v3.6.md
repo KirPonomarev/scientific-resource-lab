@@ -1900,9 +1900,9 @@ The final report must list exact IDs and hashes, never subjective percentages.
 
 <!-- BEGIN_MUTABLE_STATE_V3_6 -->
 
-STATE_REVISION: 14
-PREVIOUS_STATE_SHA256: 4467cf1b-ea8d8b0a-62492546-cdf916fc-7f3093bc-5a2e6b2e-eae7837b-2dda1993
-CURRENT_STATE_SHA256: a87878c2-2f5ca79d-d701b18b-d0312f0e-01d4a6b2-dfe78951-cd7020e0-af6a235b
+STATE_REVISION: 15
+PREVIOUS_STATE_SHA256: a87878c2-2f5ca79d-d701b18b-d0312f0e-01d4a6b2-dfe78951-cd7020e0-af6a235b
+CURRENT_STATE_SHA256: e78f3965-2c89a575-a945bd2b-c3737638-329abd3f-e9e1c2f9-59369a81-c92b11ab
 
 ## CURRENT_FACTS
 
@@ -1927,20 +1927,20 @@ current_facts:
 ~~~yaml
 execution_state:
   status: IN_PROGRESS
-  current_stage: S13
-  next_stage: S14_after_cross_prover
-  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven, S09_health_recovery_proven, S10_interface_convergence_proven, S11_p0_core_proven, S12_lean_primary_proven]
+  current_stage: S14
+  next_stage: S15_after_knowledge_layer
+  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven, S09_health_recovery_proven, S10_interface_convergence_proven, S11_p0_core_proven, S12_lean_primary_proven, S13_cross_prover_proven]
   invalidated_stages: []
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: lean_primary_formal_environment_proven
+  last_proven_transition: cross_prover_contours_proven
   active_branch_or_null: codex/srf-fabric-v1
   active_pr_or_null: null
   active_worktree_or_null: isolated_codex_worktree
   writer_lease_or_null: srf-fabric-v1-single-writer
-  active_operation_or_null: S13_cross_prover_contours
+  active_operation_or_null: S14_knowledge_corpus_layer
   active_process_or_job_or_null: null
-  next_checkpoint: after_S13_cross_prover_admission_receipt
-  next_executable_action: add Rocq, Isabelle/HOL and HOL4 independent formal contours without false theorem equivalence
+  next_checkpoint: after_S14_knowledge_layer_receipt
+  next_executable_action: build safe source-grounded literature and mathematical knowledge graph
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -1952,30 +1952,29 @@ state_capsule:
   project_id: scientific-resource-lab
   project_fingerprint: d56e03d0-d5e1a9bb-9c33a008-ab989510-2d8e41e8-bfd001df-bfc8e1c8-0b9df0b3
   mission_id: build-scientific-reasoning-fabric-v1
-  stage_id: S13
-  state_revision: 14
+  stage_id: S14
+  state_revision: 15
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: lean_primary_formal_environment_proven
-  active_operation: S13_cross_prover_contours
+  last_proven_transition: cross_prover_contours_proven
+  active_operation: S14_knowledge_corpus_layer
   active_process_or_job: null
   frozen_preimages:
     - baseline HEAD
     - repository governance
     - operator-supplied V3.6 protocol
   new_primary_evidence:
-    - LeanAdmissionReceipt 685653b0-e12407ec-db6a11f0-adeef991-7744d2af-89dc6ee8-a2267f95-25c7d527
-    - LeanAdmissionBundle sha256:f597b082-155e195f-4dc432b3-426df52f-98c50642-1492af00-7d4d3b07-16addc29
-    - LeanProofReceipt sha256:48247dcb-6630e54e-63789bf9-76c3cc70-98672321-64d3e942-e621fadb-89a8d68c
-    - Lean toolchain pinned to leanprover/lean4:v4.32.2 and commit f3b06c705e6c85f5314019d5d3baab0fec5b580c
-    - mathlib pinned to tag v4.32.2 and revision 905b95818eb32af7874a58b427f50c1711a5e96c
-    - real bounded lake env lean check PASS with import Mathlib and theorem s12_zero_add
-    - invalid theorem fixture rejected with unsolved goals
-    - focused formal tests PASS with 7 passed
-    - focused mixed tests PASS with 23 passed
-    - make test PASS with 1836 passed and 1 skipped
+    - CrossProverAdmissionReceipt 59bafa9a-6972eaea-bb0f49ad-0e1ea743-1a12c1ce-9c95208a-4327a284-a122ec4b
+    - CrossProverAdmissionBundle sha256:2815dd4c-0e801229-a9d41477-041412ad-3efd1ccc-989ad0fe-09c1249f-a490e6cf
+    - TheoremTranslationManifest sha256:b8befc75-1386eeb4-3882c674-64e10c7d-d7e0c686-4ef74133-63f1c27a-e6e8c203
+    - Lean contour ACTIVE through S12 LeanAdmissionReceipt
+    - Rocq, Isabelle/HOL and HOL4 contours recorded as WAIT_TOOLCHAIN because local executables are absent
+    - theorem translation manifests mechanically record logic and assumption gaps
+    - equivalence_claimed true is rejected by contract tests
+    - focused formal tests PASS with 13 passed
+    - make test PASS with 1842 passed and 1 skipped
     - make lint PASS
     - make typecheck PASS
-  next_executable_action: S13 Rocq, Isabelle/HOL and HOL4 independent contours
+  next_executable_action: S14 source-grounded knowledge graph and corpus taint layer
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -2032,6 +2031,9 @@ evidence_index:
   - claim: S12 Lean primary formal environment proven
     source: LeanAdmissionReceipt/v1
     identity: 685653b0-e12407ec-db6a11f0-adeef991-7744d2af-89dc6ee8-a2267f95-25c7d527
+  - claim: S13 cross-prover contours proven with declared waits
+    source: CrossProverAdmissionReceipt/v1
+    identity: 59bafa9a-6972eaea-bb0f49ad-0e1ea743-1a12c1ce-9c95208a-4327a284-a122ec4b
   - claim: Market mutation currently forbidden
     source: native operator bootstrap
     identity: 59ce6ff4c8b514c93d8d4b26d648ba6e7dd7b764
@@ -2044,7 +2046,7 @@ evidence_index:
 authority_ledger:
   routine_safe_plan_creation: exercised
   exact_hash_review_authority: exercised
-  implementation_authority: exercised_routine_safe_S01_S12
+  implementation_authority: exercised_routine_safe_S01_S13
   market_mutation_authority: absent
   security_mutation_authority: absent
   physical_t7_authority: absent
@@ -2101,6 +2103,8 @@ decision_log:
     decision: S11 admits P0 components by truthful per-engine ACTIVE, DEGRADED or WAIT_CAPABILITY evidence and preserves independent solver disagreement instead of substituting z3 for cvc5
   - id: D023
     decision: S12 pins Lean/mathlib to the stable v4.32.2 line and records kernel acceptance only for the declared formal statement, not as empirical evidence or external-formalization correctness
+  - id: D024
+    decision: S13 ships independent formal contours as explicit ACTIVE or WAIT_TOOLCHAIN records and rejects automatic cross-logic theorem equivalence claims
 ~~~
 
 ## PROGRESS_LOG
@@ -2162,6 +2166,10 @@ progress_log:
   - revision: 14
     stage: S12
     result: Lean v4.32.2 and mathlib v4.32.2 primary formal environment proven with real Mathlib smoke, invalid-proof rejection, tests, lint and typecheck green
+    observed_at: 2026-07-29
+  - revision: 15
+    stage: S13
+    result: Cross-prover contour layer proven with Lean ACTIVE, Rocq/Isabelle/HOL4 WAIT_TOOLCHAIN and semantic-gap manifests rejecting equivalence claims
     observed_at: 2026-07-29
 ~~~
 
