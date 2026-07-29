@@ -1900,9 +1900,9 @@ The final report must list exact IDs and hashes, never subjective percentages.
 
 <!-- BEGIN_MUTABLE_STATE_V3_6 -->
 
-STATE_REVISION: 15
-PREVIOUS_STATE_SHA256: a87878c2-2f5ca79d-d701b18b-d0312f0e-01d4a6b2-dfe78951-cd7020e0-af6a235b
-CURRENT_STATE_SHA256: e78f3965-2c89a575-a945bd2b-c3737638-329abd3f-e9e1c2f9-59369a81-c92b11ab
+STATE_REVISION: 16
+PREVIOUS_STATE_SHA256: e78f3965-2c89a575-a945bd2b-c3737638-329abd3f-e9e1c2f9-59369a81-c92b11ab
+CURRENT_STATE_SHA256: 7cf3f7b8-bdfd8f3c-99f87239-5fe1a969-d40ba6c3-0dc72d62-58492329-54337adf
 
 ## CURRENT_FACTS
 
@@ -1927,20 +1927,20 @@ current_facts:
 ~~~yaml
 execution_state:
   status: IN_PROGRESS
-  current_stage: S14
-  next_stage: S15_after_knowledge_layer
-  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven, S09_health_recovery_proven, S10_interface_convergence_proven, S11_p0_core_proven, S12_lean_primary_proven, S13_cross_prover_proven]
+  current_stage: S15
+  next_stage: S16_after_law_discovery
+  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven, S09_health_recovery_proven, S10_interface_convergence_proven, S11_p0_core_proven, S12_lean_primary_proven, S13_cross_prover_proven, S14_knowledge_layer_proven]
   invalidated_stages: []
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: cross_prover_contours_proven
+  last_proven_transition: knowledge_layer_proven
   active_branch_or_null: codex/srf-fabric-v1
   active_pr_or_null: null
   active_worktree_or_null: isolated_codex_worktree
   writer_lease_or_null: srf-fabric-v1-single-writer
-  active_operation_or_null: S14_knowledge_corpus_layer
+  active_operation_or_null: S15_law_discovery_dynamical_packs
   active_process_or_job_or_null: null
-  next_checkpoint: after_S14_knowledge_layer_receipt
-  next_executable_action: build safe source-grounded literature and mathematical knowledge graph
+  next_checkpoint: after_S15_lawminer_validation_receipt
+  next_executable_action: implement LawMiner and dynamical discovery with null and holdout honesty
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -1952,29 +1952,28 @@ state_capsule:
   project_id: scientific-resource-lab
   project_fingerprint: d56e03d0-d5e1a9bb-9c33a008-ab989510-2d8e41e8-bfd001df-bfc8e1c8-0b9df0b3
   mission_id: build-scientific-reasoning-fabric-v1
-  stage_id: S14
-  state_revision: 15
+  stage_id: S15
+  state_revision: 16
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: cross_prover_contours_proven
-  active_operation: S14_knowledge_corpus_layer
+  last_proven_transition: knowledge_layer_proven
+  active_operation: S15_law_discovery_dynamical_packs
   active_process_or_job: null
   frozen_preimages:
     - baseline HEAD
     - repository governance
     - operator-supplied V3.6 protocol
   new_primary_evidence:
-    - CrossProverAdmissionReceipt 59bafa9a-6972eaea-bb0f49ad-0e1ea743-1a12c1ce-9c95208a-4327a284-a122ec4b
-    - CrossProverAdmissionBundle sha256:2815dd4c-0e801229-a9d41477-041412ad-3efd1ccc-989ad0fe-09c1249f-a490e6cf
-    - TheoremTranslationManifest sha256:b8befc75-1386eeb4-3882c674-64e10c7d-d7e0c686-4ef74133-63f1c27a-e6e8c203
-    - Lean contour ACTIVE through S12 LeanAdmissionReceipt
-    - Rocq, Isabelle/HOL and HOL4 contours recorded as WAIT_TOOLCHAIN because local executables are absent
-    - theorem translation manifests mechanically record logic and assumption gaps
-    - equivalence_claimed true is rejected by contract tests
-    - focused formal tests PASS with 13 passed
-    - make test PASS with 1842 passed and 1 skipped
+    - KnowledgeLayerReceipt d0292caf-1ef6db10-7b5a80ac-77ac063c-6f40573c-0407f988-79f58213-1055d841
+    - KnowledgeLayerManifest sha256:8176c9e4-05f45b50-fa39c043-b07c405c-2f7435ea-97c91826-dcdb89eb-667499dc
+    - OpenAlex, Crossref, arXiv and OEIS source cards ACTIVE through existing bounded adapters
+    - OpenCitations, zbMATH, LMFDB, CSLib, Erdos Problems and Formal Conjectures recorded as WAIT_ADAPTER or WAIT_TERMS
+    - content-addressed knowledge facts carry offsets, payload digests, attribution and taint labels
+    - prompt-injection corpus spans are detected and kept out of privileged prompts
+    - focused knowledge tests PASS with 101 passed
+    - make test PASS with 1849 passed and 1 skipped
     - make lint PASS
     - make typecheck PASS
-  next_executable_action: S14 source-grounded knowledge graph and corpus taint layer
+  next_executable_action: S15 LawMiner and dynamical discovery validation layer
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -2034,6 +2033,9 @@ evidence_index:
   - claim: S13 cross-prover contours proven with declared waits
     source: CrossProverAdmissionReceipt/v1
     identity: 59bafa9a-6972eaea-bb0f49ad-0e1ea743-1a12c1ce-9c95208a-4327a284-a122ec4b
+  - claim: S14 knowledge layer proven with declared waits
+    source: KnowledgeLayerReceipt/v1
+    identity: d0292caf-1ef6db10-7b5a80ac-77ac063c-6f40573c-0407f988-79f58213-1055d841
   - claim: Market mutation currently forbidden
     source: native operator bootstrap
     identity: 59ce6ff4c8b514c93d8d4b26d648ba6e7dd7b764
@@ -2046,7 +2048,7 @@ evidence_index:
 authority_ledger:
   routine_safe_plan_creation: exercised
   exact_hash_review_authority: exercised
-  implementation_authority: exercised_routine_safe_S01_S13
+  implementation_authority: exercised_routine_safe_S01_S14
   market_mutation_authority: absent
   security_mutation_authority: absent
   physical_t7_authority: absent
@@ -2105,6 +2107,8 @@ decision_log:
     decision: S12 pins Lean/mathlib to the stable v4.32.2 line and records kernel acceptance only for the declared formal statement, not as empirical evidence or external-formalization correctness
   - id: D024
     decision: S13 ships independent formal contours as explicit ACTIVE or WAIT_TOOLCHAIN records and rejects automatic cross-logic theorem equivalence claims
+  - id: D025
+    decision: S14 layers taint-safe source-grounded graph manifests over existing retriever adapters and records missing corpus/source adapters as explicit WAIT states
 ~~~
 
 ## PROGRESS_LOG
@@ -2170,6 +2174,10 @@ progress_log:
   - revision: 15
     stage: S13
     result: Cross-prover contour layer proven with Lean ACTIVE, Rocq/Isabelle/HOL4 WAIT_TOOLCHAIN and semantic-gap manifests rejecting equivalence claims
+    observed_at: 2026-07-29
+  - revision: 16
+    stage: S14
+    result: Knowledge graph and taint layer proven with active bounded sources, declared source waits, prompt-injection detection and raw-corpus prompt boundary
     observed_at: 2026-07-29
 ~~~
 
