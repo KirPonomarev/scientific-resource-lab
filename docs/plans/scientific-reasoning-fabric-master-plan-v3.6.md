@@ -1900,9 +1900,9 @@ The final report must list exact IDs and hashes, never subjective percentages.
 
 <!-- BEGIN_MUTABLE_STATE_V3_6 -->
 
-STATE_REVISION: 21
-PREVIOUS_STATE_SHA256: e0d6b9fe-dde069cf-a4e2a136-36404ca3-7a2b31d2-de58b54a-e88c8537-3829dac6
-CURRENT_STATE_SHA256: f76cc6ef-758ec5a7-77fcfacf-4a131b4c-a820f663-4bc7c123-f62be8cd-a1ff04b3
+STATE_REVISION: 22
+PREVIOUS_STATE_SHA256: f76cc6ef-758ec5a7-77fcfacf-4a131b4c-a820f663-4bc7c123-f62be8cd-a1ff04b3
+CURRENT_STATE_SHA256: 8afee848-16583431-2c9c341a-ccc9c22f-b1a6af5a-f4db8116-3009e4f8-343883cf
 
 ## CURRENT_FACTS
 
@@ -1927,20 +1927,20 @@ current_facts:
 ~~~yaml
 execution_state:
   status: IN_PROGRESS
-  current_stage: S20
-  next_stage: S21_after_market_bridge
-  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven, S09_health_recovery_proven, S10_interface_convergence_proven, S11_p0_core_proven, S12_lean_primary_proven, S13_cross_prover_proven, S14_knowledge_layer_proven, S15_lawminer_proven, S16_applied_science_proven, S17_sciml_domain_proven, S18_heavy_capability_routing_proven, S19_shared_contract_child_request_prepared]
+  current_stage: S21
+  next_stage: S22_after_security_bridge
+  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven, S09_health_recovery_proven, S10_interface_convergence_proven, S11_p0_core_proven, S12_lean_primary_proven, S13_cross_prover_proven, S14_knowledge_layer_proven, S15_lawminer_proven, S16_applied_science_proven, S17_sciml_domain_proven, S18_heavy_capability_routing_proven, S19_shared_contract_child_request_prepared, S20_market_bridge_inactive_proven]
   invalidated_stages: []
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: shared_contract_child_request_prepared_wait_native
+  last_proven_transition: market_adapter_inactive_proven_wait_runtime_health
   active_branch_or_null: codex/srf-fabric-v1
   active_pr_or_null: null
   active_worktree_or_null: isolated_codex_worktree
   writer_lease_or_null: srf-fabric-v1-single-writer
-  active_operation_or_null: S20_market_bridge_inactive
+  active_operation_or_null: S21_security_bridge_inactive
   active_process_or_job_or_null: null
-  next_checkpoint: after_S20_market_bridge_inactive_receipt
-  next_executable_action: implement inactive SRF-side Market adapter with C3 semantics and no trading authority
+  next_checkpoint: after_S21_security_bridge_inactive_receipt
+  next_executable_action: implement inactive SRF-side Security adapter with sanitized C3 semantics and ebashim boundary
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -1952,29 +1952,32 @@ state_capsule:
   project_id: scientific-resource-lab
   project_fingerprint: d56e03d0-d5e1a9bb-9c33a008-ab989510-2d8e41e8-bfd001df-bfc8e1c8-0b9df0b3
   mission_id: build-scientific-reasoning-fabric-v1
-  stage_id: S20
-  state_revision: 21
+  stage_id: S21
+  state_revision: 22
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: shared_contract_child_request_prepared_wait_native
-  active_operation: S20_market_bridge_inactive
+  last_proven_transition: market_adapter_inactive_proven_wait_runtime_health
+  active_operation: S21_security_bridge_inactive
   active_process_or_job: null
   frozen_preimages:
     - baseline HEAD
     - repository governance
     - operator-supplied V3.6 protocol
   new_primary_evidence:
-    - SharedContractChildRequestReceipt f0cc9275-716e3fae-5ea9fa6e-92ac45ca-3d9d1b09-4190d5aa-5e4a5b61-c3530942
-    - ChildMissionRequest sha256:00253ea5-29a03583-b2c969be-ca4b26d1-00f1a323-7ec80163-aa85816e-7163aab5
-    - ChildMissionRequest artifact sha256:a786c38e-8c789a4f-5cbfeb8d-989e3edb-a0c192e-1d1c90d0-5bf44b35-53d78e390
-    - DualContour read-only HEAD a3cc68227387954417931fe08f9d66b6212f3308 observed clean
-    - local ScientificRequestEnvelope and ScientificResultEnvelope conformance vectors accept and reject as declared
-    - native DualContour closeout remains WAIT_NATIVE_CHILD_CLOSEOUT
-    - parent_direct_external_writes=0 and all S19 artifacts remain authority-negative
-    - focused S19 tests PASS with 4 passed
-    - make test PASS with 1878 passed and 1 skipped
+    - MarketAdapterInactiveReceipt 844bc0f3-083341d5-8e81d881-553151a7-6df1d693-0363e020-68d90b07-deb5b462
+    - Market request fixture sha256:2785ae81-59bec25c-b98fd158-bad3f245-d45368c0-4663318b-9f019594-601abf11
+    - Market result fixture sha256:4a541f42-c084896b-196e385e-1bc6234d-341c06ea-cffad9b2-8284b235-9a1bdff6
+    - Market health projection sha256:11b8f845-592d3652-4124fa89-ddcf492d-6eb6607e-385ac2e7-82ce1c3b-828c58a2
+    - inactive C3 request and observation mapping validated against ScientificRequestEnvelope and ScientificResultEnvelope
+    - trading/order language, private paths, D2/D3, credentials, authority claims, duplicate imports and stale Market HEAD are rejected
+    - activation_state=INACTIVE, market_writes=0, live_actions=0 and trading_allowed=false
+    - Market dependency remains WAIT_RUNTIME_HEALTH:RED_F8
+    - secret-scan allowlist updated with SHA-256-of-literal entries for S19 public child mission hash/signature false positives
+    - focused S20 tests PASS with 9 passed
+    - make test PASS with 1887 passed and 1 skipped
     - make lint PASS
     - make typecheck PASS
-  next_executable_action: S20 inactive Market bridge implementation
+    - secret scan PASS
+  next_executable_action: S21 inactive Security bridge implementation
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -2052,6 +2055,9 @@ evidence_index:
   - claim: S19 shared contract child request prepared with native closeout wait
     source: SharedContractChildRequestReceipt/v1
     identity: f0cc9275-716e3fae-5ea9fa6e-92ac45ca-3d9d1b09-4190d5aa-5e4a5b61-c3530942
+  - claim: S20 inactive Market bridge proven with runtime-health wait
+    source: MarketAdapterInactiveReceipt/v1
+    identity: 844bc0f3-083341d5-8e81d881-553151a7-6df1d693-0363e020-68d90b07-deb5b462
   - claim: Market mutation currently forbidden
     source: native operator bootstrap
     identity: 59ce6ff4c8b514c93d8d4b26d648ba6e7dd7b764
@@ -2064,7 +2070,7 @@ evidence_index:
 authority_ledger:
   routine_safe_plan_creation: exercised
   exact_hash_review_authority: exercised
-  implementation_authority: exercised_routine_safe_S01_S19_with_declared_wait
+  implementation_authority: exercised_routine_safe_S01_S20_with_declared_waits
   market_mutation_authority: absent
   security_mutation_authority: absent
   physical_t7_authority: absent
@@ -2135,6 +2141,8 @@ decision_log:
     decision: S18 implements WAIT-safe heavy routing with fixture-node conformance and test-HMAC packet verification while leaving real node launch, credential installation, paid Wolfram calls and image execution behind native authority gates
   - id: D030
     decision: S19 emits only an SRF-side signed child mission request and local conformance vectors; native DualContour validation remains WAIT_NATIVE_CHILD_CLOSEOUT and no parent direct external write or domain-truth claim is made
+  - id: D031
+    decision: S20 implements only an inactive SRF-side Market bridge over shared envelopes with C3 semantics, central-projector requirement and explicit rejection of live trading, private material, authority claims, duplicate imports and stale Market HEADs
 ~~~
 
 ## PROGRESS_LOG
@@ -2224,6 +2232,10 @@ progress_log:
   - revision: 21
     stage: S19
     result: Shared contract child mission request prepared with local conformance vectors green and native DualContour closeout parked as WAIT_NATIVE_CHILD_CLOSEOUT
+    observed_at: 2026-07-29
+  - revision: 22
+    stage: S20
+    result: Inactive Market bridge proven with C3 request/result mapping, authority and trading negatives, stale-head and duplicate-import guards, and WAIT_RUNTIME_HEALTH retained for Market RED_F8
     observed_at: 2026-07-29
 ~~~
 

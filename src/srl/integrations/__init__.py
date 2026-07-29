@@ -2,6 +2,15 @@
 
 from __future__ import annotations
 
+from srl.integrations.market import (
+    MARKET_ADAPTER_INACTIVE_RECEIPT_SCHEMA_VERSION,
+    MARKET_OBSERVATION_PACKET_SCHEMA_VERSION,
+    MarketBridgeError,
+    MarketBridgeStatus,
+    build_market_bridge_health_projection,
+    build_market_science_request,
+    import_market_observation_packet,
+)
 from srl.integrations.shared_contracts import (
     SHARED_CONTRACT_CHILD_MISSION_REQUEST_SCHEMA_VERSION,
     SHARED_CONTRACT_CONFORMANCE_RECEIPT_SCHEMA_VERSION,
@@ -14,12 +23,19 @@ from srl.integrations.shared_contracts import (
 )
 
 __all__ = [
+    "MARKET_ADAPTER_INACTIVE_RECEIPT_SCHEMA_VERSION",
+    "MARKET_OBSERVATION_PACKET_SCHEMA_VERSION",
     "SHARED_CONTRACT_CHILD_MISSION_REQUEST_SCHEMA_VERSION",
     "SHARED_CONTRACT_CONFORMANCE_RECEIPT_SCHEMA_VERSION",
     "ConformanceVector",
+    "MarketBridgeError",
+    "MarketBridgeStatus",
     "SharedContractError",
+    "build_market_bridge_health_projection",
+    "build_market_science_request",
     "build_shared_contract_child_mission_request",
     "build_shared_contract_conformance_receipt",
     "default_shared_contract_vectors",
+    "import_market_observation_packet",
     "verify_shared_contract_child_mission_request",
 ]
