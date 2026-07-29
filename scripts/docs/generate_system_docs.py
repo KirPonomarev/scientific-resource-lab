@@ -170,6 +170,12 @@ def _compute_node() -> str:
         "",
         "Current state: `WAIT_COMPUTE_NODE`.",
         "",
+        "A15 software readiness receipt:",
+        "`docs/verification/srf-v3-7-a15-heavy-compute-wait-receipt.json`.",
+        "",
+        "Protected activation action:",
+        "`docs/target-binding/a15-heavy-compute-operator-action.json`.",
+        "",
     ]
     return "\n".join(lines)
 

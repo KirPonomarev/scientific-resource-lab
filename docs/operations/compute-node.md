@@ -11,6 +11,12 @@ Current local capability posture:
 - SageMath: `WAIT_COMPUTE_NODE`
 - Wolfram adapter: `WAIT_AUTHORITY` until explicit credential and budget receipt
 
+A15 software readiness is recorded by
+`docs/verification/srf-v3-7-a15-heavy-compute-wait-receipt.json`. The receipt is
+authority-negative: it performs no remote launch, no spend and no unbounded
+local fallback. The protected operator action for real activation is
+`docs/target-binding/a15-heavy-compute-operator-action.json`.
+
 Remote jobs must provide a profile id, required capability, image digest,
 architecture, input digest and positive checkpoint interval. Routing accepts a
 job only when a compatible node manifest is online, has the requested

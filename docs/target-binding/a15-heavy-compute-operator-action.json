@@ -1,0 +1,47 @@
+{
+  "action_id": "A15_PROVISION_HEAVY_COMPUTE_TARGET",
+  "allowed_actions_after_authority": [
+    "select_compatible_linux_x86_64_compute_target",
+    "install_or_verify_rootless_container_or_microvm_runtime",
+    "build_or_pull_exact_digest_cpu_heavy_pack_images",
+    "run_real_petsc_job_and_record_receipt",
+    "run_real_fenicsx_job_and_record_receipt",
+    "run_real_pymor_job_and_record_receipt",
+    "run_real_scikit_fem_job_and_record_receipt",
+    "run_real_dedalus_job_and_record_receipt",
+    "run_real_sagemath_job_and_record_receipt",
+    "prove_checkpoint_resume_after_node_loss",
+    "return_artifacts_with_exact_node_and_image_identities",
+    "record_native_compute_target_receipt_without_secrets"
+  ],
+  "authority_required": true,
+  "expected_receipt_schema": "HeavyComputeTargetReceipt/v1",
+  "forbidden_without_authority": [
+    "start_remote_compute_target",
+    "install_container_runtime_on_protected_host",
+    "launch_heavy_cpu_jobs",
+    "copy_credentials_to_compute_node",
+    "spend_paid_compute_budget",
+    "claim_a15_active",
+    "claim_done_or_v2_release"
+  ],
+  "grants_authority": false,
+  "required_profiles": [
+    "heavy.petsc",
+    "heavy.fenicsx",
+    "heavy.pymor",
+    "heavy.scikit_fem",
+    "heavy.dedalus",
+    "heavy.sage"
+  ],
+  "required_stage_evidence": [
+    "compatible_linux_x86_64_node_manifest",
+    "exact_image_digest_per_profile",
+    "real_job_receipt_per_required_profile",
+    "checkpoint_resume_receipt",
+    "artifact_return_receipt",
+    "no_current_vps_overload_receipt"
+  ],
+  "schema_version": "ProtectedOperatorAction/v1",
+  "target": "compatible Linux x86_64 heavy compute target"
+}

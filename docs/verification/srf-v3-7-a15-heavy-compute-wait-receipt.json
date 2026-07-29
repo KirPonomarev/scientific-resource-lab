@@ -1,0 +1,157 @@
+{
+  "active_packs": [],
+  "canonical_writes": 0,
+  "checks": [
+    {
+      "bundle_id": "sha256:40026b66dd8b3f733fb2ae3f32f42a71e3e6351f6977d37bd6a77f510a78e61c",
+      "check_id": "A15-01-absent-compute-target-fail-closed",
+      "detail": "mandatory heavy profiles remain WAIT_COMPUTE_NODE with no local fallback",
+      "required_profiles": [
+        "heavy.petsc",
+        "heavy.fenicsx",
+        "heavy.pymor",
+        "heavy.scikit_fem",
+        "heavy.dedalus",
+        "heavy.sage"
+      ],
+      "status": "PASS"
+    },
+    {
+      "check_id": "A15-02-compatible-fixture-node-routes-without-launch",
+      "decision_ids": [
+        "sha256:fa58a6bc5b8f259a71dee544be6bc36a8ec4723707c36737803ce0b1d5c258eb",
+        "sha256:5059023e1f14a93efce2b48d87efcfada20d097503852f03dd264d44ffc0e47e",
+        "sha256:15f112c082b1692f45978e61c935df74f4241f55a4c89162f4d97064bb016f77",
+        "sha256:c358d60cded4abe5f24d9c59ec2c3566af523ce2036fe8591f0b4b067cd8646c",
+        "sha256:a8834a054a472185bffa4b1c72dee956f5d057dea3bef9b8ed43d480f24cc4fa",
+        "sha256:fb1ee20c05c3c64a5e2f2939b7b7fe65a4f64e990c0667f55ac3b70cb6773f63"
+      ],
+      "detail": "fixture node proves routing contract only; no jobs launched",
+      "node_manifest": {
+        "architecture": "linux-x86_64",
+        "capabilities": [
+          "petsc",
+          "fenicsx",
+          "pymor",
+          "scikit_fem",
+          "dedalus",
+          "sage"
+        ],
+        "image_digests": [
+          "sha256:b080b8521848680dc3c769e68dd232b9c4f29bd2c003c07437650c4bf232af9e",
+          "sha256:cc10df8548aae6f5f80a9cb4e36d36d9505a999b32e9b95bbf8bb47ec54ef2fc",
+          "sha256:2ee880fdce2be0226dafba62f235204f9716b32aab47a1d5591ab7942dea2337",
+          "sha256:c600016c8a716e382ed9064cc2422359b9bcec99bc5750062734b5b6f9e6cb18",
+          "sha256:17440101aae3d3ef2a0c95aaa64ee12cba914b08e13d8fde15e77f5cbf679254",
+          "sha256:00a763a9163a44cbe4fc693f0aafa5bdb63e44fffcf5bdc99881d158e20ba02e"
+        ],
+        "node_id": "a15-fixture-node-no-launch",
+        "online": true,
+        "revoked_image_digests": []
+      },
+      "status": "PASS"
+    },
+    {
+      "check_id": "A15-03-negative-node-and-image-guards",
+      "decisions": {
+        "architecture_mismatch": {
+          "canonical_writes": 0,
+          "checkpoint_interval_steps": 25,
+          "decision_id": "sha256:ac08f4c620d7a11094b903d3a55b450c357519b54fc73e5bedf04fcf1a4a63c4",
+          "grants_authority": false,
+          "implicit_spend": 0,
+          "job_id": "a15-heavy-petsc",
+          "profile_id": "heavy.petsc",
+          "reason": "architecture mismatch",
+          "schema_version": "HeavyRemoteRoutingDecision/v1",
+          "status": "WAIT_COMPUTE_NODE",
+          "unbounded_local_runs": 0
+        },
+        "capability_missing": {
+          "canonical_writes": 0,
+          "checkpoint_interval_steps": 25,
+          "decision_id": "sha256:98d4d0d4167b3a360e1ccc1bac4bc51d32923584233cc8d38321052ea1aa8c39",
+          "grants_authority": false,
+          "implicit_spend": 0,
+          "job_id": "a15-heavy-petsc",
+          "profile_id": "heavy.petsc",
+          "reason": "capability missing",
+          "schema_version": "HeavyRemoteRoutingDecision/v1",
+          "status": "WAIT_COMPUTE_NODE",
+          "unbounded_local_runs": 0
+        },
+        "image_missing": {
+          "canonical_writes": 0,
+          "checkpoint_interval_steps": 25,
+          "decision_id": "sha256:33cb5ec1e97e2e2b44a9a1e50eea29592a6b131bb76cf6db9f81476f39f56a59",
+          "grants_authority": false,
+          "implicit_spend": 0,
+          "job_id": "a15-heavy-petsc",
+          "profile_id": "heavy.petsc",
+          "reason": "image unavailable",
+          "schema_version": "HeavyRemoteRoutingDecision/v1",
+          "status": "WAIT_COMPUTE_NODE",
+          "unbounded_local_runs": 0
+        },
+        "offline": {
+          "canonical_writes": 0,
+          "checkpoint_interval_steps": 25,
+          "decision_id": "sha256:ccf341aeb9066d2bb90d337a198163f8895f08d8c640f888329c8f8d3b914282",
+          "grants_authority": false,
+          "implicit_spend": 0,
+          "job_id": "a15-heavy-petsc",
+          "profile_id": "heavy.petsc",
+          "reason": "node absent or offline",
+          "schema_version": "HeavyRemoteRoutingDecision/v1",
+          "status": "WAIT_COMPUTE_NODE",
+          "unbounded_local_runs": 0
+        },
+        "revoked_image": {
+          "canonical_writes": 0,
+          "checkpoint_interval_steps": 25,
+          "decision_id": "sha256:921546c2044377c064a11e950e4a8a5b9a58be9d1253dc67aa69d1975f830ad4",
+          "grants_authority": false,
+          "implicit_spend": 0,
+          "job_id": "a15-heavy-petsc",
+          "profile_id": "heavy.petsc",
+          "reason": "revoked image",
+          "schema_version": "HeavyRemoteRoutingDecision/v1",
+          "status": "REJECTED",
+          "unbounded_local_runs": 0
+        }
+      },
+      "detail": "offline, architecture, capability, image and revocation guards fail closed",
+      "status": "PASS"
+    },
+    {
+      "check_id": "A15-04-protected-operator-action-recorded",
+      "detail": "operator action records exact protected work needed for real A15 activation",
+      "operator_action_hash": "sha256:e09460d1913269ca7ad6cf6b7d8425bd31de5b03a98c685f2ba379e2b432066b",
+      "operator_action_path": "docs/target-binding/a15-heavy-compute-operator-action.json",
+      "status": "PASS"
+    }
+  ],
+  "grants_authority": false,
+  "implicit_spend": 0,
+  "live_actions": 0,
+  "receipt_id": "sha256:6c0797c03e32208df9b790396d2ed4444d514a765558283742516212061bb676",
+  "remaining_external_waits": [
+    "WAIT_COMPUTE_NODE:A15_PROVISION_HEAVY_COMPUTE_TARGET"
+  ],
+  "remaining_internal_waits": [],
+  "remote_launches": 0,
+  "result": "PASS",
+  "routable_fixture_profiles": [
+    "heavy.petsc",
+    "heavy.fenicsx",
+    "heavy.pymor",
+    "heavy.scikit_fem",
+    "heavy.dedalus",
+    "heavy.sage"
+  ],
+  "routing_contract_sha256": "sha256:700ecc7e1688e68bdb55dbc03407cdfec800bb3e8031e5d4ea3c39081cb691bc",
+  "schema_version": "StageCompletionReceipt/v1",
+  "stage_closure": "A15_WAIT_COMPUTE_NODE",
+  "stage_id": "A15",
+  "unbounded_local_runs": 0
+}
