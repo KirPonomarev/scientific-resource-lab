@@ -1,0 +1,23 @@
+{
+  "schema_version": "A01NegativeFixture/v1",
+  "candidate": {
+    "target_release": "v2.0.0",
+    "target_result": "DONE",
+    "production_signer": "ed25519_native",
+    "sandbox": "enforced_t2_t3",
+    "t7_binding": "ACTIVE"
+  },
+  "component_overrides": [
+    {
+      "component_id": "sympy",
+      "patch": {
+        "state": "WAIT_CAPABILITY",
+        "installed": false,
+        "scientific_smoke_passed": false,
+        "crosschecked": false,
+        "evidence_axis": "missing_or_protected_capability"
+      }
+    }
+  ],
+  "expected_verdict": "REJECT"
+}

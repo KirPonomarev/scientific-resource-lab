@@ -1,0 +1,116 @@
+{
+  "schema_version": "StageCompletionReceipt/v1",
+  "plan_id": "SRF-ACTIVATION-2026-07-29-V3.7",
+  "mission_id": "activate-scientific-reasoning-fabric-v2",
+  "stage_id": "A01",
+  "result": "ACCEPTED",
+  "completed_utc": "2026-07-29T06:24:00Z",
+  "base_head": "d06d0a21a49ab6e333cb2f8530c57168a7856654",
+  "branch": "codex/srf-a01-truth-ledger",
+  "plan_artifact": "docs/plans/scientific-reasoning-fabric-activation-master-plan-v3.7.md",
+  "plan_contract_sha256": "170e5a47-2d5c0dcc-b6713f7c-8c9228f4-51f86691-be281544-d92b445c-0a594a5c",
+  "pre_transition_state_sha256": "348b2c37-557aebc7-364f9572-02bce394-b60180ab-29cadedc-09512a23-97933935",
+  "post_transition_state_sha256": "980eabc7-98a73da7-ba3444cd-33e126c9-55d0ce5a-7f35b90b-620c3530-43aa2c4f",
+  "truth_ledger": {
+    "schema_version": "CapabilityTruthLedger/v1",
+    "artifact": "CAPABILITY-TRUTH-LEDGER.md",
+    "machine_source": "src/srl/capabilities/truth.py",
+    "closure_chain": [
+      "DECLARED",
+      "CONFIGURED",
+      "INSTALLED",
+      "EXECUTABLE_PROBED",
+      "SCIENTIFIC_SMOKE_PASSED",
+      "CROSSCHECKED",
+      "ACTIVE"
+    ],
+    "current_v101_active_inventory_observed": [
+      "numpy",
+      "scipy",
+      "pint",
+      "z3",
+      "ripser",
+      "pyriemann",
+      "cvxpy",
+      "clarabel"
+    ],
+    "production_versus_fixture_axis": [
+      "fixture_only",
+      "policy_only",
+      "executable_probe_only",
+      "nonfixture_executable_probe_and_scientific_smoke",
+      "production_native_evidence"
+    ]
+  },
+  "negative_fixtures": [
+    "fixtures/conformance/a01-truth-ledger/active-without-crosscheck.json",
+    "fixtures/conformance/a01-truth-ledger/fixture-signer-done.json",
+    "fixtures/conformance/a01-truth-ledger/missing-mandatory-toolchain.json",
+    "fixtures/conformance/a01-truth-ledger/policy-only-sandbox-done.json",
+    "fixtures/conformance/a01-truth-ledger/wait-capability-false-done.json"
+  ],
+  "checks": [
+    {
+      "command": "uv run pytest tests/capabilities/test_truth.py tests/docs/test_documentation_closure.py -q",
+      "status": "PASS",
+      "summary": "12 focused tests passed; A01 generated docs check is separate from historical S26 documentation closure"
+    },
+    {
+      "command": "uv run python scripts/checks/srf-v37-a01-gate.py",
+      "status": "PASS",
+      "summary": "v1.0.1 active inventory reproduced exactly; 5 false-closure fixtures rejected; DONE/v2.0.0 rejected with 19 current blockers"
+    },
+    {
+      "command": "uv run ruff check .",
+      "status": "PASS",
+      "summary": "all checks passed"
+    },
+    {
+      "command": "uv run ruff format --check .",
+      "status": "PASS",
+      "summary": "481 files formatted"
+    },
+    {
+      "command": "uv run mypy",
+      "status": "PASS",
+      "summary": "no issues found in 140 source files"
+    },
+    {
+      "command": "make verify",
+      "status": "PASS",
+      "summary": "ruff, ruff format --check, mypy strict, pytest 1932 passed / 1 skipped, A01 gate, and uv build all passed"
+    }
+  ],
+  "file_sha256": {
+    "CAPABILITY-TRUTH-LEDGER.md": "fcba7d62-bbe79e97-3d67ef9a-7cc0dcdd-f98d83a6-01772701-c7e05737-6def21f8",
+    "src/srl/capabilities/truth.py": "0bc1f252-2bda8039-0f6faf9e-ad36af80-a220e7ad-35b4b6c9-c5eb2175-bd7d1353",
+    "scripts/checks/srf-v37-a01-gate.py": "e42f0be8-7d6c1a56-999c2c7a-d50e87b7-42b14113-634cc5cc-5291ba3e-cf795a6b",
+    "scripts/docs/generate_capability_truth_ledger.py": "9cdf8ec1-0d795b4a-13dd5f10-8e7d25c9-073f70f7-0d8d9c63-91bd2d5d-f3b60abc",
+    "tests/capabilities/test_truth.py": "3c9da2eb-1b6bc69d-df052be6-ede1e9de-eb0a3fb1-770447df-a54a3e47-848e2f73",
+    ".github/workflows/v37-activation.yml": "78b77ad2-140db5fc-bfa88bc7-57c840ec-553f0938-4a2e1154-daa63829-12803fbd",
+    ".github/workflows/release.yml": "707646a6-612a7293-448b61c3-37618a67-77da5091-ad10214f-dae2bf65-30af97d3",
+    "Makefile": "28d27024-499bb0aa-d761e8c0-a4100481-6f9b7955-fc77984b-23acb4e0-3675cddf"
+  },
+  "remaining_current_blockers_for_done": [
+    "WAIT_CAPABILITY:sympy",
+    "WAIT_CAPABILITY:mpmath",
+    "WAIT_CAPABILITY:python-flint",
+    "WAIT_TOOLCHAIN:pari-gp",
+    "WAIT_TOOLCHAIN:maxima",
+    "WAIT_TOOLCHAIN:gap",
+    "WAIT_TOOLCHAIN:singular",
+    "WAIT_TOOLCHAIN:cvc5",
+    "WAIT_TOOLCHAIN:lean",
+    "WAIT_TOOLCHAIN:lake",
+    "WAIT_TOOLCHAIN:rocq",
+    "WAIT_TOOLCHAIN:isabelle",
+    "WAIT_TOOLCHAIN:hol4",
+    "WAIT_AUTHORITY:production-ed25519-signer",
+    "WAIT_COMPUTE_TARGET:t2-t3-enforced-sandbox",
+    "WAIT_T7_BINDING:t7-binding"
+  ],
+  "canonical_writes": 0,
+  "grants_authority": false,
+  "live_actions": 0,
+  "next_stage": "A02"
+}

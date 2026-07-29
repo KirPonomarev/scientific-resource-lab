@@ -1038,16 +1038,16 @@ terminal_result PASS запрещён, если remaining_internal_waits не п
 <!-- END_PLAN_CONTRACT_V3_7 -->
 
 <!-- BEGIN_MUTABLE_STATE_V3_7 -->
-STATE_REVISION: 2
-PREVIOUS_STATE_SHA256: fe6850c7-c14a0897-67073c11-8efdcfdf-22ab1914-5bf89990-9781ad53-0989c7c7
-CURRENT_STATE_SHA256: 348b2c37-557aebc7-364f9572-02bce394-b60180ab-29cadedc-09512a23-97933935
+STATE_REVISION: 3
+PREVIOUS_STATE_SHA256: 348b2c37-557aebc7-364f9572-02bce394-b60180ab-29cadedc-09512a23-97933935
+CURRENT_STATE_SHA256: 980eabc7-98a73da7-ba3444cd-33e126c9-55d0ce5a-7f35b90b-620c3530-43aa2c4f
 
 ## CURRENT_FACTS
 
 ~~~yaml
 current_facts:
   observed_at: 2026-07-29
-  repository_head: dc0ceca30c22d30916828c6b37c77962aeec7b66
+  repository_head: d06d0a21a49ab6e333cb2f8530c57168a7856654
   predecessor_release: v1.0.1
   predecessor_result: RELEASED_WITH_DECLARED_WAITS
   current_active_default_packs:
@@ -1066,22 +1066,25 @@ current_facts:
   market_bridge: INACTIVE_WAIT_RUNTIME_HEALTH
   security_bridge: INACTIVE_WAIT_SECURITY_HEALTH
   dual_contour_closeout: WAIT_NATIVE_CHILD_CLOSEOUT
+  capability_truth_ledger: ACTIVE
+  release_false_closure_gate: ACTIVE
 ~~~
 
 ## EXECUTION_STATE
 
 ~~~yaml
 execution_state:
-  status: A00_ACCEPTED
-  current_stage: A01
-  next_stage: A01_truth_ledger_and_acceptance_harness
+  status: A01_ACCEPTED
+  current_stage: A02
+  next_stage: A02_non_destructive_t7_binding
   completed_stages:
     - A00
-  active_branch_or_null: codex/srf-activation-master-plan-v3-7
+    - A01
+  active_branch_or_null: codex/srf-a01-truth-ledger
   active_pr_or_null: null
   writer_lease_or_null: null
   blocker_or_null: null
-  next_executable_action: implement CapabilityTruthLedger and release blockers
+  next_executable_action: perform non-destructive T7 binding preflight and authority check
   updated_at: 2026-07-29
 ~~~
 
@@ -1101,6 +1104,10 @@ decision_log:
     decision: external protected waits park lanes but never become false success
   - id: V37-D006
     decision: A00 exact-hash review approved V3.7 as the sole executable successor plan
+  - id: V37-D007
+    decision: A01 CapabilityTruthLedger is the machine source for V3.7 capability closure truth
+  - id: V37-D008
+    decision: DONE/v2.0.0 release closure rejects fixture signer, policy-only sandbox, missing T7 and mandatory toolchain WAIT states
 ~~~
 
 ## EVIDENCE_INDEX
@@ -1115,6 +1122,9 @@ evidence_index:
   - mission-closeout-receipt v1.0.1
   - runtime source inspection for signer, sandbox, scheduler, CAS and recovery
   - docs/verification/srf-v3-7-a00-freeze-receipt.json
+  - CAPABILITY-TRUTH-LEDGER.md
+  - scripts/checks/srf-v37-a01-gate.py
+  - docs/verification/srf-v3-7-a01-truth-ledger-receipt.json
 ~~~
 
 <!-- END_MUTABLE_STATE_V3_7 -->
