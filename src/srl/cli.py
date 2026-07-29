@@ -63,6 +63,7 @@ from srl.knowledge.retriever import (
     RetrievalTimeoutError,
     TransportResponse,
 )
+from srl.labctl import enter_report
 from srl.planning import build_plan, default_policy, load_default_catalog, route
 from srl.semantic.claims import ClaimInvariantError
 from srl.semantic.claims import validate as claim_validate
@@ -717,6 +718,24 @@ def _cmd_catalog(args: list[str], subcommand: str) -> int:
 
 
 # ---------------------------------------------------------------------------
+# Labctl handlers.
+# ---------------------------------------------------------------------------
+
+
+def _cmd_labctl_enter(args: list[str], options: dict[str, str | None]) -> int:
+    """``labctl enter [cell-id]`` emits a scope-only LabAccessReceipt."""
+    del options
+    cell_id = args[0] if args else "standalone"
+    try:
+        report = enter_report(cell_id)
+    except ValueError as exc:
+        _emit_err(_error_report("labctl enter", str(exc)))
+        return EXIT_ERROR
+    _emit(report)
+    return EXIT_OK
+
+
+# ---------------------------------------------------------------------------
 # Dispatch table.
 # ---------------------------------------------------------------------------
 
@@ -758,6 +777,7 @@ _SUBCOMMANDS: Final[dict[str, dict[str, _Handler]]] = {
         "list": _catalog_handler("list"),
         "inspect": _catalog_handler("inspect"),
     },
+    "labctl": {"enter": _cmd_labctl_enter},
 }
 
 

@@ -66,6 +66,23 @@ _SCHEMA_NAME_TO_FILE: Final[dict[str, str]] = {
     "ScienceLabPlan": "science-lab-plan.json",
     "PilotSpec": "pilot-spec.json",
     "LabExportPacket": "lab-export-packet.json",
+    "LabFederationManifest": "lab-federation-manifest.json",
+    "LabCellManifest": "lab-cell-manifest.json",
+    "LabSessionEnvelope": "lab-session-envelope.json",
+    "LabAccessReceipt": "lab-access-receipt.json",
+    "CapabilityManifest": "capability-manifest.json",
+    "SciencePackManifestV2": "science-pack-manifest-v2.json",
+    "ScientificRequestEnvelope": "scientific-request-envelope.json",
+    "ScientificResultEnvelope": "scientific-result-envelope.json",
+    "ScientificRunReceipt": "scientific-run-receipt.json",
+    "ScientificImportReceipt": "scientific-import-receipt.json",
+    "SRFPulse": "srf-pulse.json",
+    "FederationStatus": "federation-status.json",
+    "SpoolMessage": "spool-message.json",
+    "SpoolAck": "spool-ack.json",
+    "DeadLetterRecord": "dead-letter-record.json",
+    "CheckpointManifest": "checkpoint-manifest.json",
+    "RestoreDrillReceipt": "restore-drill-receipt.json",
 }
 
 # Typed fail reason for schema-level failures (meta-validation + instance

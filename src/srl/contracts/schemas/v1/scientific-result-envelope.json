@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srlab.dev/v1/ScientificResultEnvelope.json",
+  "title": "ScientificResultEnvelope/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "result_id", "request_id", "status", "payload", "created_utc", "classification", "canonical_writes", "grants_authority"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "ScientificResultEnvelope/v1"},
+    "result_id": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "request_id": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "status": {"type": "string", "enum": ["COMPLETED", "WAIT_CAPABILITY", "WAIT_RUNTIME", "WAIT_AUTHORITY", "REJECTED", "FAILED"]},
+    "payload": {"type": "object"},
+    "created_utc": {"type": "string", "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]Z$"},
+    "classification": {"type": "string", "enum": ["D0", "D1"]},
+    "canonical_writes": {"type": "integer", "const": 0},
+    "grants_authority": {"type": "boolean", "const": false}
+  }
+}

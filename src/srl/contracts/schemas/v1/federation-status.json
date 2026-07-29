@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srlab.dev/v1/FederationStatus.json",
+  "title": "FederationStatus/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "status_id", "observed_utc", "cells", "canonical_writes", "grants_authority"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "FederationStatus/v1"},
+    "status_id": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "observed_utc": {"type": "string", "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])T([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]Z$"},
+    "cells": {"type": "array", "items": {"type": "object"}, "uniqueItems": true},
+    "canonical_writes": {"type": "integer", "const": 0},
+    "grants_authority": {"type": "boolean", "const": false}
+  }
+}

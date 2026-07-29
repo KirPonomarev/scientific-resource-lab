@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srlab.dev/v1/LabFederationManifest.json",
+  "title": "LabFederationManifest/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "manifest_id", "project_fingerprint", "cells", "canonical_writes", "grants_authority"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "LabFederationManifest/v1"},
+    "manifest_id": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "project_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "cells": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "canonical_writes": {"type": "integer", "const": 0},
+    "grants_authority": {"type": "boolean", "const": false}
+  }
+}

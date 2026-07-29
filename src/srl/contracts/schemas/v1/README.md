@@ -54,6 +54,23 @@ HTTP today, but it must be unique and must not change for a given shape.
 | `science-lab-plan.json`           | `ScienceLabPlan/v1`           | A deterministic execution plan produced by the planner: a DAG of capability-profile steps with typed selection states (SELECTED / EXCLUDED_TYPED / NOT_APPLICABLE / WAIT_CAPABILITY), resource estimates, and dependency edges. A plan is not evidence (grants_authority pinned false). |
 | `pilot-spec.json`                 | `PilotSpec/v1`                | A retrospective pilot specification: the public, content-addressed description of a retrospective analysis over ALREADY-EXTANT artifacts (sha256 digests only, never paths), with null generators, seed policy, and the two safety consts pinned false (a pilot cannot promote status, materialize a prospective holdout, or grant authority). |
 | `lab-export-packet.json`          | `LabExportPacket/v1`          | The PUBLIC export envelope of an SRL lab run: a sanitized, disclosure-safe summary of internal objects with no paths/commands/credentials/private keys, packet-local digest replacement for private identities, and the four safety consts pinned (review_only=true, canonical_effect='none', grants_authority=false, canonical_writes=0). Canonical encoded packet <= 1 MiB. |
+| `lab-federation-manifest.json`    | `LabFederationManifest/v1`    | Federation identity over participating cells; authority-negative and exact-versioned. |
+| `lab-cell-manifest.json`          | `LabCellManifest/v1`          | Per-cell native-bootstrap declaration; proposal-only cells remain non-authoritative. |
+| `lab-session-envelope.json`       | `LabSessionEnvelope/v1`       | D0/D1 session identity envelope for a solo-agent entry. |
+| `lab-access-receipt.json`         | `LabAccessReceipt/v1`         | Scope-only access receipt emitted by labctl; grants no authority, orders, live actions or security actions. |
+| `capability-manifest.json`        | `CapabilityManifest/v1`       | Capability list identity for labctl and catalog surfaces. |
+| `science-pack-manifest-v2.json`   | `SciencePackManifest/v2`      | Minimal V2 pack manifest shell for future supply-chain admission. |
+| `scientific-request-envelope.json` | `ScientificRequestEnvelope/v1` | Request nerve envelope carrying D0/D1 payloads and authority-negative consts. |
+| `scientific-result-envelope.json` | `ScientificResultEnvelope/v1` | Result nerve envelope with explicit terminal / WAIT status. |
+| `scientific-run-receipt.json`     | `ScientificRunReceipt/v1`     | Receipt nerve envelope for terminal SRF run outcomes. |
+| `scientific-import-receipt.json`  | `ScientificImportReceipt/v1`  | Proposal-only import receipt; imports as C3 rather than authority. |
+| `srf-pulse.json`                  | `SRFPulse/v1`                 | SRF-local health pulse, independent of external cell health. |
+| `federation-status.json`          | `FederationStatus/v1`         | Read-only aggregation of cell status projections. |
+| `spool-message.json`              | `SpoolMessage/v1`             | At-least-once D0/D1 spool message envelope with idempotency key. |
+| `spool-ack.json`                  | `SpoolAck/v1`                 | Explicit acknowledgement / rejection envelope for spool messages. |
+| `dead-letter-record.json`         | `DeadLetterRecord/v1`         | Terminal delivery-failure record. |
+| `checkpoint-manifest.json`        | `CheckpointManifest/v1`       | Run checkpoint artifact manifest. |
+| `restore-drill-receipt.json`      | `RestoreDrillReceipt/v1`      | Bounded restore-drill receipt with authority-negative consts. |
 
 ## Naming and compatibility policy
 
