@@ -1,8 +1,8 @@
-"""Durable, on-demand runtime scheduler for bounded SRF execution."""
+"""Heavy capability routing and signed remote job packets."""
 
 from __future__ import annotations
 
-from srl.runtime.remote import (
+from srl.runtime.remote.routing import (
     HEAVY_CAPABILITY_ROUTING_BUNDLE_SCHEMA_VERSION,
     HEAVY_REMOTE_JOB_PACKET_SCHEMA_VERSION,
     HEAVY_REMOTE_ROUTING_DECISION_SCHEMA_VERSION,
@@ -18,42 +18,20 @@ from srl.runtime.remote import (
     route_heavy_job,
     verify_remote_job_packet,
 )
-from srl.runtime.scheduler import (
-    RUN_CHECKPOINT_SCHEMA_VERSION,
-    RUN_TERMINAL_RECEIPT_SCHEMA_VERSION,
-    RUNNER_CONFORMANCE_RECEIPT_SCHEMA_VERSION,
-    RuntimeRunCheckpoint,
-    RuntimeRunRequest,
-    RuntimeRunStatus,
-    SchedulerError,
-    SchedulerRoots,
-    SchedulerTerminalReceipt,
-    submit_and_dispatch_once,
-)
 
 __all__ = [
     "HEAVY_CAPABILITY_ROUTING_BUNDLE_SCHEMA_VERSION",
     "HEAVY_REMOTE_JOB_PACKET_SCHEMA_VERSION",
     "HEAVY_REMOTE_ROUTING_DECISION_SCHEMA_VERSION",
-    "RUNNER_CONFORMANCE_RECEIPT_SCHEMA_VERSION",
-    "RUN_CHECKPOINT_SCHEMA_VERSION",
-    "RUN_TERMINAL_RECEIPT_SCHEMA_VERSION",
     "BudgetReceipt",
     "ComputeNodeManifest",
     "HeavyCapabilityStatus",
     "HeavyProfile",
     "HeavyRemoteJobSpec",
     "RemoteRoutingError",
-    "RuntimeRunCheckpoint",
-    "RuntimeRunRequest",
-    "RuntimeRunStatus",
-    "SchedulerError",
-    "SchedulerRoots",
-    "SchedulerTerminalReceipt",
     "build_heavy_capability_routing_bundle",
     "build_signed_remote_job_packet",
     "default_heavy_profiles",
     "route_heavy_job",
-    "submit_and_dispatch_once",
     "verify_remote_job_packet",
 ]
