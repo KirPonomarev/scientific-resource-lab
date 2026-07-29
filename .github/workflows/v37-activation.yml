@@ -220,7 +220,7 @@ jobs:
       - name: Install HOL4 host dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends ca-certificates build-essential make polyml
+          sudo apt-get install -y --no-install-recommends ca-certificates build-essential make polyml libpolyml-dev
       - name: Pull A10 prover images
         run: |
           docker pull rocq/rocq-prover:9.2.0
