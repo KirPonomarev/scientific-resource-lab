@@ -77,17 +77,17 @@ _ZBMATH_LICENSE_SHA256: Final[str] = (
 _LMFDB_LICENSE_SHA256: Final[str] = (
     "sha256:ce00e1d8c2700b35423b1db2fd14d52a179fbdd248878c0bdc462c049ae27011"
 )
-# SHA-256("CSLib pinned GitHub commit metadata: Apache-2.0 public repository metadata")
+# SHA-256("CSLib pinned GitHub raw blob: Apache-2.0 public repository source")
 _CSLIB_LICENSE_SHA256: Final[str] = (
-    "sha256:b2cee14e7ad3d50214237acb81570cb22cbfb046befdf83b70b243c8e303317c"
+    "sha256:5c09b8b26c77718d842bf6a11e4d11dcecb97747077e18cc4ac71e717a0a8579"
 )
-# SHA-256("Erdos Problems pinned GitHub commit metadata: public repository metadata")
+# SHA-256("Erdos Problems pinned GitHub raw blob: public repository source")
 _ERDOS_LICENSE_SHA256: Final[str] = (
-    "sha256:80f5ebe01d4362209c2df14ffa75f6384c1116f639f28f72b72336381a47cdee"
+    "sha256:b4b90ac08d328d9d1a094e5ac6ef8cc440fb9ff29e167912450d183f12810d7c"
 )
-# SHA-256("Formal Conjectures pinned GitHub commit metadata: Apache-2.0 public repository metadata")
+# SHA-256("Formal Conjectures pinned GitHub raw blob: Apache-2.0 public repository source")
 _FORMAL_CONJECTURES_LICENSE_SHA256: Final[str] = (
-    "sha256:0fc16ac8604f21860310cee5ec770461d0adf3ef4c4eb11ac3a3424dc4e7cdd6"
+    "sha256:0754bc869242db9cffc9463880ba79fe32a59f8ea76cd1051741d100641768bd"
 )
 
 # The canonical registry document. This is the data the
@@ -194,41 +194,39 @@ P0_ENDPOINT_POLICY_REGISTRY: Final[dict[str, object]] = {
         },
         {
             "endpoint_id": "cslib",
-            "base_url": "https://api.github.com",
+            "base_url": "https://raw.githubusercontent.com/leanprover/cslib",
             "rate_limit_per_minute": _P0_RATE_LIMIT_PER_MINUTE,
             "byte_budget": _P0_BYTE_BUDGET,
             "cost_budget_units": _P0_COST_BUDGET_UNITS,
             "license_terms_sha256": _CSLIB_LICENSE_SHA256,
             "attribution_required": True,
             "attribution_text": (
-                "Pinned public repository metadata from leanprover/cslib on GitHub; "
+                "Pinned public source blob from leanprover/cslib on GitHub; "
                 "CSLib source is Apache-2.0."
             ),
             "retention_days": _P0_RETENTION_DAYS,
         },
         {
             "endpoint_id": "erdos_problems",
-            "base_url": "https://api.github.com",
+            "base_url": "https://raw.githubusercontent.com/teorth/erdosproblems",
             "rate_limit_per_minute": _P0_RATE_LIMIT_PER_MINUTE,
             "byte_budget": _P0_BYTE_BUDGET,
             "cost_budget_units": _P0_COST_BUDGET_UNITS,
             "license_terms_sha256": _ERDOS_LICENSE_SHA256,
             "attribution_required": True,
-            "attribution_text": (
-                "Pinned public repository metadata from teorth/erdosproblems on GitHub."
-            ),
+            "attribution_text": ("Pinned public source blob from teorth/erdosproblems on GitHub."),
             "retention_days": _P0_RETENTION_DAYS,
         },
         {
             "endpoint_id": "formal_conjectures",
-            "base_url": "https://api.github.com",
+            "base_url": "https://raw.githubusercontent.com/google-deepmind/formal-conjectures",
             "rate_limit_per_minute": _P0_RATE_LIMIT_PER_MINUTE,
             "byte_budget": _P0_BYTE_BUDGET,
             "cost_budget_units": _P0_COST_BUDGET_UNITS,
             "license_terms_sha256": _FORMAL_CONJECTURES_LICENSE_SHA256,
             "attribution_required": True,
             "attribution_text": (
-                "Pinned public repository metadata from google-deepmind/formal-conjectures "
+                "Pinned public source blob from google-deepmind/formal-conjectures "
                 "on GitHub; source is Apache-2.0."
             ),
             "retention_days": _P0_RETENTION_DAYS,

@@ -1120,7 +1120,7 @@ current_facts:
     - erdos_problems
     - formal_conjectures
   a11_knowledge_graph: ACTIVE
-  a11_receipt_id: sha256:2f44a60428495c78536ff7077acd1056fa8e0750bb9d2c7d4bb3d28f9b8a2801
+  a11_receipt_id: sha256:7dbacced167734bc0b16f0a81c5aa1b8848de4fd9ce47c06412f4716d80a6350
   a11_truth_projection: OFFLINE_HASH_BOUND_RECEIPT
   a11_live_fetch_count: 10
   a11_offline_replay_count: 10
@@ -1169,9 +1169,9 @@ current_facts:
 
 ~~~yaml
 execution_state:
-  status: A16_ACTIVE_READY_FOR_A17_WITH_PARKED_PROTECTED_LANES
-  current_stage: A17
-  next_stage: A17_complete_solo_agent_entry
+  status: A17_ACTIVE_READY_FOR_A18_WITH_PARKED_PROTECTED_LANES
+  current_stage: A18
+  next_stage: A18_dual_contour_native_child_closeout
   completed_stages:
     - A00
     - A01
@@ -1187,6 +1187,7 @@ execution_state:
     - A13
     - A14
     - A16
+    - A17
   completed_stage_lanes:
     - A07_sympy_mpmath_core
   parked_stages:
@@ -1203,11 +1204,11 @@ execution_state:
     - WAIT_LICENSE:A07_PYTHON_FLINT_LGPL_CLOSURE
     - WAIT_AUTHORITY:A09_BIND_PINNED_LEAN_MATHLIB_PROJECT_TO_T7
     - WAIT_COMPUTE_NODE:A15_PROVISION_HEAVY_COMPUTE_TARGET
-  active_branch_or_null: codex/srf-a16-products
+  active_branch_or_null: codex/srf-a17-solo-agent-entry
   active_pr_or_null: null
   writer_lease_or_null: null
   blocker_or_null: null
-  next_executable_action: continue A17 solo-agent entry while compute-node, T7-backed persistence, native compute binding, native production signing, FLINT license closure and A09 T7 formal toolchain binding remain parked
+  next_executable_action: continue A18 DualContour native child closeout while compute-node, T7-backed persistence, native compute binding, native production signing, FLINT license closure and A09 T7 formal toolchain binding remain parked
   updated_at: 2026-07-29
 ~~~
 
@@ -1250,7 +1251,7 @@ decision_log:
   - id: V37-D017
     decision: A10 Rocq/Coq, Isabelle/HOL and HOL4 independent prover contours are ACTIVE with real executable probes and shared nat zero-add proof checks; semantic-gap manifests explicitly represent logic and assumption deltas and forbid automatic theorem equivalence claims; truth-ledger A10 projection is offline from hash-bound receipt sha256:25c51de9b712afc0f1fc961c26f5dae38ed2872cb054850bd7182374ad3cca7f; full verify reuses the pinned HOL4 cache with prepare_count=0 and fetch_count=0 after the cold T7-Secure preparation
   - id: V37-D018
-    decision: A11 source-grounded knowledge graph is ACTIVE with bounded live public-source queries for OpenAlex, Crossref, arXiv, OEIS, OpenCitations, zbMATH Open, LMFDB, CSLib, Erdos Problems and Formal Conjectures; every live response is hash-bound to an exact no-network replay receipt; source policy cards project ACTIVE for all declared A11 sources; taint and citation-spoof guards keep raw corpus out of privileged prompts; truth-ledger A11 projection is offline from hash-bound receipt sha256:2f44a60428495c78536ff7077acd1056fa8e0750bb9d2c7d4bb3d28f9b8a2801
+    decision: A11 source-grounded knowledge graph is ACTIVE with bounded live public-source queries for OpenAlex, Crossref, arXiv, OEIS, OpenCitations, zbMATH Open, LMFDB, CSLib, Erdos Problems and Formal Conjectures; GitHub corpus sources use exact pinned raw blobs instead of unauthenticated commit API metadata; every live response is hash-bound to an exact no-network replay receipt; source policy cards project ACTIVE for all declared A11 sources; taint and citation-spoof guards keep raw corpus out of privileged prompts; truth-ledger A11 projection is offline from hash-bound receipt sha256:7dbacced167734bc0b16f0a81c5aa1b8848de4fd9ce47c06412f4716d80a6350
   - id: V37-D019
     decision: A12 PySR, PySINDy and PyDMD discovery/dynamics packs are ACTIVE with bounded real workloads, null controls, public benchmark receipt and no automatic scientific promotion; SR4MDL, Operon, gplearn, AI-Feynman, PyKoopman and Dysts are formally replaced for v2.0.0; truth-ledger A12 projection is offline from hash-bound receipt sha256:f76090d0a8bcbf72d986f9c7c32d125cc1624c80c7580b0aa3ea69f363ffc9a5
   - id: V37-D020
@@ -1260,7 +1261,9 @@ decision_log:
   - id: V37-D022
     decision: A15 heavy compute software readiness is PASS but stage remains WAIT_COMPUTE_NODE; PETSc, FEniCSx, pyMOR, scikit-fem, Dedalus and SageMath cannot become ACTIVE from accidental local imports and require a compatible Linux x86_64 compute target, exact image digests, real job receipts, checkpoint/resume evidence and artifact-return evidence; protected operator action is recorded at docs/target-binding/a15-heavy-compute-operator-action.json; wait receipt 6c0797c0-3e32208d-f9b79039-6d2ed444-4d514a76-55582837-42516212-061bb676 records remote_launches=0 and unbounded_local_runs=0
   - id: V37-D023
-    decision: A16 scientific products are ACTIVE with five product-level request/result/receipt chains over hash-bound A09-A14 receipts; LawMiner binds PySR/PySINDy/PyDMD, Formal Verification Lab binds Lean/mathlib/Rocq/Isabelle/HOL4 with semantic-gap manifests, Geometry and Physics Compiler binds A13 geometry/topology/optimization plus A14 SciML/domain backends, Causal Economy Lab binds native causal/CVXPY/native Bayesian diagnostics, and Literature-to-Knowledge Graph binds ten source-grounded A11 sources; product layer creates no second ledger, grants no authority and preserves inconclusive/disagreement paths; A16 stage receipt 7ec1ee91-f9e4d00e-87d1478a-1ab219b5-4fdaed49-c7392052-d6e680e8-69889760
+    decision: A16 scientific products are ACTIVE with five product-level request/result/receipt chains over hash-bound A09-A14 receipts; LawMiner binds PySR/PySINDy/PyDMD, Formal Verification Lab binds Lean/mathlib/Rocq/Isabelle/HOL4 with semantic-gap manifests, Geometry and Physics Compiler binds A13 geometry/topology/optimization plus A14 SciML/domain backends, Causal Economy Lab binds native causal/CVXPY/native Bayesian diagnostics, and Literature-to-Knowledge Graph binds ten source-grounded A11 sources; product layer creates no second ledger, grants no authority and preserves inconclusive/disagreement paths; A16 stage receipt sha256:34c59a29aa7694d7540260eff392be3425eaab4846027d516d2bc0ae29864955
+  - id: V37-D024
+    decision: A17 solo-agent entry is ACTIVE with JSON-first labctl enter/doctor/submit/status/result/export/replay/portal flow; standalone native bootstrap runs first, Market and Security entries remain proposal-only native-bootstrap WAITs, capability discovery is hash-bound to the offline truth ledger, stale or cross-head sessions fail closed, and the built-in fresh-agent task performs a real bounded units identity computation with sanitized export and deterministic replay; A17 stage receipt e4179946-b07a8931-b38ad900-abd154e2-acead3df-daf5bc8c-ccb8c3e8-e184a863
 ~~~
 
 ## EVIDENCE_INDEX
@@ -1335,6 +1338,9 @@ evidence_index:
   - src/srl/products/catalog.py
   - scripts/checks/srf-v37-a16-gate.py
   - docs/verification/srf-v3-7-a16-scientific-products-receipt.json
+  - src/srl/solo_agent.py
+  - scripts/checks/srf-v37-a17-gate.py
+  - docs/verification/srf-v3-7-a17-solo-agent-receipt.json
 ~~~
 
 <!-- END_MUTABLE_STATE_V3_7 -->

@@ -39,6 +39,7 @@ from srl.knowledge.sources.crossref import build_query as build_crossref_query  
 from srl.knowledge.sources.crossref import parse_crossref  # noqa: E402
 from srl.knowledge.sources.github_corpus import build_query as build_github_query  # noqa: E402
 from srl.knowledge.sources.github_corpus import parse_github_commit  # noqa: E402
+from srl.knowledge.sources.github_corpus import source_uri as github_source_uri  # noqa: E402
 from srl.knowledge.sources.lmfdb import build_query as build_lmfdb_query  # noqa: E402
 from srl.knowledge.sources.lmfdb import parse_lmfdb  # noqa: E402
 from srl.knowledge.sources.oeis import build_query as build_oeis_query  # noqa: E402
@@ -111,6 +112,18 @@ def _source_probes() -> tuple[SourceProbe, ...]:
             identifier="doi:10.1108/jd-12-2013-0166",
         )
 
+    def _parse_github_revision(revision: str) -> Callable[[bytes, Any, str], list[SourceRecord]]:
+        def _parse(payload: bytes, policy: Any, retrieved_utc: str) -> list[SourceRecord]:
+            return parse_github_commit(
+                payload,
+                policy,
+                retrieved_utc,
+                revision=revision,
+                source_uri_override=github_source_uri(policy.endpoint_id, revision),
+            )
+
+        return _parse
+
     return (
         SourceProbe("openalex", "graph", *build_openalex_query("graph", 1), parse_openalex),
         SourceProbe("crossref", "graph", *build_crossref_query("graph", 1), parse_crossref),
@@ -128,7 +141,7 @@ def _source_probes() -> tuple[SourceProbe, ...]:
             "cslib",
             pins["cslib-index"].repository_revision,
             *build_github_query("cslib", pins["cslib-index"].repository_revision, 1),
-            parse_github_commit,
+            _parse_github_revision(pins["cslib-index"].repository_revision),
         ),
         SourceProbe(
             "erdos_problems",
@@ -138,7 +151,7 @@ def _source_probes() -> tuple[SourceProbe, ...]:
                 pins["erdos-problems-metadata"].repository_revision,
                 1,
             ),
-            parse_github_commit,
+            _parse_github_revision(pins["erdos-problems-metadata"].repository_revision),
         ),
         SourceProbe(
             "formal_conjectures",
@@ -148,7 +161,7 @@ def _source_probes() -> tuple[SourceProbe, ...]:
                 pins["formal-conjectures"].repository_revision,
                 1,
             ),
-            parse_github_commit,
+            _parse_github_revision(pins["formal-conjectures"].repository_revision),
         ),
     )
 

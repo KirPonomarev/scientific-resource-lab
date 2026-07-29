@@ -7,7 +7,7 @@ A solo agent uses SRF by following receipts, not chat history.
 
 ```bash
 srlab labctl enter
-srlab doctor
+srlab labctl doctor
 srlab catalog inspect
 ```
 
@@ -17,6 +17,16 @@ Prepare a JSON bundle containing one scientific request and one claim,
 then run `srlab plan build <bundle-file>`. If a capability is missing,
 the planner returns a typed WAIT state instead of selecting an unsafe
 fallback.
+
+A fresh solo agent can also run the built-in bounded acceptance task:
+
+```bash
+srlab labctl submit .tmp/solo-agent-session
+srlab labctl status .tmp/solo-agent-session
+srlab labctl result .tmp/solo-agent-session
+srlab labctl export .tmp/solo-agent-session
+srlab labctl replay .tmp/solo-agent-session
+```
 
 ## Execution
 

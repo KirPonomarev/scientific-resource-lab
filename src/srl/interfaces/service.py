@@ -9,6 +9,16 @@ from srl import __version__
 from srl.contracts.errors import CONTRACT_INVALID_FAIL_REASON, ContractError
 from srl.labctl import enter_report, labctl_manifest
 from srl.planning import load_default_catalog
+from srl.solo_agent import (
+    SoloAgentError,
+    build_portal_for_session,
+    export_session,
+    replay_session,
+    session_result,
+    session_status,
+    solo_doctor,
+    submit_session,
+)
 
 INTERFACE_SERVICE_SCHEMA_VERSION: Final[str] = "InterfaceServiceReport/v1"
 
@@ -37,6 +47,13 @@ class InterfaceService:
             "status": "ok",
         }
 
+    def solo_doctor(self) -> dict[str, object]:
+        """Return the A17 solo-agent doctor report."""
+        try:
+            return solo_doctor()
+        except SoloAgentError as exc:
+            raise InterfaceServiceError(str(exc)) from exc
+
     def version(self) -> dict[str, object]:
         """Return the CLI-compatible version report."""
         return {"schema_version": "VersionReport/v1", "srl_version": __version__}
@@ -46,6 +63,48 @@ class InterfaceService:
         try:
             return enter_report(cell_id)
         except ValueError as exc:
+            raise InterfaceServiceError(str(exc)) from exc
+
+    def solo_submit(self, session_dir: str, *, cell_id: str = "standalone") -> dict[str, object]:
+        """Create a bounded local solo-agent session."""
+        try:
+            return submit_session(session_dir, cell_id=cell_id)
+        except SoloAgentError as exc:
+            raise InterfaceServiceError(str(exc)) from exc
+
+    def solo_status(self, session_dir: str) -> dict[str, object]:
+        """Return a solo-agent session status report."""
+        try:
+            return session_status(session_dir)
+        except SoloAgentError as exc:
+            raise InterfaceServiceError(str(exc)) from exc
+
+    def solo_result(self, session_dir: str) -> dict[str, object]:
+        """Return a solo-agent session result."""
+        try:
+            return session_result(session_dir)
+        except SoloAgentError as exc:
+            raise InterfaceServiceError(str(exc)) from exc
+
+    def solo_export(self, session_dir: str) -> dict[str, object]:
+        """Build a sanitized export packet for a solo-agent session."""
+        try:
+            return export_session(session_dir)
+        except SoloAgentError as exc:
+            raise InterfaceServiceError(str(exc)) from exc
+
+    def solo_replay(self, session_dir: str) -> dict[str, object]:
+        """Replay a solo-agent session."""
+        try:
+            return replay_session(session_dir)
+        except SoloAgentError as exc:
+            raise InterfaceServiceError(str(exc)) from exc
+
+    def solo_portal(self, session_dir: str) -> dict[str, object]:
+        """Render a portal for a solo-agent session."""
+        try:
+            return build_portal_for_session(session_dir)
+        except SoloAgentError as exc:
             raise InterfaceServiceError(str(exc)) from exc
 
     def capability_list(self) -> dict[str, object]:

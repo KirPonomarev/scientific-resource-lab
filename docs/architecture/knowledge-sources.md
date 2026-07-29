@@ -19,9 +19,9 @@ plus the A11 public mathematical knowledge sources:
 | OpenCitations | `https://api.opencitations.net/index/v2/citation-count/<id>` | JSON, citation count | OpenCitations API URI |
 | zbMATH Open | `https://api.zbmath.org/v1/document/_search` | JSON, document metadata | `https://zbmath.org/?q=an:<id>` |
 | LMFDB | `https://www.lmfdb.org/api/ec_curvedata/` | JSON, mathematical-object metadata | `https://www.lmfdb.org/EllipticCurve/Q/<label>` |
-| CSLib | `https://api.github.com/repos/leanprover/cslib/commits/<rev>` | JSON, pinned commit metadata | GitHub commit URI |
-| Erdos Problems | `https://api.github.com/repos/teorth/erdosproblems/commits/<rev>` | JSON, pinned commit metadata | GitHub commit URI |
-| Formal Conjectures | `https://api.github.com/repos/google-deepmind/formal-conjectures/commits/<rev>` | JSON, pinned commit metadata | GitHub commit URI |
+| CSLib | `https://raw.githubusercontent.com/leanprover/cslib/<rev>/README.md` | UTF-8 text, pinned source blob | GitHub blob URI |
+| Erdos Problems | `https://raw.githubusercontent.com/teorth/erdosproblems/<rev>/README.md` | UTF-8 text, pinned source blob | GitHub blob URI |
+| Formal Conjectures | `https://raw.githubusercontent.com/google-deepmind/formal-conjectures/<rev>/FormalConjectures/ErdosProblems/12.lean` | UTF-8 Lean text, pinned source blob | GitHub blob URI |
 
 FRED, ALFRED, and Wolfram|Alpha are deliberately absent. They require an API
 key or AppID, and the retriever is credential-free by design. Their names are

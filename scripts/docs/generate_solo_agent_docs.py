@@ -67,10 +67,16 @@ def _start_here() -> str:
         "Minimum fresh-agent sequence:",
         "",
         "1. Run `srlab labctl enter`.",
-        "2. Run `srlab doctor`.",
-        "3. Inspect available capabilities with `srlab catalog inspect`.",
-        "4. Build a request with `srlab plan build <bundle-file>`.",
-        "5. Execute only bounded, admitted work with `srlab run execute <run-spec-file>`.",
+        "2. Run `srlab labctl doctor`.",
+        "3. Submit one bounded local session with `srlab labctl submit <session-dir>`.",
+        (
+            "4. Inspect it with `srlab labctl status <session-dir>` and "
+            "`srlab labctl result <session-dir>`."
+        ),
+        (
+            "5. Export and replay it with `srlab labctl export <session-dir>` and "
+            "`srlab labctl replay <session-dir>`."
+        ),
         "",
     ]
     return "\n".join(lines)
@@ -112,7 +118,7 @@ def _runbook() -> str:
         "",
         "```bash",
         "srlab labctl enter",
-        "srlab doctor",
+        "srlab labctl doctor",
         "srlab catalog inspect",
         "```",
         "",
@@ -122,6 +128,16 @@ def _runbook() -> str:
         "then run `srlab plan build <bundle-file>`. If a capability is missing,",
         "the planner returns a typed WAIT state instead of selecting an unsafe",
         "fallback.",
+        "",
+        "A fresh solo agent can also run the built-in bounded acceptance task:",
+        "",
+        "```bash",
+        "srlab labctl submit .tmp/solo-agent-session",
+        "srlab labctl status .tmp/solo-agent-session",
+        "srlab labctl result .tmp/solo-agent-session",
+        "srlab labctl export .tmp/solo-agent-session",
+        "srlab labctl replay .tmp/solo-agent-session",
+        "```",
         "",
         "## Execution",
         "",

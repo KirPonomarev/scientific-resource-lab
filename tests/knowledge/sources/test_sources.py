@@ -352,26 +352,34 @@ def test_lmfdb_search_with_fake_transport() -> None:
 
 
 def test_github_corpus_build_query_pins_public_repo() -> None:
-    """GitHub corpus query builder stays on pinned public commit metadata."""
+    """GitHub corpus query builder stays on pinned public raw source blobs."""
     path, params = build_github_corpus_query("cslib", "93aa057", 1)
-    assert path == "/repos/leanprover/cslib/commits/93aa057"
+    assert path == "/93aa057/README.md"
     assert params == {}
 
 
 def test_github_corpus_parse_normal_and_malformed() -> None:
-    """GitHub corpus normal payload parses and malformed payload is rejected."""
+    """GitHub corpus normal raw blob parses and malformed payload is rejected."""
     policy = _policy("cslib")
-    records = parse_github_commit(_load("github_corpus_normal_1.json"), policy)
+    records = parse_github_commit(
+        b"# CSLib\n\nPinned public source metadata.\n",
+        policy,
+        revision="93aa05752a62ad3498e734d5b75fcbff965891ce",
+    )
     assert records[0].source == "cslib"
-    assert records[0].source_uri.endswith("/93aa05752a62ad3498e734d5b75fcbff965891ce")
+    assert records[0].source_uri.endswith("/93aa05752a62ad3498e734d5b75fcbff965891ce/README.md")
     with pytest.raises(SourceRecordError) as exc_info:
-        parse_github_commit(_load("github_corpus_malformed.json"), policy)
+        parse_github_commit(
+            b"",
+            policy,
+            revision="93aa05752a62ad3498e734d5b75fcbff965891ce",
+        )
     assert exc_info.value.fail_reason == CONTRACT_INVALID_FAIL_REASON
 
 
 def test_github_corpus_search_with_fake_transport() -> None:
-    """GitHub corpus search fetches through the fake transport."""
+    """GitHub corpus search fetches pinned raw blobs through the fake transport."""
     policy = _policy("cslib")
-    transport = fake_transport.FakeTransport(_load("github_corpus_normal_1.json"))
+    transport = fake_transport.FakeTransport(b"# CSLib\n\nPinned public source metadata.\n")
     records = search_github_corpus("93aa05752a62ad3498e734d5b75fcbff965891ce", 1, transport, policy)
     assert len(records) == 1

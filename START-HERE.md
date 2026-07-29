@@ -14,7 +14,7 @@ permits live trading, and never permits target-specific security action.
 Minimum fresh-agent sequence:
 
 1. Run `srlab labctl enter`.
-2. Run `srlab doctor`.
-3. Inspect available capabilities with `srlab catalog inspect`.
-4. Build a request with `srlab plan build <bundle-file>`.
-5. Execute only bounded, admitted work with `srlab run execute <run-spec-file>`.
+2. Run `srlab labctl doctor`.
+3. Submit one bounded local session with `srlab labctl submit <session-dir>`.
+4. Inspect it with `srlab labctl status <session-dir>` and `srlab labctl result <session-dir>`.
+5. Export and replay it with `srlab labctl export <session-dir>` and `srlab labctl replay <session-dir>`.
