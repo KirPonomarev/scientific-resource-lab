@@ -1,0 +1,18 @@
+{
+  "canonical_writes": 0,
+  "factory_receipt_id_grouped_sha256": "88317e91-6878bf14-5b2dde74-ed71630c-890f5bac-120afd2e-3b71e134-411d6b96",
+  "gate_command": "uv run python scripts/checks/srf-v37-a03-gate.py",
+  "grants_authority": false,
+  "profile_kinds": [
+    "julia_depot",
+    "lean_prover",
+    "native_binary",
+    "python_uv"
+  ],
+  "receipt_id_grouped_sha256": "037db610-d86fcbb8-18d90322-c7cf9e99-b0dff7cc-4bb38f49-3378aab0-d219425f",
+  "release_claim": "A03_SOFTWARE_FACTORY_ONLY",
+  "schema_version": "StageCompletionReceipt/v1",
+  "stage_closure": "SOFTWARE_ENVIRONMENT_FACTORY_ACTIVE",
+  "stage_id": "A03",
+  "terminal_state": "A03_ACCEPTED"
+}
