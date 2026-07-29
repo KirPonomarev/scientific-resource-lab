@@ -1,0 +1,542 @@
+{
+  "active_packs": [
+    "ripser",
+    "pyriemann",
+    "cvxpy",
+    "native_bayesian_conjugate",
+    "native_causal_backdoor"
+  ],
+  "canonical_writes": 0,
+  "checks": [
+    {
+      "activation_receipt": {
+        "active_pack_ids": [
+          "ripser",
+          "pyriemann",
+          "cvxpy",
+          "native_bayesian_conjugate",
+          "native_causal_backdoor"
+        ],
+        "admission_bundle": {
+          "active_pack_ids": [
+            "ripser",
+            "pyriemann",
+            "cvxpy",
+            "native_bayesian_conjugate",
+            "native_causal_backdoor"
+          ],
+          "bundle_id": "sha256:2f3582df302293cc604c3db005ddb08b4896157730d342993645338aea543fc4",
+          "canonical_writes": 0,
+          "causal_policy": "unidentified_effect_must_not_be_estimated",
+          "diagnostic_policy": "assumptions_diagnostics_uncertainty_and_solver_status_required",
+          "formally_replaced_pack_ids": [
+            "gudhi",
+            "geomstats",
+            "pot",
+            "pymanopt",
+            "keplermapper",
+            "toponetx",
+            "regina",
+            "pymc",
+            "arviz",
+            "dowhy",
+            "tigramite",
+            "econml",
+            "jaxopt",
+            "botorch"
+          ],
+          "grants_authority": false,
+          "pack_cards": [
+            {
+              "canonical_writes": 0,
+              "capability": "persistent_homology",
+              "diagnostic_policy": "null controls required",
+              "family": "topology",
+              "grants_authority": false,
+              "import_names": [
+                "ripser"
+              ],
+              "pack_id": "ripser",
+              "reason": "existing bounded adapter",
+              "status": "ACTIVE"
+            },
+            {
+              "canonical_writes": 0,
+              "capability": "spd_geometry",
+              "diagnostic_policy": "cross-validation diagnostics required",
+              "family": "geometry",
+              "grants_authority": false,
+              "import_names": [
+                "pyriemann"
+              ],
+              "pack_id": "pyriemann",
+              "reason": "existing bounded adapter",
+              "status": "ACTIVE"
+            },
+            {
+              "canonical_writes": 0,
+              "capability": "convex_optimization",
+              "diagnostic_policy": "solver status required",
+              "family": "optimization",
+              "grants_authority": false,
+              "import_names": [
+                "cvxpy"
+              ],
+              "pack_id": "cvxpy",
+              "reason": "existing bounded adapter",
+              "status": "ACTIVE"
+            },
+            {
+              "canonical_writes": 0,
+              "capability": "bounded_analytic_bayesian_diagnostics",
+              "diagnostic_policy": "closed_form_posterior_predictive_and_no_mcmc_convergence_claim",
+              "family": "probability",
+              "grants_authority": false,
+              "import_names": [],
+              "pack_id": "native_bayesian_conjugate",
+              "reason": "native bounded analytic Bayesian workload avoids optional LGPL transitive closure",
+              "status": "ACTIVE"
+            },
+            {
+              "canonical_writes": 0,
+              "capability": "backdoor_identification_and_falsification",
+              "diagnostic_policy": "identification assumptions and permutation falsification required",
+              "family": "causal",
+              "grants_authority": false,
+              "import_names": [],
+              "pack_id": "native_causal_backdoor",
+              "reason": "native bounded causal checker covers A13 identification/falsification acceptance",
+              "status": "ACTIVE"
+            },
+            {
+              "canonical_writes": 0,
+              "capability": "topological_data_analysis",
+              "diagnostic_policy": "null controls required",
+              "family": "topology",
+              "grants_authority": false,
+              "import_names": [
+                "gudhi"
+              ],
+              "pack_id": "gudhi",
+              "reason": "formally replaced for v2 by ripser persistent-homology workload",
+              "status": "FORMALLY_REPLACED"
+            },
+            {
+              "canonical_writes": 0,
+              "capability": "riemannian_geometry",
+              "diagnostic_policy": "metric diagnostics required",
+              "family": "geometry",
+              "grants_authority": false,
+              "import_names": [
+                "geomstats"
+              ],
+              "pack_id": "geomstats",
+              "reason": "formally replaced for v2 by pyriemann SPD geometry workload",
+              "status": "FORMALLY_REPLACED"
+            },
+            {
+              "canonical_writes": 0,
+              "capability": "optimal_transport",
+              "diagnostic_policy": "solver status required",
+              "family": "optimization",
+              "grants_authority": false,
+              "import_names": [
+                "ot"
+              ],
+              "pack_id": "pot",
+              "reason": "formally replaced for v2 by CVXPY bounded optimization solver matrix",
+              "status": "FORMALLY_REPLACED"
+            },
+            {
+              "canonical_writes": 0,
+              "capability": "manifold_optimization",
+              "diagnostic_policy": "solver status required",
+              "family": "optimization",
+              "grants_authority": false,
+              "import_names": [
+                "pymanopt"
+              ],
+              "pack_id": "pymanopt",
+              "reason": "formally replaced for v2 by CVXPY bounded optimization solver matrix",
+              "status": "FORMALLY_REPLACED"
+            },
+            {
+              "canonical_writes": 0,
+              "capability": "mapper_graphs",
+              "diagnostic_policy": "null controls required",
+              "family": "topology",
+              "grants_authority": false,
+              "import_names": [
+                "kmapper"
+              ],
+              "pack_id": "keplermapper",
+              "reason": "formally replaced for v2 by ripser topology workload and null controls",
+              "status": "FORMALLY_REPLACED"
+            },
+            {
+              "canonical_writes": 0,
+              "capability": "higher_order_topology",
+              "diagnostic_policy": "null controls required",
+              "family": "topology",
+              "grants_authority": false,
+              "import_names": [
+                "toponetx"
+              ],
+              "pack_id": "toponetx",
+              "reason": "formally replaced for v2 by ripser topology workload and null controls",
+              "status": "FORMALLY_REPLACED"
+            },
+            {
+              "canonical_writes": 0,
+              "capability": "3_manifold_topology",
+              "diagnostic_policy": "exact certificate required",
+              "family": "topology",
+              "grants_authority": false,
+              "import_names": [
+                "regina"
+              ],
+              "pack_id": "regina",
+              "reason": "formally replaced for v2; 3-manifold exact certificates are outside v2 scope",
+              "status": "FORMALLY_REPLACED"
+            },
+            {
+              "canonical_writes": 0,
+              "capability": "bayesian_modeling",
+              "diagnostic_policy": "mcmc diagnostics required",
+              "family": "probability",
+              "grants_authority": false,
+              "import_names": [
+                "pymc"
+              ],
+              "pack_id": "pymc",
+              "reason": "formally replaced for v2 by native conjugate Bayesian diagnostic; optional PyMC remains license-disclosed",
+              "status": "FORMALLY_REPLACED"
+            },
+            {
+              "canonical_writes": 0,
+              "capability": "mcmc_diagnostics",
+              "diagnostic_policy": "rhat_ess required",
+              "family": "probability",
+              "grants_authority": false,
+              "import_names": [
+                "arviz"
+              ],
+              "pack_id": "arviz",
+              "reason": "formally replaced for v2 by analytic diagnostics with no false MCMC convergence claim",
+              "status": "FORMALLY_REPLACED"
+            },
+            {
+              "canonical_writes": 0,
+              "capability": "causal_identification",
+              "diagnostic_policy": "identification required",
+              "family": "causal",
+              "grants_authority": false,
+              "import_names": [
+                "dowhy"
+              ],
+              "pack_id": "dowhy",
+              "reason": "formally replaced for v2 by native backdoor identification and falsification workload",
+              "status": "FORMALLY_REPLACED"
+            },
+            {
+              "canonical_writes": 0,
+              "capability": "time_series_causal_discovery",
+              "diagnostic_policy": "falsification required",
+              "family": "causal",
+              "grants_authority": false,
+              "import_names": [
+                "tigramite"
+              ],
+              "pack_id": "tigramite",
+              "reason": "formally replaced for v2 by native bounded causal falsification workload",
+              "status": "FORMALLY_REPLACED"
+            },
+            {
+              "canonical_writes": 0,
+              "capability": "heterogeneous_treatment_effects",
+              "diagnostic_policy": "identification required",
+              "family": "causal",
+              "grants_authority": false,
+              "import_names": [
+                "econml"
+              ],
+              "pack_id": "econml",
+              "reason": "formally replaced for v2 by native backdoor identification workload",
+              "status": "FORMALLY_REPLACED"
+            },
+            {
+              "canonical_writes": 0,
+              "capability": "differentiable_optimization",
+              "diagnostic_policy": "solver status required",
+              "family": "optimization",
+              "grants_authority": false,
+              "import_names": [
+                "jaxopt"
+              ],
+              "pack_id": "jaxopt",
+              "reason": "formally replaced for v2 by CVXPY bounded optimization solver matrix",
+              "status": "FORMALLY_REPLACED"
+            },
+            {
+              "canonical_writes": 0,
+              "capability": "bayesian_optimization",
+              "diagnostic_policy": "uncertainty diagnostics required",
+              "family": "optimization",
+              "grants_authority": false,
+              "import_names": [
+                "botorch"
+              ],
+              "pack_id": "botorch",
+              "reason": "formally replaced for v2 by native Bayesian diagnostics plus CVXPY solver matrix",
+              "status": "FORMALLY_REPLACED"
+            }
+          ],
+          "schema_version": "AppliedScienceAdmissionBundle/v1",
+          "wait_pack_ids": []
+        },
+        "automatic_scientific_promotion": false,
+        "canonical_writes": 0,
+        "formally_replaced_pack_ids": [
+          "gudhi",
+          "geomstats",
+          "pot",
+          "pymanopt",
+          "keplermapper",
+          "toponetx",
+          "regina",
+          "pymc",
+          "arviz",
+          "dowhy",
+          "tigramite",
+          "econml",
+          "jaxopt",
+          "botorch"
+        ],
+        "grants_authority": false,
+        "promotion_allowed": false,
+        "receipt_id": "sha256:b6ca854074974fc0265c458fed30e244c60a14078b395594b2fd02f4d64aa36f",
+        "schema_version": "AppliedScienceActivationReceipt/v1",
+        "stage_id": "A13",
+        "workload_receipts": [
+          {
+            "automatic_scientific_promotion": false,
+            "backend": "ripser",
+            "backend_versions": {
+              "core": "0.6.15",
+              "python_package": "0.6.15"
+            },
+            "canonical_writes": 0,
+            "causal_identification": "not_applicable",
+            "dataset": {
+              "kind": "synthetic",
+              "name": "unit_circle_vs_uniform_control",
+              "samples": 48
+            },
+            "diagnostics": {
+              "circle_long_lived_h1": 1,
+              "circle_max_h1_persistence": 1.470998406409,
+              "control_long_lived_h1": 0,
+              "control_max_h1_persistence": 0.113180592657
+            },
+            "family": "topology",
+            "grants_authority": false,
+            "pack_id": "ripser",
+            "promotion_allowed": false,
+            "receipt_id": "sha256:56d107b744756b5ba55e417a1ac0c375e052367706f0052aabc8ee3af86017a4",
+            "resource_envelope": {
+              "bounded": true,
+              "canonical_writes": 0,
+              "elapsed_seconds": 2.106
+            },
+            "schema_version": "AppliedScienceActivationReceipt/v1",
+            "solver_status": "checked",
+            "status": "ACTIVE",
+            "validation_metric": {
+              "name": "h1_signal_above_control",
+              "value": 1.357817813752
+            }
+          },
+          {
+            "automatic_scientific_promotion": false,
+            "backend": "pyriemann",
+            "backend_versions": {
+              "numpy": "2.4.6",
+              "python_package": "0.12",
+              "scipy": "1.18.0"
+            },
+            "canonical_writes": 0,
+            "causal_identification": "not_applicable",
+            "dataset": {
+              "kind": "synthetic",
+              "name": "commuting_spd_matrices",
+              "samples": 3
+            },
+            "diagnostics": {
+              "log_euclidean_mean_max_error": 0.0,
+              "riemannian_symmetry_error": 0.0,
+              "riemannian_triangle_slack": 2.2183865544222225
+            },
+            "family": "geometry",
+            "grants_authority": false,
+            "pack_id": "pyriemann",
+            "promotion_allowed": false,
+            "receipt_id": "sha256:0538036f31747d7d4057f250437a5dff72fbca9963cb1c474beda3e7686f553f",
+            "resource_envelope": {
+              "bounded": true,
+              "canonical_writes": 0,
+              "elapsed_seconds": 0.481
+            },
+            "schema_version": "AppliedScienceActivationReceipt/v1",
+            "solver_status": "checked",
+            "status": "ACTIVE",
+            "validation_metric": {
+              "name": "spd_geometry_diagnostics_passed",
+              "value": 1.0
+            }
+          },
+          {
+            "automatic_scientific_promotion": false,
+            "backend": "cvxpy",
+            "backend_versions": {
+              "clarabel": "0.11.1",
+              "osqp": "1.1.3",
+              "python_package": "1.9.2"
+            },
+            "canonical_writes": 0,
+            "causal_identification": "not_applicable",
+            "dataset": {
+              "kind": "synthetic",
+              "name": "bounded_ridge_regression",
+              "samples": 3
+            },
+            "diagnostics": {
+              "allowed_solvers": [
+                "clarabel",
+                "osqp"
+              ],
+              "denied_solvers": [
+                "cbc",
+                "glpk"
+              ],
+              "license_verified": true,
+              "solution_digest": "sha256:d227b7c230abfabe19ceb745a7c56d07e2c162b4a1cf374e781f7ca7e24a6ca5",
+              "solve_status": "optimal"
+            },
+            "family": "optimization",
+            "grants_authority": false,
+            "pack_id": "cvxpy",
+            "promotion_allowed": false,
+            "receipt_id": "sha256:8260a940e2c247e12f035f3d6a474d17be3542e08a6a675ebf6f159c9aedbe1a",
+            "resource_envelope": {
+              "bounded": true,
+              "canonical_writes": 0,
+              "elapsed_seconds": 0.226
+            },
+            "schema_version": "AppliedScienceActivationReceipt/v1",
+            "solver_status": "optimal",
+            "status": "ACTIVE",
+            "validation_metric": {
+              "name": "objective_decimal",
+              "value": "0.480938416422"
+            }
+          },
+          {
+            "automatic_scientific_promotion": false,
+            "backend": "native_bayesian_conjugate",
+            "backend_versions": {
+              "python": "stdlib-math"
+            },
+            "canonical_writes": 0,
+            "causal_identification": "not_applicable",
+            "dataset": {
+              "kind": "synthetic",
+              "name": "normal_mean_known_sigma",
+              "samples": 6
+            },
+            "diagnostics": {
+              "convergence_claim": false,
+              "ess": null,
+              "posterior_mean": 1.1381443298969072,
+              "posterior_predictive_tail_probability": 0.9824729883013932,
+              "posterior_sd": 0.2030692330267238,
+              "rhat": null
+            },
+            "family": "probability",
+            "grants_authority": false,
+            "pack_id": "native_bayesian_conjugate",
+            "promotion_allowed": false,
+            "receipt_id": "sha256:b92269c5d2bcee3f007e8f30e2f35390d3bda5dfc53565c34f2e7b1e38534e5a",
+            "resource_envelope": {
+              "bounded": true,
+              "canonical_writes": 0,
+              "elapsed_seconds": 0.0
+            },
+            "schema_version": "AppliedScienceActivationReceipt/v1",
+            "solver_status": "analytic_checked",
+            "status": "ACTIVE",
+            "validation_metric": {
+              "name": "posterior_predictive_tail_probability",
+              "value": 0.9824729883013932
+            }
+          },
+          {
+            "automatic_scientific_promotion": false,
+            "backend": "native_causal_backdoor",
+            "backend_versions": {
+              "python": "stdlib-linear-algebra"
+            },
+            "canonical_writes": 0,
+            "causal_identification": "identified",
+            "dataset": {
+              "kind": "synthetic",
+              "name": "confounded_backdoor_linear_effect",
+              "samples": 80
+            },
+            "diagnostics": {
+              "adjusted_treatment_effect": 1.989218374101241,
+              "falsification": "permuted_treatment_effect_near_zero",
+              "identification": "backdoor_adjustment_observed_confounder",
+              "naive_difference_in_means": 2.6666955596765245,
+              "permuted_treatment_effect": -0.018013507365315595
+            },
+            "family": "causal",
+            "grants_authority": false,
+            "pack_id": "native_causal_backdoor",
+            "promotion_allowed": false,
+            "receipt_id": "sha256:6dce03409251b407ca0280f3efcdd0ee49e2e85f38eb6362ebde752ad454dff5",
+            "resource_envelope": {
+              "bounded": true,
+              "canonical_writes": 0,
+              "elapsed_seconds": 0.0
+            },
+            "schema_version": "AppliedScienceActivationReceipt/v1",
+            "solver_status": "identified_and_falsified",
+            "status": "ACTIVE",
+            "validation_metric": {
+              "name": "adjusted_effect_abs_error",
+              "value": 0.010781625898758973
+            }
+          }
+        ]
+      },
+      "check_id": "A13-01-real-applied-science-workloads",
+      "detail": "Topology, geometry, optimization, analytic Bayesian and causal workloads executed with bounded real adapters/checkers",
+      "status": "PASS"
+    },
+    {
+      "check_id": "A13-02-diagnostics-falsification-license-and-no-promotion",
+      "detail": "A13 diagnostics include topology null control, analytic Bayesian no-MCMC claim, causal identification/falsification and explicit solver/license matrix",
+      "status": "PASS"
+    }
+  ],
+  "grants_authority": false,
+  "live_actions": 0,
+  "parked_packs": [],
+  "receipt_id": "sha256:067abec4a2274b42e8e33122076045d9c67a6d1de6e51859505866adafdbca24",
+  "remaining_external_waits": [],
+  "remaining_internal_waits": [],
+  "result": "PASS",
+  "schema_version": "StageCompletionReceipt/v1",
+  "stage_closure": "A13_ACTIVE",
+  "stage_id": "A13"
+}

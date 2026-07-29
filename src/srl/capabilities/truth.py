@@ -66,6 +66,9 @@ _Z3_UPPER_BOUND: Final[int] = 3
 _Z3_WITNESS: Final[int] = 2
 _MIN_RIPSER_DIAGRAMS: Final[int] = 2
 _CVXPY_OPTIMUM_TOLERANCE: Final[float] = 1e-5
+_A13_CAUSAL_TRUE_EFFECT: Final[float] = 2.0
+_A13_CAUSAL_EFFECT_TOLERANCE: Final[float] = 0.08
+_A13_CAUSAL_FALSIFICATION_TOLERANCE: Final[float] = 0.25
 _REPO_ROOT: Final[Path] = Path(__file__).resolve().parents[3]
 _A09_RECEIPT_PATH: Final[Path] = (
     _REPO_ROOT / "docs" / "verification" / "srf-v3-7-a09-lean-corpora-receipt.json"
@@ -78,6 +81,9 @@ _A11_RECEIPT_PATH: Final[Path] = (
 )
 _A12_RECEIPT_PATH: Final[Path] = (
     _REPO_ROOT / "docs" / "verification" / "srf-v3-7-a12-discovery-dynamics-receipt.json"
+)
+_A13_RECEIPT_PATH: Final[Path] = (
+    _REPO_ROOT / "docs" / "verification" / "srf-v3-7-a13-applied-science-receipt.json"
 )
 _EXPECTED_A09_COMPONENTS: Final[tuple[str, ...]] = (
     "lean",
@@ -109,6 +115,29 @@ _EXPECTED_A12_REPLACED: Final[tuple[str, ...]] = (
     "ai_feynman",
     "pykoopman",
     "dysts",
+)
+_EXPECTED_A13_COMPONENTS: Final[tuple[str, ...]] = (
+    "ripser",
+    "pyriemann",
+    "cvxpy",
+    "native_bayesian_conjugate",
+    "native_causal_backdoor",
+)
+_EXPECTED_A13_REPLACED: Final[tuple[str, ...]] = (
+    "gudhi",
+    "geomstats",
+    "pot",
+    "pymanopt",
+    "keplermapper",
+    "toponetx",
+    "regina",
+    "pymc",
+    "arviz",
+    "dowhy",
+    "tigramite",
+    "econml",
+    "jaxopt",
+    "botorch",
 )
 
 
@@ -674,6 +703,164 @@ def _make_a12_smoke(component_id: str) -> Callable[[], str]:
     return _smoke
 
 
+def _load_a13_receipt() -> dict[str, Any]:
+    if not _A13_RECEIPT_PATH.exists():
+        raise RuntimeError(f"A13 receipt missing: {_A13_RECEIPT_PATH.relative_to(_REPO_ROOT)}")
+    receipt = json.loads(_A13_RECEIPT_PATH.read_text(encoding="utf-8"))
+    if not isinstance(receipt, dict):
+        raise RuntimeError("A13 receipt must be a JSON object")
+    return receipt
+
+
+def _validated_a13_receipt(component_id: str) -> dict[str, Any]:  # noqa: C901, PLR0912, PLR0915
+    receipt = _load_a13_receipt()
+    if receipt.get("schema_version") != "StageCompletionReceipt/v1":
+        raise RuntimeError("A13 receipt schema drifted")
+    if receipt.get("stage_id") != "A13" or receipt.get("result") != "PASS":
+        raise RuntimeError("A13 receipt is not a PASS receipt for stage A13")
+    if receipt.get("stage_closure") != "A13_ACTIVE":
+        raise RuntimeError("A13 receipt does not close A13_ACTIVE")
+    if receipt.get("remaining_internal_waits") != []:
+        raise RuntimeError("A13 receipt contains internal waits")
+    active = receipt.get("active_packs")
+    if active != list(_EXPECTED_A13_COMPONENTS):
+        raise RuntimeError("A13 active_packs do not match expected packs")
+    if component_id not in active:
+        raise RuntimeError(f"{component_id} is absent from A13 active_packs")
+
+    checks = {
+        str(item.get("check_id")): item
+        for item in receipt.get("checks", [])
+        if isinstance(item, dict)
+    }
+    if any(item.get("status") != "PASS" for item in checks.values()):
+        raise RuntimeError("A13 receipt contains a non-PASS check")
+
+    activation = checks.get("A13-01-real-applied-science-workloads")
+    if not isinstance(activation, dict) or not isinstance(
+        activation.get("activation_receipt"), dict
+    ):
+        raise RuntimeError("A13 activation receipt missing")
+    activation_receipt = activation["activation_receipt"]
+    if activation_receipt.get("schema_version") != "AppliedScienceActivationReceipt/v1":
+        raise RuntimeError("A13 activation receipt schema drifted")
+    if activation_receipt.get("active_pack_ids") != list(_EXPECTED_A13_COMPONENTS):
+        raise RuntimeError("A13 activation active pack ids mismatch")
+    if activation_receipt.get("formally_replaced_pack_ids") != list(_EXPECTED_A13_REPLACED):
+        raise RuntimeError("A13 formal replacement ids mismatch")
+    if (
+        activation_receipt.get("promotion_allowed") is not False
+        or activation_receipt.get("automatic_scientific_promotion") is not False
+        or activation_receipt.get("canonical_writes") != 0
+        or activation_receipt.get("grants_authority") is not False
+    ):
+        raise RuntimeError("A13 activation receipt is not authority-negative")
+
+    workload_receipts = activation_receipt.get("workload_receipts")
+    if not isinstance(workload_receipts, list) or len(workload_receipts) != len(
+        _EXPECTED_A13_COMPONENTS
+    ):
+        raise RuntimeError("A13 workload receipt count mismatch")
+    by_id = {item.get("pack_id"): item for item in workload_receipts if isinstance(item, dict)}
+    if tuple(by_id) != _EXPECTED_A13_COMPONENTS:
+        raise RuntimeError("A13 workload receipts do not match expected order")
+    for pack_id, item in by_id.items():
+        if item.get("status") != "ACTIVE":
+            raise RuntimeError(f"A13 {pack_id} did not reach ACTIVE")
+        if (
+            item.get("promotion_allowed") is not False
+            or item.get("automatic_scientific_promotion") is not False
+            or item.get("canonical_writes") != 0
+            or item.get("grants_authority") is not False
+        ):
+            raise RuntimeError(f"A13 {pack_id} receipt is not authority-negative")
+        envelope = item.get("resource_envelope")
+        if not isinstance(envelope, dict) or envelope.get("bounded") is not True:
+            raise RuntimeError(f"A13 {pack_id} missing bounded resource envelope")
+        if not isinstance(item.get("dataset"), dict):
+            raise RuntimeError(f"A13 {pack_id} missing dataset binding")
+        backend_versions = item.get("backend_versions")
+        if not isinstance(backend_versions, dict) or not backend_versions:
+            raise RuntimeError(f"A13 {pack_id} missing backend version binding")
+
+    _check_a13_topology(by_id["ripser"])
+    _check_a13_bayesian(by_id["native_bayesian_conjugate"])
+    _check_a13_causal(by_id["native_causal_backdoor"])
+    _check_a13_optimization(by_id["cvxpy"])
+
+    diagnostics = checks.get("A13-02-diagnostics-falsification-license-and-no-promotion")
+    if not isinstance(diagnostics, dict) or diagnostics.get("status") != "PASS":
+        raise RuntimeError("A13 diagnostics/no-promotion check missing or failed")
+    return receipt
+
+
+def _check_a13_topology(item: dict[str, Any]) -> None:
+    diagnostics = item.get("diagnostics")
+    if not isinstance(diagnostics, dict):
+        raise RuntimeError("A13 topology diagnostics missing")
+    if diagnostics.get("circle_long_lived_h1") != 1:
+        raise RuntimeError("A13 topology did not detect expected H1 signal")
+    if diagnostics.get("control_long_lived_h1") != 0:
+        raise RuntimeError("A13 topology null control did not stay null")
+
+
+def _check_a13_bayesian(item: dict[str, Any]) -> None:
+    diagnostics = item.get("diagnostics")
+    if not isinstance(diagnostics, dict):
+        raise RuntimeError("A13 Bayesian diagnostics missing")
+    if diagnostics.get("convergence_claim") is not False:
+        raise RuntimeError("A13 Bayesian workload made an MCMC convergence claim")
+    if diagnostics.get("rhat") is not None or diagnostics.get("ess") is not None:
+        raise RuntimeError("A13 Bayesian workload emitted fake MCMC diagnostics")
+    tail = diagnostics.get("posterior_predictive_tail_probability")
+    if not isinstance(tail, float) or not 0.0 <= tail <= 1.0:
+        raise RuntimeError("A13 Bayesian posterior predictive diagnostic invalid")
+
+
+def _check_a13_causal(item: dict[str, Any]) -> None:
+    diagnostics = item.get("diagnostics")
+    if not isinstance(diagnostics, dict):
+        raise RuntimeError("A13 causal diagnostics missing")
+    if item.get("causal_identification") != "identified":
+        raise RuntimeError("A13 causal workload did not identify the effect")
+    adjusted = diagnostics.get("adjusted_treatment_effect")
+    permuted = diagnostics.get("permuted_treatment_effect")
+    if (
+        not isinstance(adjusted, float)
+        or abs(adjusted - _A13_CAUSAL_TRUE_EFFECT) > _A13_CAUSAL_EFFECT_TOLERANCE
+    ):
+        raise RuntimeError("A13 causal adjusted effect drifted")
+    if not isinstance(permuted, float) or abs(permuted) > _A13_CAUSAL_FALSIFICATION_TOLERANCE:
+        raise RuntimeError("A13 causal falsification failed")
+
+
+def _check_a13_optimization(item: dict[str, Any]) -> None:
+    diagnostics = item.get("diagnostics")
+    if not isinstance(diagnostics, dict):
+        raise RuntimeError("A13 optimization diagnostics missing")
+    if diagnostics.get("solve_status") != "optimal":
+        raise RuntimeError("A13 optimization solver status is not optimal")
+    if diagnostics.get("license_verified") is not True:
+        raise RuntimeError("A13 optimization license was not verified")
+    if diagnostics.get("denied_solvers") != ["cbc", "glpk"]:
+        raise RuntimeError("A13 optimization denied solver matrix drifted")
+
+
+def _smoke_a13_receipt(component_id: str) -> str:
+    receipt = _validated_a13_receipt(component_id)
+    return (
+        f"A13 offline truth projection accepted {component_id} from "
+        f"{receipt['receipt_id']} with applied workload receipts and diagnostics"
+    )
+
+
+def _make_a13_smoke(component_id: str) -> Callable[[], str]:
+    def _smoke() -> str:
+        return _smoke_a13_receipt(component_id)
+
+    return _smoke
+
+
 _SPECS: Final[tuple[ComponentSpec, ...]] = (
     ComponentSpec(
         "numpy",
@@ -949,6 +1136,18 @@ _SPECS: Final[tuple[ComponentSpec, ...]] = (
         )
         for pack_id in _EXPECTED_A12_COMPONENTS
     ),
+    *(
+        ComponentSpec(
+            pack_id,
+            "a13_applied_science",
+            "A13",
+            "stage_receipt",
+            activation_wait_state="WAIT_CAPABILITY",
+            current_v101_active=True,
+            smoke=_make_a13_smoke(pack_id),
+        )
+        for pack_id in _EXPECTED_A13_COMPONENTS
+    ),
     ComponentSpec(
         "production-ed25519-signer",
         "a04_transport",
@@ -1013,6 +1212,9 @@ def _stage_receipt_probe(spec: ComponentSpec) -> tuple[bool, str | None, str | N
         elif spec.stage == "A12":
             receipt = _validated_a12_receipt(spec.component_id)
             receipt_path = _receipt_display_path(_A12_RECEIPT_PATH)
+        elif spec.stage == "A13":
+            receipt = _validated_a13_receipt(spec.component_id)
+            receipt_path = _receipt_display_path(_A13_RECEIPT_PATH)
         else:
             return False, None, f"stage receipt unsupported for {spec.stage}"
     except Exception as exc:
@@ -1153,6 +1355,16 @@ def build_truth_ledger() -> dict[str, Any]:
             f"{item['state']}:{item['component_id']}"
             for item in components
             if item["activation_stage"] == "A12" and item["state"] != "ACTIVE"
+        ],
+        "a13_active_inventory_observed": [
+            item["component_id"]
+            for item in components
+            if item["activation_stage"] == "A13" and item["state"] == "ACTIVE"
+        ],
+        "a13_parked_blockers": [
+            f"{item['state']}:{item['component_id']}"
+            for item in components
+            if item["activation_stage"] == "A13" and item["state"] != "ACTIVE"
         ],
         "a07_parked_blockers": [f"WAIT_LICENSE:python-flint:{FLINT_WAIT_REASON}"],
         "production_versus_fixture_axis": [

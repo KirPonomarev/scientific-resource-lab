@@ -1040,7 +1040,7 @@ terminal_result PASS запрещён, если remaining_internal_waits не п
 <!-- BEGIN_MUTABLE_STATE_V3_7 -->
 STATE_REVISION: 13
 PREVIOUS_STATE_SHA256: f9db73e0-eb34c0ac-cd2584c2-ef77abe3-83e388b8-a027dd42-f958df66-28e9c74d
-CURRENT_STATE_SHA256: f3a0e18b-94136d6b-22ade9d7-00afac15-4646903a-08eb3b19-9b1cd9ea-ca4e99bc
+CURRENT_STATE_SHA256: 9838f081-6b8610e1-4afb9c19-26ba605c-c902ee18-64715c82-c82085d7-988a8952
 
 ## CURRENT_FACTS
 
@@ -1169,9 +1169,9 @@ current_facts:
 
 ~~~yaml
 execution_state:
-  status: A12_ACTIVE_READY_FOR_A13_WITH_PARKED_PROTECTED_LANES
-  current_stage: A13
-  next_stage: A13_activate_applied_simulation_and_optimization
+  status: A13_ACTIVE_READY_FOR_A14_WITH_PARKED_PROTECTED_LANES
+  current_stage: A14
+  next_stage: A14_activate_sciml_and_domain_science
   completed_stages:
     - A00
     - A01
@@ -1184,6 +1184,7 @@ execution_state:
     - A10
     - A11
     - A12
+    - A13
   completed_stage_lanes:
     - A07_sympy_mpmath_core
   parked_stages:
@@ -1199,11 +1200,11 @@ execution_state:
     - WAIT_COMPUTE_TARGET:A05_BIND_NATIVE_SANDBOX_COMPUTE_TARGET
     - WAIT_LICENSE:A07_PYTHON_FLINT_LGPL_CLOSURE
     - WAIT_AUTHORITY:A09_BIND_PINNED_LEAN_MATHLIB_PROJECT_TO_T7
-  active_branch_or_null: codex/srf-a12-discovery-dynamics
+  active_branch_or_null: codex/srf-a13-applied-science
   active_pr_or_null: null
   writer_lease_or_null: null
   blocker_or_null: WAIT_LICENSE:A07_PYTHON_FLINT_LGPL_CLOSURE
-  next_executable_action: start A13 applied simulation and optimization activation while keeping T7-backed persistence, native compute binding, native production signing, FLINT license closure and A09 T7 formal toolchain binding parked until exact authority/evidence exists
+  next_executable_action: start A14 SciML and domain science activation while keeping T7-backed persistence, native compute binding, native production signing, FLINT license closure and A09 T7 formal toolchain binding parked until exact authority/evidence exists
   updated_at: 2026-07-29
 ~~~
 
@@ -1247,6 +1248,10 @@ decision_log:
     decision: A10 Rocq/Coq, Isabelle/HOL and HOL4 independent prover contours are ACTIVE with real executable probes and shared nat zero-add proof checks; semantic-gap manifests explicitly represent logic and assumption deltas and forbid automatic theorem equivalence claims; truth-ledger A10 projection is offline from hash-bound receipt sha256:25c51de9b712afc0f1fc961c26f5dae38ed2872cb054850bd7182374ad3cca7f; full verify reuses the pinned HOL4 cache with prepare_count=0 and fetch_count=0 after the cold T7-Secure preparation
   - id: V37-D018
     decision: A11 source-grounded knowledge graph is ACTIVE with bounded live public-source queries for OpenAlex, Crossref, arXiv, OEIS, OpenCitations, zbMATH Open, LMFDB, CSLib, Erdos Problems and Formal Conjectures; every live response is hash-bound to an exact no-network replay receipt; source policy cards project ACTIVE for all declared A11 sources; taint and citation-spoof guards keep raw corpus out of privileged prompts; truth-ledger A11 projection is offline from hash-bound receipt sha256:2f44a60428495c78536ff7077acd1056fa8e0750bb9d2c7d4bb3d28f9b8a2801
+  - id: V37-D019
+    decision: A12 PySR, PySINDy and PyDMD discovery/dynamics packs are ACTIVE with bounded real workloads, null controls, public benchmark receipt and no automatic scientific promotion; SR4MDL, Operon, gplearn, AI-Feynman, PyKoopman and Dysts are formally replaced for v2.0.0; truth-ledger A12 projection is offline from hash-bound receipt sha256:f76090d0a8bcbf72d986f9c7c32d125cc1624c80c7580b0aa3ea69f363ffc9a5
+  - id: V37-D020
+    decision: A13 applied-science packs are ACTIVE with ripser topology signal/null control, pyriemann SPD geometry diagnostics, CVXPY solver/license matrix, native analytic Bayesian diagnostics without MCMC convergence claims and native causal backdoor identification plus falsification; all broader catalog items are formally replaced for v2.0.0; truth-ledger A13 projection is offline from hash-bound receipt sha256:067abec4a2274b42e8e33122076045d9c67a6d1de6e51859505866adafdbca24
 ~~~
 
 ## EVIDENCE_INDEX
@@ -1302,6 +1307,14 @@ evidence_index:
   - scripts/checks/srf-v37-a10-gate.py
   - scripts/ci/prepare_a10_hol4.py
   - src/srl/packs/formal/cross_prover.py
+  - docs/architecture/discovery-dynamics-a12.md
+  - scripts/checks/srf-v37-a12-prepare-julia.py
+  - scripts/checks/srf-v37-a12-gate.py
+  - docs/verification/srf-v3-7-a12-discovery-dynamics-receipt.json
+  - docs/architecture/applied-science-a13.md
+  - docs/catalog/applied-science.md
+  - scripts/checks/srf-v37-a13-gate.py
+  - docs/verification/srf-v3-7-a13-applied-science-receipt.json
 ~~~
 
 <!-- END_MUTABLE_STATE_V3_7 -->
