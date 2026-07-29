@@ -14,6 +14,13 @@ without a verified certificate).
 
 from __future__ import annotations
 
+from srl.packs.adapters.native_algebra import (
+    A08_NATIVE_SCHEMA_VERSION,
+    A08NativeSmoke,
+    A08ToolProbe,
+    A08ToolState,
+    run_a08_native_smoke,
+)
 from srl.packs.adapters.p0_python_core import (
     FLINT_WAIT_REASON,
     P0_PYTHON_CORE_ACTIVE_PACKS,
@@ -51,6 +58,7 @@ from srl.packs.adapters.units import (
 )
 
 __all__ = [
+    "A08_NATIVE_SCHEMA_VERSION",
     "AVAILABLE_SOLVERS",
     "CONVERSION_SIG_DIGITS",
     "FLINT_WAIT_REASON",
@@ -66,6 +74,9 @@ __all__ = [
     "SUPPORTED_OPERATORS",
     "UNIT_FAIL_REASON",
     "WAIT_LICENSE_SOLVERS",
+    "A08NativeSmoke",
+    "A08ToolProbe",
+    "A08ToolState",
     "Dimension",
     "P0PythonCoreSmoke",
     "SmtError",
@@ -77,6 +88,7 @@ __all__ = [
     "convert",
     "parse_unit",
     "pint_version",
+    "run_a08_native_smoke",
     "run_p0_python_core_smoke",
     "validate_dimensions",
     "z3_version",

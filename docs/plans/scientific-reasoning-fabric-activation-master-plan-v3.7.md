@@ -1038,16 +1038,16 @@ terminal_result PASS запрещён, если remaining_internal_waits не п
 <!-- END_PLAN_CONTRACT_V3_7 -->
 
 <!-- BEGIN_MUTABLE_STATE_V3_7 -->
-STATE_REVISION: 9
-PREVIOUS_STATE_SHA256: dba3d9db-1b976c7d-b57db8d8-0173d281-e5cd0670-ef91d24a-1599148d-deeca4d5
-CURRENT_STATE_SHA256: 564e5e5b-a79cb42b-5b6e7ea4-d9c8be96-cb6d5a38-24c8b6ba-fba85242-0d25eb34
+STATE_REVISION: 10
+PREVIOUS_STATE_SHA256: 564e5e5b-a79cb42b-5b6e7ea4-d9c8be96-cb6d5a38-24c8b6ba-fba85242-0d25eb34
+CURRENT_STATE_SHA256: 2e67c7bc-b88800f3-06e7cdad-4ce4b37f-29058a2c-108f870e-e0662c04-f6461c05
 
 ## CURRENT_FACTS
 
 ~~~yaml
 current_facts:
   observed_at: 2026-07-29
-  repository_head: 66cc9cad08ce6036869c5bf8557c6b712a72c405
+  repository_head: a19d0c38d8642296723a6e5d38afd5f831c6e9ba
   predecessor_release: v1.0.1
   predecessor_result: RELEASED_WITH_DECLARED_WAITS
   current_active_default_packs:
@@ -1063,6 +1063,19 @@ current_facts:
     - mpmath
   a07_sympy_mpmath_core: ACTIVE
   a07_python_flint: WAIT_LICENSE
+  current_active_native_toolchains:
+    - pari-gp
+    - maxima
+    - gap
+    - singular
+    - z3-native
+    - cvc5
+  a08_pari_gp: ACTIVE
+  a08_maxima: ACTIVE
+  a08_gap: ACTIVE
+  a08_singular: ACTIVE
+  a08_z3_native: ACTIVE
+  a08_cvc5: ACTIVE
   production_signer: WAIT_AUTHORITY
   production_ed25519_transport_interface: ACTIVE
   fixture_hmac_production_path: REJECTED
@@ -1092,9 +1105,9 @@ current_facts:
 
 ~~~yaml
 execution_state:
-  status: A07_PARTIAL_ACTIVE_WAIT_FLINT_LICENSE
-  current_stage: A08
-  next_stage: A08_activate_native_algebra_and_smt
+  status: A08_ACTIVE_READY_FOR_A09_WITH_PARKED_PROTECTED_LANES
+  current_stage: A09
+  next_stage: A09_activate_lean_and_mathematical_corpora
   completed_stages:
     - A00
     - A01
@@ -1102,6 +1115,7 @@ execution_state:
     - A04
     - A05
     - A06
+    - A08
   completed_stage_lanes:
     - A07_sympy_mpmath_core
   parked_stages:
@@ -1115,11 +1129,11 @@ execution_state:
     - WAIT_AUTHORITY:A04_BIND_PRODUCTION_ED25519_KEYRING
     - WAIT_COMPUTE_TARGET:A05_BIND_NATIVE_SANDBOX_COMPUTE_TARGET
     - WAIT_LICENSE:A07_PYTHON_FLINT_LGPL_CLOSURE
-  active_branch_or_null: codex/srf-a07-p0-python-core
+  active_branch_or_null: codex/srf-a08-native-algebra-smt
   active_pr_or_null: null
   writer_lease_or_null: null
   blocker_or_null: WAIT_LICENSE:A07_PYTHON_FLINT_LGPL_CLOSURE
-  next_executable_action: start A08 native algebra and SMT software/toolchain probes while keeping T7-backed persistence, native compute binding and FLINT license closure parked until exact authority/evidence exists
+  next_executable_action: start A09 Lean and mathematical corpora activation while keeping T7-backed persistence, native compute binding, native production signing and FLINT license closure parked until exact authority/evidence exists
   updated_at: 2026-07-29
 ~~~
 
@@ -1155,6 +1169,8 @@ decision_log:
     decision: A06 durable scheduler software lane is active with T7-work namespace contract, crash/restart exact-once recovery, pool/backpressure controls and bound terminal receipts; native T7 persistence remains WAIT_T7_BINDING
   - id: V37-D014
     decision: A07 SymPy and mpmath default Python core packs are ACTIVE with real import probes, scientific smoke and independent crosschecks; python-flint/FLINT/Arb/Calcium remains WAIT_LICENSE because current package metadata declares an LGPL-family closure denied by SRL default dependency policy
+  - id: V37-D015
+    decision: A08 native algebra and SMT toolchains are ACTIVE with external PARI/GP, Maxima, GAP, Singular, native Z3 and cvc5 executable probes, bounded scientific smokes, Z3/cvc5 agreement and uv license-boundary enforcement
 ~~~
 
 ## EVIDENCE_INDEX
@@ -1193,6 +1209,9 @@ evidence_index:
   - scripts/checks/srf-v37-a07-gate.py
   - docs/target-binding/a07-python-flint-license-operator-action.json
   - docs/verification/srf-v3-7-a07-p0-python-core-receipt.json
+  - docs/architecture/native-algebra-smt.md
+  - scripts/checks/srf-v37-a08-gate.py
+  - docs/verification/srf-v3-7-a08-native-algebra-smt-receipt.json
 ~~~
 
 <!-- END_MUTABLE_STATE_V3_7 -->
