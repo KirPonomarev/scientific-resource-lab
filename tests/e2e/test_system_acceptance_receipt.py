@@ -1,11 +1,16 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import re
+import shutil
+import subprocess
 from pathlib import Path
 from typing import Any
 
 RECEIPT_PATH = Path("docs/verification/system-acceptance-receipt.json")
+REPO_ROOT = Path(__file__).resolve().parents[2]
+_GIT = shutil.which("git") or "git"
 
 _PLAN_HASH = "947d1858c8cf110f3c6bdb07c70a8ff132459f9e7b6448d1afbf84d4270c1ff0"
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$|^[0-9a-f]{8}(-[0-9a-f]{8}){7}$")
@@ -71,6 +76,21 @@ def _normalize_digest(value: str) -> str:
     return value.replace("-", "")
 
 
+def _sha256(path: str) -> str:
+    return _normalize_digest(hashlib.sha256((REPO_ROOT / path).read_bytes()).hexdigest())
+
+
+def _git_merge_base(ref: str) -> str:
+    result = subprocess.run(  # noqa: S603
+        [_GIT, "merge-base", "HEAD", ref],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return result.stdout.strip()
+
+
 def test_system_acceptance_receipt_identity_and_authority_negative() -> None:
     receipt = _receipt()
 
@@ -83,6 +103,10 @@ def test_system_acceptance_receipt_identity_and_authority_negative() -> None:
     assert receipt["grants_authority"] is False
     assert receipt["live_actions"] == 0
     assert receipt["protected_actions"]["performed"] == []
+    assert set(receipt["protected_actions"]["wait_states"]) >= {
+        "WAIT_T7_BINDING",
+        "WAIT_COMPUTE_NODE",
+    }
 
 
 def test_validation_matrix_covers_every_required_layer() -> None:
@@ -128,3 +152,18 @@ def test_receipt_paths_are_public_repository_paths() -> None:
         for value in receipt[section]:
             assert not any(marker in value for marker in private_markers), value
             assert Path(value).exists(), value
+
+
+def test_receipt_hashes_current_evidence_files() -> None:
+    receipt = _receipt()
+    file_hashes = receipt["file_sha256"]
+
+    for path, expected in file_hashes.items():
+        assert _sha256(path) == _normalize_digest(expected), path
+
+
+def test_evidence_run_head_is_in_current_candidate_history() -> None:
+    receipt = _receipt()
+
+    evidence_head = receipt["git_head"]
+    assert _git_merge_base(evidence_head) == evidence_head

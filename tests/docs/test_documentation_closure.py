@@ -28,9 +28,7 @@ REQUIRED_DOCS = (
     "RELEASE-RUNBOOK.md",
 )
 RECEIPT_PATH = Path("docs/verification/documentation-closure-receipt.json")
-_SYSTEM_ACCEPTANCE_RECEIPT = (
-    "f8f9398e-27be37fa-3266e749-57d000db-46aa2815-f6be384c-761ffdd8-62468ae5"
-)
+SYSTEM_RECEIPT_PATH = Path("docs/verification/system-acceptance-receipt.json")
 
 
 def _run(*args: str) -> subprocess.CompletedProcess[str]:
@@ -46,8 +44,16 @@ def _receipt() -> dict[str, Any]:
     return json.loads(RECEIPT_PATH.read_text(encoding="utf-8"))
 
 
+def _system_receipt() -> dict[str, Any]:
+    return json.loads(SYSTEM_RECEIPT_PATH.read_text(encoding="utf-8"))
+
+
 def _normalize_digest(value: str) -> str:
     return value.removeprefix("sha256:").replace("-", "")
+
+
+def _sha256(path: str) -> str:
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
 def test_generated_documentation_is_current() -> None:
@@ -76,8 +82,12 @@ def test_documentation_closure_receipt_is_authority_negative() -> None:
     assert receipt["canonical_writes"] == 0
     assert receipt["grants_authority"] is False
     assert receipt["live_actions"] == 0
+    assert set(receipt["protected_actions"]["wait_states"]) >= {
+        "WAIT_T7_BINDING",
+        "WAIT_COMPUTE_NODE",
+    }
     assert _normalize_digest(receipt["source_system_acceptance_receipt"]) == (
-        _normalize_digest(_SYSTEM_ACCEPTANCE_RECEIPT)
+        _normalize_digest(_system_receipt()["receipt_id"])
     )
 
 
@@ -87,8 +97,17 @@ def test_documentation_closure_receipt_hashes_required_docs() -> None:
 
     assert set(doc_hashes) == set(REQUIRED_DOCS)
     for doc, expected in doc_hashes.items():
-        actual = hashlib.sha256(Path(doc).read_bytes()).hexdigest()
+        actual = _sha256(doc)
         assert actual == _normalize_digest(expected), doc
+
+
+def test_documentation_closure_receipt_hashes_generated_sources() -> None:
+    receipt = _receipt()
+    source_hashes = receipt["generated_source_sha256"]
+
+    for path, expected in source_hashes.items():
+        actual = _sha256(path)
+        assert actual == _normalize_digest(expected), path
 
 
 def test_documentation_checks_all_passed() -> None:

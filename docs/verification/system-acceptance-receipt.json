@@ -139,9 +139,9 @@
   "file_sha256": {
     "docs/verification/SYSTEM-ACCEPTANCE.md": "f333191b-52c01dcc-92e01215-b6fbba3a-af8bd98b-c7601574-d99c4e8b-b623635d",
     "tests/adversarial/test_system_acceptance_failure_routes.py": "d37a2774-eea73ca2-0b6bb6f5-a8d6b76b-76446bee-4ab24160-6df17751-45b76083",
-    "tests/e2e/test_system_acceptance_receipt.py": "23943066-098fa1ed-8118b306-a3d941f6-48bcae42-9871fa07-d300608f-39398b06"
+    "tests/e2e/test_system_acceptance_receipt.py": "6d1855e0-1337c8d4-67e262bb-18000afb-c8ee09c5-417198a5-02cf08c0-df0d1ff2"
   },
-  "git_head": "0e65c0f15105f54487cf2ea91bb4996a520d8f19",
+  "git_head": "04f68f738999bb73c5a533599c0fdad169034d84",
   "grants_authority": false,
   "limitations_machine_visible": true,
   "live_actions": 0,
@@ -159,7 +159,7 @@
       "WAIT_COMPUTE_NODE"
     ]
   },
-  "receipt_id": "f8f9398e-27be37fa-3266e749-57d000db-46aa2815-f6be384c-761ffdd8-62468ae5",
+  "receipt_id": "4bc23430-bff9f4e9-6661e528-640a3656-66b878f5-33a13610-45892770-86a35a1d",
   "restore_acceptance": {
     "canonical_writes": 0,
     "command": "make test plus tests/recovery/test_health_recovery.py::test_bounded_restore_drill_restores_unique_artifacts",

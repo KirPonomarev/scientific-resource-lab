@@ -1902,7 +1902,7 @@ The final report must list exact IDs and hashes, never subjective percentages.
 
 STATE_REVISION: 28
 PREVIOUS_STATE_SHA256: 4bd1fa42-8b40ce74-97cd97f6-28686539-6465312a-58ed3850-4dbdfcb8-605955b2
-CURRENT_STATE_SHA256: 0a114d30-9b791a67-f2a56e83-47c13bdf-d2da3d4b-a63962f2-861bbd81-2098b846
+CURRENT_STATE_SHA256: aa256cf2-3be46fc0-41f8e88e-a2e3c984-e6238f93-4bbeb7a0-6a0dd122-275760ea
 
 ## CURRENT_FACTS
 
@@ -1963,8 +1963,8 @@ state_capsule:
     - repository governance
     - operator-supplied V3.6 protocol
   new_primary_evidence:
-    - SystemAcceptanceReceipt f8f9398e-27be37fa-3266e749-57d000db-46aa2815-f6be384c-761ffdd8-62468ae5
-    - DocumentationClosureReceipt 5cada12e-fb16a845-09782ab8-47b21e1e-57a31f5a-e92c3c3b-c23b555d-31ae07ec
+    - SystemAcceptanceReceipt 4bc23430-bff9f4e9-6661e528-640a3656-66b878f5-33a13610-45892770-86a35a1d
+    - DocumentationClosureReceipt cc282752-4ca59271-7d0edcf6-7c3ff642-191ec034-167d5536-86f81b0a-dd7d2247
     - generated root documentation set complete for START-HERE, SYSTEM-ATLAS, SOLO-AGENT-RUNBOOK, CELL-MATRIX, CAPABILITY-CATALOG, CONTRACT-MATRIX, AUTHORITY-MATRIX, DATA-CLASSIFICATION, FAILURE-ROUTING, T7-OPERATIONS, COMPUTE-NODE, MARKET-INTEGRATION, SECURITY-INTEGRATION, TRADING-EXECUTION-BOUNDARY, PACK-AUTHORING, PACK-REVOCATION, RECOVERY-RUNBOOK and RELEASE-RUNBOOK
     - S26 checks PASS: solo docs, system docs, markdown structure, link check, public boundary and secret scan
     - documentation closure tests PASS
@@ -2064,10 +2064,10 @@ evidence_index:
     identity: ffcbdff9-2502a1f2-e709d3a7-7f71c65d-bf6d0365-05d6dd44-c0bbda84-501b5e96
   - claim: S25 full-system validation and chaos acceptance proven
     source: SystemAcceptanceReceipt/v1
-    identity: f8f9398e-27be37fa-3266e749-57d000db-46aa2815-f6be384c-761ffdd8-62468ae5
+    identity: 4bc23430-bff9f4e9-6661e528-640a3656-66b878f5-33a13610-45892770-86a35a1d
   - claim: S26 documentation closure and generated drift gates proven
     source: DocumentationClosureReceipt/v1
-    identity: 5cada12e-fb16a845-09782ab8-47b21e1e-57a31f5a-e92c3c3b-c23b555d-31ae07ec
+    identity: cc282752-4ca59271-7d0edcf6-7c3ff642-191ec034-167d5536-86f81b0a-dd7d2247
   - claim: Market mutation currently forbidden
     source: native operator bootstrap
     identity: 59ce6ff4c8b514c93d8d4b26d648ba6e7dd7b764
