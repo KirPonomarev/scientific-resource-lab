@@ -76,6 +76,9 @@ _A10_RECEIPT_PATH: Final[Path] = (
 _A11_RECEIPT_PATH: Final[Path] = (
     _REPO_ROOT / "docs" / "verification" / "srf-v3-7-a11-knowledge-graph-receipt.json"
 )
+_A12_RECEIPT_PATH: Final[Path] = (
+    _REPO_ROOT / "docs" / "verification" / "srf-v3-7-a12-discovery-dynamics-receipt.json"
+)
 _EXPECTED_A09_COMPONENTS: Final[tuple[str, ...]] = (
     "lean",
     "lake",
@@ -97,6 +100,15 @@ _EXPECTED_A11_COMPONENTS: Final[tuple[str, ...]] = (
     "cslib",
     "erdos_problems",
     "formal_conjectures",
+)
+_EXPECTED_A12_COMPONENTS: Final[tuple[str, ...]] = ("pysr", "pysindy", "pydmd")
+_EXPECTED_A12_REPLACED: Final[tuple[str, ...]] = (
+    "sr4mdl",
+    "operon",
+    "gplearn",
+    "ai_feynman",
+    "pykoopman",
+    "dysts",
 )
 
 
@@ -559,6 +571,109 @@ def _make_a11_smoke(component_id: str) -> Callable[[], str]:
     return _smoke
 
 
+def _load_a12_receipt() -> dict[str, Any]:
+    if not _A12_RECEIPT_PATH.exists():
+        raise RuntimeError(f"A12 receipt missing: {_A12_RECEIPT_PATH.relative_to(_REPO_ROOT)}")
+    receipt = json.loads(_A12_RECEIPT_PATH.read_text(encoding="utf-8"))
+    if not isinstance(receipt, dict):
+        raise RuntimeError("A12 receipt must be a JSON object")
+    return receipt
+
+
+def _validated_a12_receipt(component_id: str) -> dict[str, Any]:  # noqa: C901, PLR0912, PLR0915
+    receipt = _load_a12_receipt()
+    if receipt.get("schema_version") != "StageCompletionReceipt/v1":
+        raise RuntimeError("A12 receipt schema drifted")
+    if receipt.get("stage_id") != "A12" or receipt.get("result") != "PASS":
+        raise RuntimeError("A12 receipt is not a PASS receipt for stage A12")
+    if receipt.get("stage_closure") != "A12_ACTIVE":
+        raise RuntimeError("A12 receipt does not close A12_ACTIVE")
+    if receipt.get("remaining_internal_waits") != []:
+        raise RuntimeError("A12 receipt contains internal waits")
+    active = receipt.get("active_packs")
+    if active != list(_EXPECTED_A12_COMPONENTS):
+        raise RuntimeError("A12 active_packs do not match expected packs")
+    if component_id not in active:
+        raise RuntimeError(f"{component_id} is absent from A12 active_packs")
+
+    checks = {
+        str(item.get("check_id")): item
+        for item in receipt.get("checks", [])
+        if isinstance(item, dict)
+    }
+    if any(item.get("status") != "PASS" for item in checks.values()):
+        raise RuntimeError("A12 receipt contains a non-PASS check")
+
+    activation = checks.get("A12-01-real-discovery-dynamics-smoke")
+    if not isinstance(activation, dict) or not isinstance(
+        activation.get("activation_receipt"), dict
+    ):
+        raise RuntimeError("A12 activation receipt missing")
+    activation_receipt = activation["activation_receipt"]
+    if activation_receipt.get("active_pack_ids") != list(_EXPECTED_A12_COMPONENTS):
+        raise RuntimeError("A12 activation active pack ids mismatch")
+    if activation_receipt.get("formally_replaced_pack_ids") != list(_EXPECTED_A12_REPLACED):
+        raise RuntimeError("A12 formal replacement ids mismatch")
+    if (
+        activation_receipt.get("promotion_allowed") is not False
+        or activation_receipt.get("automatic_scientific_promotion") is not False
+        or activation_receipt.get("canonical_writes") != 0
+        or activation_receipt.get("grants_authority") is not False
+    ):
+        raise RuntimeError("A12 activation receipt is not authority-negative")
+
+    pack_receipts = activation_receipt.get("pack_receipts")
+    if not isinstance(pack_receipts, list) or len(pack_receipts) != len(_EXPECTED_A12_COMPONENTS):
+        raise RuntimeError("A12 pack receipt count mismatch")
+    by_id = {item.get("pack_id"): item for item in pack_receipts if isinstance(item, dict)}
+    if tuple(by_id) != _EXPECTED_A12_COMPONENTS:
+        raise RuntimeError("A12 pack receipts do not match expected order")
+    for pack_id, item in by_id.items():
+        if item.get("status") != "ACTIVE" or item.get("observed_above_null") is not True:
+            raise RuntimeError(f"A12 {pack_id} did not reach ACTIVE")
+        if (
+            item.get("promotion_allowed") is not False
+            or item.get("automatic_scientific_promotion") is not False
+            or item.get("canonical_writes") != 0
+            or item.get("grants_authority") is not False
+        ):
+            raise RuntimeError(f"A12 {pack_id} receipt is not authority-negative")
+        envelope = item.get("resource_envelope")
+        if not isinstance(envelope, dict) or envelope.get("bounded") is not True:
+            raise RuntimeError(f"A12 {pack_id} missing bounded resource envelope")
+        if not isinstance(item.get("candidate"), dict) or not isinstance(item.get("dataset"), dict):
+            raise RuntimeError(f"A12 {pack_id} missing candidate or dataset binding")
+        backend_versions = item.get("backend_versions")
+        if not isinstance(backend_versions, dict) or not backend_versions.get("python_package"):
+            raise RuntimeError(f"A12 {pack_id} missing backend version binding")
+        if pack_id == "pysr" and not backend_versions.get("julia"):
+            raise RuntimeError("A12 PySR receipt missing Julia version binding")
+
+    public = activation_receipt.get("public_benchmark_receipt")
+    if not isinstance(public, dict) or public.get("observed_above_null") is not True:
+        raise RuntimeError("A12 public benchmark receipt missing or inconclusive")
+
+    no_promotion = checks.get("A12-02-no-automatic-scientific-promotion")
+    if not isinstance(no_promotion, dict) or no_promotion.get("status") != "PASS":
+        raise RuntimeError("A12 no-promotion check missing or failed")
+    return receipt
+
+
+def _smoke_a12_receipt(component_id: str) -> str:
+    receipt = _validated_a12_receipt(component_id)
+    return (
+        f"A12 offline truth projection accepted {component_id} from "
+        f"{receipt['receipt_id']} with real discovery/dynamics receipts and null checks"
+    )
+
+
+def _make_a12_smoke(component_id: str) -> Callable[[], str]:
+    def _smoke() -> str:
+        return _smoke_a12_receipt(component_id)
+
+    return _smoke
+
+
 _SPECS: Final[tuple[ComponentSpec, ...]] = (
     ComponentSpec(
         "numpy",
@@ -822,6 +937,18 @@ _SPECS: Final[tuple[ComponentSpec, ...]] = (
         )
         for source_id in _EXPECTED_A11_COMPONENTS
     ),
+    *(
+        ComponentSpec(
+            pack_id,
+            "a12_discovery_dynamics",
+            "A12",
+            "stage_receipt",
+            activation_wait_state="WAIT_CAPABILITY",
+            current_v101_active=True,
+            smoke=_make_a12_smoke(pack_id),
+        )
+        for pack_id in _EXPECTED_A12_COMPONENTS
+    ),
     ComponentSpec(
         "production-ed25519-signer",
         "a04_transport",
@@ -883,6 +1010,9 @@ def _stage_receipt_probe(spec: ComponentSpec) -> tuple[bool, str | None, str | N
         elif spec.stage == "A11":
             receipt = _validated_a11_receipt(spec.component_id)
             receipt_path = _receipt_display_path(_A11_RECEIPT_PATH)
+        elif spec.stage == "A12":
+            receipt = _validated_a12_receipt(spec.component_id)
+            receipt_path = _receipt_display_path(_A12_RECEIPT_PATH)
         else:
             return False, None, f"stage receipt unsupported for {spec.stage}"
     except Exception as exc:
@@ -1013,6 +1143,16 @@ def build_truth_ledger() -> dict[str, Any]:
             f"{item['state']}:{item['component_id']}"
             for item in components
             if item["activation_stage"] == "A11" and item["state"] != "ACTIVE"
+        ],
+        "a12_active_inventory_observed": [
+            item["component_id"]
+            for item in components
+            if item["activation_stage"] == "A12" and item["state"] == "ACTIVE"
+        ],
+        "a12_parked_blockers": [
+            f"{item['state']}:{item['component_id']}"
+            for item in components
+            if item["activation_stage"] == "A12" and item["state"] != "ACTIVE"
         ],
         "a07_parked_blockers": [f"WAIT_LICENSE:python-flint:{FLINT_WAIT_REASON}"],
         "production_versus_fixture_axis": [

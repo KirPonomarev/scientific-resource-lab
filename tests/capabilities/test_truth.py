@@ -5,6 +5,7 @@ import json
 import subprocess
 import sys
 from pathlib import Path
+from typing import Any, cast
 
 import pytest
 
@@ -75,7 +76,7 @@ def test_a09_truth_projection_is_offline_and_receipt_backed(
         )
 
     monkeypatch.setattr(truth, "_SPECS", a09_specs)
-    monkeypatch.setattr(truth.shutil, "which", forbidden)
+    monkeypatch.setattr(cast(Any, truth).shutil, "which", forbidden)
     monkeypatch.setattr(subprocess, "run", forbidden)
 
     first = truth.build_truth_ledger()
@@ -149,7 +150,7 @@ def test_a10_truth_projection_is_offline_and_receipt_backed(
     monkeypatch.setattr(truth, "_SPECS", a10_specs)
     monkeypatch.setattr(truth, "_A10_RECEIPT_PATH", receipt_path)
     monkeypatch.setattr(truth, "independent_prover_pin_manifest_hash", lambda: "fixture-a10-pins")
-    monkeypatch.setattr(truth.shutil, "which", forbidden)
+    monkeypatch.setattr(cast(Any, truth).shutil, "which", forbidden)
     monkeypatch.setattr(subprocess, "run", forbidden)
 
     first = truth.build_truth_ledger()
@@ -225,7 +226,7 @@ def test_a11_truth_projection_is_offline_and_receipt_backed(
 
     monkeypatch.setattr(truth, "_SPECS", a11_specs)
     monkeypatch.setattr(truth, "_A11_RECEIPT_PATH", receipt_path)
-    monkeypatch.setattr(truth.shutil, "which", forbidden)
+    monkeypatch.setattr(cast(Any, truth).shutil, "which", forbidden)
     monkeypatch.setattr(subprocess, "run", forbidden)
 
     first = truth.build_truth_ledger()
@@ -233,6 +234,69 @@ def test_a11_truth_projection_is_offline_and_receipt_backed(
 
     assert first["a11_active_inventory_observed"] == sources
     assert second["a11_active_inventory_observed"] == first["a11_active_inventory_observed"]
+    assert {item["probe_kind"] for item in first["components"]} == {"stage_receipt"}
+
+
+def test_a12_truth_projection_is_offline_and_receipt_backed(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    packs = ["pysr", "pysindy", "pydmd"]
+    replaced = ["sr4mdl", "operon", "gplearn", "ai_feynman", "pykoopman", "dysts"]
+    receipt = {
+        "schema_version": "StageCompletionReceipt/v1",
+        "stage_id": "A12",
+        "result": "PASS",
+        "stage_closure": "A12_ACTIVE",
+        "active_packs": packs,
+        "parked_packs": [],
+        "remaining_internal_waits": [],
+        "remaining_external_waits": [],
+        "checks": [
+            {
+                "check_id": "A12-01-real-discovery-dynamics-smoke",
+                "status": "PASS",
+                "activation_receipt": {
+                    "schema_version": "DiscoveryDynamicsActivationReceipt/v1",
+                    "active_pack_ids": packs,
+                    "formally_replaced_pack_ids": replaced,
+                    "pack_receipts": [_a12_pack_receipt(pack_id) for pack_id in packs],
+                    "public_benchmark_receipt": {"observed_above_null": True},
+                    "promotion_allowed": False,
+                    "automatic_scientific_promotion": False,
+                    "canonical_writes": 0,
+                    "grants_authority": False,
+                },
+            },
+            {
+                "check_id": "A12-02-no-automatic-scientific-promotion",
+                "status": "PASS",
+            },
+        ],
+        "canonical_writes": 0,
+        "grants_authority": False,
+        "receipt_id": "sha256:fixture-a12-receipt",
+    }
+    receipt_path = tmp_path / "a12-receipt.json"
+    receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+    a12_specs = tuple(item for item in truth._SPECS if item.stage == "A12")
+
+    def forbidden(*_args: object, **_kwargs: object) -> object:
+        raise AssertionError(
+            "A12 truth projection must not import discovery engines or spawn subprocesses"
+        )
+
+    monkeypatch.setattr(truth, "_SPECS", a12_specs)
+    monkeypatch.setattr(truth, "_A12_RECEIPT_PATH", receipt_path)
+    monkeypatch.setattr(cast(Any, truth).importlib, "import_module", forbidden)
+    monkeypatch.setattr(cast(Any, truth).shutil, "which", forbidden)
+    monkeypatch.setattr(subprocess, "run", forbidden)
+
+    first = truth.build_truth_ledger()
+    second = truth.build_truth_ledger()
+
+    assert first["a12_active_inventory_observed"] == packs
+    assert second["a12_active_inventory_observed"] == first["a12_active_inventory_observed"]
     assert {item["probe_kind"] for item in first["components"]} == {"stage_receipt"}
 
 
@@ -249,6 +313,25 @@ def _a10_proof_check(check_id: str, prover_id: str) -> dict[str, object]:
             "version_probe": {"returncode": 0},
             "proof_probe": {"returncode": 0},
         },
+    }
+
+
+def _a12_pack_receipt(pack_id: str) -> dict[str, object]:
+    backend_versions: dict[str, object] = {"python_package": "fixture"}
+    if pack_id == "pysr":
+        backend_versions["julia"] = "julia version fixture"
+    return {
+        "pack_id": pack_id,
+        "status": "ACTIVE",
+        "observed_above_null": True,
+        "promotion_allowed": False,
+        "automatic_scientific_promotion": False,
+        "canonical_writes": 0,
+        "grants_authority": False,
+        "resource_envelope": {"bounded": True},
+        "candidate": {"kind": "fixture"},
+        "dataset": {"kind": "fixture"},
+        "backend_versions": backend_versions,
     }
 
 

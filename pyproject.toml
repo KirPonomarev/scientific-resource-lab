@@ -109,15 +109,21 @@ Repository = "https://github.com/KirPonomarev/scientific-resource-lab"
 Changelog = "https://github.com/KirPonomarev/scientific-resource-lab/blob/main/CHANGELOG.md"
 
 # Optional extras. The ``bayesian`` extra (WP-H71a) pulls pymc + arviz for the
-# bounded one-chain posterior adapter. These are NOT default runtime deps: their
-# transitive closure includes ``cons`` (LGPL-3.0-only, a hard import of
-# pytensor), which the SRL pack policy denies. Keeping them in an opt-in extra
-# keeps the default install closure (and ``license_inventory``) clean. Install
-# with ``uv sync --extra bayesian`` to build/test the adapter. See ADR-0008.
+# bounded one-chain posterior adapter. The ``discovery`` extra (A12) pulls the
+# PySR/PySINDy/PyDMD activation engines and still requires an explicit Julia
+# executable for the PySR smoke gate. These are NOT default runtime deps: their
+# broader transitive closures stay opt-in so the default install closure (and
+# ``license_inventory``) remains clean. Install with ``uv sync --extra bayesian``
+# or ``uv sync --extra discovery`` to build/test those adapters. See ADR-0008.
 [project.optional-dependencies]
 bayesian = [
     "arviz>=0.20,<1",
     "pymc>=5.20,<6",
+]
+discovery = [
+    "pydmd>=2025.8,<2026",
+    "pysindy>=2.0,<3",
+    "pysr>=1.5,<2",
 ]
 
 # Hatchling build targets. The import package (srl) differs from the

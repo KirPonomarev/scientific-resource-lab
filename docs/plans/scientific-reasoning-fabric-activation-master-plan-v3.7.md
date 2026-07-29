@@ -1125,6 +1125,21 @@ current_facts:
   a11_live_fetch_count: 10
   a11_offline_replay_count: 10
   a11_cache_root_role: T7_SECURE_SESSION_CACHE
+  current_active_discovery_dynamics:
+    - pysr
+    - pysindy
+    - pydmd
+  a12_discovery_dynamics: ACTIVE
+  a12_receipt_ref: docs/verification/srf-v3-7-a12-discovery-dynamics-receipt.json
+  a12_activation_receipt_ref: embedded_in_a12_receipt
+  a12_truth_projection: OFFLINE_HASH_BOUND_RECEIPT
+  a12_formally_replaced_packs:
+    - sr4mdl
+    - operon
+    - gplearn
+    - ai_feynman
+    - pykoopman
+    - dysts
   production_signer: WAIT_AUTHORITY
   production_ed25519_transport_interface: ACTIVE
   fixture_hmac_production_path: REJECTED
@@ -1154,9 +1169,9 @@ current_facts:
 
 ~~~yaml
 execution_state:
-  status: A11_ACTIVE_READY_FOR_A12_WITH_PARKED_PROTECTED_LANES
-  current_stage: A12
-  next_stage: A12_activate_discovery_and_dynamics
+  status: A12_ACTIVE_READY_FOR_A13_WITH_PARKED_PROTECTED_LANES
+  current_stage: A13
+  next_stage: A13_activate_applied_simulation_and_optimization
   completed_stages:
     - A00
     - A01
@@ -1168,6 +1183,7 @@ execution_state:
     - A09
     - A10
     - A11
+    - A12
   completed_stage_lanes:
     - A07_sympy_mpmath_core
   parked_stages:
@@ -1183,11 +1199,11 @@ execution_state:
     - WAIT_COMPUTE_TARGET:A05_BIND_NATIVE_SANDBOX_COMPUTE_TARGET
     - WAIT_LICENSE:A07_PYTHON_FLINT_LGPL_CLOSURE
     - WAIT_AUTHORITY:A09_BIND_PINNED_LEAN_MATHLIB_PROJECT_TO_T7
-  active_branch_or_null: codex/srf-a11-knowledge-graph
+  active_branch_or_null: codex/srf-a12-discovery-dynamics
   active_pr_or_null: null
   writer_lease_or_null: null
   blocker_or_null: WAIT_LICENSE:A07_PYTHON_FLINT_LGPL_CLOSURE
-  next_executable_action: start A12 discovery and dynamics activation while keeping T7-backed persistence, native compute binding, native production signing, FLINT license closure and A09 T7 formal toolchain binding parked until exact authority/evidence exists
+  next_executable_action: start A13 applied simulation and optimization activation while keeping T7-backed persistence, native compute binding, native production signing, FLINT license closure and A09 T7 formal toolchain binding parked until exact authority/evidence exists
   updated_at: 2026-07-29
 ~~~
 
