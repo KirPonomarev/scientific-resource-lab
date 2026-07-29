@@ -331,3 +331,23 @@ jobs:
           path: .cache/srl-a12-julia-depot
           key: >-
             a12-${{ runner.os }}-${{ runner.arch }}-julia-1.12.6-${{ hashFiles('pyproject.toml', 'uv.lock') }}
+
+  a13-applied-science:
+    name: A13 applied science gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
+        with:
+          persist-credentials: false
+      - name: Setup uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9  # v9.0.0
+        with:
+          enable-cache: true
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+      - name: Install dependencies (locked)
+        run: uv sync --locked
+      - name: V3.7 A13 applied science gate
+        run: uv run python scripts/checks/srf-v37-a13-gate.py

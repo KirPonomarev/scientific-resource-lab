@@ -56,6 +56,11 @@ Current v1.0.1 active inventory reproduced by the ledger:
 | `pysr` | `a12_discovery_dynamics` | `A12` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
 | `pysindy` | `a12_discovery_dynamics` | `A12` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
 | `pydmd` | `a12_discovery_dynamics` | `A12` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
+| `ripser` | `a13_applied_science` | `A13` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
+| `pyriemann` | `a13_applied_science` | `A13` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
+| `cvxpy` | `a13_applied_science` | `A13` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
+| `native_bayesian_conjugate` | `a13_applied_science` | `A13` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
+| `native_causal_backdoor` | `a13_applied_science` | `A13` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
 | `production-ed25519-signer` | `a04_transport` | `A04` | `WAIT_AUTHORITY` | `missing_or_protected_capability` |
 | `t2-t3-enforced-sandbox` | `a05_sandbox` | `A05` | `WAIT_COMPUTE_TARGET` | `missing_or_protected_capability` |
 | `t7-binding` | `a02_t7` | `A02` | `WAIT_T7_BINDING` | `missing_or_protected_capability` |

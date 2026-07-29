@@ -300,6 +300,89 @@ def test_a12_truth_projection_is_offline_and_receipt_backed(
     assert {item["probe_kind"] for item in first["components"]} == {"stage_receipt"}
 
 
+def test_a13_truth_projection_is_offline_and_receipt_backed(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    packs = [
+        "ripser",
+        "pyriemann",
+        "cvxpy",
+        "native_bayesian_conjugate",
+        "native_causal_backdoor",
+    ]
+    replaced = [
+        "gudhi",
+        "geomstats",
+        "pot",
+        "pymanopt",
+        "keplermapper",
+        "toponetx",
+        "regina",
+        "pymc",
+        "arviz",
+        "dowhy",
+        "tigramite",
+        "econml",
+        "jaxopt",
+        "botorch",
+    ]
+    receipt = {
+        "schema_version": "StageCompletionReceipt/v1",
+        "stage_id": "A13",
+        "result": "PASS",
+        "stage_closure": "A13_ACTIVE",
+        "active_packs": packs,
+        "parked_packs": [],
+        "remaining_internal_waits": [],
+        "remaining_external_waits": [],
+        "checks": [
+            {
+                "check_id": "A13-01-real-applied-science-workloads",
+                "status": "PASS",
+                "activation_receipt": {
+                    "schema_version": "AppliedScienceActivationReceipt/v1",
+                    "active_pack_ids": packs,
+                    "formally_replaced_pack_ids": replaced,
+                    "workload_receipts": [_a13_workload_receipt(pack_id) for pack_id in packs],
+                    "promotion_allowed": False,
+                    "automatic_scientific_promotion": False,
+                    "canonical_writes": 0,
+                    "grants_authority": False,
+                },
+            },
+            {
+                "check_id": "A13-02-diagnostics-falsification-license-and-no-promotion",
+                "status": "PASS",
+            },
+        ],
+        "canonical_writes": 0,
+        "grants_authority": False,
+        "receipt_id": "sha256:fixture-a13-receipt",
+    }
+    receipt_path = tmp_path / "a13-receipt.json"
+    receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+    a13_specs = tuple(item for item in truth._SPECS if item.stage == "A13")
+
+    def forbidden(*_args: object, **_kwargs: object) -> object:
+        raise AssertionError(
+            "A13 truth projection must not import applied engines or spawn subprocesses"
+        )
+
+    monkeypatch.setattr(truth, "_SPECS", a13_specs)
+    monkeypatch.setattr(truth, "_A13_RECEIPT_PATH", receipt_path)
+    monkeypatch.setattr(cast(Any, truth).importlib, "import_module", forbidden)
+    monkeypatch.setattr(cast(Any, truth).shutil, "which", forbidden)
+    monkeypatch.setattr(subprocess, "run", forbidden)
+
+    first = truth.build_truth_ledger()
+    second = truth.build_truth_ledger()
+
+    assert first["a13_active_inventory_observed"] == packs
+    assert second["a13_active_inventory_observed"] == first["a13_active_inventory_observed"]
+    assert {item["probe_kind"] for item in first["components"]} == {"stage_receipt"}
+
+
 def _a10_proof_check(check_id: str, prover_id: str) -> dict[str, object]:
     return {
         "check_id": check_id,
@@ -333,6 +416,47 @@ def _a12_pack_receipt(pack_id: str) -> dict[str, object]:
         "dataset": {"kind": "fixture"},
         "backend_versions": backend_versions,
     }
+
+
+def _a13_workload_receipt(pack_id: str) -> dict[str, object]:
+    base: dict[str, object] = {
+        "pack_id": pack_id,
+        "status": "ACTIVE",
+        "promotion_allowed": False,
+        "automatic_scientific_promotion": False,
+        "canonical_writes": 0,
+        "grants_authority": False,
+        "resource_envelope": {"bounded": True},
+        "dataset": {"kind": "fixture"},
+        "backend_versions": {"backend": "fixture"},
+        "causal_identification": "not_applicable",
+        "diagnostics": {},
+    }
+    if pack_id == "ripser":
+        base["diagnostics"] = {
+            "circle_long_lived_h1": 1,
+            "control_long_lived_h1": 0,
+        }
+    elif pack_id == "native_bayesian_conjugate":
+        base["diagnostics"] = {
+            "convergence_claim": False,
+            "rhat": None,
+            "ess": None,
+            "posterior_predictive_tail_probability": 0.5,
+        }
+    elif pack_id == "native_causal_backdoor":
+        base["causal_identification"] = "identified"
+        base["diagnostics"] = {
+            "adjusted_treatment_effect": 2.0,
+            "permuted_treatment_effect": 0.0,
+        }
+    elif pack_id == "cvxpy":
+        base["diagnostics"] = {
+            "solve_status": "optimal",
+            "license_verified": True,
+            "denied_solvers": ["cbc", "glpk"],
+        }
+    return base
 
 
 def _a11_source_result(endpoint_id: str) -> dict[str, object]:
