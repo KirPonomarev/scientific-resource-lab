@@ -28,7 +28,7 @@ uv run srlab doctor
 Expected output looks like:
 
 ```json
-{"platform":"...","python":"3.12.x","schema_version":"DoctorReport/v1","srl_version":"0.1.0","status":"ok"}
+{"platform":"...","python":"3.12.x","schema_version":"DoctorReport/v1","srl_version":"1.0.1","status":"ok"}
 ```
 
 ## 3. Regenerate the synthetic fixtures

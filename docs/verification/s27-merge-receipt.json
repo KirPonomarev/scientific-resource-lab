@@ -1,0 +1,46 @@
+{
+  "schema_version": "MergeReceipt/v1",
+  "stage_id": "S27",
+  "mission_id": "build-scientific-reasoning-fabric-v1",
+  "result": "PASS",
+  "pull_request": {
+    "number": 47,
+    "url": "https://github.com/KirPonomarev/scientific-resource-lab/pull/47",
+    "state": "MERGED",
+    "merged_at": "2026-07-29T04:08:16Z",
+    "base_ref_oid": "947cbb4515307b54fe3eb9b6366cdb392361c867",
+    "head_ref_oid": "031683f4cc9eafa656b9224afd32ccc5388563a1",
+    "merge_commit": "ce08dd0d389354ae94680c149eabe1fd80cb08a3",
+    "merge_method": "squash"
+  },
+  "candidate_checks": {
+    "pr_head": "031683f4cc9eafa656b9224afd32ccc5388563a1",
+    "status": "PASS",
+    "evidence": "gh pr checks 47 --watch=false returned all pass before merge"
+  },
+  "main_post_merge_workflows": {
+    "head_sha": "ce08dd0d389354ae94680c149eabe1fd80cb08a3",
+    "status": "PASS",
+    "workflows": [
+      "storage",
+      "public-boundary",
+      "fixtures",
+      "mcp",
+      "knowledge",
+      "security",
+      "docs",
+      "integration",
+      "cli",
+      "contracts"
+    ]
+  },
+  "canonical_writes": 0,
+  "grants_authority": false,
+  "live_actions": 0,
+  "protected_actions": {
+    "performed": [],
+    "wait_states": []
+  },
+  "next_stage": "S28",
+  "receipt_id": "156b47b4-8a94ba6d-4fcbebe0-8d4acedc-85cb93ea-05f20072-f3161740-28db05bd"
+}

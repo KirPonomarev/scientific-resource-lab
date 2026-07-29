@@ -11,6 +11,14 @@ is supported. See `README.md` and `GOVERNANCE.md` for the evidence rules.
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-07-29
+
+Scientific Reasoning Fabric V3.6 execution release: contract-first SRF runtime
+surface, solo-agent `labctl` workflow, authority-negative bridge contracts for
+Market/Security/DualContour lanes, full-system validation and chaos receipts,
+generated documentation closure, and release evidence with residual protected
+WAIT states kept machine-visible.
+
 ## [1.0.0] - 2026-07-28
 
 Standalone Scientific Resource Lab with stable LabExportPacket/v1:
