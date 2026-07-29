@@ -65,7 +65,11 @@ license = "Apache-2.0"
 #   both 3.11 and 3.12 without a cross-cutting floor bump, the bounds stay inside
 #   the 3.11-compatible family (pymc 5.x, arviz 0.23.x). The adapter uses only
 #   the stable ``pm.sample`` / ``az.summary`` surface common to both families.
+# - certifi (A11): portable CA bundle for verified HTTPS in the stdlib urllib
+#   retriever. No auth material is read; this avoids platform-specific trust-store
+#   drift while keeping TLS verification enabled for public source adapters.
 dependencies = [
+    "certifi>=2024.8.30",
     "clarabel>=0.11.1",
     "cryptography>=43",
     "cvxpy>=1.9.2",

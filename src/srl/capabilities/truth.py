@@ -73,6 +73,9 @@ _A09_RECEIPT_PATH: Final[Path] = (
 _A10_RECEIPT_PATH: Final[Path] = (
     _REPO_ROOT / "docs" / "verification" / "srf-v3-7-a10-independent-provers-receipt.json"
 )
+_A11_RECEIPT_PATH: Final[Path] = (
+    _REPO_ROOT / "docs" / "verification" / "srf-v3-7-a11-knowledge-graph-receipt.json"
+)
 _EXPECTED_A09_COMPONENTS: Final[tuple[str, ...]] = (
     "lean",
     "lake",
@@ -83,6 +86,18 @@ _EXPECTED_A09_COMPONENTS: Final[tuple[str, ...]] = (
 )
 _EXPECTED_A10_COMPONENTS: Final[tuple[str, ...]] = ("rocq", "isabelle", "hol4")
 _EXPECTED_A10_TRANSLATION_MANIFESTS: Final[int] = 3
+_EXPECTED_A11_COMPONENTS: Final[tuple[str, ...]] = (
+    "openalex",
+    "crossref",
+    "arxiv",
+    "oeis",
+    "opencitations",
+    "zbmath",
+    "lmfdb",
+    "cslib",
+    "erdos_problems",
+    "formal_conjectures",
+)
 
 
 @dataclass(frozen=True)
@@ -446,6 +461,104 @@ def _smoke_a10_hol4() -> str:
     return _smoke_a10_receipt("hol4")
 
 
+def _load_a11_receipt() -> dict[str, Any]:
+    if not _A11_RECEIPT_PATH.exists():
+        raise RuntimeError(f"A11 receipt missing: {_A11_RECEIPT_PATH.relative_to(_REPO_ROOT)}")
+    receipt = json.loads(_A11_RECEIPT_PATH.read_text(encoding="utf-8"))
+    if not isinstance(receipt, dict):
+        raise RuntimeError("A11 receipt must be a JSON object")
+    return receipt
+
+
+def _validated_a11_receipt(component_id: str) -> dict[str, Any]:  # noqa: C901, PLR0912, PLR0915
+    receipt = _load_a11_receipt()
+    if receipt.get("schema_version") != "StageCompletionReceipt/v1":
+        raise RuntimeError("A11 receipt schema drifted")
+    if receipt.get("stage_id") != "A11" or receipt.get("result") != "PASS":
+        raise RuntimeError("A11 receipt is not a PASS receipt for stage A11")
+    if receipt.get("stage_closure") != "A11_ACTIVE":
+        raise RuntimeError("A11 receipt does not close A11_ACTIVE")
+    if receipt.get("remaining_internal_waits") != []:
+        raise RuntimeError("A11 receipt contains internal waits")
+    active = receipt.get("active_packs")
+    if not isinstance(active, list) or set(active) != set(_EXPECTED_A11_COMPONENTS):
+        raise RuntimeError("A11 active_packs do not match expected sources")
+    if component_id not in active:
+        raise RuntimeError(f"{component_id} is absent from A11 active_packs")
+
+    checks = {
+        str(item.get("check_id")): item
+        for item in receipt.get("checks", [])
+        if isinstance(item, dict)
+    }
+    if any(item.get("status") != "PASS" for item in checks.values()):
+        raise RuntimeError("A11 receipt contains a non-PASS check")
+
+    admission = checks.get("A11-01-source-policy-admission")
+    if not isinstance(admission, dict) or admission.get("active_sources") != list(
+        _EXPECTED_A11_COMPONENTS
+    ):
+        raise RuntimeError("A11 source policy admission does not match expected sources")
+
+    live = checks.get("A11-02-live-source-probes-and-replay")
+    if not isinstance(live, dict):
+        raise RuntimeError("A11 live source check missing")
+    source_results = live.get("source_results")
+    if not isinstance(source_results, list) or len(source_results) != len(_EXPECTED_A11_COMPONENTS):
+        raise RuntimeError("A11 source result count mismatch")
+    by_endpoint = {
+        item.get("endpoint_id"): item for item in source_results if isinstance(item, dict)
+    }
+    if set(by_endpoint) != set(_EXPECTED_A11_COMPONENTS):
+        raise RuntimeError("A11 source result endpoints mismatch")
+    for endpoint_id, item in by_endpoint.items():
+        live_receipt = item.get("live_query_receipt")
+        replay_receipt = item.get("offline_replay_receipt")
+        if not isinstance(live_receipt, dict) or not isinstance(replay_receipt, dict):
+            raise RuntimeError(f"A11 {endpoint_id} query receipts missing")
+        if live_receipt.get("endpoint_id") != endpoint_id:
+            raise RuntimeError(f"A11 {endpoint_id} live receipt endpoint mismatch")
+        if replay_receipt.get("endpoint_id") != endpoint_id:
+            raise RuntimeError(f"A11 {endpoint_id} replay receipt endpoint mismatch")
+        if live_receipt.get("cached") is not False:
+            raise RuntimeError(f"A11 {endpoint_id} live receipt was not a live fetch")
+        if replay_receipt.get("cached") is not True:
+            raise RuntimeError(f"A11 {endpoint_id} replay receipt was not cached")
+        if live_receipt.get("response_sha256") != replay_receipt.get("response_sha256"):
+            raise RuntimeError(f"A11 {endpoint_id} live/replay response hash mismatch")
+        if not item.get("record_ids") or not item.get("source_uris"):
+            raise RuntimeError(f"A11 {endpoint_id} parser emitted no records")
+
+    graph = checks.get("A11-03-knowledge-graph-taint-and-citation-contract")
+    if not isinstance(graph, dict) or not isinstance(graph.get("manifest"), dict):
+        raise RuntimeError("A11 graph manifest missing")
+    manifest = graph["manifest"]
+    if set(manifest.get("active_source_ids", [])) != set(_EXPECTED_A11_COMPONENTS):
+        raise RuntimeError("A11 graph manifest active sources mismatch")
+    if manifest.get("wait_source_ids") != []:
+        raise RuntimeError("A11 graph manifest contains WAIT sources")
+    if not manifest.get("prompt_injection_fact_ids"):
+        raise RuntimeError("A11 graph manifest did not quarantine malicious corpus")
+    if manifest.get("raw_corpus_in_privileged_prompt") != 0:
+        raise RuntimeError("A11 graph manifest allowed raw corpus in privileged prompt")
+    return receipt
+
+
+def _smoke_a11_receipt(component_id: str) -> str:
+    receipt = _validated_a11_receipt(component_id)
+    return (
+        f"A11 offline truth projection accepted {component_id} from "
+        f"{receipt['receipt_id']} with live source receipts, replay hashes and taint checks"
+    )
+
+
+def _make_a11_smoke(component_id: str) -> Callable[[], str]:
+    def _smoke() -> str:
+        return _smoke_a11_receipt(component_id)
+
+    return _smoke
+
+
 _SPECS: Final[tuple[ComponentSpec, ...]] = (
     ComponentSpec(
         "numpy",
@@ -697,6 +810,18 @@ _SPECS: Final[tuple[ComponentSpec, ...]] = (
         current_v101_active=True,
         smoke=_smoke_a10_hol4,
     ),
+    *(
+        ComponentSpec(
+            source_id,
+            "a11_knowledge_graph",
+            "A11",
+            "stage_receipt",
+            activation_wait_state="WAIT_CAPABILITY",
+            current_v101_active=True,
+            smoke=_make_a11_smoke(source_id),
+        )
+        for source_id in _EXPECTED_A11_COMPONENTS
+    ),
     ComponentSpec(
         "production-ed25519-signer",
         "a04_transport",
@@ -755,6 +880,9 @@ def _stage_receipt_probe(spec: ComponentSpec) -> tuple[bool, str | None, str | N
         elif spec.stage == "A10":
             receipt = _validated_a10_receipt(spec.component_id)
             receipt_path = _receipt_display_path(_A10_RECEIPT_PATH)
+        elif spec.stage == "A11":
+            receipt = _validated_a11_receipt(spec.component_id)
+            receipt_path = _receipt_display_path(_A11_RECEIPT_PATH)
         else:
             return False, None, f"stage receipt unsupported for {spec.stage}"
     except Exception as exc:
@@ -875,6 +1003,16 @@ def build_truth_ledger() -> dict[str, Any]:
             f"{item['state']}:{item['component_id']}"
             for item in components
             if item["activation_stage"] == "A10" and item["state"] != "ACTIVE"
+        ],
+        "a11_active_inventory_observed": [
+            item["component_id"]
+            for item in components
+            if item["activation_stage"] == "A11" and item["state"] == "ACTIVE"
+        ],
+        "a11_parked_blockers": [
+            f"{item['state']}:{item['component_id']}"
+            for item in components
+            if item["activation_stage"] == "A11" and item["state"] != "ACTIVE"
         ],
         "a07_parked_blockers": [f"WAIT_LICENSE:python-flint:{FLINT_WAIT_REASON}"],
         "production_versus_fixture_axis": [

@@ -1,9 +1,10 @@
-"""P0 knowledge-adapter policy descriptors (data only, no live calls).
+"""A11 knowledge-adapter policy descriptors (data only, no live calls).
 
 This module declares the conservative egress policy for the four P0 knowledge
-endpoints (OpenAlex, Crossref, arXiv, OEIS) as a canonical JSON document that
-a :class:`~srl.knowledge.retriever.PolicyRegistry` loads. It is **data only**:
-no live network call is made here, and no adapter performs a fetch at import.
+endpoints plus the A11 public mathematical knowledge sources as a canonical
+JSON document that a :class:`~srl.knowledge.retriever.PolicyRegistry` loads.
+It is **data only**: no live network call is made here, and no adapter performs
+a fetch at import.
 
 Each descriptor carries conservative defaults:
 
@@ -29,7 +30,7 @@ from typing import Final
 
 from srl.knowledge.retriever import ENDPOINT_POLICY_SCHEMA_VERSION, PolicyRegistry
 
-# Conservative defaults shared by every P0 endpoint.
+# Conservative defaults shared by every public endpoint.
 _P0_RATE_LIMIT_PER_MINUTE: Final[int] = 10
 _P0_BYTE_BUDGET: Final[int] = 50 * 1024 * 1024  # 50 MiB
 _P0_COST_BUDGET_UNITS: Final[int] = 1000
@@ -63,6 +64,30 @@ _ARXIV_LICENSE_SHA256: Final[str] = (
 # SHA-256("OEIS: Creative Commons Attribution-NonCommercial 3.0")
 _OEIS_LICENSE_SHA256: Final[str] = (
     "sha256:c3d4e5f60718293041a5b6c7d8e9f0a1b2c3d4e5f6071829304a5b6c7d8e9f0a"
+)
+# SHA-256("OpenCitations Index v2: public citation metadata API; attribution required")
+_OPENCITATIONS_LICENSE_SHA256: Final[str] = (
+    "sha256:2c0ef475e0e7143013727ca95019a387d2acc4d98f43b332be7b7734b3c98101"
+)
+# SHA-256("zbMATH Open API: mathematical bibliographic metadata; attribution required")
+_ZBMATH_LICENSE_SHA256: Final[str] = (
+    "sha256:4649e56de17cf48ae493dac61bc67c9dae53aab2f12852f38e4af33b915a7352"
+)
+# SHA-256("LMFDB API: public mathematical database metadata; attribution required")
+_LMFDB_LICENSE_SHA256: Final[str] = (
+    "sha256:ce00e1d8c2700b35423b1db2fd14d52a179fbdd248878c0bdc462c049ae27011"
+)
+# SHA-256("CSLib pinned GitHub commit metadata: Apache-2.0 public repository metadata")
+_CSLIB_LICENSE_SHA256: Final[str] = (
+    "sha256:b2cee14e7ad3d50214237acb81570cb22cbfb046befdf83b70b243c8e303317c"
+)
+# SHA-256("Erdos Problems pinned GitHub commit metadata: public repository metadata")
+_ERDOS_LICENSE_SHA256: Final[str] = (
+    "sha256:80f5ebe01d4362209c2df14ffa75f6384c1116f639f28f72b72336381a47cdee"
+)
+# SHA-256("Formal Conjectures pinned GitHub commit metadata: Apache-2.0 public repository metadata")
+_FORMAL_CONJECTURES_LICENSE_SHA256: Final[str] = (
+    "sha256:0fc16ac8604f21860310cee5ec770461d0adf3ef4c4eb11ac3a3424dc4e7cdd6"
 )
 
 # The canonical registry document. This is the data the
@@ -123,6 +148,88 @@ P0_ENDPOINT_POLICY_REGISTRY: Final[dict[str, object]] = {
             "attribution_text": (
                 "Data from the On-Line Encyclopedia of Integer Sequences "
                 "(https://oeis.org), licensed under CC BY-NC 3.0."
+            ),
+            "retention_days": _P0_RETENTION_DAYS,
+        },
+        {
+            "endpoint_id": "opencitations",
+            "base_url": "https://api.opencitations.net/index/v2",
+            "rate_limit_per_minute": _P0_RATE_LIMIT_PER_MINUTE,
+            "byte_budget": _P0_BYTE_BUDGET,
+            "cost_budget_units": _P0_COST_BUDGET_UNITS,
+            "license_terms_sha256": _OPENCITATIONS_LICENSE_SHA256,
+            "attribution_required": True,
+            "attribution_text": (
+                "Citation metadata from OpenCitations Index "
+                "(https://opencitations.net/index), public API attribution required."
+            ),
+            "retention_days": _P0_RETENTION_DAYS,
+        },
+        {
+            "endpoint_id": "zbmath",
+            "base_url": "https://api.zbmath.org/v1",
+            "rate_limit_per_minute": _P0_RATE_LIMIT_PER_MINUTE,
+            "byte_budget": _P0_BYTE_BUDGET,
+            "cost_budget_units": _P0_COST_BUDGET_UNITS,
+            "license_terms_sha256": _ZBMATH_LICENSE_SHA256,
+            "attribution_required": True,
+            "attribution_text": (
+                "Metadata from zbMATH Open (https://zbmath.org), public API attribution required."
+            ),
+            "retention_days": _P0_RETENTION_DAYS,
+        },
+        {
+            "endpoint_id": "lmfdb",
+            "base_url": "https://www.lmfdb.org/api",
+            "rate_limit_per_minute": _P0_RATE_LIMIT_PER_MINUTE,
+            "byte_budget": _P0_BYTE_BUDGET,
+            "cost_budget_units": _P0_COST_BUDGET_UNITS,
+            "license_terms_sha256": _LMFDB_LICENSE_SHA256,
+            "attribution_required": True,
+            "attribution_text": (
+                "Metadata from the LMFDB API (https://www.lmfdb.org), public "
+                "mathematical database attribution required."
+            ),
+            "retention_days": _P0_RETENTION_DAYS,
+        },
+        {
+            "endpoint_id": "cslib",
+            "base_url": "https://api.github.com",
+            "rate_limit_per_minute": _P0_RATE_LIMIT_PER_MINUTE,
+            "byte_budget": _P0_BYTE_BUDGET,
+            "cost_budget_units": _P0_COST_BUDGET_UNITS,
+            "license_terms_sha256": _CSLIB_LICENSE_SHA256,
+            "attribution_required": True,
+            "attribution_text": (
+                "Pinned public repository metadata from leanprover/cslib on GitHub; "
+                "CSLib source is Apache-2.0."
+            ),
+            "retention_days": _P0_RETENTION_DAYS,
+        },
+        {
+            "endpoint_id": "erdos_problems",
+            "base_url": "https://api.github.com",
+            "rate_limit_per_minute": _P0_RATE_LIMIT_PER_MINUTE,
+            "byte_budget": _P0_BYTE_BUDGET,
+            "cost_budget_units": _P0_COST_BUDGET_UNITS,
+            "license_terms_sha256": _ERDOS_LICENSE_SHA256,
+            "attribution_required": True,
+            "attribution_text": (
+                "Pinned public repository metadata from teorth/erdosproblems on GitHub."
+            ),
+            "retention_days": _P0_RETENTION_DAYS,
+        },
+        {
+            "endpoint_id": "formal_conjectures",
+            "base_url": "https://api.github.com",
+            "rate_limit_per_minute": _P0_RATE_LIMIT_PER_MINUTE,
+            "byte_budget": _P0_BYTE_BUDGET,
+            "cost_budget_units": _P0_COST_BUDGET_UNITS,
+            "license_terms_sha256": _FORMAL_CONJECTURES_LICENSE_SHA256,
+            "attribution_required": True,
+            "attribution_text": (
+                "Pinned public repository metadata from google-deepmind/formal-conjectures "
+                "on GitHub; source is Apache-2.0."
             ),
             "retention_days": _P0_RETENTION_DAYS,
         },

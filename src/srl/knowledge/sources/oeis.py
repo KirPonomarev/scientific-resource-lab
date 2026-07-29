@@ -30,6 +30,8 @@ def _oeis_number(item: dict[str, Any]) -> str:
     number = item.get("number")
     if isinstance(number, str) and _OEIS_NUMBER_RE.match(number):
         return number
+    if isinstance(number, int) and number >= 0:
+        return f"A{number:06d}"
     # Fall back to parsing the number from the name, e.g. "A000045 Fibonacci numbers".
     name = item.get("name")
     if isinstance(name, str):
@@ -83,13 +85,18 @@ def parse_oeis(
     except (json.JSONDecodeError, UnicodeDecodeError) as exc:
         msg = f"OEIS payload is not valid UTF-8 JSON: {exc}"
         raise SourceRecordError(msg) from exc
-    if not isinstance(data, dict):
-        msg = "OEIS payload must be a JSON object"
+    results_obj: Any
+    if isinstance(data, list):
+        results_obj = data
+    elif isinstance(data, dict):
+        results_obj = data.get("results")
+    else:
+        msg = "OEIS payload must be a JSON object or compact result list"
         raise SourceRecordError(msg)
-    results = data.get("results")
-    if not isinstance(results, list):
+    if not isinstance(results_obj, list):
         msg = "OEIS payload must contain a 'results' list"
         raise SourceRecordError(msg)
+    results: list[Any] = results_obj
 
     payload_digest = sha256_digest(payload)
     license_note = policy.license_terms_sha256

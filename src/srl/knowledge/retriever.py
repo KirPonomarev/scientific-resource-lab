@@ -56,6 +56,7 @@ import hashlib
 import json
 import os
 import random
+import ssl
 import time
 import urllib.error
 import urllib.parse
@@ -64,6 +65,8 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Final, Protocol
+
+import certifi
 
 from srl.contracts.canonical import dumps as canonical_dumps
 
@@ -693,7 +696,9 @@ class UrllibTransport:
         :class:`urllib.error.HTTPError` for non-2xx responses so the retriever
         can classify retry vs. fail.
         """
-        opener = self._opener or urllib.request.build_opener()
+        opener = self._opener or urllib.request.build_opener(
+            urllib.request.HTTPSHandler(context=_verified_ssl_context())
+        )
         req = urllib.request.Request(  # noqa: S310 - https verified above
             url, headers={"User-Agent": self._user_agent}
         )
@@ -1493,6 +1498,11 @@ _LOCAL_RANDOM_SEED: Final[int] = 0x5EED
 _LOCAL_RANDOM: Final[random.Random] = random.Random(  # noqa: S311 - deterministic jitter, not crypto
     _LOCAL_RANDOM_SEED
 )
+
+
+def _verified_ssl_context() -> ssl.SSLContext:
+    """Return a verified TLS context using the pinned runtime CA bundle."""
+    return ssl.create_default_context(cafile=certifi.where())
 
 
 def construct_retriever(**kwargs: Any) -> ApiRetriever:

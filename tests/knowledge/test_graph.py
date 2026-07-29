@@ -15,19 +15,21 @@ from srl.knowledge import (
 from srl.knowledge.sources import SourceRecord
 
 
-def test_source_cards_cover_master_plan_sources_with_waits() -> None:
+def test_source_cards_cover_master_plan_sources_as_active() -> None:
     cards = default_source_policy_cards()
-    by_id = {card.source_id: card for card in cards}
 
-    assert {"openalex", "crossref", "arxiv", "oeis"} <= {
-        card.source_id for card in cards if card.status is KnowledgeSourceStatus.ACTIVE
+    assert {card.source_id for card in cards if card.status is KnowledgeSourceStatus.ACTIVE} == {
+        "openalex",
+        "crossref",
+        "arxiv",
+        "oeis",
+        "opencitations",
+        "zbmath",
+        "lmfdb",
+        "cslib",
+        "erdos_problems",
+        "formal_conjectures",
     }
-    assert by_id["opencitations"].status is KnowledgeSourceStatus.WAIT_ADAPTER
-    assert by_id["zbmath"].status is KnowledgeSourceStatus.WAIT_TERMS
-    assert by_id["lmfdb"].status is KnowledgeSourceStatus.WAIT_ADAPTER
-    assert by_id["cslib"].status is KnowledgeSourceStatus.WAIT_ADAPTER
-    assert by_id["erdos_problems"].status is KnowledgeSourceStatus.WAIT_ADAPTER
-    assert by_id["formal_conjectures"].status is KnowledgeSourceStatus.WAIT_ADAPTER
 
 
 def test_prompt_injection_detection_marks_untrusted_corpus() -> None:
@@ -85,8 +87,19 @@ def test_manifest_records_edges_and_wait_sources() -> None:
         citation_edges=((str(first["fact_id"]), str(second["fact_id"])),),
     )
 
-    assert manifest["active_source_ids"] == ["openalex", "crossref", "arxiv", "oeis"]
-    assert "opencitations" in cast(list[str], manifest["wait_source_ids"])
+    assert manifest["active_source_ids"] == [
+        "openalex",
+        "crossref",
+        "arxiv",
+        "oeis",
+        "opencitations",
+        "zbmath",
+        "lmfdb",
+        "cslib",
+        "erdos_problems",
+        "formal_conjectures",
+    ]
+    assert manifest["wait_source_ids"] == []
     assert manifest["citation_edges"] == [
         {
             "source_fact_id": first["fact_id"],

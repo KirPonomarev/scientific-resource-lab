@@ -1108,6 +1108,23 @@ current_facts:
   a10_hol4_cache_status: REUSED_ON_FULL_VERIFY
   a10_hol4_prepare_count: 0
   a10_hol4_fetch_count: 0
+  current_active_knowledge_sources:
+    - openalex
+    - crossref
+    - arxiv
+    - oeis
+    - opencitations
+    - zbmath
+    - lmfdb
+    - cslib
+    - erdos_problems
+    - formal_conjectures
+  a11_knowledge_graph: ACTIVE
+  a11_receipt_id: sha256:2f44a60428495c78536ff7077acd1056fa8e0750bb9d2c7d4bb3d28f9b8a2801
+  a11_truth_projection: OFFLINE_HASH_BOUND_RECEIPT
+  a11_live_fetch_count: 10
+  a11_offline_replay_count: 10
+  a11_cache_root_role: T7_SECURE_SESSION_CACHE
   production_signer: WAIT_AUTHORITY
   production_ed25519_transport_interface: ACTIVE
   fixture_hmac_production_path: REJECTED
@@ -1137,9 +1154,9 @@ current_facts:
 
 ~~~yaml
 execution_state:
-  status: A10_ACTIVE_READY_FOR_A11_WITH_PARKED_PROTECTED_LANES
-  current_stage: A11
-  next_stage: A11_activate_knowledge_graph
+  status: A11_ACTIVE_READY_FOR_A12_WITH_PARKED_PROTECTED_LANES
+  current_stage: A12
+  next_stage: A12_activate_discovery_and_dynamics
   completed_stages:
     - A00
     - A01
@@ -1150,6 +1167,7 @@ execution_state:
     - A08
     - A09
     - A10
+    - A11
   completed_stage_lanes:
     - A07_sympy_mpmath_core
   parked_stages:
@@ -1165,11 +1183,11 @@ execution_state:
     - WAIT_COMPUTE_TARGET:A05_BIND_NATIVE_SANDBOX_COMPUTE_TARGET
     - WAIT_LICENSE:A07_PYTHON_FLINT_LGPL_CLOSURE
     - WAIT_AUTHORITY:A09_BIND_PINNED_LEAN_MATHLIB_PROJECT_TO_T7
-  active_branch_or_null: codex/srf-a10-independent-provers
+  active_branch_or_null: codex/srf-a11-knowledge-graph
   active_pr_or_null: null
   writer_lease_or_null: null
   blocker_or_null: WAIT_LICENSE:A07_PYTHON_FLINT_LGPL_CLOSURE
-  next_executable_action: start A11 knowledge graph activation while keeping T7-backed persistence, native compute binding, native production signing, FLINT license closure and A09 T7 formal toolchain binding parked until exact authority/evidence exists
+  next_executable_action: start A12 discovery and dynamics activation while keeping T7-backed persistence, native compute binding, native production signing, FLINT license closure and A09 T7 formal toolchain binding parked until exact authority/evidence exists
   updated_at: 2026-07-29
 ~~~
 
@@ -1211,6 +1229,8 @@ decision_log:
     decision: A09 Lean/lake/mathlib and mathematical corpora are ACTIVE with pinned Lean 4.32.2, real kernel accept/reject checks, pinned mathlib module import, axiom inventory, CSLib/Erdos/Formal Conjectures pins and remote corpus blob traversal; truth-ledger A09 projection is offline from hash-bound receipt sha256:366c24395552933e3f758599b28e0e93ac136bd86a6ce0d5a7ff5ed61c0e2ca1; full make verify uses one session-scoped A09 prepare with prepare_count=1 fetch_count=1 and warm prepare reuse reports prepare_count=0 fetch_count=0; physical T7 formal toolchain binding remains WAIT_AUTHORITY
   - id: V37-D017
     decision: A10 Rocq/Coq, Isabelle/HOL and HOL4 independent prover contours are ACTIVE with real executable probes and shared nat zero-add proof checks; semantic-gap manifests explicitly represent logic and assumption deltas and forbid automatic theorem equivalence claims; truth-ledger A10 projection is offline from hash-bound receipt sha256:25c51de9b712afc0f1fc961c26f5dae38ed2872cb054850bd7182374ad3cca7f; full verify reuses the pinned HOL4 cache with prepare_count=0 and fetch_count=0 after the cold T7-Secure preparation
+  - id: V37-D018
+    decision: A11 source-grounded knowledge graph is ACTIVE with bounded live public-source queries for OpenAlex, Crossref, arXiv, OEIS, OpenCitations, zbMATH Open, LMFDB, CSLib, Erdos Problems and Formal Conjectures; every live response is hash-bound to an exact no-network replay receipt; source policy cards project ACTIVE for all declared A11 sources; taint and citation-spoof guards keep raw corpus out of privileged prompts; truth-ledger A11 projection is offline from hash-bound receipt sha256:2f44a60428495c78536ff7077acd1056fa8e0750bb9d2c7d4bb3d28f9b8a2801
 ~~~
 
 ## EVIDENCE_INDEX
@@ -1228,6 +1248,8 @@ evidence_index:
   - CAPABILITY-TRUTH-LEDGER.md
   - scripts/checks/srf-v37-a01-gate.py
   - docs/verification/srf-v3-7-a01-truth-ledger-receipt.json
+  - scripts/checks/srf-v37-a11-gate.py
+  - docs/verification/srf-v3-7-a11-knowledge-graph-receipt.json
   - scripts/checks/srf-v37-a02-gate.py
   - docs/target-binding/t7-native-binding-operator-action.json
   - docs/verification/srf-v3-7-a02-t7-binding-wait-receipt.json
