@@ -56,6 +56,13 @@ def _sha256(path: str) -> str:
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
+def _receipt_id(receipt: dict[str, Any]) -> str:
+    payload = {key: value for key, value in receipt.items() if key != "receipt_id"}
+    canonical = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    digest = hashlib.sha256(canonical).hexdigest()
+    return "-".join(digest[index : index + 8] for index in range(0, 64, 8))
+
+
 def test_generated_documentation_is_current() -> None:
     solo = _run("scripts/docs/generate_solo_agent_docs.py", "--check")
     system = _run("scripts/docs/generate_system_docs.py", "--check")
@@ -108,6 +115,12 @@ def test_documentation_closure_receipt_hashes_generated_sources() -> None:
     for path, expected in source_hashes.items():
         actual = _sha256(path)
         assert actual == _normalize_digest(expected), path
+
+
+def test_documentation_closure_receipt_id_is_content_addressed() -> None:
+    receipt = _receipt()
+
+    assert receipt["receipt_id"] == _receipt_id(receipt)
 
 
 def test_documentation_checks_all_passed() -> None:

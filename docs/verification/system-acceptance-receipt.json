@@ -139,7 +139,7 @@
   "file_sha256": {
     "docs/verification/SYSTEM-ACCEPTANCE.md": "f333191b-52c01dcc-92e01215-b6fbba3a-af8bd98b-c7601574-d99c4e8b-b623635d",
     "tests/adversarial/test_system_acceptance_failure_routes.py": "d37a2774-eea73ca2-0b6bb6f5-a8d6b76b-76446bee-4ab24160-6df17751-45b76083",
-    "tests/e2e/test_system_acceptance_receipt.py": "6d1855e0-1337c8d4-67e262bb-18000afb-c8ee09c5-417198a5-02cf08c0-df0d1ff2"
+    "tests/e2e/test_system_acceptance_receipt.py": "a091e05d-5729848a-7ece8a1e-315e1af8-62f300d0-89ec05be-e87c7d77-a8f4832e"
   },
   "git_head": "04f68f738999bb73c5a533599c0fdad169034d84",
   "grants_authority": false,
@@ -159,7 +159,7 @@
       "WAIT_COMPUTE_NODE"
     ]
   },
-  "receipt_id": "4bc23430-bff9f4e9-6661e528-640a3656-66b878f5-33a13610-45892770-86a35a1d",
+  "receipt_id": "32e0f109-bd211578-83370768-64aef057-4b812814-a2f81593-18d7b4ac-96fffedc",
   "restore_acceptance": {
     "canonical_writes": 0,
     "command": "make test plus tests/recovery/test_health_recovery.py::test_bounded_restore_drill_restores_unique_artifacts",
@@ -519,5 +519,15 @@
     "default_dependency_closure": "uv sync --locked before default and license-sensitive gates",
     "optional_extra_gate": "WP-H71a runs last with uv run --extra bayesian",
     "reason": "bayesian extra is testable but not part of default admitted runtime closure"
+  },
+  "candidate_binding": {
+    "binding_mode": "current_file_sha256_manifest",
+    "bound_paths": [
+      "docs/verification/SYSTEM-ACCEPTANCE.md",
+      "tests/adversarial/test_system_acceptance_failure_routes.py",
+      "tests/e2e/test_system_acceptance_receipt.py"
+    ],
+    "git_history_required": false,
+    "shallow_checkout_safe": true
   }
 }

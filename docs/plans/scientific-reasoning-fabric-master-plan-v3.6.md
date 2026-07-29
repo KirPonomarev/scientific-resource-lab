@@ -1900,9 +1900,9 @@ The final report must list exact IDs and hashes, never subjective percentages.
 
 <!-- BEGIN_MUTABLE_STATE_V3_6 -->
 
-STATE_REVISION: 28
-PREVIOUS_STATE_SHA256: 4bd1fa42-8b40ce74-97cd97f6-28686539-6465312a-58ed3850-4dbdfcb8-605955b2
-CURRENT_STATE_SHA256: aa256cf2-3be46fc0-41f8e88e-a2e3c984-e6238f93-4bbeb7a0-6a0dd122-275760ea
+STATE_REVISION: 29
+PREVIOUS_STATE_SHA256: aa256cf2-3be46fc0-41f8e88e-a2e3c984-e6238f93-4bbeb7a0-6a0dd122-275760ea
+CURRENT_STATE_SHA256: b2762b72-e9d9157f-6341afed-227946c0-a273480d-4b9545f2-4c214e6e-faed04f9
 
 ## CURRENT_FACTS
 
@@ -1934,13 +1934,13 @@ execution_state:
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
   last_proven_transition: documentation_closure_proven
   active_branch_or_null: codex/srf-fabric-v1
-  active_pr_or_null: null
+  active_pr_or_null: 47
   active_worktree_or_null: isolated_codex_worktree
   writer_lease_or_null: srf-fabric-v1-single-writer
   active_operation_or_null: S27_candidate_pr_review_merge
   active_process_or_job_or_null: null
   next_checkpoint: after_S27_candidate_pr_review_merge_receipt
-  next_executable_action: prepare candidate branch, push, open PR, run independent review and merge through native governance
+  next_executable_action: push S27 CI remediation, wait for required checks, then merge through native governance
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -1953,7 +1953,7 @@ state_capsule:
   project_fingerprint: d56e03d0-d5e1a9bb-9c33a008-ab989510-2d8e41e8-bfd001df-bfc8e1c8-0b9df0b3
   mission_id: build-scientific-reasoning-fabric-v1
   stage_id: S27
-  state_revision: 28
+  state_revision: 29
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
   last_proven_transition: documentation_closure_proven
   active_operation: S27_candidate_pr_review_merge
@@ -1963,13 +1963,15 @@ state_capsule:
     - repository governance
     - operator-supplied V3.6 protocol
   new_primary_evidence:
-    - SystemAcceptanceReceipt 4bc23430-bff9f4e9-6661e528-640a3656-66b878f5-33a13610-45892770-86a35a1d
-    - DocumentationClosureReceipt cc282752-4ca59271-7d0edcf6-7c3ff642-191ec034-167d5536-86f81b0a-dd7d2247
+    - SystemAcceptanceReceipt 32e0f109-bd211578-83370768-64aef057-4b812814-a2f81593-18d7b4ac-96fffedc
+    - DocumentationClosureReceipt da29cf58-2e27f45d-6d5cc9ad-29897d84-5a53cfb0-417fad78-62ff36b7-c2ae6d75
     - generated root documentation set complete for START-HERE, SYSTEM-ATLAS, SOLO-AGENT-RUNBOOK, CELL-MATRIX, CAPABILITY-CATALOG, CONTRACT-MATRIX, AUTHORITY-MATRIX, DATA-CLASSIFICATION, FAILURE-ROUTING, T7-OPERATIONS, COMPUTE-NODE, MARKET-INTEGRATION, SECURITY-INTEGRATION, TRADING-EXECUTION-BOUNDARY, PACK-AUTHORING, PACK-REVOCATION, RECOVERY-RUNBOOK and RELEASE-RUNBOOK
     - S26 checks PASS: solo docs, system docs, markdown structure, link check, public boundary and secret scan
     - documentation closure tests PASS
+    - S27 CI remediation focused tests PASS: tests/e2e/test_system_acceptance_receipt.py and tests/docs/test_documentation_closure.py
+    - S25/S26 receipts now assert content-addressed receipt_id and shallow-checkout-safe file-hash binding instead of requiring git history depth
     - residual waits remain explicit: WAIT_T7_BINDING, WAIT_COMPUTE_NODE, WAIT_RUNTIME_HEALTH:MARKET_RED_F8, WAIT_SECURITY_HEALTH:BOOTSTRAP_UNAVAILABLE, WAIT_CAPABILITY:advanced_optional_science_packs, WAIT_NATIVE_CHILD_CLOSEOUT:DUAL_CONTOUR
-  next_executable_action: S27 candidate PR, independent review and merge
+  next_executable_action: push S27 CI remediation, wait for required checks, then merge through native governance
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -2064,10 +2066,13 @@ evidence_index:
     identity: ffcbdff9-2502a1f2-e709d3a7-7f71c65d-bf6d0365-05d6dd44-c0bbda84-501b5e96
   - claim: S25 full-system validation and chaos acceptance proven
     source: SystemAcceptanceReceipt/v1
-    identity: 4bc23430-bff9f4e9-6661e528-640a3656-66b878f5-33a13610-45892770-86a35a1d
+    identity: 32e0f109-bd211578-83370768-64aef057-4b812814-a2f81593-18d7b4ac-96fffedc
   - claim: S26 documentation closure and generated drift gates proven
     source: DocumentationClosureReceipt/v1
-    identity: cc282752-4ca59271-7d0edcf6-7c3ff642-191ec034-167d5536-86f81b0a-dd7d2247
+    identity: da29cf58-2e27f45d-6d5cc9ad-29897d84-5a53cfb0-417fad78-62ff36b7-c2ae6d75
+  - claim: S27 CI remediation for shallow GitHub Actions checkouts proven locally
+    source: focused pytest and receipt binding checks
+    identity: 32e0f109-bd211578-83370768-64aef057-4b812814-a2f81593-18d7b4ac-96fffedc
   - claim: Market mutation currently forbidden
     source: native operator bootstrap
     identity: 59ce6ff4c8b514c93d8d4b26d648ba6e7dd7b764
@@ -2278,6 +2283,10 @@ progress_log:
   - revision: 28
     stage: S26
     result: Required documentation set generated and checked from manifests, schemas and receipts with DocumentationClosureReceipt and public-boundary/secret scans clean
+    observed_at: 2026-07-29
+  - revision: 29
+    stage: S27
+    result: Remediated CI-only shallow checkout failure by replacing history-depth-dependent merge-base assertion with content-addressed receipt IDs and current file-hash candidate binding; focused receipt/documentation tests pass
     observed_at: 2026-07-29
 ~~~
 

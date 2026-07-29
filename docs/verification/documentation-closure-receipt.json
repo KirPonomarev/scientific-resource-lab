@@ -60,13 +60,13 @@
     "WAIT_NATIVE_CHILD_CLOSEOUT:DUAL_CONTOUR"
   ],
   "generated_source_sha256": {
-    "docs/verification/system-acceptance-receipt.json": "fa3c1788-8f7973d7-8eed722c-5cb1f86c-bc30c9e7-ea984bd3-e752229b-67edf0cb",
+    "docs/verification/system-acceptance-receipt.json": "55f7295e-4d25cd66-24ac24db-0769f234-6ef69e46-64648377-8c29e228-19344fbe",
     "scripts/checks/markdown_structure.py": "99fdf1a0-4a5a0fc0-bd5e0eff-3692561b-297d30cc-63ba3e69-6798ace3-e49a8448",
     "scripts/docs/generate_solo_agent_docs.py": "ef66a5c4-3251a593-8912005d-8b615233-7e9f8c05-f3bfad1c-001de985-528c643f",
     "scripts/docs/generate_system_docs.py": "43748dea-6c1266fa-3f67165d-e6355691-7df1a523-422d9760-be96c66d-f207677d",
     "tests/adversarial/test_system_acceptance_failure_routes.py": "d37a2774-eea73ca2-0b6bb6f5-a8d6b76b-76446bee-4ab24160-6df17751-45b76083",
-    "tests/docs/test_documentation_closure.py": "9436144e-8de717d7-c8f9d044-a28adc08-0f0f8699-3585f292-4dd10b54-a38dcc4f",
-    "tests/e2e/test_system_acceptance_receipt.py": "6d1855e0-1337c8d4-67e262bb-18000afb-c8ee09c5-417198a5-02cf08c0-df0d1ff2"
+    "tests/docs/test_documentation_closure.py": "a92a57e9-defe9987-e9d560c8-812cf518-ca408045-8cdc40e9-9e636d7c-b275fca1",
+    "tests/e2e/test_system_acceptance_receipt.py": "a091e05d-5729848a-7ece8a1e-315e1af8-62f300d0-89ec05be-e87c7d77-a8f4832e"
   },
   "generated_sources": [
     "scripts/docs/generate_solo_agent_docs.py",
@@ -90,7 +90,7 @@
       "WAIT_COMPUTE_NODE"
     ]
   },
-  "receipt_id": "cc282752-4ca59271-7d0edcf6-7c3ff642-191ec034-167d5536-86f81b0a-dd7d2247",
+  "receipt_id": "da29cf58-2e27f45d-6d5cc9ad-29897d84-5a53cfb0-417fad78-62ff36b7-c2ae6d75",
   "required_doc_sha256": {
     "AUTHORITY-MATRIX.md": "67d84c99-3fb300d6-545aa7fd-6d074290-f4d0394c-74621f5a-8c760d85-abdcf2fd",
     "CAPABILITY-CATALOG.md": "58228411-adc12e5b-217b0542-13b0a59f-ac3e6947-2a724d06-c7ab790f-bbeac55e",
@@ -133,7 +133,7 @@
   ],
   "result": "PASS",
   "schema_version": "DocumentationClosureReceipt/v1",
-  "source_system_acceptance_receipt": "sha256:4bc23430-bff9f4e9-6661e528-640a3656-66b878f5-33a13610-45892770-86a35a1d",
+  "source_system_acceptance_receipt": "sha256:32e0f109-bd211578-83370768-64aef057-4b812814-a2f81593-18d7b4ac-96fffedc",
   "stage_id": "S26",
   "state_preimage_hash_before_transition": "4bd1fa42-8b40ce74-97cd97f6-28686539-6465312a-58ed3850-4dbdfcb8-605955b2"
 }

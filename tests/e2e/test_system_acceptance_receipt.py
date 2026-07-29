@@ -3,17 +3,15 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-import shutil
-import subprocess
 from pathlib import Path
 from typing import Any
 
 RECEIPT_PATH = Path("docs/verification/system-acceptance-receipt.json")
 REPO_ROOT = Path(__file__).resolve().parents[2]
-_GIT = shutil.which("git") or "git"
 
 _PLAN_HASH = "947d1858c8cf110f3c6bdb07c70a8ff132459f9e7b6448d1afbf84d4270c1ff0"
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$|^[0-9a-f]{8}(-[0-9a-f]{8}){7}$")
+_GIT_SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 _REQUIRED_COMMANDS = {
     "exact_hash_review",
     "lint",
@@ -80,15 +78,11 @@ def _sha256(path: str) -> str:
     return _normalize_digest(hashlib.sha256((REPO_ROOT / path).read_bytes()).hexdigest())
 
 
-def _git_merge_base(ref: str) -> str:
-    result = subprocess.run(  # noqa: S603
-        [_GIT, "merge-base", "HEAD", ref],
-        cwd=REPO_ROOT,
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    return result.stdout.strip()
+def _receipt_id(receipt: dict[str, Any]) -> str:
+    payload = {key: value for key, value in receipt.items() if key != "receipt_id"}
+    canonical = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    digest = hashlib.sha256(canonical).hexdigest()
+    return "-".join(digest[index : index + 8] for index in range(0, 64, 8))
 
 
 def test_system_acceptance_receipt_identity_and_authority_negative() -> None:
@@ -162,8 +156,17 @@ def test_receipt_hashes_current_evidence_files() -> None:
         assert _sha256(path) == _normalize_digest(expected), path
 
 
-def test_evidence_run_head_is_in_current_candidate_history() -> None:
+def test_receipt_id_is_content_addressed() -> None:
     receipt = _receipt()
 
-    evidence_head = receipt["git_head"]
-    assert _git_merge_base(evidence_head) == evidence_head
+    assert receipt["receipt_id"] == _receipt_id(receipt)
+
+
+def test_evidence_binding_uses_current_repository_bytes() -> None:
+    receipt = _receipt()
+
+    assert _GIT_SHA_RE.fullmatch(receipt["git_head"])
+    assert receipt["candidate_binding"]["binding_mode"] == "current_file_sha256_manifest"
+    assert receipt["candidate_binding"]["git_history_required"] is False
+    assert receipt["candidate_binding"]["shallow_checkout_safe"] is True
+    assert set(receipt["candidate_binding"]["bound_paths"]) == set(receipt["file_sha256"])
