@@ -1900,9 +1900,9 @@ The final report must list exact IDs and hashes, never subjective percentages.
 
 <!-- BEGIN_MUTABLE_STATE_V3_6 -->
 
-STATE_REVISION: 18
-PREVIOUS_STATE_SHA256: 055a8e39-ccbf186a-86917f74-b5e3e744-13cd15be-f69b5912-a756958b-5c544dac
-CURRENT_STATE_SHA256: 160fc420-a13de71b-f483e9b5-e3f8f3ce-529e37cf-a746d4df-aaa206da-21cf2979
+STATE_REVISION: 19
+PREVIOUS_STATE_SHA256: 160fc420-a13de71b-f483e9b5-e3f8f3ce-529e37cf-a746d4df-aaa206da-21cf2979
+CURRENT_STATE_SHA256: 29b38821-f93809bb-6c918649-36c4f1a7-cc3c578b-5fa51310-4974f46c-fde28e55
 
 ## CURRENT_FACTS
 
@@ -1927,20 +1927,20 @@ current_facts:
 ~~~yaml
 execution_state:
   status: IN_PROGRESS
-  current_stage: S17
-  next_stage: S18_after_sciml_domain
-  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven, S09_health_recovery_proven, S10_interface_convergence_proven, S11_p0_core_proven, S12_lean_primary_proven, S13_cross_prover_proven, S14_knowledge_layer_proven, S15_lawminer_proven, S16_applied_science_proven]
+  current_stage: S18
+  next_stage: S19_after_heavy_capability
+  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven, S09_health_recovery_proven, S10_interface_convergence_proven, S11_p0_core_proven, S12_lean_primary_proven, S13_cross_prover_proven, S14_knowledge_layer_proven, S15_lawminer_proven, S16_applied_science_proven, S17_sciml_domain_proven]
   invalidated_stages: []
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: applied_science_packs_proven
+  last_proven_transition: sciml_domain_profiles_proven
   active_branch_or_null: codex/srf-fabric-v1
   active_pr_or_null: null
   active_worktree_or_null: isolated_codex_worktree
   writer_lease_or_null: srf-fabric-v1-single-writer
-  active_operation_or_null: S17_sciml_domain_science_packs
+  active_operation_or_null: S18_heavy_capability_routing
   active_process_or_job_or_null: null
-  next_checkpoint: after_S17_sciml_domain_admission_receipt
-  next_executable_action: admit Julia/Python SciML and domain packs under reproducible environments
+  next_checkpoint: after_S18_heavy_capability_routing_receipt
+  next_executable_action: implement capability matching, tiny local profiles and signed remote job protocol
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -1952,29 +1952,29 @@ state_capsule:
   project_id: scientific-resource-lab
   project_fingerprint: d56e03d0-d5e1a9bb-9c33a008-ab989510-2d8e41e8-bfd001df-bfc8e1c8-0b9df0b3
   mission_id: build-scientific-reasoning-fabric-v1
-  stage_id: S17
-  state_revision: 18
+  stage_id: S18
+  state_revision: 19
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: applied_science_packs_proven
-  active_operation: S17_sciml_domain_science_packs
+  last_proven_transition: sciml_domain_profiles_proven
+  active_operation: S18_heavy_capability_routing
   active_process_or_job: null
   frozen_preimages:
     - baseline HEAD
     - repository governance
     - operator-supplied V3.6 protocol
   new_primary_evidence:
-    - AppliedScienceAdmissionReceipt 2126e15b-7963a97e-d4d63834-792bed31-3270dcf9-98b9f9a7-14661450-6f443261
-    - AppliedScienceAdmissionBundle sha256:51d0d0e5-78ab0d5d-012a02d7-df40d5b3-0917a11b-885fcd0d-879ed0b7-3fb9ab83
-    - ripser, pyriemann and cvxpy admitted as ACTIVE bounded local applied packs
-    - GUDHI, geomstats, POT, pymanopt, KeplerMapper, TopoNetX, Regina, PyMC, ArviZ, DoWhy, Tigramite, EconML, JAXopt and BoTorch recorded as WAIT_CAPABILITY
-    - applied result receipts require assumptions, diagnostics and solver status
-    - unidentified causal effects are rejected when an effect estimate is supplied
-    - applied result receipts remain authority-negative and canonical_writes=0
-    - focused applied product and adapter tests PASS with 140 passed and 1 skipped
-    - make test PASS with 1859 passed and 1 skipped
+    - SciMLDomainAdmissionReceipt 86661918-acfda1e7-3b5da2a4-0a76876f-9027b795-109eab00-55dbb6e1-c82ebcbc
+    - SciMLDomainAdmissionBundle sha256:6cbb4355-c4321f61-55f83a8a-74245c84-49977f29-a2412da8-4bad1217-6d51e568
+    - Julia SciML, ModelingToolkit and DataDrivenDiffEq profiles recorded as WAIT_CAPABILITY because Julia executable evidence is absent
+    - diffrax, QuTiP, Cadabra, Astropy, Cantera, PyBaMM, quimb and cotengra profiles recorded as WAIT_CAPABILITY because import evidence is absent
+    - SciML/domain result receipts require unit bindings, solver name/family, positive tolerance and trace SHA-256
+    - cross-language fixture receipt rejects bitwise identity claims across runtimes or solver families
+    - shared_mutable_global_depots=0 and all S17 receipts remain authority-negative
+    - focused S17 tests PASS with 7 passed
+    - make test PASS with 1866 passed and 1 skipped
     - make lint PASS
     - make typecheck PASS
-  next_executable_action: S17 SciML and domain-science packs
+  next_executable_action: S18 PDE, HPC, Sage and budgeted remote oracles
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -2043,6 +2043,9 @@ evidence_index:
   - claim: S16 applied science packs proven with declared waits
     source: AppliedScienceAdmissionReceipt/v1
     identity: 2126e15b-7963a97e-d4d63834-792bed31-3270dcf9-98b9f9a7-14661450-6f443261
+  - claim: S17 SciML and domain-science profiles proven with declared waits
+    source: SciMLDomainAdmissionReceipt/v1
+    identity: 86661918-acfda1e7-3b5da2a4-0a76876f-9027b795-109eab00-55dbb6e1-c82ebcbc
   - claim: Market mutation currently forbidden
     source: native operator bootstrap
     identity: 59ce6ff4c8b514c93d8d4b26d648ba6e7dd7b764
@@ -2055,7 +2058,7 @@ evidence_index:
 authority_ledger:
   routine_safe_plan_creation: exercised
   exact_hash_review_authority: exercised
-  implementation_authority: exercised_routine_safe_S01_S16
+  implementation_authority: exercised_routine_safe_S01_S17
   market_mutation_authority: absent
   security_mutation_authority: absent
   physical_t7_authority: absent
@@ -2120,6 +2123,8 @@ decision_log:
     decision: S15 uses a bounded deterministic LawMiner baseline to prove null, leakage and candidate-only semantics while advanced symbolic and dynamical engines remain explicit WAIT_CAPABILITY
   - id: D027
     decision: S16 admits only already bounded local applied adapters as ACTIVE and keeps missing topology, probability, causal and optimization engines in WAIT_CAPABILITY while enforcing assumptions, diagnostics, solver status and unidentified-causal-effect guards
+  - id: D028
+    decision: S17 records Julia/Python SciML and domain engines as reproducible profile cards, keeps all missing runtimes in WAIT_CAPABILITY, and proves unit, solver, tolerance and cross-runtime bitwise-identity guards without adding a mutable Julia depot or heavy dependency closure
 ~~~
 
 ## PROGRESS_LOG
@@ -2197,6 +2202,10 @@ progress_log:
   - revision: 18
     stage: S16
     result: Applied science packs proven with ripser, pyriemann and cvxpy active; missing engines parked as WAIT_CAPABILITY; diagnostics, solver status and causal-identification guards enforced
+    observed_at: 2026-07-29
+  - revision: 19
+    stage: S17
+    result: SciML and domain-science profile admission proven with all named runtimes parked as WAIT_CAPABILITY, shared mutable depots forbidden, and unit, solver, tolerance and cross-runtime comparison guards enforced
     observed_at: 2026-07-29
 ~~~
 
