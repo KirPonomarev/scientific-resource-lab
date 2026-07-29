@@ -15,6 +15,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, Final
 
+from srl.packs.adapters.native_algebra import run_a08_native_smoke
 from srl.packs.adapters.p0_python_core import FLINT_WAIT_REASON, run_p0_python_core_smoke
 
 TRUTH_STATES: Final[tuple[str, ...]] = (
@@ -33,6 +34,7 @@ WAIT_STATES: Final[tuple[str, ...]] = (
     "WAIT_AUTHORITY",
     "WAIT_T7_BINDING",
     "WAIT_COMPUTE_TARGET",
+    "WAIT_LICENSE",
 )
 
 CURRENT_V101_ACTIVE_INVENTORY: Final[tuple[str, ...]] = (
@@ -168,6 +170,39 @@ def _smoke_mpmath() -> str:
     return "; ".join((smoke.high_precision_crosscheck, smoke.interval_crosscheck))
 
 
+def _smoke_a08_native(component_id: str) -> str:
+    smoke = run_a08_native_smoke()
+    by_id = {item.component_id: item for item in smoke.tools}
+    item = by_id[component_id]
+    if not item.active:
+        raise RuntimeError(item.error or f"{component_id} did not reach ACTIVE")
+    return f"{item.smoke_detail}; {item.crosscheck_detail}"
+
+
+def _smoke_pari_gp() -> str:
+    return _smoke_a08_native("pari-gp")
+
+
+def _smoke_maxima() -> str:
+    return _smoke_a08_native("maxima")
+
+
+def _smoke_gap() -> str:
+    return _smoke_a08_native("gap")
+
+
+def _smoke_singular() -> str:
+    return _smoke_a08_native("singular")
+
+
+def _smoke_z3_native() -> str:
+    return _smoke_a08_native("z3-native")
+
+
+def _smoke_cvc5() -> str:
+    return _smoke_a08_native("cvc5")
+
+
 _SPECS: Final[tuple[ComponentSpec, ...]] = (
     ComponentSpec(
         "numpy",
@@ -285,6 +320,8 @@ _SPECS: Final[tuple[ComponentSpec, ...]] = (
         "native_executable",
         executable_names=("gp",),
         activation_wait_state="WAIT_TOOLCHAIN",
+        current_v101_active=True,
+        smoke=_smoke_pari_gp,
     ),
     ComponentSpec(
         "maxima",
@@ -293,6 +330,8 @@ _SPECS: Final[tuple[ComponentSpec, ...]] = (
         "native_executable",
         executable_names=("maxima",),
         activation_wait_state="WAIT_TOOLCHAIN",
+        current_v101_active=True,
+        smoke=_smoke_maxima,
     ),
     ComponentSpec(
         "gap",
@@ -301,6 +340,8 @@ _SPECS: Final[tuple[ComponentSpec, ...]] = (
         "native_executable",
         executable_names=("gap",),
         activation_wait_state="WAIT_TOOLCHAIN",
+        current_v101_active=True,
+        smoke=_smoke_gap,
     ),
     ComponentSpec(
         "singular",
@@ -309,6 +350,18 @@ _SPECS: Final[tuple[ComponentSpec, ...]] = (
         "native_executable",
         executable_names=("Singular", "singular"),
         activation_wait_state="WAIT_TOOLCHAIN",
+        current_v101_active=True,
+        smoke=_smoke_singular,
+    ),
+    ComponentSpec(
+        "z3-native",
+        "a08_smt",
+        "A08",
+        "native_executable",
+        executable_names=("z3",),
+        activation_wait_state="WAIT_TOOLCHAIN",
+        current_v101_active=True,
+        smoke=_smoke_z3_native,
     ),
     ComponentSpec(
         "cvc5",
@@ -317,6 +370,8 @@ _SPECS: Final[tuple[ComponentSpec, ...]] = (
         "native_executable",
         executable_names=("cvc5",),
         activation_wait_state="WAIT_TOOLCHAIN",
+        current_v101_active=True,
+        smoke=_smoke_cvc5,
     ),
     ComponentSpec(
         "lean",
@@ -478,6 +533,16 @@ def build_truth_ledger() -> dict[str, Any]:
             item["component_id"]
             for item in components
             if item["activation_stage"] == "A07" and item["state"] == "ACTIVE"
+        ],
+        "a08_active_inventory_observed": [
+            item["component_id"]
+            for item in components
+            if item["activation_stage"] == "A08" and item["state"] == "ACTIVE"
+        ],
+        "a08_parked_blockers": [
+            f"{item['state']}:{item['component_id']}"
+            for item in components
+            if item["activation_stage"] == "A08" and item["state"] != "ACTIVE"
         ],
         "a07_parked_blockers": [f"WAIT_LICENSE:python-flint:{FLINT_WAIT_REASON}"],
         "production_versus_fixture_axis": [

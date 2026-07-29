@@ -28,11 +28,12 @@ Current v1.0.1 active inventory reproduced by the ledger:
 | `sympy` | `a07_p0_python_core` | `A07` | `ACTIVE` | `nonfixture_executable_probe_and_scientific_smoke` |
 | `mpmath` | `a07_p0_python_core` | `A07` | `ACTIVE` | `nonfixture_executable_probe_and_scientific_smoke` |
 | `python-flint` | `a07_p0_python_core` | `A07` | `WAIT_LICENSE` | `missing_or_protected_capability` |
-| `pari-gp` | `a08_native_algebra` | `A08` | `WAIT_TOOLCHAIN` | `missing_or_protected_capability` |
-| `maxima` | `a08_native_algebra` | `A08` | `WAIT_TOOLCHAIN` | `missing_or_protected_capability` |
-| `gap` | `a08_native_algebra` | `A08` | `WAIT_TOOLCHAIN` | `missing_or_protected_capability` |
-| `singular` | `a08_native_algebra` | `A08` | `WAIT_TOOLCHAIN` | `missing_or_protected_capability` |
-| `cvc5` | `a08_smt` | `A08` | `WAIT_TOOLCHAIN` | `missing_or_protected_capability` |
+| `pari-gp` | `a08_native_algebra` | `A08` | `ACTIVE` | `nonfixture_executable_probe_and_scientific_smoke` |
+| `maxima` | `a08_native_algebra` | `A08` | `ACTIVE` | `nonfixture_executable_probe_and_scientific_smoke` |
+| `gap` | `a08_native_algebra` | `A08` | `ACTIVE` | `nonfixture_executable_probe_and_scientific_smoke` |
+| `singular` | `a08_native_algebra` | `A08` | `ACTIVE` | `nonfixture_executable_probe_and_scientific_smoke` |
+| `z3-native` | `a08_smt` | `A08` | `ACTIVE` | `nonfixture_executable_probe_and_scientific_smoke` |
+| `cvc5` | `a08_smt` | `A08` | `ACTIVE` | `nonfixture_executable_probe_and_scientific_smoke` |
 | `lean` | `a09_formal` | `A09` | `WAIT_TOOLCHAIN` | `missing_or_protected_capability` |
 | `lake` | `a09_formal` | `A09` | `WAIT_TOOLCHAIN` | `missing_or_protected_capability` |
 | `rocq` | `a10_formal` | `A10` | `WAIT_TOOLCHAIN` | `missing_or_protected_capability` |

@@ -20,6 +20,10 @@ jobs:
       - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
         with:
           enable-cache: false
+      - name: Install native A08 toolchains
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends pari-gp maxima gap singular cvc5 z3
       - name: Set up Python 3.12
         run: uv python install 3.12
       - name: Install dependencies (locked)
@@ -30,6 +34,8 @@ jobs:
           git merge-base --is-ancestor HEAD origin/main
       - name: V3.7 A01 truth-ledger gate
         run: uv run python scripts/checks/srf-v37-a01-gate.py
+      - name: V3.7 A08 native algebra and SMT gate
+        run: uv run python scripts/checks/srf-v37-a08-gate.py
       - name: build evidence
         run: python3 scripts/release/build-evidence.py
       - name: verify evidence schema
