@@ -48,8 +48,10 @@ def test_rocq_docker_probe_uses_container_absolute_source_path(
             volume = command[command.index("-v") + 1]
             host_path = Path(volume.split(":", 1)[0])
             source_path = host_path / "SRL_A10_ROCQ.v"
-            assert stat_mode(host_path) == 0o755
+            assert stat_mode(host_path) == 0o777
             assert stat_mode(source_path) == 0o644
+            (host_path / "SRL_A10_ROCQ.glob").write_text("glob", encoding="utf-8")
+            (host_path / "SRL_A10_ROCQ.vo").write_text("vo", encoding="utf-8")
         return subprocess.CompletedProcess(command, 0, stdout=b"", stderr=b"")
 
     monkeypatch.setenv("SRL_A10_ROCQ_DOCKER_IMAGE", "rocq/rocq-prover:9.2.0")

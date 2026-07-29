@@ -121,7 +121,7 @@ def _docker_command(
 
 def _prepare_docker_mount(root: Path) -> None:
     """Make ephemeral public proof sources readable by non-root prover images."""
-    root.chmod(0o755)
+    root.chmod(0o777)
     for child in root.iterdir():
         if child.is_file():
             child.chmod(0o644)
