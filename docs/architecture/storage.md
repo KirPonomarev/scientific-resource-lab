@@ -247,6 +247,22 @@ stub exists to keep the external authority boundary explicit: the store is
 *known* and *named*, but no bytes are written to operator storage without a
 native target binding.
 
+## V3.7 A02 non-destructive binding gate
+
+V3.7 adds `scripts/checks/srf-v37-a02-gate.py`, a stage gate for the activation
+plan. It is intentionally non-destructive: the gate writes only to a temporary
+fixture root, never to `/Volumes/T7`. It checks the SRF namespace manifest, the
+400 GiB allocation and 100 GiB reserve policy, a real fixture-root CAS
+write/read/corruption rejection, the cold-CAS DB/WAL ban, the committed
+read-only T7 preflight, and the false-closure rule for `T7BindingReceipt/v1`.
+
+The gate's current truthful terminal state is `WAIT_T7_BINDING`, not `ACTIVE`.
+`ACTIVE` requires a target-scoped native authority receipt plus every protected
+physical evidence field: namespace creation, object roundtrip, corruption
+rejection, unplug wait, replug resume, and no internal Mac project-data
+dependency. The exact non-authorizing operator action is tracked in
+`docs/target-binding/t7-native-binding-operator-action.json`.
+
 ## Testing posture
 
 The entire CAS layer is hermetic. Tests and CI inject fake providers and use

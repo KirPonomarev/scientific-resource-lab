@@ -1,0 +1,28 @@
+{
+  "action_hash_grouped_sha256": "a3028eef-04e3f0f3-d0e8dac7-42237dc5-b2308119-0b18b687-5feadeba-798bc315",
+  "action_id": "A02_BIND_T7_NATIVE_TARGET",
+  "allowed_actions_after_authority": [
+    "verify_exact_volume_identity_from_out_of_repo_expected_identity",
+    "create_srf_namespaces_under_target_root",
+    "enforce_400_gib_allocation_and_100_gib_free_reserve",
+    "bind_private_overlay_envs_caches_scratch_spool_to_target",
+    "write_read_and_hashcheck_one_nonsecret_probe_object",
+    "corrupt_copy_inside_restore_test_namespace_and_verify_rejection",
+    "unplug_target_and_record_WAIT_T7_BINDING_without_corruption",
+    "replug_target_and_record_safe_resume",
+    "prove_no_project_data_dependency_on_internal_mac_storage"
+  ],
+  "authority_required": true,
+  "expected_receipt_schema": "T7BindingReceipt/v1",
+  "forbidden_without_authority": [
+    "format",
+    "erase",
+    "restore_overwrite",
+    "active_database_or_wal_inside_cold_cas",
+    "copy_owner_paths_or_volume_uuid_into_git",
+    "claim_ACTIVE_or_DONE"
+  ],
+  "grants_authority": false,
+  "schema_version": "ProtectedOperatorAction/v1",
+  "target": "operator-owned external T7 volume mounted by label"
+}
