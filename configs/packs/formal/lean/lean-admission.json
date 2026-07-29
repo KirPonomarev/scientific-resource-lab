@@ -1,0 +1,1 @@
+{"schema_version":"LeanAdmissionConfig/v1","toolchain":"leanprover/lean4:v4.32.2","lean_commit":"f3b06c705e6c85f5314019d5d3baab0fec5b580c","mathlib_url":"https://github.com/leanprover-community/mathlib4.git","mathlib_tag":"v4.32.2","mathlib_revision":"905b95818eb32af7874a58b427f50c1711a5e96c","formal_scope":"declared_statement_only","canonical_writes":0,"grants_authority":false}

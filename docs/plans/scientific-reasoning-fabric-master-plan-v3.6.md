@@ -1900,9 +1900,9 @@ The final report must list exact IDs and hashes, never subjective percentages.
 
 <!-- BEGIN_MUTABLE_STATE_V3_6 -->
 
-STATE_REVISION: 13
-PREVIOUS_STATE_SHA256: 5970a45c-9f04d9eb-f49adfc5-65589a16-adc4154a-5e8d7ed3-a04821c0-36729ce9
-CURRENT_STATE_SHA256: 4467cf1b-ea8d8b0a-62492546-cdf916fc-7f3093bc-5a2e6b2e-eae7837b-2dda1993
+STATE_REVISION: 14
+PREVIOUS_STATE_SHA256: 4467cf1b-ea8d8b0a-62492546-cdf916fc-7f3093bc-5a2e6b2e-eae7837b-2dda1993
+CURRENT_STATE_SHA256: a87878c2-2f5ca79d-d701b18b-d0312f0e-01d4a6b2-dfe78951-cd7020e0-af6a235b
 
 ## CURRENT_FACTS
 
@@ -1927,20 +1927,20 @@ current_facts:
 ~~~yaml
 execution_state:
   status: IN_PROGRESS
-  current_stage: S12
-  next_stage: S13_after_lean_primary
-  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven, S09_health_recovery_proven, S10_interface_convergence_proven, S11_p0_core_proven]
+  current_stage: S13
+  next_stage: S14_after_cross_prover
+  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven, S09_health_recovery_proven, S10_interface_convergence_proven, S11_p0_core_proven, S12_lean_primary_proven]
   invalidated_stages: []
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: p0_core_proven
+  last_proven_transition: lean_primary_formal_environment_proven
   active_branch_or_null: codex/srf-fabric-v1
   active_pr_or_null: null
   active_worktree_or_null: isolated_codex_worktree
   writer_lease_or_null: srf-fabric-v1-single-writer
-  active_operation_or_null: S12_lean_primary_formal_environment
+  active_operation_or_null: S13_cross_prover_contours
   active_process_or_job_or_null: null
-  next_checkpoint: after_S12_lean_admission_receipt
-  next_executable_action: establish Lean 4 plus pinned mathlib as primary formal mathematics pack
+  next_checkpoint: after_S13_cross_prover_admission_receipt
+  next_executable_action: add Rocq, Isabelle/HOL and HOL4 independent formal contours without false theorem equivalence
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -1952,28 +1952,30 @@ state_capsule:
   project_id: scientific-resource-lab
   project_fingerprint: d56e03d0-d5e1a9bb-9c33a008-ab989510-2d8e41e8-bfd001df-bfc8e1c8-0b9df0b3
   mission_id: build-scientific-reasoning-fabric-v1
-  stage_id: S12
-  state_revision: 13
+  stage_id: S13
+  state_revision: 14
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: p0_core_proven
-  active_operation: S12_lean_primary_formal_environment
+  last_proven_transition: lean_primary_formal_environment_proven
+  active_operation: S13_cross_prover_contours
   active_process_or_job: null
   frozen_preimages:
     - baseline HEAD
     - repository governance
     - operator-supplied V3.6 protocol
   new_primary_evidence:
-    - P0CoreAdmissionReceipt 9517a304-74b48a50-766d7570-c6c1521c-8aa645fc-0ff92324-11479b40-e03078e9
-    - P0CoreAdmissionBundle sha256:ad7a8d90-01a1d943-b6354359-960577ff-54d6a3a4-12fcf073-1cb6b2ae-3299afa7
-    - ACTIVE components limited to NumPy, SciPy, Pint and Z3 under current runtime import evidence
-    - cvc5 recorded as independent DEGRADED solver with WAIT_LICENSE and no z3 substitution
-    - SymPy, mpmath, FLINT/Arb/Calcium, PARI/GP, Maxima, GAP and Singular recorded as WAIT_CAPABILITY
-    - focused P0 tests PASS with 137 passed
-    - pack suite PASS with 391 passed and 1 skipped
-    - make test PASS with 1829 passed and 1 skipped
+    - LeanAdmissionReceipt 685653b0-e12407ec-db6a11f0-adeef991-7744d2af-89dc6ee8-a2267f95-25c7d527
+    - LeanAdmissionBundle sha256:f597b082-155e195f-4dc432b3-426df52f-98c50642-1492af00-7d4d3b07-16addc29
+    - LeanProofReceipt sha256:48247dcb-6630e54e-63789bf9-76c3cc70-98672321-64d3e942-e621fadb-89a8d68c
+    - Lean toolchain pinned to leanprover/lean4:v4.32.2 and commit f3b06c705e6c85f5314019d5d3baab0fec5b580c
+    - mathlib pinned to tag v4.32.2 and revision 905b95818eb32af7874a58b427f50c1711a5e96c
+    - real bounded lake env lean check PASS with import Mathlib and theorem s12_zero_add
+    - invalid theorem fixture rejected with unsolved goals
+    - focused formal tests PASS with 7 passed
+    - focused mixed tests PASS with 23 passed
+    - make test PASS with 1836 passed and 1 skipped
     - make lint PASS
     - make typecheck PASS
-  next_executable_action: S12 Lean 4 plus pinned mathlib primary formal environment
+  next_executable_action: S13 Rocq, Isabelle/HOL and HOL4 independent contours
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -2027,6 +2029,9 @@ evidence_index:
   - claim: S11 P0 core admission proven
     source: P0CoreAdmissionReceipt/v1
     identity: 9517a304-74b48a50-766d7570-c6c1521c-8aa645fc-0ff92324-11479b40-e03078e9
+  - claim: S12 Lean primary formal environment proven
+    source: LeanAdmissionReceipt/v1
+    identity: 685653b0-e12407ec-db6a11f0-adeef991-7744d2af-89dc6ee8-a2267f95-25c7d527
   - claim: Market mutation currently forbidden
     source: native operator bootstrap
     identity: 59ce6ff4c8b514c93d8d4b26d648ba6e7dd7b764
@@ -2039,7 +2044,7 @@ evidence_index:
 authority_ledger:
   routine_safe_plan_creation: exercised
   exact_hash_review_authority: exercised
-  implementation_authority: exercised_routine_safe_S01_S11
+  implementation_authority: exercised_routine_safe_S01_S12
   market_mutation_authority: absent
   security_mutation_authority: absent
   physical_t7_authority: absent
@@ -2094,6 +2099,8 @@ decision_log:
     decision: S10 uses a shared read-only InterfaceService for common CLI, MCP and portal semantics while leaving each surface responsible only for transport/framing/rendering
   - id: D022
     decision: S11 admits P0 components by truthful per-engine ACTIVE, DEGRADED or WAIT_CAPABILITY evidence and preserves independent solver disagreement instead of substituting z3 for cvc5
+  - id: D023
+    decision: S12 pins Lean/mathlib to the stable v4.32.2 line and records kernel acceptance only for the declared formal statement, not as empirical evidence or external-formalization correctness
 ~~~
 
 ## PROGRESS_LOG
@@ -2151,6 +2158,10 @@ progress_log:
   - revision: 13
     stage: S11
     result: P0 admission bundle proven with NumPy, SciPy, Pint and Z3 ACTIVE, cvc5 DEGRADED, advanced engines WAIT_CAPABILITY and authority-negative tests green
+    observed_at: 2026-07-29
+  - revision: 14
+    stage: S12
+    result: Lean v4.32.2 and mathlib v4.32.2 primary formal environment proven with real Mathlib smoke, invalid-proof rejection, tests, lint and typecheck green
     observed_at: 2026-07-29
 ~~~
 
