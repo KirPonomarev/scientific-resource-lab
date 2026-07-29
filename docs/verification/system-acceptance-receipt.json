@@ -1,0 +1,523 @@
+{
+  "branch": "codex/srf-fabric-v1",
+  "candidate_scope": "standalone SRF plus inactive proposal-only bridge contracts",
+  "canonical_writes": 0,
+  "chaos_receipts": {
+    "corrupt": {
+      "canonical_writes": 0,
+      "evidence_command": "uv run pytest tests/cas/test_engine.py tests/execution/test_materialize.py tests/bridge/test_export_corpus.py",
+      "evidence_paths": [
+        "tests/cas/test_engine.py",
+        "tests/execution/test_materialize.py",
+        "tests/bridge/test_export_corpus.py"
+      ],
+      "grants_authority": false,
+      "live_actions": 0,
+      "status": "PASS",
+      "test_selectors": [
+        "tests/cas/test_engine.py",
+        "tests/execution/test_materialize.py::test_materialize_raises_on_store_corruption",
+        "tests/bridge/test_export_corpus.py::test_adversarial_corpus_case_rejected_typed"
+      ]
+    },
+    "crash": {
+      "canonical_writes": 0,
+      "evidence_command": "uv run pytest tests/cas/test_engine_crash.py tests/security/test_adversarial.py",
+      "evidence_paths": [
+        "tests/cas/test_engine_crash.py",
+        "tests/security/test_adversarial.py"
+      ],
+      "grants_authority": false,
+      "live_actions": 0,
+      "status": "PASS",
+      "test_selectors": [
+        "tests/cas/test_engine_crash.py",
+        "tests/security/test_adversarial.py::test_fifty_run_conformance_sequence_is_orphan_free"
+      ]
+    },
+    "duplicate": {
+      "canonical_writes": 0,
+      "evidence_command": "uv run pytest tests/transport/test_spool.py tests/integrations/market/test_bridge.py tests/integrations/security/test_bridge.py",
+      "evidence_paths": [
+        "tests/transport/test_spool.py",
+        "tests/integrations/market/test_bridge.py",
+        "tests/integrations/security/test_bridge.py"
+      ],
+      "grants_authority": false,
+      "live_actions": 0,
+      "status": "PASS",
+      "test_selectors": [
+        "tests/transport/test_spool.py::test_duplicate_delivery_is_idempotent",
+        "tests/integrations/market/test_bridge.py::test_market_observation_rejects_duplicate_import",
+        "tests/integrations/security/test_bridge.py::test_security_observation_rejects_duplicate_import"
+      ]
+    },
+    "injection": {
+      "canonical_writes": 0,
+      "evidence_command": "uv run pytest tests/security/test_adversarial.py tests/bridge/test_packet.py tests/integrations/security/test_bridge.py",
+      "evidence_paths": [
+        "tests/security/test_adversarial.py",
+        "tests/bridge/test_packet.py",
+        "tests/integrations/security/test_bridge.py"
+      ],
+      "grants_authority": false,
+      "live_actions": 0,
+      "status": "PASS",
+      "test_selectors": [
+        "tests/security/test_adversarial.py::test_each_case_matches_expectation_and_receipt_last",
+        "tests/bridge/test_packet.py::test_adversarial_fixture_every_case_rejected",
+        "tests/integrations/security/test_bridge.py"
+      ]
+    },
+    "low_disk": {
+      "canonical_writes": 0,
+      "evidence_command": "uv run pytest tests/cas/test_capacity.py && uv run python scripts/checks/wp20-gate.py",
+      "evidence_paths": [
+        "tests/cas/test_capacity.py",
+        "scripts/checks/wp20-gate.py"
+      ],
+      "grants_authority": false,
+      "live_actions": 0,
+      "status": "PASS",
+      "test_selectors": [
+        "tests/cas/test_capacity.py::test_check_capacity_exceeded_at_ceiling",
+        "scripts/checks/wp20-gate.py"
+      ]
+    },
+    "revoke": {
+      "canonical_writes": 0,
+      "evidence_command": "uv run pytest tests/packs/test_governance.py tests/heavy/test_remote_routing.py",
+      "evidence_paths": [
+        "tests/packs/test_governance.py",
+        "tests/heavy/test_remote_routing.py"
+      ],
+      "grants_authority": false,
+      "live_actions": 0,
+      "status": "PASS",
+      "test_selectors": [
+        "tests/packs/test_governance.py::test_direct_revocation_wins_over_complete_evidence",
+        "tests/heavy/test_remote_routing.py::test_revoked_image_is_rejected"
+      ]
+    },
+    "stale": {
+      "canonical_writes": 0,
+      "evidence_command": "uv run pytest tests/recovery/test_health_recovery.py tests/integrations/market/test_bridge.py tests/integrations/security/test_bridge.py tests/bridge/test_export_corpus.py",
+      "evidence_paths": [
+        "tests/recovery/test_health_recovery.py",
+        "tests/integrations/market/test_bridge.py",
+        "tests/integrations/security/test_bridge.py",
+        "tests/bridge/test_export_corpus.py"
+      ],
+      "grants_authority": false,
+      "live_actions": 0,
+      "status": "PASS",
+      "test_selectors": [
+        "tests/recovery/test_health_recovery.py::test_stale_pulse_projects_wait_srf",
+        "tests/integrations/market/test_bridge.py::test_market_observation_rejects_stale_head",
+        "tests/integrations/security/test_bridge.py::test_security_observation_rejects_stale_head",
+        "tests/bridge/test_export_corpus.py::test_adversarial_corpus_case_rejected_typed"
+      ]
+    }
+  },
+  "declared_wait_states": [
+    "WAIT_T7_BINDING",
+    "WAIT_COMPUTE_NODE",
+    "WAIT_RUNTIME_HEALTH:MARKET_RED_F8",
+    "WAIT_SECURITY_HEALTH:BOOTSTRAP_UNAVAILABLE",
+    "WAIT_CAPABILITY:advanced_optional_science_packs",
+    "WAIT_NATIVE_CHILD_CLOSEOUT:DUAL_CONTOUR"
+  ],
+  "evidence_paths": [
+    "docs/verification/SYSTEM-ACCEPTANCE.md",
+    "docs/verification/system-acceptance-receipt.json",
+    "tests/e2e/test_system_acceptance_receipt.py",
+    "tests/adversarial/test_system_acceptance_failure_routes.py",
+    "Makefile",
+    "scripts/checks/public_boundary.py",
+    "scripts/checks/secret_scan.py"
+  ],
+  "file_sha256": {
+    "docs/verification/SYSTEM-ACCEPTANCE.md": "f333191b52c01dcc92e01215b6fbba3aaf8bd98bc7601574d99c4e8bb623635d",
+    "tests/adversarial/test_system_acceptance_failure_routes.py": "d37a2774eea73ca20b6bb6f5a8d6b76b76446bee4ab241606df1775145b76083",
+    "tests/e2e/test_system_acceptance_receipt.py": "23943066098fa1ed8118b306a3d941f648bcae429871fa07d300608f39398b06"
+  },
+  "git_head": "0e65c0f15105f54487cf2ea91bb4996a520d8f19",
+  "grants_authority": false,
+  "limitations_machine_visible": true,
+  "live_actions": 0,
+  "manifest_paths": [
+    "docs/verification/SYSTEM-ACCEPTANCE.md",
+    "docs/verification/system-acceptance-receipt.json"
+  ],
+  "mission_id": "build-scientific-reasoning-fabric-v1",
+  "next_stage": "S26",
+  "plan_hash": "947d1858c8cf110f3c6bdb07c70a8ff132459f9e7b6448d1afbf84d4270c1ff0",
+  "protected_actions": {
+    "performed": [],
+    "wait_states": [
+      "WAIT_T7_BINDING",
+      "WAIT_COMPUTE_NODE"
+    ]
+  },
+  "receipt_id": "f35bf7389b37e04cf81a9905c0e8c865753d686ae1d997b7d1c9761a797a4aab",
+  "restore_acceptance": {
+    "canonical_writes": 0,
+    "command": "make test plus tests/recovery/test_health_recovery.py::test_bounded_restore_drill_restores_unique_artifacts",
+    "grants_authority": false,
+    "status": "PASS"
+  },
+  "result": "PASS_WITH_DECLARED_WAITS",
+  "schema_version": "SystemAcceptanceReceipt/v1",
+  "solo_agent_acceptance": {
+    "command": "make test plus tests/unit/test_labctl.py and tests/e2e/test_system_acceptance_receipt.py",
+    "entrypoint": "srlab labctl enter",
+    "fresh_agent_uses_chat_history": false,
+    "status": "PASS"
+  },
+  "stage_id": "S25",
+  "state_preimage_hash_before_transition": "6c79f6cadfcabd170a88494595be2deeba9967fe6be686d94e03d0c330b04242",
+  "validation_matrix": [
+    {
+      "command": "python3 exact marker-bounded plan/state hash review",
+      "command_id": "exact_hash_review",
+      "duration_seconds": 0.0,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "PLAN=947d1858c8cf110f3c6bdb07c70a8ff132459f9e7b6448d1afbf84d4270c1ff0; STATE=6c79f6cadfcabd170a88494595be2deeba9967fe6be686d94e03d0c330b04242"
+    },
+    {
+      "command": "uv sync --locked",
+      "command_id": "default_env_reset",
+      "duration_seconds": 0.031,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "default dependency closure restored from uv.lock before license-sensitive gates"
+    },
+    {
+      "command": "make lint",
+      "command_id": "lint",
+      "duration_seconds": 0.142,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "PASS"
+    },
+    {
+      "command": "make typecheck",
+      "command_id": "typecheck",
+      "duration_seconds": 0.291,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "PASS"
+    },
+    {
+      "command": "make test",
+      "command_id": "full_pytest",
+      "duration_seconds": 90.683,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "1911 passed, 1 skipped in 90.13s"
+    },
+    {
+      "command": "make corpus",
+      "command_id": "corpus",
+      "duration_seconds": 0.128,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "PASS"
+    },
+    {
+      "command": "make router-determinism",
+      "command_id": "router_determinism",
+      "duration_seconds": 0.099,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "PASS"
+    },
+    {
+      "command": "make repro-check",
+      "command_id": "repro_check",
+      "duration_seconds": 0.874,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "reproducible wheel content_manifest_sha256=77c65145c1338ef4965e064295b105a3d7d0978711ba4a6fa9c2f398b525aa20"
+    },
+    {
+      "command": "uv run python scripts/checks/public_boundary.py",
+      "command_id": "public_boundary",
+      "duration_seconds": 0.544,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "public_boundary/v1 PASS; violations=[]"
+    },
+    {
+      "command": "uv run python scripts/checks/secret_scan.py",
+      "command_id": "secret_scan",
+      "duration_seconds": 0.459,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "secret_scan/v1 PASS; findings=[]"
+    },
+    {
+      "command": "uv run python scripts/checks/wp03-gate.py",
+      "command_id": "gate_wp03",
+      "duration_seconds": 0.067,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-03 GateReceipt PASS"
+    },
+    {
+      "command": "uv run python scripts/checks/wp10-gate.py",
+      "command_id": "gate_wp10",
+      "duration_seconds": 0.169,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-10 GateReceipt PASS"
+    },
+    {
+      "command": "uv run python scripts/checks/wp11-gate.py",
+      "command_id": "gate_wp11",
+      "duration_seconds": 0.17,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-11 GateReceipt PASS"
+    },
+    {
+      "command": "uv run python scripts/checks/wp12-gate.py",
+      "command_id": "gate_wp12",
+      "duration_seconds": 0.1,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-12 GateReceipt PASS"
+    },
+    {
+      "command": "uv run python scripts/checks/wp13-gate.py",
+      "command_id": "gate_wp13",
+      "duration_seconds": 0.107,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-13 GateReceipt PASS"
+    },
+    {
+      "command": "uv run python scripts/checks/wp14-gate.py",
+      "command_id": "gate_wp14",
+      "duration_seconds": 0.095,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-14 GateReceipt PASS"
+    },
+    {
+      "command": "uv run python scripts/checks/wp20-gate.py",
+      "command_id": "gate_wp20",
+      "duration_seconds": 0.126,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-20 GateReceipt PASS"
+    },
+    {
+      "command": "uv run python scripts/checks/wp21-gate.py",
+      "command_id": "gate_wp21",
+      "duration_seconds": 0.227,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-21 GateReceipt PASS"
+    },
+    {
+      "command": "uv run python scripts/checks/wp22-gate.py",
+      "command_id": "gate_wp22",
+      "duration_seconds": 0.116,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-22 GateReceipt PASS"
+    },
+    {
+      "command": "uv run python scripts/checks/wp23-gate.py",
+      "command_id": "gate_wp23",
+      "duration_seconds": 0.103,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-23 GateReceipt PASS"
+    },
+    {
+      "command": "uv run python scripts/checks/wp24-gate.py",
+      "command_id": "gate_wp24",
+      "duration_seconds": 0.099,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-24 GateReceipt PASS"
+    },
+    {
+      "command": "uv run python scripts/checks/wp30-gate.py",
+      "command_id": "gate_wp30",
+      "duration_seconds": 0.104,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-30 GateReceipt PASS"
+    },
+    {
+      "command": "uv run python scripts/checks/wp31-gate.py",
+      "command_id": "gate_wp31",
+      "duration_seconds": 14.36,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-31 GateReceipt PASS"
+    },
+    {
+      "command": "uv run python scripts/checks/wp32-gate.py",
+      "command_id": "gate_wp32",
+      "duration_seconds": 0.534,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-32 GateReceipt PASS"
+    },
+    {
+      "command": "uv run python scripts/checks/wp33-gate.py",
+      "command_id": "gate_wp33",
+      "duration_seconds": 0.119,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-33 GateReceipt PASS"
+    },
+    {
+      "command": "uv run python scripts/checks/wp34-gate.py",
+      "command_id": "gate_wp34",
+      "duration_seconds": 55.254,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-34 GateReceipt PASS"
+    },
+    {
+      "command": "uv run python scripts/checks/wp40-gate.py",
+      "command_id": "gate_wp40",
+      "duration_seconds": 1.284,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-40 GateReceipt PASS"
+    },
+    {
+      "command": "uv run python scripts/checks/wp41-gate.py",
+      "command_id": "gate_wp41",
+      "duration_seconds": 13.261,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-41 GateReceipt PASS"
+    },
+    {
+      "command": "uv run python scripts/checks/wp42-gate.py",
+      "command_id": "gate_wp42",
+      "duration_seconds": 1.892,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-42 GateReceipt PASS"
+    },
+    {
+      "command": "uv run python scripts/checks/wp43-gate.py",
+      "command_id": "gate_wp43",
+      "duration_seconds": 2.037,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-43 GateReceipt PASS"
+    },
+    {
+      "command": "uv run python scripts/checks/wp44-gate.py",
+      "command_id": "gate_wp44",
+      "duration_seconds": 0.115,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-44 GateReceipt PASS"
+    },
+    {
+      "command": "uv run python scripts/checks/wp45-gate.py",
+      "command_id": "gate_wp45",
+      "duration_seconds": 2.073,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-45 GateReceipt PASS"
+    },
+    {
+      "command": "uv run python scripts/checks/wp50-gate.py",
+      "command_id": "gate_wp50",
+      "duration_seconds": 0.247,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-50 GateReceipt PASS"
+    },
+    {
+      "command": "uv run python scripts/checks/wp51-gate.py",
+      "command_id": "gate_wp51",
+      "duration_seconds": 0.858,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-51 GateReceipt PASS"
+    },
+    {
+      "command": "uv run python scripts/checks/wp52-gate.py",
+      "command_id": "gate_wp52",
+      "duration_seconds": 0.125,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-52 GateReceipt PASS"
+    },
+    {
+      "command": "uv run python scripts/checks/wp60-gate.py",
+      "command_id": "gate_wp60",
+      "duration_seconds": 0.099,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-60 GateReceipt PASS"
+    },
+    {
+      "command": "uv run python scripts/checks/wp70-gate.py",
+      "command_id": "gate_wp70",
+      "duration_seconds": 0.103,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-70 GateReceipt PASS"
+    },
+    {
+      "command": "uv run python scripts/checks/wp71b-gate.py",
+      "command_id": "gate_wp71b",
+      "duration_seconds": 1.612,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-71b GateReceipt PASS"
+    },
+    {
+      "command": "uv run python scripts/checks/wp72-gate.py",
+      "command_id": "gate_wp72",
+      "duration_seconds": 0.096,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-72 GateReceipt PASS"
+    },
+    {
+      "command": "uv run python scripts/checks/wp73-gate.py",
+      "command_id": "gate_wp73",
+      "duration_seconds": 0.111,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-73 GateReceipt PASS"
+    },
+    {
+      "command": "uv run python scripts/checks/wp80-gate.py",
+      "command_id": "gate_wp80",
+      "duration_seconds": 0.878,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-80 GateReceipt PASS"
+    },
+    {
+      "command": "uv run --extra bayesian python scripts/checks/wp71a-gate.py",
+      "command_id": "gate_wp71a",
+      "duration_seconds": 23.068,
+      "exit_code": 0,
+      "status": "PASS",
+      "summary": "WP-71a GateReceipt PASS"
+    }
+  ],
+  "validation_matrix_private_sha256": "ef15a686edabc4dc149297e5fcfa5fb2f6fae7e9e0aa8ff3a2c7537ad2ccc9b7",
+  "validation_strategy": {
+    "default_dependency_closure": "uv sync --locked before default and license-sensitive gates",
+    "optional_extra_gate": "WP-H71a runs last with uv run --extra bayesian",
+    "reason": "bayesian extra is testable but not part of default admitted runtime closure"
+  }
+}

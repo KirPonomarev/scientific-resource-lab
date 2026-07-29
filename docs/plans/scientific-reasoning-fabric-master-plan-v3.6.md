@@ -1900,9 +1900,9 @@ The final report must list exact IDs and hashes, never subjective percentages.
 
 <!-- BEGIN_MUTABLE_STATE_V3_6 -->
 
-STATE_REVISION: 26
-PREVIOUS_STATE_SHA256: d327d950-df4ba2a6-ade5159e-d89966d5-0c3c6a42-69ab9529-914aade7-b41238c4
-CURRENT_STATE_SHA256: 3f889a13-d0f7a0fb-3f29d392-9fc0f085-761e6bde-7e17f38e-acf05d26-ef29aaf3
+STATE_REVISION: 27
+PREVIOUS_STATE_SHA256: 6c79f6ca-dfcabd17-0a884945-95be2dee-ba9967fe-6be686d9-4e03d0c3-30b04242
+CURRENT_STATE_SHA256: 4bd1fa42-8b40ce74-97cd97f6-28686539-6465312a-58ed3850-4dbdfcb8-605955b2
 
 ## CURRENT_FACTS
 
@@ -1927,20 +1927,20 @@ current_facts:
 ~~~yaml
 execution_state:
   status: IN_PROGRESS
-  current_stage: S25
-  next_stage: S26_after_validation
-  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven, S09_health_recovery_proven, S10_interface_convergence_proven, S11_p0_core_proven, S12_lean_primary_proven, S13_cross_prover_proven, S14_knowledge_layer_proven, S15_lawminer_proven, S16_applied_science_proven, S17_sciml_domain_proven, S18_heavy_capability_routing_proven, S19_shared_contract_child_request_prepared, S20_market_bridge_inactive_proven, S21_security_bridge_inactive_proven, S22_market_native_child_wait_recorded, S23_security_native_child_wait_recorded, S24_physical_profile_preflight_proven]
+  current_stage: S26
+  next_stage: S27_after_documentation_closure
+  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven, S09_health_recovery_proven, S10_interface_convergence_proven, S11_p0_core_proven, S12_lean_primary_proven, S13_cross_prover_proven, S14_knowledge_layer_proven, S15_lawminer_proven, S16_applied_science_proven, S17_sciml_domain_proven, S18_heavy_capability_routing_proven, S19_shared_contract_child_request_prepared, S20_market_bridge_inactive_proven, S21_security_bridge_inactive_proven, S22_market_native_child_wait_recorded, S23_security_native_child_wait_recorded, S24_physical_profile_preflight_proven, S25_system_acceptance_proven]
   invalidated_stages: []
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: physical_profile_preflight_proven
+  last_proven_transition: system_acceptance_proven
   active_branch_or_null: codex/srf-fabric-v1
   active_pr_or_null: null
   active_worktree_or_null: isolated_codex_worktree
   writer_lease_or_null: srf-fabric-v1-single-writer
-  active_operation_or_null: S25_full_system_validation
+  active_operation_or_null: S26_documentation_closure
   active_process_or_job_or_null: null
-  next_checkpoint: after_S25_full_system_validation_receipt
-  next_executable_action: run full-system validation, chaos and solo-agent acceptance checks
+  next_checkpoint: after_S26_documentation_closure_receipt
+  next_executable_action: generate and verify complete system documentation from manifests, schemas and receipts
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -1952,28 +1952,26 @@ state_capsule:
   project_id: scientific-resource-lab
   project_fingerprint: d56e03d0-d5e1a9bb-9c33a008-ab989510-2d8e41e8-bfd001df-bfc8e1c8-0b9df0b3
   mission_id: build-scientific-reasoning-fabric-v1
-  stage_id: S25
-  state_revision: 26
+  stage_id: S26
+  state_revision: 27
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: physical_profile_preflight_proven
-  active_operation: S25_full_system_validation
+  last_proven_transition: system_acceptance_proven
+  active_operation: S26_documentation_closure
   active_process_or_job: null
   frozen_preimages:
     - baseline HEAD
     - repository governance
     - operator-supplied V3.6 protocol
   new_primary_evidence:
-    - PhysicalCapabilityBindingPacketReceipt 5e858a49-bccfeb62-e17571c7-e95fa711-60eec672-1bfc8228-a69e535a-35a4ac75
-    - T7 binding request 2cfd1406-9e51d67f-db60fb24-c9d07248-0127c0be-01035064-fe4ff5e1-e4eb1340
-    - T7 read-only preflight f48d4dae-62b28f3c-f48749af-84d643b5-133d05e5-4b91f71f-cd138d70-8ef45081
-    - T7 mount label observed as APFS external physical disk with 544 GiB available and reserve check PASS
-    - native binding remains WAIT_T7_BINDING and Science Compute Node remains WAIT_COMPUTE_NODE
-    - no format, erase, restore, sync, database placement, hardware purchase or cloud purchase was performed
-    - make test PASS with 1903 passed and 1 skipped
-    - make lint PASS
-    - make typecheck PASS
-    - secret scan PASS
-  next_executable_action: S25 full-system validation and chaos acceptance
+    - SystemAcceptanceReceipt f35bf738-9b37e04c-f81a9905-c0e8c865-753d686a-e1d997b7-d1c9761a-797a4aab
+    - S25ValidationMatrix/v1 private evidence hash recorded in receipt with 42 commands and zero failed
+    - make test PASS with 1911 passed and 1 skipped
+    - public boundary PASS and secret scan PASS
+    - default dependency closure reset before license-sensitive gates
+    - optional WP-H71a Bayesian gate PASS with declared bayesian extra and no default closure contamination
+    - chaos routes PASS for crash, duplicate, revoke, corrupt, stale, injection and low disk
+    - residual waits remain explicit: WAIT_T7_BINDING, WAIT_COMPUTE_NODE, WAIT_RUNTIME_HEALTH:MARKET_RED_F8, WAIT_SECURITY_HEALTH:BOOTSTRAP_UNAVAILABLE, WAIT_CAPABILITY:advanced_optional_science_packs, WAIT_NATIVE_CHILD_CLOSEOUT:DUAL_CONTOUR
+  next_executable_action: S26 documentation closure and generated drift gates
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -2065,7 +2063,10 @@ evidence_index:
     identity: a7bbccf2-db4ee9f5-a2f568d0-ef2ea46b-ac2ecc35-7256577a-268d29ef-9fc2ac73
   - claim: S24 physical T7 profile preflight proven with declared waits
     source: PhysicalCapabilityBindingPacketReceipt/v1
-    identity: 5e858a49-bccfeb62-e17571c7-e95fa711-60eec672-1bfc8228-a69e535a-35a4ac75
+    identity: ffcbdff9-2502a1f2-e709d3a7-7f71c65d-bf6d0365-05d6dd44-c0bbda84-501b5e96
+  - claim: S25 full-system validation and chaos acceptance proven
+    source: SystemAcceptanceReceipt/v1
+    identity: f35bf738-9b37e04c-f81a9905-c0e8c865-753d686a-e1d997b7-d1c9761a-797a4aab
   - claim: Market mutation currently forbidden
     source: native operator bootstrap
     identity: 59ce6ff4c8b514c93d8d4b26d648ba6e7dd7b764
@@ -2268,6 +2269,10 @@ progress_log:
   - revision: 26
     stage: S24
     result: Physical T7 binding request and read-only preflight prepared with reserve check PASS, WAIT_T7_BINDING and WAIT_COMPUTE_NODE recorded, and no protected storage or purchase action performed
+    observed_at: 2026-07-29
+  - revision: 27
+    stage: S25
+    result: Full-system validation, chaos acceptance, solo-agent entry, restore evidence, default license closure and optional Bayesian gate isolation proven with residual waits explicit
     observed_at: 2026-07-29
 ~~~
 

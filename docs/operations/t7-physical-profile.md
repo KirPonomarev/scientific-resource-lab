@@ -1,12 +1,12 @@
 # T7 Physical Profile
 
-S24 performs a read-only physical capability preflight for `/Volumes/T7` and
+S24 performs a read-only physical capability preflight for the `T7` mount label and
 prepares a binding request. No storage writes, formatting, restore, sync,
 database placement, hardware purchase or cloud purchase were performed.
 
 Read-only observation:
 
-- Volume: `/Volumes/T7`
+- Volume label: `T7`
 - Filesystem: APFS
 - External physical disk observed: true
 - Capacity: 931 GiB
