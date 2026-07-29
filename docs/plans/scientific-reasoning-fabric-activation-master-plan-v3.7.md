@@ -1169,9 +1169,9 @@ current_facts:
 
 ~~~yaml
 execution_state:
-  status: A14_ACTIVE_READY_FOR_A15_WITH_PARKED_PROTECTED_LANES
+  status: A15_SOFTWARE_READINESS_PASS_WAIT_COMPUTE_NODE
   current_stage: A15
-  next_stage: A15_provision_and_activate_heavy_compute
+  next_stage: A15_provision_and_activate_heavy_compute_after_authority
   completed_stages:
     - A00
     - A01
@@ -1201,11 +1201,12 @@ execution_state:
     - WAIT_COMPUTE_TARGET:A05_BIND_NATIVE_SANDBOX_COMPUTE_TARGET
     - WAIT_LICENSE:A07_PYTHON_FLINT_LGPL_CLOSURE
     - WAIT_AUTHORITY:A09_BIND_PINNED_LEAN_MATHLIB_PROJECT_TO_T7
-  active_branch_or_null: codex/srf-a14-sciml-domain
+    - WAIT_COMPUTE_NODE:A15_PROVISION_HEAVY_COMPUTE_TARGET
+  active_branch_or_null: codex/srf-a15-heavy-compute
   active_pr_or_null: null
   writer_lease_or_null: null
-  blocker_or_null: WAIT_LICENSE:A07_PYTHON_FLINT_LGPL_CLOSURE
-  next_executable_action: start A15 heavy compute target provisioning analysis while keeping T7-backed persistence, native compute binding, native production signing, FLINT license closure and A09 T7 formal toolchain binding parked until exact authority/evidence exists
+  blocker_or_null: WAIT_COMPUTE_NODE:A15_PROVISION_HEAVY_COMPUTE_TARGET
+  next_executable_action: request exact authority for A15 compute target provisioning or continue A16 software-only product work while compute-node, T7-backed persistence, native compute binding, native production signing, FLINT license closure and A09 T7 formal toolchain binding remain parked
   updated_at: 2026-07-29
 ~~~
 
@@ -1255,6 +1256,8 @@ decision_log:
     decision: A13 applied-science packs are ACTIVE with ripser topology signal/null control, pyriemann SPD geometry diagnostics, CVXPY solver/license matrix, native analytic Bayesian diagnostics without MCMC convergence claims and native causal backdoor identification plus falsification; all broader catalog items are formally replaced for v2.0.0; truth-ledger A13 projection is offline from hash-bound receipt sha256:067abec4a2274b42e8e33122076045d9c67a6d1de6e51859505866adafdbca24
   - id: V37-D021
     decision: A14 SciML/domain packs are ACTIVE with a real Julia SciMLBase/OrdinaryDiffEq ODE solve, Python diffrax ODE solve, QuTiP quantum evolution, Astropy coordinate transform, Cantera combustion equilibrium, native bounded battery RC model, quimb many-body diagonalization and cotengra tensor-network contraction path; ModelingToolkit, DataDrivenDiffEq, Cadabra and PyBaMM are formally replaced for v2.0.0; cross-language ODE evidence is tolerance-only with no bitwise identity claim; truth-ledger A14 projection is offline from hash-bound receipt sha256:2ab6c81a418700072a1330008290304cd24fe74993efd65c22b4fd43397080ae
+  - id: V37-D022
+    decision: A15 heavy compute software readiness is PASS but stage remains WAIT_COMPUTE_NODE; PETSc, FEniCSx, pyMOR, scikit-fem, Dedalus and SageMath cannot become ACTIVE from accidental local imports and require a compatible Linux x86_64 compute target, exact image digests, real job receipts, checkpoint/resume evidence and artifact-return evidence; protected operator action is recorded at docs/target-binding/a15-heavy-compute-operator-action.json; wait receipt 6c0797c0-3e32208d-f9b79039-6d2ed444-4d514a76-55582837-42516212-061bb676 records remote_launches=0 and unbounded_local_runs=0
 ~~~
 
 ## EVIDENCE_INDEX
@@ -1323,6 +1326,9 @@ evidence_index:
   - scripts/checks/srf-v37-a14-prepare-julia.py
   - scripts/checks/srf-v37-a14-gate.py
   - docs/verification/srf-v3-7-a14-sciml-domain-receipt.json
+  - scripts/checks/srf-v37-a15-gate.py
+  - docs/target-binding/a15-heavy-compute-operator-action.json
+  - docs/verification/srf-v3-7-a15-heavy-compute-wait-receipt.json
 ~~~
 
 <!-- END_MUTABLE_STATE_V3_7 -->

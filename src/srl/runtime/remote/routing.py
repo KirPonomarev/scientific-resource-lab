@@ -20,6 +20,14 @@ HEAVY_REMOTE_ROUTING_DECISION_SCHEMA_VERSION: Final[str] = "HeavyRemoteRoutingDe
 _TEST_HMAC_SHA256: Final[str] = "test-hmac-sha256"
 _WAIT_RUNTIME: Final[str] = "runtime_or_node_capability_missing"
 _WAIT_AUTHORITY: Final[str] = "credential_or_budget_authority_missing"
+A15_REQUIRED_PROFILE_IDS: Final[tuple[str, ...]] = (
+    "heavy.petsc",
+    "heavy.fenicsx",
+    "heavy.pymor",
+    "heavy.scikit_fem",
+    "heavy.dedalus",
+    "heavy.sage",
+)
 
 
 class RemoteRoutingError(ContractError):
@@ -54,6 +62,7 @@ class HeavyProfile:
     tiny_local_allowed: bool
     paid_oracle: bool
     checkpoint_policy: str
+    requires_compute_target: bool = True
     status: HeavyCapabilityStatus = HeavyCapabilityStatus.WAIT_COMPUTE_NODE
     reason: str = _WAIT_RUNTIME
 
@@ -70,6 +79,8 @@ class HeavyProfile:
             raise RemoteRoutingError("tiny_local_allowed must be a bool")
         if isinstance(self.paid_oracle, bool) is False:
             raise RemoteRoutingError("paid_oracle must be a bool")
+        if isinstance(self.requires_compute_target, bool) is False:
+            raise RemoteRoutingError("requires_compute_target must be a bool")
 
     def with_status(self, status: HeavyCapabilityStatus, reason: str) -> HeavyProfile:
         """Return this profile with changed routing status."""
@@ -84,6 +95,7 @@ class HeavyProfile:
             tiny_local_allowed=self.tiny_local_allowed,
             paid_oracle=self.paid_oracle,
             checkpoint_policy=self.checkpoint_policy,
+            requires_compute_target=self.requires_compute_target,
             status=status,
             reason=reason,
         )
@@ -101,6 +113,7 @@ class HeavyProfile:
             "tiny_local_allowed": self.tiny_local_allowed,
             "paid_oracle": self.paid_oracle,
             "checkpoint_policy": self.checkpoint_policy,
+            "requires_compute_target": self.requires_compute_target,
             "status": self.status.value,
             "reason": self.reason,
             "canonical_writes": 0,
@@ -361,6 +374,7 @@ def _profile(  # noqa: PLR0913, PLR0917
     tiny_local_allowed: bool,
     *,
     paid_oracle: bool = False,
+    requires_compute_target: bool = True,
 ) -> HeavyProfile:
     return HeavyProfile(
         profile_id=profile_id,
@@ -373,6 +387,7 @@ def _profile(  # noqa: PLR0913, PLR0917
         tiny_local_allowed=tiny_local_allowed,
         paid_oracle=paid_oracle,
         checkpoint_policy="checkpoint_by_deterministic_step_count",
+        requires_compute_target=requires_compute_target,
     )
 
 
@@ -388,7 +403,12 @@ def _assess_profile(  # noqa: PLR0911
         name for name in profile.import_names if importlib.util.find_spec(name) is None
     ]
     missing_executables = [name for name in profile.executable_names if shutil.which(name) is None]
-    if not missing_imports and not missing_executables and profile.tiny_local_allowed:
+    if (
+        not profile.requires_compute_target
+        and not missing_imports
+        and not missing_executables
+        and profile.tiny_local_allowed
+    ):
         return profile.with_status(
             HeavyCapabilityStatus.ACTIVE_LOCAL,
             "tiny local runtime importable under bounded profile",
@@ -447,6 +467,7 @@ def _require_non_empty(value: object, field: str) -> None:
 
 
 __all__ = [
+    "A15_REQUIRED_PROFILE_IDS",
     "HEAVY_CAPABILITY_ROUTING_BUNDLE_SCHEMA_VERSION",
     "HEAVY_REMOTE_JOB_PACKET_SCHEMA_VERSION",
     "HEAVY_REMOTE_ROUTING_DECISION_SCHEMA_VERSION",

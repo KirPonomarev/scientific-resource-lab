@@ -42,6 +42,7 @@ WAIT_STATES: Final[tuple[str, ...]] = (
     "WAIT_AUTHORITY",
     "WAIT_T7_BINDING",
     "WAIT_COMPUTE_TARGET",
+    "WAIT_COMPUTE_NODE",
     "WAIT_LICENSE",
 )
 
@@ -157,6 +158,14 @@ _EXPECTED_A14_REPLACED: Final[tuple[str, ...]] = (
     "julia_datadrivendiffeq",
     "python_cadabra",
     "python_pybamm",
+)
+_EXPECTED_A15_COMPONENTS: Final[tuple[str, ...]] = (
+    "petsc",
+    "fenicsx",
+    "pymor",
+    "scikit-fem",
+    "dedalus",
+    "sagemath",
 )
 
 
@@ -1306,6 +1315,16 @@ _SPECS: Final[tuple[ComponentSpec, ...]] = (
         )
         for pack_id in _EXPECTED_A14_COMPONENTS
     ),
+    *(
+        ComponentSpec(
+            pack_id,
+            "a15_heavy_compute",
+            "A15",
+            "remote_compute_target",
+            activation_wait_state="WAIT_COMPUTE_NODE",
+        )
+        for pack_id in _EXPECTED_A15_COMPONENTS
+    ),
     ComponentSpec(
         "production-ed25519-signer",
         "a04_transport",
@@ -1536,6 +1555,16 @@ def build_truth_ledger() -> dict[str, Any]:
             f"{item['state']}:{item['component_id']}"
             for item in components
             if item["activation_stage"] == "A14" and item["state"] != "ACTIVE"
+        ],
+        "a15_active_inventory_observed": [
+            item["component_id"]
+            for item in components
+            if item["activation_stage"] == "A15" and item["state"] == "ACTIVE"
+        ],
+        "a15_parked_blockers": [
+            f"{item['state']}:{item['component_id']}"
+            for item in components
+            if item["activation_stage"] == "A15" and item["state"] != "ACTIVE"
         ],
         "a07_parked_blockers": [f"WAIT_LICENSE:python-flint:{FLINT_WAIT_REASON}"],
         "production_versus_fixture_axis": [

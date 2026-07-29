@@ -69,6 +69,12 @@ Current v1.0.1 active inventory reproduced by the ledger:
 | `native_battery_rc` | `a14_sciml_domain` | `A14` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
 | `python_quimb_many_body` | `a14_sciml_domain` | `A14` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
 | `python_cotengra_tensor_network` | `a14_sciml_domain` | `A14` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
+| `petsc` | `a15_heavy_compute` | `A15` | `WAIT_COMPUTE_NODE` | `missing_or_protected_capability` |
+| `fenicsx` | `a15_heavy_compute` | `A15` | `WAIT_COMPUTE_NODE` | `missing_or_protected_capability` |
+| `pymor` | `a15_heavy_compute` | `A15` | `WAIT_COMPUTE_NODE` | `missing_or_protected_capability` |
+| `scikit-fem` | `a15_heavy_compute` | `A15` | `WAIT_COMPUTE_NODE` | `missing_or_protected_capability` |
+| `dedalus` | `a15_heavy_compute` | `A15` | `WAIT_COMPUTE_NODE` | `missing_or_protected_capability` |
+| `sagemath` | `a15_heavy_compute` | `A15` | `WAIT_COMPUTE_NODE` | `missing_or_protected_capability` |
 | `production-ed25519-signer` | `a04_transport` | `A04` | `WAIT_AUTHORITY` | `missing_or_protected_capability` |
 | `t2-t3-enforced-sandbox` | `a05_sandbox` | `A05` | `WAIT_COMPUTE_TARGET` | `missing_or_protected_capability` |
 | `t7-binding` | `a02_t7` | `A02` | `WAIT_T7_BINDING` | `missing_or_protected_capability` |

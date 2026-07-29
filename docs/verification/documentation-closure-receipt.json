@@ -63,7 +63,7 @@
     "docs/verification/system-acceptance-receipt.json": "55f7295e-4d25cd66-24ac24db-0769f234-6ef69e46-64648377-8c29e228-19344fbe",
     "scripts/checks/markdown_structure.py": "99fdf1a0-4a5a0fc0-bd5e0eff-3692561b-297d30cc-63ba3e69-6798ace3-e49a8448",
     "scripts/docs/generate_solo_agent_docs.py": "ef66a5c4-3251a593-8912005d-8b615233-7e9f8c05-f3bfad1c-001de985-528c643f",
-    "scripts/docs/generate_system_docs.py": "43748dea-6c1266fa-3f67165d-e6355691-7df1a523-422d9760-be96c66d-f207677d",
+    "scripts/docs/generate_system_docs.py": "466747ac-0d13d660-0b5167f8-3e554cd1-bb698706-106124e7-041fca25-55699f49",
     "tests/adversarial/test_system_acceptance_failure_routes.py": "d37a2774-eea73ca2-0b6bb6f5-a8d6b76b-76446bee-4ab24160-6df17751-45b76083",
     "tests/docs/test_documentation_closure.py": "a92a57e9-defe9987-e9d560c8-812cf518-ca408045-8cdc40e9-9e636d7c-b275fca1",
     "tests/e2e/test_system_acceptance_receipt.py": "a091e05d-5729848a-7ece8a1e-315e1af8-62f300d0-89ec05be-e87c7d77-a8f4832e"
@@ -90,12 +90,12 @@
       "WAIT_COMPUTE_NODE"
     ]
   },
-  "receipt_id": "da29cf58-2e27f45d-6d5cc9ad-29897d84-5a53cfb0-417fad78-62ff36b7-c2ae6d75",
+  "receipt_id": "f08757b5-a047f896-34c15c9e-54b51c61-e126ec9f-3084ea27-98d5d6b4-af0248f7",
   "required_doc_sha256": {
     "AUTHORITY-MATRIX.md": "67d84c99-3fb300d6-545aa7fd-6d074290-f4d0394c-74621f5a-8c760d85-abdcf2fd",
     "CAPABILITY-CATALOG.md": "58228411-adc12e5b-217b0542-13b0a59f-ac3e6947-2a724d06-c7ab790f-bbeac55e",
     "CELL-MATRIX.md": "a26067d0-203f1e9f-cb2e0bd9-88a2a5d2-1111e703-c37b0db5-84b79e5d-32b6e05e",
-    "COMPUTE-NODE.md": "e478d79c-f14701a6-67a3c9f7-3d315e60-00b43a2a-1f4fcab0-2422699c-4c8de597",
+    "COMPUTE-NODE.md": "8cf776b2-49af3783-190a9157-c9feb1b0-72caf9bb-77398b4d-4f521ea2-7949c5c9",
     "CONTRACT-MATRIX.md": "a5a58a6f-821fd320-4c58e042-151c9e45-c469d74f-4fd2ce1e-bf7b266e-ade8b806",
     "DATA-CLASSIFICATION.md": "e3b511d6-6e208c06-2b17d73a-31591dc2-6d6b4801-8925b646-4055b67b-2250136a",
     "FAILURE-ROUTING.md": "81e48c1c-e5bdba23-8b5909dc-15adfb9f-afa9ce84-c227849f-29549e00-cc6f753c",

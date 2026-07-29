@@ -65,6 +65,20 @@ def test_active_entries_have_full_nonfixture_evidence_chain() -> None:
         }
 
 
+def test_a15_truth_projection_remains_wait_compute_node() -> None:
+    ledger = build_truth_ledger()
+
+    assert ledger["a15_active_inventory_observed"] == []
+    assert ledger["a15_parked_blockers"] == [
+        "WAIT_COMPUTE_NODE:petsc",
+        "WAIT_COMPUTE_NODE:fenicsx",
+        "WAIT_COMPUTE_NODE:pymor",
+        "WAIT_COMPUTE_NODE:scikit-fem",
+        "WAIT_COMPUTE_NODE:dedalus",
+        "WAIT_COMPUTE_NODE:sagemath",
+    ]
+
+
 def test_a09_truth_projection_is_offline_and_receipt_backed(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

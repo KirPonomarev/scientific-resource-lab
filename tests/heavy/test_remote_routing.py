@@ -5,6 +5,7 @@ from typing import cast
 import pytest
 
 from srl.runtime import (
+    A15_REQUIRED_PROFILE_IDS,
     BudgetReceipt,
     ComputeNodeManifest,
     HeavyCapabilityStatus,
@@ -16,6 +17,7 @@ from srl.runtime import (
     route_heavy_job,
     verify_remote_job_packet,
 )
+from srl.runtime.remote import routing
 
 
 def _profile_image(profile_id: str) -> str:
@@ -74,6 +76,26 @@ def test_heavy_bundle_parks_absent_local_and_remote_capabilities() -> None:
     assert bundle["unbounded_local_runs"] == 0
     assert bundle["canonical_writes"] == 0
     assert bundle["grants_authority"] is False
+
+
+def test_a15_required_profiles_do_not_become_active_from_local_imports(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(routing.importlib.util, "find_spec", lambda _name: object())
+    monkeypatch.setattr(routing.shutil, "which", lambda _name: "/usr/bin/fixture")
+
+    bundle = build_heavy_capability_routing_bundle()
+
+    profiles = {
+        cast(dict[str, object], item)["profile_id"]: cast(dict[str, object], item)
+        for item in cast(list[object], bundle["profiles"])
+    }
+    for profile_id in A15_REQUIRED_PROFILE_IDS:
+        assert profiles[profile_id]["requires_compute_target"] is True
+        assert profiles[profile_id]["status"] == HeavyCapabilityStatus.WAIT_COMPUTE_NODE.value
+        assert profiles[profile_id]["reason"] == "node absent or offline"
+    assert bundle["active_local_profile_ids"] == []
+    assert bundle["unbounded_local_runs"] == 0
 
 
 def test_compatible_fixture_node_routes_job_without_launching() -> None:

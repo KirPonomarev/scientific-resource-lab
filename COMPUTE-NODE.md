@@ -12,3 +12,9 @@ or exhausted budget returns a typed WAIT/REJECT decision; SRF must not fall
 back to an unbounded local Mac run.
 
 Current state: `WAIT_COMPUTE_NODE`.
+
+A15 software readiness receipt:
+`docs/verification/srf-v3-7-a15-heavy-compute-wait-receipt.json`.
+
+Protected activation action:
+`docs/target-binding/a15-heavy-compute-operator-action.json`.

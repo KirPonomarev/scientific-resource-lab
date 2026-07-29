@@ -118,6 +118,7 @@ def main() -> int:
     env["SRL_A14_JULIA_PROJECT_DIR"] = str(a14_project)
     env["JULIA_DEPOT_PATH"] = str(a14_depot)
     steps.append(_run([sys.executable, "scripts/checks/srf-v37-a14-gate.py"], env=env))
+    steps.append(_run([sys.executable, "scripts/checks/srf-v37-a15-gate.py"], env=env))
     if (REPO_ROOT / "dist").exists():
         shutil.rmtree(REPO_ROOT / "dist")
     steps.append(_run(["uv", "build"], env=env))
