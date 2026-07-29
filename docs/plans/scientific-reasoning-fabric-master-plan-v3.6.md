@@ -1900,9 +1900,9 @@ The final report must list exact IDs and hashes, never subjective percentages.
 
 <!-- BEGIN_MUTABLE_STATE_V3_6 -->
 
-STATE_REVISION: 29
-PREVIOUS_STATE_SHA256: aa256cf2-3be46fc0-41f8e88e-a2e3c984-e6238f93-4bbeb7a0-6a0dd122-275760ea
-CURRENT_STATE_SHA256: b2762b72-e9d9157f-6341afed-227946c0-a273480d-4b9545f2-4c214e6e-faed04f9
+STATE_REVISION: 30
+PREVIOUS_STATE_SHA256: b2762b72-e9d9157f-6341afed-227946c0-a273480d-4b9545f2-4c214e6e-faed04f9
+CURRENT_STATE_SHA256: d2bbc32b-ceb0a72b-b2226b4d-5865905d-9044f4a2-8b67b430-70fc0d99-50c8c26f
 
 ## CURRENT_FACTS
 
@@ -1927,20 +1927,20 @@ current_facts:
 ~~~yaml
 execution_state:
   status: IN_PROGRESS
-  current_stage: S27
-  next_stage: S28_after_candidate_merge
-  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven, S09_health_recovery_proven, S10_interface_convergence_proven, S11_p0_core_proven, S12_lean_primary_proven, S13_cross_prover_proven, S14_knowledge_layer_proven, S15_lawminer_proven, S16_applied_science_proven, S17_sciml_domain_proven, S18_heavy_capability_routing_proven, S19_shared_contract_child_request_prepared, S20_market_bridge_inactive_proven, S21_security_bridge_inactive_proven, S22_market_native_child_wait_recorded, S23_security_native_child_wait_recorded, S24_physical_profile_preflight_proven, S25_system_acceptance_proven, S26_documentation_closure_proven]
+  current_stage: S28
+  next_stage: S28_release_after_release_pr_merge
+  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven, S09_health_recovery_proven, S10_interface_convergence_proven, S11_p0_core_proven, S12_lean_primary_proven, S13_cross_prover_proven, S14_knowledge_layer_proven, S15_lawminer_proven, S16_applied_science_proven, S17_sciml_domain_proven, S18_heavy_capability_routing_proven, S19_shared_contract_child_request_prepared, S20_market_bridge_inactive_proven, S21_security_bridge_inactive_proven, S22_market_native_child_wait_recorded, S23_security_native_child_wait_recorded, S24_physical_profile_preflight_proven, S25_system_acceptance_proven, S26_documentation_closure_proven, S27_candidate_pr_review_merge_proven]
   invalidated_stages: []
-  exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: documentation_closure_proven
-  active_branch_or_null: codex/srf-fabric-v1
-  active_pr_or_null: 47
+  exact_identity: ce08dd0d389354ae94680c149eabe1fd80cb08a3
+  last_proven_transition: candidate_pr_review_merge_proven
+  active_branch_or_null: codex/srf-release-v1
+  active_pr_or_null: null
   active_worktree_or_null: isolated_codex_worktree
   writer_lease_or_null: srf-fabric-v1-single-writer
-  active_operation_or_null: S27_candidate_pr_review_merge
+  active_operation_or_null: S28_reproducible_release_and_closeout
   active_process_or_job_or_null: null
-  next_checkpoint: after_S27_candidate_pr_review_merge_receipt
-  next_executable_action: push S27 CI remediation, wait for required checks, then merge through native governance
+  next_checkpoint: after_S28_release_pr_merge_and_tag
+  next_executable_action: open release PR for v1.0.1 patch release because v1.0.0 tag already exists; wait for checks, merge, tag, publish release artifacts and close mission
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -1952,11 +1952,11 @@ state_capsule:
   project_id: scientific-resource-lab
   project_fingerprint: d56e03d0-d5e1a9bb-9c33a008-ab989510-2d8e41e8-bfd001df-bfc8e1c8-0b9df0b3
   mission_id: build-scientific-reasoning-fabric-v1
-  stage_id: S27
-  state_revision: 29
-  exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: documentation_closure_proven
-  active_operation: S27_candidate_pr_review_merge
+  stage_id: S28
+  state_revision: 30
+  exact_identity: ce08dd0d389354ae94680c149eabe1fd80cb08a3
+  last_proven_transition: candidate_pr_review_merge_proven
+  active_operation: S28_reproducible_release_and_closeout
   active_process_or_job: null
   frozen_preimages:
     - baseline HEAD
@@ -1970,8 +1970,11 @@ state_capsule:
     - documentation closure tests PASS
     - S27 CI remediation focused tests PASS: tests/e2e/test_system_acceptance_receipt.py and tests/docs/test_documentation_closure.py
     - S25/S26 receipts now assert content-addressed receipt_id and shallow-checkout-safe file-hash binding instead of requiring git history depth
+    - MergeReceipt 156b47b4-8a94ba6d-4fcbebe0-8d4acedc-85cb93ea-05f20072-f3161740-28db05bd for PR #47, merge commit ce08dd0d389354ae94680c149eabe1fd80cb08a3
+    - existing published v1.0.0 tag points to 947cbb4515307b54fe3eb9b6366cdb392361c867, so S28 release candidate uses semver patch tag v1.0.1 without retagging
+    - S28 preflight PASS on release branch: make verify, repro-check, public-boundary, secret-scan, docs checks and release artifact build for srlab-1.0.1
     - residual waits remain explicit: WAIT_T7_BINDING, WAIT_COMPUTE_NODE, WAIT_RUNTIME_HEALTH:MARKET_RED_F8, WAIT_SECURITY_HEALTH:BOOTSTRAP_UNAVAILABLE, WAIT_CAPABILITY:advanced_optional_science_packs, WAIT_NATIVE_CHILD_CLOSEOUT:DUAL_CONTOUR
-  next_executable_action: push S27 CI remediation, wait for required checks, then merge through native governance
+  next_executable_action: open release PR for v1.0.1 patch release because v1.0.0 tag already exists; wait for checks, merge, tag, publish release artifacts and close mission
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -2073,6 +2076,12 @@ evidence_index:
   - claim: S27 CI remediation for shallow GitHub Actions checkouts proven locally
     source: focused pytest and receipt binding checks
     identity: 32e0f109-bd211578-83370768-64aef057-4b812814-a2f81593-18d7b4ac-96fffedc
+  - claim: S27 candidate PR review and merge proven
+    source: MergeReceipt/v1
+    identity: 156b47b4-8a94ba6d-4fcbebe0-8d4acedc-85cb93ea-05f20072-f3161740-28db05bd
+  - claim: S28 release tag collision resolved without history rewrite
+    source: git tag and GitHub release inspection
+    identity: v1.0.1
   - claim: Market mutation currently forbidden
     source: native operator bootstrap
     identity: 59ce6ff4c8b514c93d8d4b26d648ba6e7dd7b764
@@ -2287,6 +2296,10 @@ progress_log:
   - revision: 29
     stage: S27
     result: Remediated CI-only shallow checkout failure by replacing history-depth-dependent merge-base assertion with content-addressed receipt IDs and current file-hash candidate binding; focused receipt/documentation tests pass
+    observed_at: 2026-07-29
+  - revision: 30
+    stage: S27
+    result: Candidate PR #47 merged by native squash merge to ce08dd0d389354ae94680c149eabe1fd80cb08a3 with PR checks and main post-merge workflows passing; S28 release lane opened as v1.0.1 because v1.0.0 is already published on 947cbb4515307b54fe3eb9b6366cdb392361c867
     observed_at: 2026-07-29
 ~~~
 
