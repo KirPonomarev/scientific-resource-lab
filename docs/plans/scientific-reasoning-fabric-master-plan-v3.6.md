@@ -1900,9 +1900,9 @@ The final report must list exact IDs and hashes, never subjective percentages.
 
 <!-- BEGIN_MUTABLE_STATE_V3_6 -->
 
-STATE_REVISION: 12
-PREVIOUS_STATE_SHA256: 624a4c4d-f0b1f8af-546af5ce-bc3027ed-59cc32db-19d29dc7-92aff4bf-9f8af4af
-CURRENT_STATE_SHA256: 5970a45c-9f04d9eb-f49adfc5-65589a16-adc4154a-5e8d7ed3-a04821c0-36729ce9
+STATE_REVISION: 13
+PREVIOUS_STATE_SHA256: 5970a45c-9f04d9eb-f49adfc5-65589a16-adc4154a-5e8d7ed3-a04821c0-36729ce9
+CURRENT_STATE_SHA256: 4467cf1b-ea8d8b0a-62492546-cdf916fc-7f3093bc-5a2e6b2e-eae7837b-2dda1993
 
 ## CURRENT_FACTS
 
@@ -1927,20 +1927,20 @@ current_facts:
 ~~~yaml
 execution_state:
   status: IN_PROGRESS
-  current_stage: S11
-  next_stage: S12_after_p0_core
-  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven, S09_health_recovery_proven, S10_interface_convergence_proven]
+  current_stage: S12
+  next_stage: S13_after_lean_primary
+  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven, S09_health_recovery_proven, S10_interface_convergence_proven, S11_p0_core_proven]
   invalidated_stages: []
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: interface_convergence_proven
+  last_proven_transition: p0_core_proven
   active_branch_or_null: codex/srf-fabric-v1
   active_pr_or_null: null
   active_worktree_or_null: isolated_codex_worktree
   writer_lease_or_null: srf-fabric-v1-single-writer
-  active_operation_or_null: S11_p0_core_packs
+  active_operation_or_null: S12_lean_primary_formal_environment
   active_process_or_job_or_null: null
-  next_checkpoint: after_S11_p0_core_receipt
-  next_executable_action: admit complete P0 numerical, symbolic, exact algebra and SMT compute core
+  next_checkpoint: after_S12_lean_admission_receipt
+  next_executable_action: establish Lean 4 plus pinned mathlib as primary formal mathematics pack
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -1952,27 +1952,28 @@ state_capsule:
   project_id: scientific-resource-lab
   project_fingerprint: d56e03d0-d5e1a9bb-9c33a008-ab989510-2d8e41e8-bfd001df-bfc8e1c8-0b9df0b3
   mission_id: build-scientific-reasoning-fabric-v1
-  stage_id: S11
-  state_revision: 12
+  stage_id: S12
+  state_revision: 13
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: interface_convergence_proven
-  active_operation: S11_p0_core_packs
+  last_proven_transition: p0_core_proven
+  active_operation: S12_lean_primary_formal_environment
   active_process_or_job: null
   frozen_preimages:
     - baseline HEAD
     - repository governance
     - operator-supplied V3.6 protocol
   new_primary_evidence:
-    - InterfaceConvergenceReceipt be999a0f-61f07901-62d96a44-28035147-ade36978-e07050aa-0e5f5e82-6cfea448
-    - shared read-only InterfaceService introduced for CLI, MCP and portal-facing semantics
-    - CLI doctor, version, catalog list, catalog inspect and labctl enter route through InterfaceService
-    - MCP list_capabilities and inspect_capability route through InterfaceService
-    - portal build report carries InterfaceService manifest and authority-negative catalog digest
-    - CLI/MCP/portal parity tests PASS with 113 passed
-    - make test PASS with 1823 passed and 1 skipped
+    - P0CoreAdmissionReceipt 9517a304-74b48a50-766d7570-c6c1521c-8aa645fc-0ff92324-11479b40-e03078e9
+    - P0CoreAdmissionBundle sha256:ad7a8d90-01a1d943-b6354359-960577ff-54d6a3a4-12fcf073-1cb6b2ae-3299afa7
+    - ACTIVE components limited to NumPy, SciPy, Pint and Z3 under current runtime import evidence
+    - cvc5 recorded as independent DEGRADED solver with WAIT_LICENSE and no z3 substitution
+    - SymPy, mpmath, FLINT/Arb/Calcium, PARI/GP, Maxima, GAP and Singular recorded as WAIT_CAPABILITY
+    - focused P0 tests PASS with 137 passed
+    - pack suite PASS with 391 passed and 1 skipped
+    - make test PASS with 1829 passed and 1 skipped
     - make lint PASS
     - make typecheck PASS
-  next_executable_action: S11 P0 numerical, symbolic, exact algebra and SMT packs
+  next_executable_action: S12 Lean 4 plus pinned mathlib primary formal environment
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -2023,6 +2024,9 @@ evidence_index:
   - claim: S10 interface convergence proven
     source: InterfaceConvergenceReceipt/v1
     identity: be999a0f-61f07901-62d96a44-28035147-ade36978-e07050aa-0e5f5e82-6cfea448
+  - claim: S11 P0 core admission proven
+    source: P0CoreAdmissionReceipt/v1
+    identity: 9517a304-74b48a50-766d7570-c6c1521c-8aa645fc-0ff92324-11479b40-e03078e9
   - claim: Market mutation currently forbidden
     source: native operator bootstrap
     identity: 59ce6ff4c8b514c93d8d4b26d648ba6e7dd7b764
@@ -2035,7 +2039,7 @@ evidence_index:
 authority_ledger:
   routine_safe_plan_creation: exercised
   exact_hash_review_authority: exercised
-  implementation_authority: exercised_routine_safe_S01_S10
+  implementation_authority: exercised_routine_safe_S01_S11
   market_mutation_authority: absent
   security_mutation_authority: absent
   physical_t7_authority: absent
@@ -2088,6 +2092,8 @@ decision_log:
     decision: S09 makes SRFPulse independent and FederationStatus read-only; live T7 restore and destructive recovery operations remain WAIT_AUTHORITY
   - id: D021
     decision: S10 uses a shared read-only InterfaceService for common CLI, MCP and portal semantics while leaving each surface responsible only for transport/framing/rendering
+  - id: D022
+    decision: S11 admits P0 components by truthful per-engine ACTIVE, DEGRADED or WAIT_CAPABILITY evidence and preserves independent solver disagreement instead of substituting z3 for cvc5
 ~~~
 
 ## PROGRESS_LOG
@@ -2141,6 +2147,10 @@ progress_log:
   - revision: 12
     stage: S10
     result: CLI, MCP and portal common semantics routed through shared InterfaceService and parity-tested
+    observed_at: 2026-07-29
+  - revision: 13
+    stage: S11
+    result: P0 admission bundle proven with NumPy, SciPy, Pint and Z3 ACTIVE, cvc5 DEGRADED, advanced engines WAIT_CAPABILITY and authority-negative tests green
     observed_at: 2026-07-29
 ~~~
 
