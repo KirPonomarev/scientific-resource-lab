@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import os
+import platform
 import shutil
 import subprocess
 import sys
@@ -30,7 +31,18 @@ if str(SRC) not in sys.path:
 from scripts.ci.prepare_a09_mathlib import prepare_session_project  # noqa: E402
 from scripts.ci.prepare_a10_hol4 import prepare_hol4  # noqa: E402
 
+from srl.packs.formal import load_independent_prover_pins  # noqa: E402
+
 SUMMARY_PATH: Final[Path] = REPO_ROOT / ".tmp" / "verify-v37-summary.json"
+
+
+def _default_isabelle_image() -> str:
+    pins = load_independent_prover_pins()
+    isabelle = pins["isabelle"]
+    machine = platform.machine().lower()
+    if machine in {"arm64", "aarch64"} and isinstance(isabelle.get("docker_image_arm"), str):
+        return str(isabelle["docker_image_arm"])
+    return str(isabelle["docker_image"])
 
 
 def _run(command: list[str], *, env: dict[str, str]) -> dict[str, Any]:
@@ -84,7 +96,7 @@ def main() -> int:
     )
     env["SRL_A10_HOL4_HOME"] = str(a10_prepare_report["hol4_home"])
     env.setdefault("SRL_A10_ROCQ_DOCKER_IMAGE", "rocq/rocq-prover:9.2.0")
-    env.setdefault("SRL_A10_ISABELLE_DOCKER_IMAGE", "makarius/isabelle:Isabelle2025-2")
+    env.setdefault("SRL_A10_ISABELLE_DOCKER_IMAGE", _default_isabelle_image())
 
     steps.append(_run([sys.executable, "scripts/checks/srf-v37-a10-gate.py"], env=env))
     if (REPO_ROOT / "dist").exists():

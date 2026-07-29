@@ -129,9 +129,7 @@ def test_independent_prover_pin_manifest_is_authority_negative() -> None:
 
 
 def test_a10_translation_manifests_cover_all_independent_contours() -> None:
-    contours = (
-        *discover_cross_prover_contours(executable_resolver=lambda _name: None),
-    )
+    contours = (*discover_cross_prover_contours(executable_resolver=lambda _name: None),)
     manifests = build_a10_translation_manifests(contours=contours)
 
     assert [manifest["target_contour_id"] for manifest in manifests] == [

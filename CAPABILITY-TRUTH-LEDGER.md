@@ -40,9 +40,9 @@ Current v1.0.1 active inventory reproduced by the ledger:
 | `cslib-index` | `a09_formal_corpus` | `A09` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
 | `erdos-problems-metadata` | `a09_formal_corpus` | `A09` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
 | `formal-conjectures` | `a09_formal_corpus` | `A09` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
-| `rocq` | `a10_formal` | `A10` | `WAIT_TOOLCHAIN` | `missing_or_protected_capability` |
-| `isabelle` | `a10_formal` | `A10` | `WAIT_TOOLCHAIN` | `missing_or_protected_capability` |
-| `hol4` | `a10_formal` | `A10` | `WAIT_TOOLCHAIN` | `missing_or_protected_capability` |
+| `rocq` | `a10_formal` | `A10` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
+| `isabelle` | `a10_formal` | `A10` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
+| `hol4` | `a10_formal` | `A10` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
 | `production-ed25519-signer` | `a04_transport` | `A04` | `WAIT_AUTHORITY` | `missing_or_protected_capability` |
 | `t2-t3-enforced-sandbox` | `a05_sandbox` | `A05` | `WAIT_COMPUTE_TARGET` | `missing_or_protected_capability` |
 | `t7-binding` | `a02_t7` | `A02` | `WAIT_T7_BINDING` | `missing_or_protected_capability` |

@@ -199,7 +199,7 @@ def _check_isabelle() -> dict[str, Any]:
                 "  imports Main",
                 "begin",
                 "",
-                "theorem srl_a10_zero_add: \"0 + (n::nat) = n\"",
+                'theorem srl_a10_zero_add: "0 + (n::nat) = n"',
                 "  by simp",
                 "",
                 "end",
@@ -258,9 +258,9 @@ def _check_hol4() -> dict[str, Any]:
         script = "\n".join(
             (
                 "open HolKernel boolLib bossLib;",
-                "val _ = new_theory \"srl_a10\";",
+                'val _ = new_theory "srl_a10";',
                 "val srl_a10_zero_add = store_thm(",
-                "  \"srl_a10_zero_add\",",
+                '  "srl_a10_zero_add",',
                 "  ``!n:num. 0 + n = n``,",
                 "  simp[]);",
                 "val _ = export_theory();",
