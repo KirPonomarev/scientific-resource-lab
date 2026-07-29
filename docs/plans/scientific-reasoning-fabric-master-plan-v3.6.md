@@ -1900,9 +1900,9 @@ The final report must list exact IDs and hashes, never subjective percentages.
 
 <!-- BEGIN_MUTABLE_STATE_V3_6 -->
 
-STATE_REVISION: 10
-PREVIOUS_STATE_SHA256: 91f04f34-a8033755-e9d6fb4b-fb973063-30b704d6-20806827-e425a786-73d8a575
-CURRENT_STATE_SHA256: a4e30037-14c29c66-4fe04606-50ab32e3-123de7cf-fdf934e8-9a7c7bfe-f85c109d
+STATE_REVISION: 11
+PREVIOUS_STATE_SHA256: a4e30037-14c29c66-4fe04606-50ab32e3-123de7cf-fdf934e8-9a7c7bfe-f85c109d
+CURRENT_STATE_SHA256: 624a4c4d-f0b1f8af-546af5ce-bc3027ed-59cc32db-19d29dc7-92aff4bf-9f8af4af
 
 ## CURRENT_FACTS
 
@@ -1927,20 +1927,20 @@ current_facts:
 ~~~yaml
 execution_state:
   status: IN_PROGRESS
-  current_stage: S09
-  next_stage: S10_after_health_recovery
-  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven]
+  current_stage: S10
+  next_stage: S11_after_interface_convergence
+  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven, S09_health_recovery_proven]
   invalidated_stages: []
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: runner_scheduler_proven
+  last_proven_transition: health_recovery_proven
   active_branch_or_null: codex/srf-fabric-v1
   active_pr_or_null: null
   active_worktree_or_null: isolated_codex_worktree
   writer_lease_or_null: srf-fabric-v1-single-writer
-  active_operation_or_null: S09_health_recovery_pulse
+  active_operation_or_null: S10_interface_convergence
   active_process_or_job_or_null: null
-  next_checkpoint: after_S09_health_recovery_receipt
-  next_executable_action: implement SRFPulse, read-only FederationStatus and bounded restore harness
+  next_checkpoint: after_S10_interface_convergence_receipt
+  next_executable_action: implement labctl command family and route MCP/portal through same application service
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -1952,28 +1952,29 @@ state_capsule:
   project_id: scientific-resource-lab
   project_fingerprint: d56e03d0-d5e1a9bb-9c33a008-ab989510-2d8e41e8-bfd001df-bfc8e1c8-0b9df0b3
   mission_id: build-scientific-reasoning-fabric-v1
-  stage_id: S09
-  state_revision: 10
+  stage_id: S10
+  state_revision: 11
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: runner_scheduler_proven
-  active_operation: S09_health_recovery_pulse
+  last_proven_transition: health_recovery_proven
+  active_operation: S10_interface_convergence
   active_process_or_job: null
   frozen_preimages:
     - baseline HEAD
     - repository governance
     - operator-supplied V3.6 protocol
   new_primary_evidence:
-    - RunnerConformanceReceipt ce425ad7-37745abf-c4a26441-bc96ddac-244c64fc-0d05e7e4-1b48a5ee-f73eebac
-    - explicit-dispatch file-backed scheduler implemented with queued, running, terminal and cancel checkpoints
-    - WIP=1 enforced by refusing dispatch while a running checkpoint exists
-    - CAS materialization, fixed-entrypoint runner and receipt-last sealer remain the only execution path
-    - cancel, interrupted recovery, stale pack, resource overflow, local disk wait, FIFO fairness and sealed output properties tested
-    - WP31, WP32 and WP34 runner gates PASS
-    - affected runtime, execution and adversarial tests PASS with 151 passed
-    - make test PASS with 1810 passed and 1 skipped
+    - HealthAndRecoveryReceipt dd7e5233-44698068-a686ef20-b9725301-9830352a-e8d0942b-abbfc483-1d7e1a27
+    - SRFPulse/v1 builder and stale/cross-head WAIT_SRF assessment implemented
+    - FederationStatus/v1 is read-only aggregation and does not overwrite native Market or Security health
+    - deterministic trace ids and trace links implemented
+    - bounded restore drill restores explicit CAS artifact manifest into empty fixture target and validates RestoreDrillReceipt/v1
+    - corrupt source CAS surfaces CAS_INTEGRITY_FAILURE; non-empty restore target is refused
+    - live T7 restore, destructive overwrite, reboot and production backup movement remain WAIT_AUTHORITY
+    - affected recovery, contracts, CAS and runtime tests PASS with 196 passed
+    - make test PASS with 1819 passed and 1 skipped
     - make lint PASS
     - make typecheck PASS
-  next_executable_action: S09 SRFPulse, federation status, tracing and disaster recovery
+  next_executable_action: S10 labctl, MCP, portal and export convergence
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -2018,6 +2019,9 @@ evidence_index:
   - claim: S08 runner scheduler proven
     source: RunnerConformanceReceipt/v1
     identity: ce425ad7-37745abf-c4a26441-bc96ddac-244c64fc-0d05e7e4-1b48a5ee-f73eebac
+  - claim: S09 health and recovery proven
+    source: HealthAndRecoveryReceipt/v1
+    identity: dd7e5233-44698068-a686ef20-b9725301-9830352a-e8d0942b-abbfc483-1d7e1a27
   - claim: Market mutation currently forbidden
     source: native operator bootstrap
     identity: 59ce6ff4c8b514c93d8d4b26d648ba6e7dd7b764
@@ -2030,7 +2034,7 @@ evidence_index:
 authority_ledger:
   routine_safe_plan_creation: exercised
   exact_hash_review_authority: exercised
-  implementation_authority: exercised_routine_safe_S01_S08
+  implementation_authority: exercised_routine_safe_S01_S09
   market_mutation_authority: absent
   security_mutation_authority: absent
   physical_t7_authority: absent
@@ -2079,6 +2083,8 @@ decision_log:
     decision: S07 keeps production packs out of ACTIVE until complete SBOM, lock, vulnerability, license and admission evidence exists; current packs remain usable inventory records but not governed ACTIVE packs
   - id: D019
     decision: S08 adds an explicit-dispatch scheduler over the existing runner/materializer/sealer stack rather than starting a Mac daemon or creating a second execution path
+  - id: D020
+    decision: S09 makes SRFPulse independent and FederationStatus read-only; live T7 restore and destructive recovery operations remain WAIT_AUTHORITY
 ~~~
 
 ## PROGRESS_LOG
@@ -2124,6 +2130,10 @@ progress_log:
   - revision: 10
     stage: S08
     result: durable explicit-dispatch scheduler validated; WIP=1, resume, cancel, backpressure, stale-pack wait, resource wait and sealed-result invariants proven
+    observed_at: 2026-07-29
+  - revision: 11
+    stage: S09
+    result: independent SRFPulse, read-only FederationStatus, deterministic tracing and bounded restore drill validated
     observed_at: 2026-07-29
 ~~~
 
