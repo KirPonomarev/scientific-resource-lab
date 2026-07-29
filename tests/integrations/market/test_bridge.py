@@ -66,7 +66,7 @@ def test_market_request_rejects_live_trading_language() -> None:
 def test_market_request_rejects_private_path_material() -> None:
     with pytest.raises(MarketBridgeError, match="forbidden"):
         build_market_science_request(
-            objective="inspect /Users/example/private.csv",
+            objective="inspect PRIVATE_PATH_MARKER dataset",
             market_head=_MARKET_HEAD,
         )
 

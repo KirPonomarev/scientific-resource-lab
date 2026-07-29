@@ -22,6 +22,7 @@ _BLOCKED_MARKET_PATTERNS: Final[tuple[re.Pattern[str], ...]] = (
     re.compile(r"\btrading\s+strategy\b", re.I),
     re.compile(r"\b(api[_ -]?key|credential|secret)\b", re.I),
     re.compile(r"\bD[23]\b"),
+    re.compile(r"\bPRIVATE_PATH_MARKER\b"),
     re.compile(r"/Users/|/Volumes/|/private/", re.I),
 )
 

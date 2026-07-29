@@ -1900,9 +1900,9 @@ The final report must list exact IDs and hashes, never subjective percentages.
 
 <!-- BEGIN_MUTABLE_STATE_V3_6 -->
 
-STATE_REVISION: 22
-PREVIOUS_STATE_SHA256: f76cc6ef-758ec5a7-77fcfacf-4a131b4c-a820f663-4bc7c123-f62be8cd-a1ff04b3
-CURRENT_STATE_SHA256: 8afee848-16583431-2c9c341a-ccc9c22f-b1a6af5a-f4db8116-3009e4f8-343883cf
+STATE_REVISION: 23
+PREVIOUS_STATE_SHA256: 8afee848-16583431-2c9c341a-ccc9c22f-b1a6af5a-f4db8116-3009e4f8-343883cf
+CURRENT_STATE_SHA256: db8146a7-f496c4ce-a1542f12-ad725e51-1a33703c-9fb75a1f-b4613580-2211c39c
 
 ## CURRENT_FACTS
 
@@ -1927,20 +1927,20 @@ current_facts:
 ~~~yaml
 execution_state:
   status: IN_PROGRESS
-  current_stage: S21
-  next_stage: S22_after_security_bridge
-  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven, S09_health_recovery_proven, S10_interface_convergence_proven, S11_p0_core_proven, S12_lean_primary_proven, S13_cross_prover_proven, S14_knowledge_layer_proven, S15_lawminer_proven, S16_applied_science_proven, S17_sciml_domain_proven, S18_heavy_capability_routing_proven, S19_shared_contract_child_request_prepared, S20_market_bridge_inactive_proven]
+  current_stage: S22
+  next_stage: S23_after_market_native_child
+  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven, S09_health_recovery_proven, S10_interface_convergence_proven, S11_p0_core_proven, S12_lean_primary_proven, S13_cross_prover_proven, S14_knowledge_layer_proven, S15_lawminer_proven, S16_applied_science_proven, S17_sciml_domain_proven, S18_heavy_capability_routing_proven, S19_shared_contract_child_request_prepared, S20_market_bridge_inactive_proven, S21_security_bridge_inactive_proven]
   invalidated_stages: []
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: market_adapter_inactive_proven_wait_runtime_health
+  last_proven_transition: security_adapter_inactive_proven_wait_security_health
   active_branch_or_null: codex/srf-fabric-v1
   active_pr_or_null: null
   active_worktree_or_null: isolated_codex_worktree
   writer_lease_or_null: srf-fabric-v1-single-writer
-  active_operation_or_null: S21_security_bridge_inactive
+  active_operation_or_null: S22_market_native_child_mission
   active_process_or_job_or_null: null
-  next_checkpoint: after_S21_security_bridge_inactive_receipt
-  next_executable_action: implement inactive SRF-side Security adapter with sanitized C3 semantics and ebashim boundary
+  next_checkpoint: after_S22_market_child_request_or_wait_receipt
+  next_executable_action: prepare Market native child packet and park exact WAIT_RUNTIME_HEALTH if native RED persists
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -1952,32 +1952,32 @@ state_capsule:
   project_id: scientific-resource-lab
   project_fingerprint: d56e03d0-d5e1a9bb-9c33a008-ab989510-2d8e41e8-bfd001df-bfc8e1c8-0b9df0b3
   mission_id: build-scientific-reasoning-fabric-v1
-  stage_id: S21
-  state_revision: 22
+  stage_id: S22
+  state_revision: 23
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: market_adapter_inactive_proven_wait_runtime_health
-  active_operation: S21_security_bridge_inactive
+  last_proven_transition: security_adapter_inactive_proven_wait_security_health
+  active_operation: S22_market_native_child_mission
   active_process_or_job: null
   frozen_preimages:
     - baseline HEAD
     - repository governance
     - operator-supplied V3.6 protocol
   new_primary_evidence:
-    - MarketAdapterInactiveReceipt 844bc0f3-083341d5-8e81d881-553151a7-6df1d693-0363e020-68d90b07-deb5b462
-    - Market request fixture sha256:2785ae81-59bec25c-b98fd158-bad3f245-d45368c0-4663318b-9f019594-601abf11
-    - Market result fixture sha256:4a541f42-c084896b-196e385e-1bc6234d-341c06ea-cffad9b2-8284b235-9a1bdff6
-    - Market health projection sha256:11b8f845-592d3652-4124fa89-ddcf492d-6eb6607e-385ac2e7-82ce1c3b-828c58a2
+    - SecurityAdapterInactiveReceipt e1665e83-fe1ff945-d3a6c922-634a94f8-e96685eb-98bead5c-90590e3c-ff47ad0d
+    - Security request fixture sha256:620dad36-09541b67-5475ca80-34b1145e-f24d89a6-29257389-e3ebe637-b9ed0741
+    - Security result fixture sha256:864df6cd-824273fb-2f6e0507-746d06ed-c7188bd2-1accc0e4-48c35b3c-5ae0aed7
+    - Security health projection sha256:d58826e3-e018a3e0-ccf631e8-3bb955fd-01a12499-de22db2f-c96d3144-6dfe87e1
     - inactive C3 request and observation mapping validated against ScientificRequestEnvelope and ScientificResultEnvelope
-    - trading/order language, private paths, D2/D3, credentials, authority claims, duplicate imports and stale Market HEAD are rejected
-    - activation_state=INACTIVE, market_writes=0, live_actions=0 and trading_allowed=false
-    - Market dependency remains WAIT_RUNTIME_HEALTH:RED_F8
-    - secret-scan allowlist updated with SHA-256-of-literal entries for S19 public child mission hash/signature false positives
-    - focused S20 tests PASS with 9 passed
-    - make test PASS with 1887 passed and 1 skipped
+    - D2/D3, credentials, private paths, target identifiers, exploit material, prompt injection, non-ebashim executors, authority claims, duplicate imports and stale Security HEAD are rejected
+    - activation_state=INACTIVE, native_executor_boundary=ebashim, security_actions=0, target_actions=0 and D2_D3_transfers=0
+    - Security dependency remains WAIT_SECURITY_HEALTH
+    - Market and Security private-path negative fixtures use PUBLIC_SAFE PRIVATE_PATH_MARKER sentinel instead of absolute local paths
+    - focused S21 tests PASS with 13 passed
+    - focused Market and Security bridge regression tests PASS with 22 passed
+    - make test PASS with 1900 passed and 1 skipped
     - make lint PASS
     - make typecheck PASS
-    - secret scan PASS
-  next_executable_action: S21 inactive Security bridge implementation
+  next_executable_action: S22 Market native child mission or exact wait
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -2058,6 +2058,9 @@ evidence_index:
   - claim: S20 inactive Market bridge proven with runtime-health wait
     source: MarketAdapterInactiveReceipt/v1
     identity: 844bc0f3-083341d5-8e81d881-553151a7-6df1d693-0363e020-68d90b07-deb5b462
+  - claim: S21 inactive Security bridge proven with security-health wait
+    source: SecurityAdapterInactiveReceipt/v1
+    identity: e1665e83-fe1ff945-d3a6c922-634a94f8-e96685eb-98bead5c-90590e3c-ff47ad0d
   - claim: Market mutation currently forbidden
     source: native operator bootstrap
     identity: 59ce6ff4c8b514c93d8d4b26d648ba6e7dd7b764
@@ -2070,7 +2073,7 @@ evidence_index:
 authority_ledger:
   routine_safe_plan_creation: exercised
   exact_hash_review_authority: exercised
-  implementation_authority: exercised_routine_safe_S01_S20_with_declared_waits
+  implementation_authority: exercised_routine_safe_S01_S21_with_declared_waits
   market_mutation_authority: absent
   security_mutation_authority: absent
   physical_t7_authority: absent
@@ -2143,6 +2146,8 @@ decision_log:
     decision: S19 emits only an SRF-side signed child mission request and local conformance vectors; native DualContour validation remains WAIT_NATIVE_CHILD_CLOSEOUT and no parent direct external write or domain-truth claim is made
   - id: D031
     decision: S20 implements only an inactive SRF-side Market bridge over shared envelopes with C3 semantics, central-projector requirement and explicit rejection of live trading, private material, authority claims, duplicate imports and stale Market HEADs
+  - id: D032
+    decision: S21 implements only an inactive SRF-side Security bridge over sanitized shared envelopes with ebashim as native executor boundary and explicit rejection of D2/D3, target, exploit, prompt-injection, authority and executor-bypass material
 ~~~
 
 ## PROGRESS_LOG
@@ -2236,6 +2241,10 @@ progress_log:
   - revision: 22
     stage: S20
     result: Inactive Market bridge proven with C3 request/result mapping, authority and trading negatives, stale-head and duplicate-import guards, and WAIT_RUNTIME_HEALTH retained for Market RED_F8
+    observed_at: 2026-07-29
+  - revision: 23
+    stage: S21
+    result: Inactive Security bridge proven with sanitized C3 request/result mapping, ebashim boundary, D2/D3 and target containment, authority negatives, stale-head and duplicate-import guards
     observed_at: 2026-07-29
 ~~~
 
