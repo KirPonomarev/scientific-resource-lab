@@ -62,7 +62,7 @@
   "generated_source_sha256": {
     "docs/verification/system-acceptance-receipt.json": "55f7295e-4d25cd66-24ac24db-0769f234-6ef69e46-64648377-8c29e228-19344fbe",
     "scripts/checks/markdown_structure.py": "99fdf1a0-4a5a0fc0-bd5e0eff-3692561b-297d30cc-63ba3e69-6798ace3-e49a8448",
-    "scripts/docs/generate_solo_agent_docs.py": "ef66a5c4-3251a593-8912005d-8b615233-7e9f8c05-f3bfad1c-001de985-528c643f",
+    "scripts/docs/generate_solo_agent_docs.py": "2371ff722fa7a7000673418ed6cd45d2e7fe5fe45021eb4c73eb0707b76a0342",
     "scripts/docs/generate_system_docs.py": "466747ac-0d13d660-0b5167f8-3e554cd1-bb698706-106124e7-041fca25-55699f49",
     "tests/adversarial/test_system_acceptance_failure_routes.py": "d37a2774-eea73ca2-0b6bb6f5-a8d6b76b-76446bee-4ab24160-6df17751-45b76083",
     "tests/docs/test_documentation_closure.py": "a92a57e9-defe9987-e9d560c8-812cf518-ca408045-8cdc40e9-9e636d7c-b275fca1",
@@ -90,7 +90,7 @@
       "WAIT_COMPUTE_NODE"
     ]
   },
-  "receipt_id": "f08757b5-a047f896-34c15c9e-54b51c61-e126ec9f-3084ea27-98d5d6b4-af0248f7",
+  "receipt_id": "4db1172d-993c52e3-5394c4ff-d96a3e6d-1889b71a-59d302e1-3e3ca933-149312a1",
   "required_doc_sha256": {
     "AUTHORITY-MATRIX.md": "67d84c99-3fb300d6-545aa7fd-6d074290-f4d0394c-74621f5a-8c760d85-abdcf2fd",
     "CAPABILITY-CATALOG.md": "58228411-adc12e5b-217b0542-13b0a59f-ac3e6947-2a724d06-c7ab790f-bbeac55e",
@@ -105,8 +105,8 @@
     "RECOVERY-RUNBOOK.md": "b64ea3d4-427b0c6a-197c33ce-3ad70ee0-857d5197-5fa7fa4c-41c40fad-9f641295",
     "RELEASE-RUNBOOK.md": "26499eca-289fd58a-81f7da1d-37183d12-21fff4fc-4dd21c3d-6a2273e5-c2bc4e39",
     "SECURITY-INTEGRATION.md": "cb171078-9efc72a0-c72128f6-1fd1b65e-11c0dc78-dc1493d4-d70ec0c3-c36e39ac",
-    "SOLO-AGENT-RUNBOOK.md": "86b0ada5-02d9cbe3-8417d08a-d450c4cb-030c8ca0-94bb4875-c8fca194-79f12e7e",
-    "START-HERE.md": "e2780d5b-4e43a33f-e68dab85-ce879423-06de30bc-ef4a5eb5-d212361c-5ec564d3",
+    "SOLO-AGENT-RUNBOOK.md": "91a50c0d7f7c45f45aafe82acc10bdffd05113dfac8704649896701598d2dc49",
+    "START-HERE.md": "ed65180dc8d497b9e2a8ab0959920a1bde86b2b602846e2579ad6cd98135abb2",
     "SYSTEM-ATLAS.md": "79a659a5-33724ef8-42db727c-2614e8ff-a773b8d2-b836da71-103fae93-ecd876e5",
     "T7-OPERATIONS.md": "5d56d8fb-ee87a208-6b4a6be1-1e87e97f-a2c987cc-690e5fec-e4a2c407-a99e3afa",
     "TRADING-EXECUTION-BOUNDARY.md": "9a20599b-c03d1464-82293e82-0b58c11d-c8a5b9ee-d1bebcc4-c46c1072-920b8103"

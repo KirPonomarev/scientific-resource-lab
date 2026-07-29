@@ -1169,9 +1169,9 @@ current_facts:
 
 ~~~yaml
 execution_state:
-  status: A16_ACTIVE_READY_FOR_A17_WITH_PARKED_PROTECTED_LANES
-  current_stage: A17
-  next_stage: A17_complete_solo_agent_entry
+  status: A17_ACTIVE_READY_FOR_A18_WITH_PARKED_PROTECTED_LANES
+  current_stage: A18
+  next_stage: A18_dual_contour_native_child_closeout
   completed_stages:
     - A00
     - A01
@@ -1187,6 +1187,7 @@ execution_state:
     - A13
     - A14
     - A16
+    - A17
   completed_stage_lanes:
     - A07_sympy_mpmath_core
   parked_stages:
@@ -1203,11 +1204,11 @@ execution_state:
     - WAIT_LICENSE:A07_PYTHON_FLINT_LGPL_CLOSURE
     - WAIT_AUTHORITY:A09_BIND_PINNED_LEAN_MATHLIB_PROJECT_TO_T7
     - WAIT_COMPUTE_NODE:A15_PROVISION_HEAVY_COMPUTE_TARGET
-  active_branch_or_null: codex/srf-a16-products
+  active_branch_or_null: codex/srf-a17-solo-agent-entry
   active_pr_or_null: null
   writer_lease_or_null: null
   blocker_or_null: null
-  next_executable_action: continue A17 solo-agent entry while compute-node, T7-backed persistence, native compute binding, native production signing, FLINT license closure and A09 T7 formal toolchain binding remain parked
+  next_executable_action: continue A18 DualContour native child closeout while compute-node, T7-backed persistence, native compute binding, native production signing, FLINT license closure and A09 T7 formal toolchain binding remain parked
   updated_at: 2026-07-29
 ~~~
 
@@ -1261,6 +1262,8 @@ decision_log:
     decision: A15 heavy compute software readiness is PASS but stage remains WAIT_COMPUTE_NODE; PETSc, FEniCSx, pyMOR, scikit-fem, Dedalus and SageMath cannot become ACTIVE from accidental local imports and require a compatible Linux x86_64 compute target, exact image digests, real job receipts, checkpoint/resume evidence and artifact-return evidence; protected operator action is recorded at docs/target-binding/a15-heavy-compute-operator-action.json; wait receipt 6c0797c0-3e32208d-f9b79039-6d2ed444-4d514a76-55582837-42516212-061bb676 records remote_launches=0 and unbounded_local_runs=0
   - id: V37-D023
     decision: A16 scientific products are ACTIVE with five product-level request/result/receipt chains over hash-bound A09-A14 receipts; LawMiner binds PySR/PySINDy/PyDMD, Formal Verification Lab binds Lean/mathlib/Rocq/Isabelle/HOL4 with semantic-gap manifests, Geometry and Physics Compiler binds A13 geometry/topology/optimization plus A14 SciML/domain backends, Causal Economy Lab binds native causal/CVXPY/native Bayesian diagnostics, and Literature-to-Knowledge Graph binds ten source-grounded A11 sources; product layer creates no second ledger, grants no authority and preserves inconclusive/disagreement paths; A16 stage receipt 7ec1ee91-f9e4d00e-87d1478a-1ab219b5-4fdaed49-c7392052-d6e680e8-69889760
+  - id: V37-D024
+    decision: A17 solo-agent entry is ACTIVE with JSON-first labctl enter/doctor/submit/status/result/export/replay/portal flow; standalone native bootstrap runs first, Market and Security entries remain proposal-only native-bootstrap WAITs, capability discovery is hash-bound to the offline truth ledger, stale or cross-head sessions fail closed, and the built-in fresh-agent task performs a real bounded units identity computation with sanitized export and deterministic replay; A17 stage receipt e4179946-b07a8931-b38ad900-abd154e2-acead3df-daf5bc8c-ccb8c3e8-e184a863
 ~~~
 
 ## EVIDENCE_INDEX
@@ -1335,6 +1338,9 @@ evidence_index:
   - src/srl/products/catalog.py
   - scripts/checks/srf-v37-a16-gate.py
   - docs/verification/srf-v3-7-a16-scientific-products-receipt.json
+  - src/srl/solo_agent.py
+  - scripts/checks/srf-v37-a17-gate.py
+  - docs/verification/srf-v3-7-a17-solo-agent-receipt.json
 ~~~
 
 <!-- END_MUTABLE_STATE_V3_7 -->

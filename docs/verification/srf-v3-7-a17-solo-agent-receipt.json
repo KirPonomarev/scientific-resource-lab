@@ -1,0 +1,112 @@
+{
+  "acceptance": {
+    "canonical_writes": 0,
+    "checks": [
+      {
+        "check_id": "A17-01-enter-standalone",
+        "detail": "labctl enter works",
+        "status": "PASS"
+      },
+      {
+        "check_id": "A17-02-cross-lab-entry-waits",
+        "detail": "market/security entries are proposal-only native-bootstrap waits",
+        "market_status": "WAIT_NATIVE_BOOTSTRAP",
+        "security_status": "WAIT_NATIVE_BOOTSTRAP",
+        "status": "PASS"
+      },
+      {
+        "check_id": "A17-03-submit-status-result",
+        "result_id": "sha256:e1b5b5fb2b64ce76db8b6f1312e084c2746491571f9918f35c51ae8cf8d213fb",
+        "session_id": "sha256:7644f30510ab7aab69da67c6214a9b5933afe768e024ace40339a21c7c66405e",
+        "status": "PASS"
+      },
+      {
+        "check_id": "A17-04-export-replay-portal",
+        "packet_id": "sha256:d6765ebf526f58280ec902597cf872fc3045cac0766f55482dfb3e3ebaa522ce",
+        "status": "PASS"
+      },
+      {
+        "check_id": "A17-05-wrong-checkout-and-stale-head-fail-closed",
+        "stale_status": "STALE_OR_CROSS_HEAD",
+        "status": "PASS",
+        "wrong_checkout_status": "WRONG_CHECKOUT"
+      },
+      {
+        "check_id": "A17-06-shared-service-layer",
+        "detail": "CLI, MCP and portal consume InterfaceService/solo_agent surfaces",
+        "status": "PASS"
+      }
+    ],
+    "doctor_status": "OK",
+    "export_packet_id": "sha256:d6765ebf526f58280ec902597cf872fc3045cac0766f55482dfb3e3ebaa522ce",
+    "grants_authority": false,
+    "receipt_id": "sha256:957e72914fa7daa7caa850d07c300f627334893cd8d1d2463804157f2a8ccaa1",
+    "replay_status": "REPLAY_MATCH",
+    "result": "PASS",
+    "result_id": "sha256:e1b5b5fb2b64ce76db8b6f1312e084c2746491571f9918f35c51ae8cf8d213fb",
+    "schema_version": "SoloAgentAcceptanceReceipt/v1",
+    "session_id": "sha256:7644f30510ab7aab69da67c6214a9b5933afe768e024ace40339a21c7c66405e",
+    "stage_closure": "A17_ACTIVE",
+    "stage_id": "A17"
+  },
+  "canonical_writes": 0,
+  "checks": [
+    {
+      "check_id": "A17-01-enter-standalone",
+      "detail": "labctl enter works",
+      "status": "PASS"
+    },
+    {
+      "check_id": "A17-02-cross-lab-entry-waits",
+      "detail": "market/security entries are proposal-only native-bootstrap waits",
+      "market_status": "WAIT_NATIVE_BOOTSTRAP",
+      "security_status": "WAIT_NATIVE_BOOTSTRAP",
+      "status": "PASS"
+    },
+    {
+      "check_id": "A17-03-submit-status-result",
+      "result_id": "sha256:e1b5b5fb2b64ce76db8b6f1312e084c2746491571f9918f35c51ae8cf8d213fb",
+      "session_id": "sha256:7644f30510ab7aab69da67c6214a9b5933afe768e024ace40339a21c7c66405e",
+      "status": "PASS"
+    },
+    {
+      "check_id": "A17-04-export-replay-portal",
+      "packet_id": "sha256:d6765ebf526f58280ec902597cf872fc3045cac0766f55482dfb3e3ebaa522ce",
+      "status": "PASS"
+    },
+    {
+      "check_id": "A17-05-wrong-checkout-and-stale-head-fail-closed",
+      "stale_status": "STALE_OR_CROSS_HEAD",
+      "status": "PASS",
+      "wrong_checkout_status": "WRONG_CHECKOUT"
+    },
+    {
+      "check_id": "A17-06-shared-service-layer",
+      "detail": "CLI, MCP and portal consume InterfaceService/solo_agent surfaces",
+      "status": "PASS"
+    }
+  ],
+  "commands": [
+    "srlab labctl enter",
+    "srlab labctl doctor",
+    "srlab labctl submit <session-dir>",
+    "srlab labctl status <session-dir>",
+    "srlab labctl result <session-dir>",
+    "srlab labctl export <session-dir>",
+    "srlab labctl replay <session-dir>",
+    "srlab labctl portal <session-dir>"
+  ],
+  "export_packet_id": "sha256:d6765ebf526f58280ec902597cf872fc3045cac0766f55482dfb3e3ebaa522ce",
+  "grants_authority": false,
+  "live_actions": 0,
+  "receipt_id": "sha256:e4179946b07a8931b38ad900abd154e2acead3dfdaf5bc8cccb8c3e8e184a863",
+  "remaining_external_waits": [],
+  "remaining_internal_waits": [],
+  "result": "PASS",
+  "result_id": "sha256:e1b5b5fb2b64ce76db8b6f1312e084c2746491571f9918f35c51ae8cf8d213fb",
+  "schema_version": "StageCompletionReceipt/v1",
+  "session_id": "sha256:7644f30510ab7aab69da67c6214a9b5933afe768e024ace40339a21c7c66405e",
+  "solo_acceptance_receipt_id": "sha256:957e72914fa7daa7caa850d07c300f627334893cd8d1d2463804157f2a8ccaa1",
+  "stage_closure": "A17_ACTIVE",
+  "stage_id": "A17"
+}

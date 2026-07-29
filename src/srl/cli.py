@@ -704,6 +704,77 @@ def _cmd_labctl_enter(args: list[str], options: dict[str, str | None]) -> int:
     return EXIT_OK
 
 
+def _cmd_labctl_doctor(args: list[str], options: dict[str, str | None]) -> int:
+    """``labctl doctor`` emits the A17 solo-agent doctor report."""
+    del args, options
+    try:
+        report = InterfaceService().solo_doctor()
+    except InterfaceServiceError as exc:
+        _emit_err(_error_report("labctl doctor", str(exc)))
+        return EXIT_ERROR
+    _emit(report)
+    return EXIT_OK
+
+
+def _cmd_labctl_submit(args: list[str], options: dict[str, str | None]) -> int:
+    """``labctl submit <session-dir> [cell-id]`` runs one bounded solo task."""
+    del options
+    if not args:
+        _emit_err(_error_report("labctl submit", "expected <session-dir> [cell-id]"))
+        return EXIT_ERROR
+    session_dir = args[0]
+    cell_id = args[1] if len(args) > 1 else "standalone"
+    try:
+        report = InterfaceService().solo_submit(session_dir, cell_id=cell_id)
+    except InterfaceServiceError as exc:
+        _emit_err(_error_report("labctl submit", str(exc)))
+        return EXIT_ERROR
+    _emit(report)
+    return EXIT_OK
+
+
+def _cmd_labctl_session_report(
+    args: list[str],
+    options: dict[str, str | None],
+    *,
+    subcommand: str,
+) -> int:
+    """Dispatch a session-dir based labctl report command."""
+    del options
+    if not args:
+        _emit_err(_error_report(f"labctl {subcommand}", "expected <session-dir>"))
+        return EXIT_ERROR
+    service = InterfaceService()
+    try:
+        if subcommand == "status":
+            report = service.solo_status(args[0])
+        elif subcommand == "result":
+            report = service.solo_result(args[0])
+        elif subcommand == "export":
+            report = service.solo_export(args[0])
+        elif subcommand == "replay":
+            report = service.solo_replay(args[0])
+        elif subcommand == "portal":
+            report = service.solo_portal(args[0])
+        else:  # pragma: no cover - table construction keeps this unreachable.
+            _emit_err(_error_report(f"labctl {subcommand}", "unknown labctl session report"))
+            return EXIT_USAGE
+    except InterfaceServiceError as exc:
+        _emit_err(_error_report(f"labctl {subcommand}", str(exc)))
+        return EXIT_ERROR
+    _emit(report)
+    return EXIT_OK
+
+
+def _labctl_session_handler(subcommand: str) -> _Handler:
+    """Return a handler for a session-dir based labctl subcommand."""
+
+    def _handler(args: list[str], options: dict[str, str | None]) -> int:
+        return _cmd_labctl_session_report(args, options, subcommand=subcommand)
+
+    return _handler
+
+
 # ---------------------------------------------------------------------------
 # Dispatch table.
 # ---------------------------------------------------------------------------
@@ -746,7 +817,16 @@ _SUBCOMMANDS: Final[dict[str, dict[str, _Handler]]] = {
         "list": _catalog_handler("list"),
         "inspect": _catalog_handler("inspect"),
     },
-    "labctl": {"enter": _cmd_labctl_enter},
+    "labctl": {
+        "enter": _cmd_labctl_enter,
+        "doctor": _cmd_labctl_doctor,
+        "submit": _cmd_labctl_submit,
+        "status": _labctl_session_handler("status"),
+        "result": _labctl_session_handler("result"),
+        "export": _labctl_session_handler("export"),
+        "replay": _labctl_session_handler("replay"),
+        "portal": _labctl_session_handler("portal"),
+    },
 }
 
 

@@ -17,7 +17,7 @@ PROJECT_ID: Final[str] = "scientific-resource-lab"
 PRODUCT_NAME: Final[str] = "Scientific Reasoning Fabric"
 PROJECT_FINGERPRINT: Final[str] = "d56e03d0d5e1a9bb9c33a008ab9895102d8e41e8bfd001dfbfc8e1c80b9df0b3"
 MISSION_ID: Final[str] = "build-scientific-reasoning-fabric-v1"
-PLAN_ID: Final[str] = "SRF-MASTER-2026-07-29-V3.6"
+PLAN_ID: Final[str] = "SRF-MASTER-2026-07-29-V3.7"
 
 _CELLS: Final[dict[str, dict[str, Any]]] = {
     "standalone": {
@@ -68,7 +68,12 @@ def labctl_manifest() -> dict[str, Any]:
             "security_actions_allowed": False,
         },
         "next_commands": [
-            "srlab doctor",
+            "srlab labctl doctor",
+            "srlab labctl submit <session-dir>",
+            "srlab labctl status <session-dir>",
+            "srlab labctl result <session-dir>",
+            "srlab labctl export <session-dir>",
+            "srlab labctl replay <session-dir>",
             "srlab catalog inspect",
             "srlab plan build <bundle-file>",
             "srlab run execute <run-spec-file>",
