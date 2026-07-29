@@ -39,6 +39,7 @@ from srl.contracts.schema import (
 from srl.contracts.schema import (
     validate as schema_validate,
 )
+from srl.interfaces import InterfaceService, InterfaceServiceError
 from srl.knowledge.adapters import p0_registry
 from srl.knowledge.retriever import (
     ApiRetriever,
@@ -239,17 +240,9 @@ def m_list_capabilities(_ctx: MethodContext, _args: dict[str, Any]) -> dict[str,
     Mirrors ``srlab catalog list``. Returns the catalog digest and the sorted
     list of ``{profile, capability_id, availability}`` entries.
     """
-    catalog = load_default_catalog()
-    entries = [
-        {
-            "profile": entry.profile,
-            "capability_id": entry.capability_id,
-            "availability": entry.availability,
-        }
-        for entry in catalog.entries.values()
-    ]
-    entries.sort(key=lambda e: e["profile"])
-    result = {"catalog_digest": catalog.digest, "entries": entries}
+    service = InterfaceService()
+    listed = service.capability_list()
+    result = {"catalog_digest": listed["catalog_digest"], "entries": listed["entries"]}
     return _success("list_capabilities", result=result)
 
 
@@ -265,20 +258,11 @@ def m_inspect_capability(_ctx: MethodContext, args: dict[str, Any]) -> dict[str,
     ``{"profile": "<name>"}``. An unknown profile is a typed CONTRACT_INVALID.
     """
     profile = _require_str(args.get("profile"), name="profile")
-    catalog = load_default_catalog()
-    entry = catalog.entry_for(profile)
-    if entry is None:
-        msg = f"unknown profile {profile!r}; not in the shipped catalog"
-        raise McpMethodError(msg, fail_reason=CONTRACT_INVALID)
-    result = {
-        "catalog_digest": catalog.digest,
-        "entry": {
-            "capability_id": entry.capability_id,
-            "profile": entry.profile,
-            "adapter_id": entry.adapter_id,
-            "availability": entry.availability,
-        },
-    }
+    try:
+        inspected = InterfaceService().inspect_capability(profile)
+    except InterfaceServiceError as exc:
+        raise McpMethodError(str(exc), fail_reason=CONTRACT_INVALID) from exc
+    result = {"catalog_digest": inspected["catalog_digest"], "entry": inspected["entry"]}
     return _success("inspect_capability", result=result)
 
 

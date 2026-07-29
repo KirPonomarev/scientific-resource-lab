@@ -37,14 +37,12 @@ violation. All other command failures exit ``1``.
 from __future__ import annotations
 
 import json
-import platform
 import shutil
 import sys
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any, Final
 
-from srl import __version__
 from srl.canonical import canonical_json_line
 from srl.cas.store import LocalArtifactStore
 from srl.contracts.errors import CONTRACT_INVALID_FAIL_REASON
@@ -53,6 +51,7 @@ from srl.contracts.schema import validate as schema_validate
 from srl.execution.policy import load_policy
 from srl.execution.runner import POLICY_VIOLATION_FAIL_REASON, RunStatus, run_adapter
 from srl.execution.sandbox import prepare_scratch
+from srl.interfaces import InterfaceService, InterfaceServiceError
 from srl.knowledge.adapters import p0_registry
 from srl.knowledge.retriever import (
     ApiRetriever,
@@ -63,7 +62,6 @@ from srl.knowledge.retriever import (
     RetrievalTimeoutError,
     TransportResponse,
 )
-from srl.labctl import enter_report
 from srl.planning import build_plan, default_policy, load_default_catalog, route
 from srl.semantic.claims import ClaimInvariantError
 from srl.semantic.claims import validate as claim_validate
@@ -121,21 +119,12 @@ def _emit_err(report: dict[str, Any]) -> None:
 
 def _doctor_report() -> dict[str, Any]:
     """Build the DoctorReport/v1 payload describing the runtime."""
-    return {
-        "schema_version": DOCTOR_SCHEMA,
-        "srl_version": __version__,
-        "python": platform.python_version(),
-        "platform": platform.platform(),
-        "status": "ok",
-    }
+    return dict(InterfaceService().doctor())
 
 
 def _version_report() -> dict[str, Any]:
     """Build the VersionReport/v1 payload."""
-    return {
-        "schema_version": VERSION_SCHEMA,
-        "srl_version": __version__,
-    }
+    return dict(InterfaceService().version())
 
 
 def _load_json_file(path_str: str, command: str) -> dict[str, Any] | int:
@@ -685,35 +674,15 @@ def _cmd_catalog(args: list[str], subcommand: str) -> int:
     """``catalog list|inspect``."""
     del args
     try:
-        catalog = load_default_catalog()
+        service = InterfaceService()
     except Exception as exc:
         _emit_err(_error_report(f"catalog {subcommand}", str(exc)))
         return EXIT_ERROR
     if subcommand == "list":
-        entries = [
-            {
-                "profile": entry.profile,
-                "capability_id": entry.capability_id,
-                "availability": entry.availability,
-            }
-            for entry in catalog.entries.values()
-        ]
-        entries.sort(key=lambda e: e["profile"])
-        _emit(
-            {
-                "schema_version": "CapabilityCatalogList/v1",
-                "catalog_digest": catalog.digest,
-                "entries": entries,
-            }
-        )
+        _emit(service.capability_list())
         return EXIT_OK
     # subcommand == "inspect"
-    _emit(
-        {
-            "schema_version": "CapabilityCatalogReport/v1",
-            "catalog": catalog.to_dict(),
-        }
-    )
+    _emit(service.capability_report())
     return EXIT_OK
 
 
@@ -727,8 +696,8 @@ def _cmd_labctl_enter(args: list[str], options: dict[str, str | None]) -> int:
     del options
     cell_id = args[0] if args else "standalone"
     try:
-        report = enter_report(cell_id)
-    except ValueError as exc:
+        report = InterfaceService().enter(cell_id)
+    except InterfaceServiceError as exc:
         _emit_err(_error_report("labctl enter", str(exc)))
         return EXIT_ERROR
     _emit(report)

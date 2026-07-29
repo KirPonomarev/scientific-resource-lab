@@ -1900,9 +1900,9 @@ The final report must list exact IDs and hashes, never subjective percentages.
 
 <!-- BEGIN_MUTABLE_STATE_V3_6 -->
 
-STATE_REVISION: 11
-PREVIOUS_STATE_SHA256: a4e30037-14c29c66-4fe04606-50ab32e3-123de7cf-fdf934e8-9a7c7bfe-f85c109d
-CURRENT_STATE_SHA256: 624a4c4d-f0b1f8af-546af5ce-bc3027ed-59cc32db-19d29dc7-92aff4bf-9f8af4af
+STATE_REVISION: 12
+PREVIOUS_STATE_SHA256: 624a4c4d-f0b1f8af-546af5ce-bc3027ed-59cc32db-19d29dc7-92aff4bf-9f8af4af
+CURRENT_STATE_SHA256: 5970a45c-9f04d9eb-f49adfc5-65589a16-adc4154a-5e8d7ed3-a04821c0-36729ce9
 
 ## CURRENT_FACTS
 
@@ -1927,20 +1927,20 @@ current_facts:
 ~~~yaml
 execution_state:
   status: IN_PROGRESS
-  current_stage: S10
-  next_stage: S11_after_interface_convergence
-  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven, S09_health_recovery_proven]
+  current_stage: S11
+  next_stage: S12_after_p0_core
+  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven, S08_runner_scheduler_proven, S09_health_recovery_proven, S10_interface_convergence_proven]
   invalidated_stages: []
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: health_recovery_proven
+  last_proven_transition: interface_convergence_proven
   active_branch_or_null: codex/srf-fabric-v1
   active_pr_or_null: null
   active_worktree_or_null: isolated_codex_worktree
   writer_lease_or_null: srf-fabric-v1-single-writer
-  active_operation_or_null: S10_interface_convergence
+  active_operation_or_null: S11_p0_core_packs
   active_process_or_job_or_null: null
-  next_checkpoint: after_S10_interface_convergence_receipt
-  next_executable_action: implement labctl command family and route MCP/portal through same application service
+  next_checkpoint: after_S11_p0_core_receipt
+  next_executable_action: admit complete P0 numerical, symbolic, exact algebra and SMT compute core
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -1952,29 +1952,27 @@ state_capsule:
   project_id: scientific-resource-lab
   project_fingerprint: d56e03d0-d5e1a9bb-9c33a008-ab989510-2d8e41e8-bfd001df-bfc8e1c8-0b9df0b3
   mission_id: build-scientific-reasoning-fabric-v1
-  stage_id: S10
-  state_revision: 11
+  stage_id: S11
+  state_revision: 12
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: health_recovery_proven
-  active_operation: S10_interface_convergence
+  last_proven_transition: interface_convergence_proven
+  active_operation: S11_p0_core_packs
   active_process_or_job: null
   frozen_preimages:
     - baseline HEAD
     - repository governance
     - operator-supplied V3.6 protocol
   new_primary_evidence:
-    - HealthAndRecoveryReceipt dd7e5233-44698068-a686ef20-b9725301-9830352a-e8d0942b-abbfc483-1d7e1a27
-    - SRFPulse/v1 builder and stale/cross-head WAIT_SRF assessment implemented
-    - FederationStatus/v1 is read-only aggregation and does not overwrite native Market or Security health
-    - deterministic trace ids and trace links implemented
-    - bounded restore drill restores explicit CAS artifact manifest into empty fixture target and validates RestoreDrillReceipt/v1
-    - corrupt source CAS surfaces CAS_INTEGRITY_FAILURE; non-empty restore target is refused
-    - live T7 restore, destructive overwrite, reboot and production backup movement remain WAIT_AUTHORITY
-    - affected recovery, contracts, CAS and runtime tests PASS with 196 passed
-    - make test PASS with 1819 passed and 1 skipped
+    - InterfaceConvergenceReceipt be999a0f-61f07901-62d96a44-28035147-ade36978-e07050aa-0e5f5e82-6cfea448
+    - shared read-only InterfaceService introduced for CLI, MCP and portal-facing semantics
+    - CLI doctor, version, catalog list, catalog inspect and labctl enter route through InterfaceService
+    - MCP list_capabilities and inspect_capability route through InterfaceService
+    - portal build report carries InterfaceService manifest and authority-negative catalog digest
+    - CLI/MCP/portal parity tests PASS with 113 passed
+    - make test PASS with 1823 passed and 1 skipped
     - make lint PASS
     - make typecheck PASS
-  next_executable_action: S10 labctl, MCP, portal and export convergence
+  next_executable_action: S11 P0 numerical, symbolic, exact algebra and SMT packs
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -2022,6 +2020,9 @@ evidence_index:
   - claim: S09 health and recovery proven
     source: HealthAndRecoveryReceipt/v1
     identity: dd7e5233-44698068-a686ef20-b9725301-9830352a-e8d0942b-abbfc483-1d7e1a27
+  - claim: S10 interface convergence proven
+    source: InterfaceConvergenceReceipt/v1
+    identity: be999a0f-61f07901-62d96a44-28035147-ade36978-e07050aa-0e5f5e82-6cfea448
   - claim: Market mutation currently forbidden
     source: native operator bootstrap
     identity: 59ce6ff4c8b514c93d8d4b26d648ba6e7dd7b764
@@ -2034,7 +2035,7 @@ evidence_index:
 authority_ledger:
   routine_safe_plan_creation: exercised
   exact_hash_review_authority: exercised
-  implementation_authority: exercised_routine_safe_S01_S09
+  implementation_authority: exercised_routine_safe_S01_S10
   market_mutation_authority: absent
   security_mutation_authority: absent
   physical_t7_authority: absent
@@ -2085,6 +2086,8 @@ decision_log:
     decision: S08 adds an explicit-dispatch scheduler over the existing runner/materializer/sealer stack rather than starting a Mac daemon or creating a second execution path
   - id: D020
     decision: S09 makes SRFPulse independent and FederationStatus read-only; live T7 restore and destructive recovery operations remain WAIT_AUTHORITY
+  - id: D021
+    decision: S10 uses a shared read-only InterfaceService for common CLI, MCP and portal semantics while leaving each surface responsible only for transport/framing/rendering
 ~~~
 
 ## PROGRESS_LOG
@@ -2134,6 +2137,10 @@ progress_log:
   - revision: 11
     stage: S09
     result: independent SRFPulse, read-only FederationStatus, deterministic tracing and bounded restore drill validated
+    observed_at: 2026-07-29
+  - revision: 12
+    stage: S10
+    result: CLI, MCP and portal common semantics routed through shared InterfaceService and parity-tested
     observed_at: 2026-07-29
 ~~~
 
