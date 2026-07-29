@@ -161,3 +161,31 @@ to cross that bridge: a pack should be materialized and executed only after it
 has reached `EXPERIMENTAL_ACCEPTED` with a complete chain of receipts. The
 probes referenced by the manifest (`runtime_probe` and `actual_compute_probe`)
 are the hooks that WP-C23 uses to prove the pack before admission.
+
+## S07 governance layer
+
+S07 adds `srl.packs.governance` above the WP-C23 state machine. The governance
+layer projects a validated `ResourcePackManifest/v1` into
+`SciencePackManifest/v2` and then decides whether the pack can be `ACTIVE`.
+
+`ACTIVE` requires all of the following evidence:
+
+- schema-valid `SciencePackManifest/v2`;
+- allowed license and content-addressed license text;
+- SBOM digest;
+- dependency lock digest;
+- every dependency in the SBOM has an artifact hash;
+- vulnerability scan summary within policy thresholds;
+- full admission receipt chain through all WP-C23 transitions;
+- no direct pack revocation and no revoked dependency.
+
+Missing evidence parks the pack in a precise WAIT state (`WAIT_SBOM`,
+`WAIT_LOCK`, `WAIT_VULNERABILITY_SCAN`, `WAIT_ADMISSION_RECEIPT` or
+`WAIT_LICENSE`). Direct or transitive revocation returns `REVOKED`. There is no
+path that marks a pack `ACTIVE` merely because it installed, imported, or passed
+a runtime probe.
+
+The current committed pack inventory is treated conservatively: licenses are
+known and allowed, but missing production SBOM/vulnerability/admission evidence
+keeps packs out of `ACTIVE` until their full evidence is present. This is a
+capability truth claim, not a feature removal.

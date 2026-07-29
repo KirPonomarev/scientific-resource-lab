@@ -1902,7 +1902,7 @@ The final report must list exact IDs and hashes, never subjective percentages.
 
 STATE_REVISION: 6
 PREVIOUS_STATE_SHA256: f99da285-290477be-8878585f-dd5c4f9f-154337df-890e43d9-703dd4ab-b2acdf3d
-CURRENT_STATE_SHA256: 79d54441-4b827021-c9d04449-d5e68669-cffb414a-bb407779-88827282-c72bbe51
+CURRENT_STATE_SHA256: 91f04f34-a8033755-e9d6fb4b-fb973063-30b704d6-20806827-e425a786-73d8a575
 
 ## CURRENT_FACTS
 
@@ -1927,20 +1927,20 @@ current_facts:
 ~~~yaml
 execution_state:
   status: IN_PROGRESS
-  current_stage: S07
-  next_stage: S08_after_supply_chain_admission
-  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven]
+  current_stage: S08
+  next_stage: S09_after_runner_scheduler
+  completed_stages: [S00_plan_content_written, S00_exact_hash_review_approved, S01_baseline_truth_proven, S02_solo_agent_bootstrap_proven, S03_contract_kernel_proven, S04_storage_fabric_validated, S05_reliable_spool_transport_proven, S06_sandbox_boundary_proven, S07_pack_governance_proven]
   invalidated_stages: []
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: sandbox_boundary_proven
+  last_proven_transition: pack_governance_proven
   active_branch_or_null: codex/srf-fabric-v1
   active_pr_or_null: null
   active_worktree_or_null: isolated_codex_worktree
   writer_lease_or_null: srf-fabric-v1-single-writer
-  active_operation_or_null: S07_supply_chain_admission
+  active_operation_or_null: S08_runner_scheduler_checkpoints
   active_process_or_job_or_null: null
-  next_checkpoint: after_S07_pack_governance_receipt
-  next_executable_action: implement SciencePackManifest/v2 admission and revocation registry
+  next_checkpoint: after_S08_runner_conformance_receipt
+  next_executable_action: implement queue scheduler, pack dispatcher, checkpoint and sealed output pipeline
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -1952,27 +1952,27 @@ state_capsule:
   project_id: scientific-resource-lab
   project_fingerprint: d56e03d0-d5e1a9bb-9c33a008-ab989510-2d8e41e8-bfd001df-bfc8e1c8-0b9df0b3
   mission_id: build-scientific-reasoning-fabric-v1
-  stage_id: S07
-  state_revision: 8
+  stage_id: S08
+  state_revision: 9
   exact_identity: 947cbb4515307b54fe3eb9b6366cdb392361c867
-  last_proven_transition: sandbox_boundary_proven
-  active_operation: S07_supply_chain_admission
+  last_proven_transition: pack_governance_proven
+  active_operation: S08_runner_scheduler_checkpoints
   active_process_or_job: null
   frozen_preimages:
     - baseline HEAD
     - repository governance
     - operator-supplied V3.6 protocol
   new_primary_evidence:
-    - SandboxValidationReceipt b2bb63de-e3c202cf-345b78e2-431d54b8-9890cb72-70ee9146-96ddfb99-a9764c3d
-    - T0-T4 trust-class sandbox admission implemented
-    - current host admits T0/T1 and parks T2/T3 as WAIT_COMPUTE_NODE without weak fallback
-    - T4 budget/provider lane parks as WAIT_AUTHORITY until native receipt exists
-    - WP34 adversarial runner gate PASS with 14 cases and 50-run conformance
+    - PackGovernanceReceipt 73968fe5-9b961600-40c14e0b-03b6873a-0b7af1ed-b4c93668-1b1175b5-77e211cb
+    - SciencePackManifest/v2 governance projection implemented
+    - pack ACTIVE gate requires SBOM, lock, allowed license, vulnerability scan, full WP-C23 admission chain and no direct or transitive revocation
+    - current pack inventory has zero unknown licenses and zero ACTIVE packs without complete governance evidence
+    - WP22 and WP23 pack-admission gates PASS
+    - make test PASS with 1801 passed and 1 skipped
     - public-boundary and secret-scan passed on staged SRF surface
     - make lint PASS
-    - make test PASS
     - make typecheck PASS
-  next_executable_action: S07 supply chain, admission, dependency DAG and revocation
+  next_executable_action: S08 runner, scheduler, checkpoints and backpressure
   blocker_or_null: null
   updated_at: 2026-07-29
 ~~~
@@ -2011,6 +2011,9 @@ evidence_index:
   - claim: S06 sandbox boundary proven
     source: SandboxValidationReceipt/v1
     identity: b2bb63de-e3c202cf-345b78e2-431d54b8-9890cb72-70ee9146-96ddfb99-a9764c3d
+  - claim: S07 pack governance proven
+    source: PackGovernanceReceipt/v1
+    identity: 73968fe5-9b961600-40c14e0b-03b6873a-0b7af1ed-b4c93668-1b1175b5-77e211cb
   - claim: Market mutation currently forbidden
     source: native operator bootstrap
     identity: 59ce6ff4c8b514c93d8d4b26d648ba6e7dd7b764
@@ -2023,7 +2026,7 @@ evidence_index:
 authority_ledger:
   routine_safe_plan_creation: exercised
   exact_hash_review_authority: exercised
-  implementation_authority: exercised_routine_safe_S01_S06
+  implementation_authority: exercised_routine_safe_S01_S07
   market_mutation_authority: absent
   security_mutation_authority: absent
   physical_t7_authority: absent
@@ -2068,6 +2071,8 @@ decision_log:
     decision: S06 extends the existing execution runner with a separate trust-class sandbox admission policy instead of creating a second runtime or claiming unproven Mac isolation
   - id: D017
     decision: S06 treats T2/T3 missing container, microVM, network-deny or taint capabilities as WAIT_COMPUTE_NODE and treats T4 missing budget/provider authority as WAIT_AUTHORITY
+  - id: D018
+    decision: S07 keeps production packs out of ACTIVE until complete SBOM, lock, vulnerability, license and admission evidence exists; current packs remain usable inventory records but not governed ACTIVE packs
 ~~~
 
 ## PROGRESS_LOG
@@ -2105,6 +2110,10 @@ progress_log:
   - revision: 8
     stage: S06
     result: trust-class sandbox admission validated; T2/T3 weak fallback absent, T4 authority parked, adversarial runner gate passed
+    observed_at: 2026-07-29
+  - revision: 9
+    stage: S07
+    result: pack governance validated; manifest v2 projection, revocation, license, vulnerability and complete-admission gates proven
     observed_at: 2026-07-29
 ~~~
 
