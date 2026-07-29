@@ -4,6 +4,8 @@
 Make prerequisites run in separate shells, which is exactly how A09 ended up
 with repeated mathlib provisioning. This orchestrator owns one environment and
 injects the prepared A09 project only once, at the A09 probe boundary.
+It also owns the A10 HOL4 session cache so independent prover verification does
+not depend on Make prerequisite environment leakage.
 """
 
 from __future__ import annotations
@@ -26,6 +28,7 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from scripts.ci.prepare_a09_mathlib import prepare_session_project  # noqa: E402
+from scripts.ci.prepare_a10_hol4 import prepare_hol4  # noqa: E402
 
 SUMMARY_PATH: Final[Path] = REPO_ROOT / ".tmp" / "verify-v37-summary.json"
 
@@ -72,6 +75,18 @@ def main() -> int:
     env["SRL_A09_MATHLIB_PROJECT_DIR"] = str(prepare_report["project_dir"])
 
     steps.append(_run([sys.executable, "scripts/checks/srf-v37-a09-gate.py"], env=env))
+
+    a10_cache_root = Path(env["SRL_A10_CACHE_ROOT"]) if "SRL_A10_CACHE_ROOT" in env else None
+    a10_prepare_report = prepare_hol4(
+        cache_root=a10_cache_root
+        if a10_cache_root is not None
+        else Path(env.get("TMPDIR", tempfile.gettempdir())) / "srl-a10-hol4-session-cache",
+    )
+    env["SRL_A10_HOL4_HOME"] = str(a10_prepare_report["hol4_home"])
+    env.setdefault("SRL_A10_ROCQ_DOCKER_IMAGE", "rocq/rocq-prover:9.2.0")
+    env.setdefault("SRL_A10_ISABELLE_DOCKER_IMAGE", "makarius/isabelle:Isabelle2025-2")
+
+    steps.append(_run([sys.executable, "scripts/checks/srf-v37-a10-gate.py"], env=env))
     if (REPO_ROOT / "dist").exists():
         shutil.rmtree(REPO_ROOT / "dist")
     steps.append(_run(["uv", "build"], env=env))
@@ -89,6 +104,16 @@ def main() -> int:
                 "fetch_count",
                 "cache_status",
                 "project_dir_role",
+            )
+        },
+        "a10_hol4_prepare": {
+            key: a10_prepare_report[key]
+            for key in (
+                "cache_key",
+                "installer_sha256",
+                "prepare_count",
+                "fetch_count",
+                "cache_status",
             )
         },
     }

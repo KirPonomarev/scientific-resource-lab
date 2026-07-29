@@ -12,7 +12,7 @@ jobs:
   build-evidence:
     name: release evidence
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
@@ -23,15 +23,25 @@ jobs:
       - name: Install native A08 toolchains
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends pari-gp maxima gap singular cvc5 z3
+          sudo apt-get install -y --no-install-recommends pari-gp maxima gap singular cvc5 z3 ca-certificates build-essential make polyml
       - name: Install native A09 Lean/mathlib toolchain
         run: scripts/ci/install-lean-toolchain.sh
+      - name: Pull A10 prover images
+        run: |
+          docker pull rocq/rocq-prover:9.2.0
+          docker pull makarius/isabelle:Isabelle2025-2
       - name: Restore exact A09 mathlib cache
         uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         with:
           path: .cache/srl-a09
           key: >-
             a09-${{ runner.os }}-${{ runner.arch }}-lean-4.32.2-mathlib-905b95818eb32af7874a58b427f50c1711a5e96c-${{ hashFiles('scripts/ci/install-lean-toolchain.sh', 'scripts/ci/prepare_a09_mathlib.py', 'src/srl/packs/formal/lean/adapter.py', 'configs/packs/formal/lean/corpus-pins.json') }}
+      - name: Restore exact A10 HOL4 cache
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: .cache/srl-a10
+          key: >-
+            a10-${{ runner.os }}-${{ runner.arch }}-hol4-trindemossen-2-${{ hashFiles('scripts/ci/prepare_a10_hol4.py', 'src/srl/packs/formal/cross_prover.py', 'configs/packs/formal/independent-prover-pins.json') }}
       - name: Set up Python 3.12
         run: uv python install 3.12
       - name: Install dependencies (locked)
@@ -54,6 +64,19 @@ jobs:
           python3 -c 'import json; r=json.load(open(".tmp/a09-prepare-report.json")); assert r["prepare_count"] <= 1; print("A09 prepare_count", r["prepare_count"], "fetch_count", r["fetch_count"], "cache_status", r["cache_status"])'
       - name: V3.7 A09 Lean/mathlib and corpus gate
         run: uv run python scripts/checks/srf-v37-a09-gate.py
+      - name: Prepare pinned A10 HOL4 once
+        env:
+          SRL_A10_CACHE_ROOT: .cache/srl-a10
+        run: |
+          uv run python scripts/ci/prepare_a10_hol4.py --cache-root .cache/srl-a10 --report .tmp/a10-hol4-prepare-report.json
+          hol4_home="$(python3 -c 'import json; print(json.load(open(".tmp/a10-hol4-prepare-report.json"))["hol4_home"])')"
+          echo "SRL_A10_HOL4_HOME=${hol4_home}" >> "$GITHUB_ENV"
+          python3 -c 'import json; r=json.load(open(".tmp/a10-hol4-prepare-report.json")); assert r["prepare_count"] <= 1; print("A10 HOL4 prepare_count", r["prepare_count"], "fetch_count", r["fetch_count"], "cache_status", r["cache_status"])'
+      - name: V3.7 A10 independent prover gate
+        env:
+          SRL_A10_ROCQ_DOCKER_IMAGE: rocq/rocq-prover:9.2.0
+          SRL_A10_ISABELLE_DOCKER_IMAGE: makarius/isabelle:Isabelle2025-2
+        run: uv run python scripts/checks/srf-v37-a10-gate.py
       - name: build evidence
         run: python3 scripts/release/build-evidence.py
       - name: verify evidence schema

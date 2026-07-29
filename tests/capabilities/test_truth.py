@@ -4,6 +4,7 @@ import copy
 import json
 import subprocess
 import sys
+from pathlib import Path
 
 import pytest
 
@@ -90,6 +91,89 @@ def test_a09_truth_projection_is_offline_and_receipt_backed(
     ]
     assert second["a09_active_inventory_observed"] == first["a09_active_inventory_observed"]
     assert {item["probe_kind"] for item in first["components"]} == {"stage_receipt"}
+
+
+def test_a10_truth_projection_is_offline_and_receipt_backed(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    receipt = {
+        "schema_version": "StageCompletionReceipt/v1",
+        "stage_id": "A10",
+        "result": "PASS",
+        "stage_closure": "A10_ACTIVE",
+        "active_packs": ["rocq", "isabelle", "hol4"],
+        "parked_packs": [],
+        "remaining_internal_waits": [],
+        "remaining_external_waits": [],
+        "checks": [
+            {
+                "check_id": "A10-00-receipt-projects-truth-ledger-active",
+                "status": "PASS",
+            },
+            {
+                "check_id": "A10-01-independent-prover-pins",
+                "status": "PASS",
+                "pin_manifest_sha256": "fixture-a10-pins",
+            },
+            _a10_proof_check("A10-02-rocq-proof", "rocq"),
+            _a10_proof_check("A10-03-isabelle-proof", "isabelle"),
+            _a10_proof_check("A10-04-hol4-proof", "hol4"),
+            {
+                "check_id": "A10-05-semantic-gap-manifests",
+                "status": "PASS",
+                "admission_bundle": {
+                    "automatic_equivalence_claims": 0,
+                    "wait_contour_ids": [],
+                    "translation_manifests": [
+                        {"equivalence_claimed": False},
+                        {"equivalence_claimed": False},
+                        {"equivalence_claimed": False},
+                    ],
+                },
+            },
+        ],
+        "canonical_writes": 0,
+        "grants_authority": False,
+        "receipt_id": "sha256:fixture-a10-receipt",
+    }
+    receipt_path = tmp_path / "a10-receipt.json"
+    receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+    a10_specs = tuple(item for item in truth._SPECS if item.stage == "A10")
+
+    def forbidden(*_args: object, **_kwargs: object) -> object:
+        raise AssertionError(
+            "A10 truth projection must not probe executables or spawn subprocesses"
+        )
+
+    monkeypatch.setattr(truth, "_SPECS", a10_specs)
+    monkeypatch.setattr(truth, "_A10_RECEIPT_PATH", receipt_path)
+    monkeypatch.setattr(truth, "independent_prover_pin_manifest_hash", lambda: "fixture-a10-pins")
+    monkeypatch.setattr(truth.shutil, "which", forbidden)
+    monkeypatch.setattr(subprocess, "run", forbidden)
+
+    first = truth.build_truth_ledger()
+    second = truth.build_truth_ledger()
+
+    assert first["a10_active_inventory_observed"] == ["rocq", "isabelle", "hol4"]
+    assert second["a10_active_inventory_observed"] == first["a10_active_inventory_observed"]
+    assert {item["probe_kind"] for item in first["components"]} == {"stage_receipt"}
+
+
+def _a10_proof_check(check_id: str, prover_id: str) -> dict[str, object]:
+    return {
+        "check_id": check_id,
+        "status": "PASS",
+        "proof_receipt": {
+            "prover_id": prover_id,
+            "theorem_label": "srl_a10_zero_add",
+            "formal_check": "checked",
+            "canonical_writes": 0,
+            "grants_authority": False,
+            "version_probe": {"returncode": 0},
+            "proof_probe": {"returncode": 0},
+        },
+    }
 
 
 def test_release_gate_rejects_fixture_signer_policy_sandbox_and_waits() -> None:

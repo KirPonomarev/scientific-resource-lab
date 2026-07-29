@@ -19,6 +19,7 @@ from typing import Any, Final
 
 from srl.packs.adapters.native_algebra import run_a08_native_smoke
 from srl.packs.adapters.p0_python_core import FLINT_WAIT_REASON, run_p0_python_core_smoke
+from srl.packs.formal import independent_prover_pin_manifest_hash
 from srl.packs.formal.lean import (
     default_corpus_pins,
     default_corpus_statements,
@@ -69,6 +70,9 @@ _REPO_ROOT: Final[Path] = Path(__file__).resolve().parents[3]
 _A09_RECEIPT_PATH: Final[Path] = (
     _REPO_ROOT / "docs" / "verification" / "srf-v3-7-a09-lean-corpora-receipt.json"
 )
+_A10_RECEIPT_PATH: Final[Path] = (
+    _REPO_ROOT / "docs" / "verification" / "srf-v3-7-a10-independent-provers-receipt.json"
+)
 _EXPECTED_A09_COMPONENTS: Final[tuple[str, ...]] = (
     "lean",
     "lake",
@@ -77,6 +81,8 @@ _EXPECTED_A09_COMPONENTS: Final[tuple[str, ...]] = (
     "erdos-problems-metadata",
     "formal-conjectures",
 )
+_EXPECTED_A10_COMPONENTS: Final[tuple[str, ...]] = ("rocq", "isabelle", "hol4")
+_EXPECTED_A10_TRANSLATION_MANIFESTS: Final[int] = 3
 
 
 @dataclass(frozen=True)
@@ -344,6 +350,102 @@ def _smoke_a09_formal_conjectures() -> str:
     return _smoke_a09_receipt("formal-conjectures")
 
 
+def _load_a10_receipt() -> dict[str, Any]:
+    if not _A10_RECEIPT_PATH.exists():
+        raise RuntimeError(f"A10 receipt missing: {_A10_RECEIPT_PATH.relative_to(_REPO_ROOT)}")
+    receipt = json.loads(_A10_RECEIPT_PATH.read_text(encoding="utf-8"))
+    if not isinstance(receipt, dict):
+        raise RuntimeError("A10 receipt must be a JSON object")
+    return receipt
+
+
+def _validated_a10_receipt(component_id: str) -> dict[str, Any]:  # noqa: C901, PLR0912
+    receipt = _load_a10_receipt()
+    if receipt.get("schema_version") != "StageCompletionReceipt/v1":
+        raise RuntimeError("A10 receipt schema drifted")
+    if receipt.get("stage_id") != "A10" or receipt.get("result") != "PASS":
+        raise RuntimeError("A10 receipt is not a PASS receipt for stage A10")
+    if receipt.get("stage_closure") != "A10_ACTIVE":
+        raise RuntimeError("A10 receipt does not close A10_ACTIVE")
+    if receipt.get("remaining_internal_waits") != []:
+        raise RuntimeError("A10 receipt contains internal waits")
+    active = receipt.get("active_packs")
+    if not isinstance(active, list) or set(active) != set(_EXPECTED_A10_COMPONENTS):
+        raise RuntimeError("A10 active_packs do not match expected components")
+    if component_id not in active:
+        raise RuntimeError(f"{component_id} is absent from A10 active_packs")
+
+    checks = {
+        str(item.get("check_id")): item
+        for item in receipt.get("checks", [])
+        if isinstance(item, dict)
+    }
+    if any(item.get("status") != "PASS" for item in checks.values()):
+        raise RuntimeError("A10 receipt contains a non-PASS check")
+    pin_check = checks.get("A10-01-independent-prover-pins")
+    if not isinstance(pin_check, dict):
+        raise RuntimeError("A10 pin check missing")
+    if pin_check.get("pin_manifest_sha256") != independent_prover_pin_manifest_hash():
+        raise RuntimeError("A10 pin manifest hash mismatch")
+
+    for check_id, prover_id in (
+        ("A10-02-rocq-proof", "rocq"),
+        ("A10-03-isabelle-proof", "isabelle"),
+        ("A10-04-hol4-proof", "hol4"),
+    ):
+        check = checks.get(check_id)
+        if not isinstance(check, dict) or not isinstance(check.get("proof_receipt"), dict):
+            raise RuntimeError(f"{check_id} proof receipt missing")
+        proof = check["proof_receipt"]
+        if proof.get("prover_id") != prover_id:
+            raise RuntimeError(f"{check_id} prover id mismatch")
+        if proof.get("theorem_label") != "srl_a10_zero_add":
+            raise RuntimeError(f"{check_id} theorem label mismatch")
+        if proof.get("formal_check") != "checked":
+            raise RuntimeError(f"{check_id} did not check the proof")
+        if proof.get("canonical_writes") != 0 or proof.get("grants_authority") is not False:
+            raise RuntimeError(f"{check_id} proof receipt is not authority-negative")
+        for probe_name in ("version_probe", "proof_probe"):
+            probe = proof.get(probe_name)
+            if not isinstance(probe, dict) or probe.get("returncode") != 0:
+                raise RuntimeError(f"{check_id} {probe_name} failed")
+
+    semantic = checks.get("A10-05-semantic-gap-manifests")
+    if not isinstance(semantic, dict) or not isinstance(semantic.get("admission_bundle"), dict):
+        raise RuntimeError("A10 semantic-gap admission bundle missing")
+    bundle = semantic["admission_bundle"]
+    if bundle.get("automatic_equivalence_claims") != 0:
+        raise RuntimeError("A10 bundle claims automatic equivalence")
+    if bundle.get("wait_contour_ids") != []:
+        raise RuntimeError("A10 bundle contains WAIT contours")
+    manifests = bundle.get("translation_manifests")
+    if not isinstance(manifests, list) or len(manifests) != _EXPECTED_A10_TRANSLATION_MANIFESTS:
+        raise RuntimeError("A10 translation manifest count mismatch")
+    if any(manifest.get("equivalence_claimed") is not False for manifest in manifests):
+        raise RuntimeError("A10 translation manifest claimed equivalence")
+    return receipt
+
+
+def _smoke_a10_receipt(component_id: str) -> str:
+    receipt = _validated_a10_receipt(component_id)
+    return (
+        f"A10 offline truth projection accepted {component_id} from "
+        f"{receipt['receipt_id']} with real prover proof receipts and semantic-gap manifests"
+    )
+
+
+def _smoke_a10_rocq() -> str:
+    return _smoke_a10_receipt("rocq")
+
+
+def _smoke_a10_isabelle() -> str:
+    return _smoke_a10_receipt("isabelle")
+
+
+def _smoke_a10_hol4() -> str:
+    return _smoke_a10_receipt("hol4")
+
+
 _SPECS: Final[tuple[ComponentSpec, ...]] = (
     ComponentSpec(
         "numpy",
@@ -572,25 +674,28 @@ _SPECS: Final[tuple[ComponentSpec, ...]] = (
         "rocq",
         "a10_formal",
         "A10",
-        "native_executable",
-        executable_names=("rocq", "coqc"),
+        "stage_receipt",
         activation_wait_state="WAIT_TOOLCHAIN",
+        current_v101_active=True,
+        smoke=_smoke_a10_rocq,
     ),
     ComponentSpec(
         "isabelle",
         "a10_formal",
         "A10",
-        "native_executable",
-        executable_names=("isabelle",),
+        "stage_receipt",
         activation_wait_state="WAIT_TOOLCHAIN",
+        current_v101_active=True,
+        smoke=_smoke_a10_isabelle,
     ),
     ComponentSpec(
         "hol4",
         "a10_formal",
         "A10",
-        "native_executable",
-        executable_names=("hol", "Holmake"),
+        "stage_receipt",
         activation_wait_state="WAIT_TOOLCHAIN",
+        current_v101_active=True,
+        smoke=_smoke_a10_hol4,
     ),
     ComponentSpec(
         "production-ed25519-signer",
@@ -644,11 +749,24 @@ def _executable_probe(spec: ComponentSpec) -> tuple[bool, str | None, str | None
 
 def _stage_receipt_probe(spec: ComponentSpec) -> tuple[bool, str | None, str | None]:
     try:
-        receipt = _validated_a09_receipt(spec.component_id)
+        if spec.stage == "A09":
+            receipt = _validated_a09_receipt(spec.component_id)
+            receipt_path = _receipt_display_path(_A09_RECEIPT_PATH)
+        elif spec.stage == "A10":
+            receipt = _validated_a10_receipt(spec.component_id)
+            receipt_path = _receipt_display_path(_A10_RECEIPT_PATH)
+        else:
+            return False, None, f"stage receipt unsupported for {spec.stage}"
     except Exception as exc:
         return False, None, f"{type(exc).__name__}: {exc}"
-    receipt_path = _A09_RECEIPT_PATH.relative_to(_REPO_ROOT)
     return True, f"{receipt_path}:{receipt['receipt_id']}", None
+
+
+def _receipt_display_path(path: Path) -> str:
+    try:
+        return str(path.relative_to(_REPO_ROOT))
+    except ValueError:
+        return path.name
 
 
 def _probe(spec: ComponentSpec) -> dict[str, Any]:
@@ -747,6 +865,16 @@ def build_truth_ledger() -> dict[str, Any]:
             f"{item['state']}:{item['component_id']}"
             for item in components
             if item["activation_stage"] == "A09" and item["state"] != "ACTIVE"
+        ],
+        "a10_active_inventory_observed": [
+            item["component_id"]
+            for item in components
+            if item["activation_stage"] == "A10" and item["state"] == "ACTIVE"
+        ],
+        "a10_parked_blockers": [
+            f"{item['state']}:{item['component_id']}"
+            for item in components
+            if item["activation_stage"] == "A10" and item["state"] != "ACTIVE"
         ],
         "a07_parked_blockers": [f"WAIT_LICENSE:python-flint:{FLINT_WAIT_REASON}"],
         "production_versus_fixture_axis": [
