@@ -122,6 +122,7 @@ def _docker_command(
 def _rocq_compile_shell(source_file: str) -> str:
     """Return a stable Rocq/Coq compile command for container probes."""
     return (
+        f"test -f {source_file} && "
         f"if command -v coqc >/dev/null; then coqc {source_file}; "
         f"else rocq compile {source_file}; fi"
     )
@@ -153,7 +154,7 @@ def _check_rocq() -> dict[str, Any]:
                 [
                     "sh",
                     "-lc",
-                    _rocq_compile_shell("SRL_A10_ROCQ.v"),
+                    _rocq_compile_shell("/work/SRL_A10_ROCQ.v"),
                 ],
                 workdir=root,
             )
