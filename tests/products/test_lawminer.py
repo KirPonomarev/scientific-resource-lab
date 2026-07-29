@@ -24,11 +24,28 @@ def test_discovery_pack_cards_record_wait_capabilities() -> None:
     assert by_id["pydmd"].status is DiscoveryPackStatus.WAIT_CAPABILITY
 
 
-def test_admission_bundle_is_authority_negative() -> None:
+def test_admission_bundle_waits_when_optional_engines_are_not_importable(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr("srl.products.lawminer.importlib.util.find_spec", lambda _name: None)
+
     bundle = build_lawminer_admission_bundle()
 
     assert bundle["active_pack_ids"] == ["lawminer.linear_baseline"]
     assert "pysr" in cast(list[str], bundle["wait_pack_ids"])
+    assert bundle["promotion_policy"] == "candidate_only_no_automatic_law_promotion"
+    assert bundle["canonical_writes"] == 0
+    assert bundle["grants_authority"] is False
+
+
+def test_admission_bundle_remains_authority_negative_with_importable_engines(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr("srl.products.lawminer.importlib.util.find_spec", lambda _name: object())
+
+    bundle = build_lawminer_admission_bundle()
+
+    assert {"pysr", "pysindy", "pydmd"}.issubset(cast(list[str], bundle["active_pack_ids"]))
     assert bundle["promotion_policy"] == "candidate_only_no_automatic_law_promotion"
     assert bundle["canonical_writes"] == 0
     assert bundle["grants_authority"] is False

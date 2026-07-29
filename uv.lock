@@ -265,6 +265,18 @@ wheels = [
 ]
 
 [[package]]
+name = "click"
+version = "8.4.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "colorama", marker = "sys_platform == 'win32'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/76/d4/81420972a676e8ffea40450d8c8c92943e7218a78fe9b64359836cc9876b/click-8.4.2.tar.gz", hash = "sha256:9a6cea6e60b17ebe0a44c5cc636d94f09bd66142c1cd7d8b4cd731c4917a15f6", size = 338000, upload-time = "2026-06-24T17:45:15.148Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/fb/e2/79c688af8b210d232694e31e59da9f6ec747bae31c3f5946e4e9b98860d5/click-8.4.2-py3-none-any.whl", hash = "sha256:e6f9f66136c816745b9d65817da91d61d957fb16e02e4dcd0552553c5a197b76", size = 119243, upload-time = "2026-06-24T17:45:13.73Z" },
+]
+
+[[package]]
 name = "cloudpickle"
 version = "3.1.2"
 source = { registry = "https://pypi.org/simple" }
@@ -608,6 +620,22 @@ wheels = [
 ]
 
 [[package]]
+name = "derivative"
+version = "0.6.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "importlib-metadata" },
+    { name = "numpy" },
+    { name = "scikit-learn" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "scipy", version = "1.18.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c5/e8/79b4127aa6b797b7a74fa20635229e2d97af384fb1950d25700a2fce13a2/derivative-0.6.3.tar.gz", hash = "sha256:72e7fd56e92665f939b5449c4b9ceea88fdf02eda7378cf0a3e961ab0df58181", size = 15223, upload-time = "2024-08-27T02:28:10.936Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/cd/3a/6a615fa5a1fb1e11f0ad41febedea907a2f20a310f7a9fc5b3a16639c2ad/derivative-0.6.3-py3-none-any.whl", hash = "sha256:e121926a21e13a5ab1db07e10e26a5e805494a1255eac032c2fba309547e64c9", size = 14866, upload-time = "2024-08-27T02:28:09.248Z" },
+]
+
+[[package]]
 name = "etuples"
 version = "0.3.10"
 source = { registry = "https://pypi.org/simple" }
@@ -883,6 +911,18 @@ wheels = [
 ]
 
 [[package]]
+name = "importlib-metadata"
+version = "9.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "zipp" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a9/01/15bb152d77b21318514a96f43af312635eb2500c96b55398d020c93d86ea/importlib_metadata-9.0.0.tar.gz", hash = "sha256:a4f57ab599e6a2e3016d7595cfd72eb4661a5106e787a95bcc90c7105b831efc", size = 56405, upload-time = "2026-03-20T06:42:56.999Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/38/3d/2d244233ac4f76e38533cfcb2991c9eb4c7bf688ae0a036d30725b8faafe/importlib_metadata-9.0.0-py3-none-any.whl", hash = "sha256:2d21d1cc5a017bd0559e36150c21c830ab1dc304dedd1b7ea85d20f45ef3edd7", size = 27789, upload-time = "2026-03-20T06:42:55.665Z" },
+]
+
+[[package]]
 name = "iniconfig"
 version = "2.3.0"
 source = { registry = "https://pypi.org/simple" }
@@ -937,6 +977,33 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/19/74/a633ee74eb36c44aa6d1095e7cc5569bebf04342ee146178e2d36600708b/jsonschema_specifications-2025.9.1.tar.gz", hash = "sha256:b540987f239e745613c7a9176f3edb72b832a4ac465cf02712288397832b5e8d", size = 32855, upload-time = "2025-09-08T01:34:59.186Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/41/45/1a4ed80516f02155c51f51e8cedb3c1902296743db0bbc66608a0db2814f/jsonschema_specifications-2025.9.1-py3-none-any.whl", hash = "sha256:98802fee3a11ee76ecaca44429fda8a41bff98b00a0f2838151b113f210cc6fe", size = 18437, upload-time = "2025-09-08T01:34:57.871Z" },
+]
+
+[[package]]
+name = "juliacall"
+version = "0.9.26"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "juliapkg" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c5/51/5662ad9cb56bb37ccd4b1711b8438c96b146304e07a4331cf6ea963d2a88/juliacall-0.9.26.tar.gz", hash = "sha256:e8ccffd017f60d0b4db33b9f67660c8acbb6e2f37f364ebb5798babde036c985", size = 472361, upload-time = "2025-07-15T18:48:49.624Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/06/e2/9ba7fb4869d2675d53f8c157c84bde77d25240f3cc96b2d33cc2f8aa39b2/juliacall-0.9.26-py3-none-any.whl", hash = "sha256:4a5c93b477cc13ddc48a6a5526626edc0826d5128c522d91e0e0da1b5abe09bc", size = 12053, upload-time = "2025-07-15T18:48:47.67Z" },
+]
+
+[[package]]
+name = "juliapkg"
+version = "0.1.24"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "filelock" },
+    { name = "semver" },
+    { name = "tomli" },
+    { name = "tomlkit" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/42/db/a419cef4a40f2a85578509e8369da1295c05a405cf6f4f097ab030ffb7bd/juliapkg-0.1.24.tar.gz", hash = "sha256:5fdb000639c2d00edbc7524753cc732d1503902473bdbf6bd46e69c7d8f2cbd5", size = 23872, upload-time = "2026-05-31T15:09:06.498Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1c/00/fe4ed0756d1bbc30c7de45ec084f2468b74de4cdebcca2a27fb1bb366d62/juliapkg-0.1.24-py3-none-any.whl", hash = "sha256:cc3d39ccd26c82aa1fcaea413c6d7be062bbabdda07b922ac73a1abb7f38b7f8", size = 22297, upload-time = "2026-05-31T15:09:05.488Z" },
 ]
 
 [[package]]
@@ -1777,6 +1844,25 @@ wheels = [
 ]
 
 [[package]]
+name = "pydmd"
+version = "2025.8.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "h5netcdf" },
+    { name = "matplotlib" },
+    { name = "numpy" },
+    { name = "scikit-learn" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "scipy", version = "1.18.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.12'" },
+    { name = "xarray" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/2a/a1/b6ada0880cdbc17b1a1df19d12fee9ef45996afeac99ba81f0764b429752/pydmd-2025.8.1.tar.gz", hash = "sha256:3f4d1c3d48e33e43430b46dc1f1ad757c507376c23f7cd68e5abaa1ae526205c", size = 178983, upload-time = "2025-08-01T04:24:51.016Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c2/ae/b77f873a99a203cbb52e0b0ca0c8c2d58e3f7013328b027112fbfb4c256a/pydmd-2025.8.1-py3-none-any.whl", hash = "sha256:5a0ae2b46ce2ff0e6076934520d88d5894c3201a292d280d78bfd12480ec44b9", size = 152729, upload-time = "2025-08-01T04:24:49.629Z" },
+]
+
+[[package]]
 name = "pygments"
 version = "2.20.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1842,6 +1928,41 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/ab/a9/849d09dae8b9746958ffe65ca9609b7f16e45ea69b16057a1929b16c8726/pyriemann-0.12.tar.gz", hash = "sha256:a1450307bf3360fafe4e2e11a5db81889245f34b0042094bf8b59b7fe2bdeb9f", size = 173434, upload-time = "2026-07-01T20:03:07.79Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/57/5c/e788ad2f904c633520d9f283785e6177a66096b2efa356b46b4647a3240f/pyriemann-0.12-py2.py3-none-any.whl", hash = "sha256:74a90b2ef0938c94fe9bf90b6506991fc19da55850aae5fdf992026b3845d43a", size = 153585, upload-time = "2026-07-01T20:03:06.55Z" },
+]
+
+[[package]]
+name = "pysindy"
+version = "2.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "derivative" },
+    { name = "numpy" },
+    { name = "scikit-learn" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "scipy", version = "1.18.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/d7/ef/5765d83e6ea76442bffbd083e6009ef7825202a624886b2efb3fbce4acdb/pysindy-2.1.0.tar.gz", hash = "sha256:369659db632e72e670b64cfd79fd3c0b9efc8e3a36f0c35f4f11b844e863bb08", size = 3239626, upload-time = "2026-01-08T18:15:39.502Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c7/8d/46455f0b58eba0044edb48c6bd495455c1d6f1872a701e5a4fb94f93618d/pysindy-2.1.0-py3-none-any.whl", hash = "sha256:b75c1bc760b728eac52a42ee3e3dd97454175e49df29124740ea7dee43a8be39", size = 123357, upload-time = "2026-01-08T18:15:38.062Z" },
+]
+
+[[package]]
+name = "pysr"
+version = "1.5.10"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "click" },
+    { name = "juliacall" },
+    { name = "numpy" },
+    { name = "pandas" },
+    { name = "scikit-learn" },
+    { name = "sympy" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/3d/30/774fa751e86af935c9b89ae9a1480b748e3cca7df7743710a2f751901106/pysr-1.5.10.tar.gz", hash = "sha256:1f6bfc424dc9f22d07a6d36eb98c54ca2755893ad534a8805e4fbcd9b8208767", size = 2398585, upload-time = "2026-03-30T17:37:01.198Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1a/64/87547c34d4e88aa8c7976fa1be8627ab8a06fccb4d8710224391f6df8a0d/pysr-1.5.10-py3-none-any.whl", hash = "sha256:856dc287beb7bc652f0ddbc6f5aa3540c278ab2180a61fd02727984f72dc26a6", size = 99301, upload-time = "2026-03-30T17:37:00.172Z" },
 ]
 
 [[package]]
@@ -2425,6 +2546,15 @@ wheels = [
 ]
 
 [[package]]
+name = "semver"
+version = "3.0.4"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/72/d1/d3159231aec234a59dd7d601e9dd9fe96f3afff15efd33c1070019b26132/semver-3.0.4.tar.gz", hash = "sha256:afc7d8c584a5ed0a11033af086e8af226a9c0b206f313e0301f8dd7b6b589602", size = 269730, upload-time = "2025-01-24T13:19:27.617Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a6/24/4d91e05817e92e3a61c8a21e08fd0f390f5301f1c448b137c57c4bc6e543/semver-3.0.4-py3-none-any.whl", hash = "sha256:9c824d87ba7f7ab4a1890799cec8596f15c1241cb473404ea1cb0c55e4b04746", size = 17912, upload-time = "2025-01-24T13:19:24.949Z" },
+]
+
+[[package]]
 name = "setuptools"
 version = "83.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2508,6 +2638,11 @@ bayesian = [
     { name = "arviz" },
     { name = "pymc" },
 ]
+discovery = [
+    { name = "pydmd" },
+    { name = "pysindy" },
+    { name = "pysr" },
+]
 
 [package.dev-dependencies]
 dev = [
@@ -2531,14 +2666,17 @@ requires-dist = [
     { name = "mpmath", specifier = ">=1.3.0" },
     { name = "numpy", specifier = ">=2.0" },
     { name = "pint", specifier = ">=0.25.3" },
+    { name = "pydmd", marker = "extra == 'discovery'", specifier = ">=2025.8,<2026" },
     { name = "pymc", marker = "extra == 'bayesian'", specifier = ">=5.20,<6" },
     { name = "pyriemann", specifier = ">=0.12" },
+    { name = "pysindy", marker = "extra == 'discovery'", specifier = ">=2.0,<3" },
+    { name = "pysr", marker = "extra == 'discovery'", specifier = ">=1.5,<2" },
     { name = "ripser", specifier = ">=0.6.15" },
     { name = "scipy", specifier = ">=1.14" },
     { name = "sympy", specifier = ">=1.14.0" },
     { name = "z3-solver", specifier = ">=4.13.0" },
 ]
-provides-extras = ["bayesian"]
+provides-extras = ["bayesian", "discovery"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -2624,6 +2762,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/12/64/da524626d3b9cc40c168a13da8335fe1c51be12c0a63685cc6db7308daae/tomli-2.4.1-cp314-cp314t-win_amd64.whl", hash = "sha256:2c1c351919aca02858f740c6d33adea0c5deea37f9ecca1cc1ef9e884a619d26", size = 121196, upload-time = "2026-03-25T20:22:01.169Z" },
     { url = "https://files.pythonhosted.org/packages/5a/cd/e80b62269fc78fc36c9af5a6b89c835baa8af28ff5ad28c7028d60860320/tomli-2.4.1-cp314-cp314t-win_arm64.whl", hash = "sha256:eab21f45c7f66c13f2a9e0e1535309cee140182a9cdae1e041d02e47291e8396", size = 100393, upload-time = "2026-03-25T20:22:02.137Z" },
     { url = "https://files.pythonhosted.org/packages/7b/61/cceae43728b7de99d9b847560c262873a1f6c98202171fd5ed62640b494b/tomli-2.4.1-py3-none-any.whl", hash = "sha256:0d85819802132122da43cb86656f8d1f8c6587d54ae7dcaf30e90533028b49fe", size = 14583, upload-time = "2026-03-25T20:22:03.012Z" },
+]
+
+[[package]]
+name = "tomlkit"
+version = "0.15.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/94/96/e07752635b98536177fa1f37671c8f3cdde2e724c6bcf6034b2cfb571565/tomlkit-0.15.1.tar.gz", hash = "sha256:e25bbf38843005246210a12982776f27f99cb9be67160e14434d0c0d21ee1e97", size = 180129, upload-time = "2026-07-17T01:48:04.562Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/13/bc/8c13eb66537dce1d2bd3a57132902f38d0e7f5bb46fa9f4daed9fe9d76ee/tomlkit-0.15.1-py3-none-any.whl", hash = "sha256:177a05aece5a8ca5266fd3c448abb47b8d352f09d477d3ca8332db4d89b24304", size = 49449, upload-time = "2026-07-17T01:48:05.728Z" },
 ]
 
 [[package]]
@@ -2737,4 +2884,13 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/4e/77/e3035532e8de59628728e033c83dcd0f69d85a9fdc1f50e27832e08c4179/z3_solver-5.0.0.0-py3-none-win32.whl", hash = "sha256:12bd67ca7fb0a956bee5affd1d65afee2d2395efcdda6da5887c7d2dc5f0b61b", size = 13872179, upload-time = "2026-07-17T01:54:07.561Z" },
     { url = "https://files.pythonhosted.org/packages/b3/3c/bc1d7d55e5493e4637ef48c7a3680ce5e00082352f680baa22f491bfee20/z3_solver-5.0.0.0-py3-none-win_amd64.whl", hash = "sha256:9b0aca98598353ea7eb59a51f909a399f6d0e687a1de3671b60a734cea4bb6bd", size = 16918299, upload-time = "2026-07-17T01:54:10.269Z" },
     { url = "https://files.pythonhosted.org/packages/ab/0a/cd948e4a9dceaaaf7e82490efad6556ca297c46149852358cfcf527d3d79/z3_solver-5.0.0.0-py3-none-win_arm64.whl", hash = "sha256:c4da1580a8f0f71178174eaa38db01e01b618938f514c17ef5bee1edb9b5614e", size = 15807738, upload-time = "2026-07-17T01:54:13.524Z" },
+]
+
+[[package]]
+name = "zipp"
+version = "4.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/b9/d8/eab98a517c14134c0b2eb4e2387bc5f457334293ec5d2dd3857ec2966802/zipp-4.1.0.tar.gz", hash = "sha256:4cb57381f544315db7688e976e922a2b18cdb513d21cc194eb42232ba2a3e602", size = 26214, upload-time = "2026-05-18T20:08:57.967Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/3a/13/547360d81e6d88d58492968ffda9f9542854f11310ee556fef14260cc886/zipp-4.1.0-py3-none-any.whl", hash = "sha256:25ad4e16390cd314347dd8f1de67a2ac538ae658ed4ab9db16029c07c188e97f", size = 10238, upload-time = "2026-05-18T20:08:57.045Z" },
 ]

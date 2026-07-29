@@ -1,0 +1,299 @@
+{
+  "active_packs": [
+    "pysr",
+    "pysindy",
+    "pydmd"
+  ],
+  "canonical_writes": 0,
+  "checks": [
+    {
+      "activation_receipt": {
+        "active_pack_ids": [
+          "pysr",
+          "pysindy",
+          "pydmd"
+        ],
+        "automatic_scientific_promotion": false,
+        "canonical_writes": 0,
+        "catalog_policy": [
+          {
+            "canonical_writes": 0,
+            "decision": "ACTIVE_REQUIRED",
+            "family": "law_discovery",
+            "grants_authority": false,
+            "mandatory_for_a12": true,
+            "pack_id": "pysr",
+            "reason": "Julia-backed symbolic regression"
+          },
+          {
+            "canonical_writes": 0,
+            "decision": "ACTIVE_REQUIRED",
+            "family": "dynamical",
+            "grants_authority": false,
+            "mandatory_for_a12": true,
+            "pack_id": "pysindy",
+            "reason": "sparse dynamics identification"
+          },
+          {
+            "canonical_writes": 0,
+            "decision": "ACTIVE_REQUIRED",
+            "family": "dynamical",
+            "grants_authority": false,
+            "mandatory_for_a12": true,
+            "pack_id": "pydmd",
+            "reason": "dynamic mode decomposition"
+          },
+          {
+            "canonical_writes": 0,
+            "decision": "FORMALLY_REPLACED",
+            "family": "law_discovery",
+            "grants_authority": false,
+            "mandatory_for_a12": false,
+            "pack_id": "sr4mdl",
+            "reason": "not required for v2 A12 once PySR provides symbolic-regression coverage"
+          },
+          {
+            "canonical_writes": 0,
+            "decision": "FORMALLY_REPLACED",
+            "family": "law_discovery",
+            "grants_authority": false,
+            "mandatory_for_a12": false,
+            "pack_id": "operon",
+            "reason": "not required for v2 A12 once PySR provides symbolic-regression coverage"
+          },
+          {
+            "canonical_writes": 0,
+            "decision": "FORMALLY_REPLACED",
+            "family": "law_discovery",
+            "grants_authority": false,
+            "mandatory_for_a12": false,
+            "pack_id": "gplearn",
+            "reason": "not required for v2 A12 once PySR provides symbolic-regression coverage"
+          },
+          {
+            "canonical_writes": 0,
+            "decision": "FORMALLY_REPLACED",
+            "family": "law_discovery",
+            "grants_authority": false,
+            "mandatory_for_a12": false,
+            "pack_id": "ai_feynman",
+            "reason": "not required for v2 A12 once PySR provides symbolic-regression coverage"
+          },
+          {
+            "canonical_writes": 0,
+            "decision": "FORMALLY_REPLACED",
+            "family": "dynamical",
+            "grants_authority": false,
+            "mandatory_for_a12": false,
+            "pack_id": "pykoopman",
+            "reason": "not required for v2 A12 once PyDMD provides bounded Koopman-linear evidence"
+          },
+          {
+            "canonical_writes": 0,
+            "decision": "FORMALLY_REPLACED",
+            "family": "dynamical",
+            "grants_authority": false,
+            "mandatory_for_a12": false,
+            "pack_id": "dysts",
+            "reason": "not required for v2 A12; synthetic and public benchmark datasets cover this stage"
+          }
+        ],
+        "formally_replaced_pack_ids": [
+          "sr4mdl",
+          "operon",
+          "gplearn",
+          "ai_feynman",
+          "pykoopman",
+          "dysts"
+        ],
+        "grants_authority": false,
+        "pack_receipts": [
+          {
+            "automatic_scientific_promotion": false,
+            "backend": "pysr",
+            "backend_versions": {
+              "julia": "julia version 1.12.6",
+              "julia_depot_role": "explicit_env",
+              "python_package": "1.5.10"
+            },
+            "candidate": {
+              "equation": "((x + x) * 0.99999994) + 1.0000005",
+              "kind": "symbolic_expression"
+            },
+            "canonical_writes": 0,
+            "dataset": {
+              "kind": "synthetic",
+              "name": "affine_law_y_equals_2x_plus_1",
+              "samples": 8
+            },
+            "family": "law_discovery",
+            "grants_authority": false,
+            "holdout_policy": "bounded_retrospective_holdout_no_prospective_materialization",
+            "null_metric": {
+              "name": "permuted_observation_rmse",
+              "seed": 12,
+              "value": 4.358898943540674
+            },
+            "observed_above_null": true,
+            "pack_id": "pysr",
+            "promotion_allowed": false,
+            "receipt_id": "sha256:87fb0a417258adb1558e57c7dd04ab83856992702810fb43028b62c7b7b16b84",
+            "resource_envelope": {
+              "bounded": true,
+              "canonical_writes": 0,
+              "elapsed_seconds": 17.16
+            },
+            "schema_version": "DiscoveryDynamicsActivationReceipt/v1",
+            "status": "ACTIVE",
+            "unit_checks": "passed",
+            "validation_metric": {
+              "name": "rmse",
+              "threshold": 0.0001,
+              "value": 2.778488795148837e-07
+            }
+          },
+          {
+            "automatic_scientific_promotion": false,
+            "backend": "pysindy",
+            "backend_versions": {
+              "python_package": "2.1.0"
+            },
+            "candidate": {
+              "equations": [
+                " 2.0000 x"
+              ],
+              "kind": "sparse_dynamics"
+            },
+            "canonical_writes": 0,
+            "dataset": {
+              "kind": "synthetic",
+              "name": "dx_dt_equals_2x",
+              "samples": 21
+            },
+            "family": "dynamical",
+            "grants_authority": false,
+            "holdout_policy": "bounded_retrospective_holdout_no_prospective_materialization",
+            "null_metric": {
+              "name": "permuted_observation_rmse",
+              "seed": 13,
+              "value": 6.277949763219064
+            },
+            "observed_above_null": true,
+            "pack_id": "pysindy",
+            "promotion_allowed": false,
+            "receipt_id": "sha256:39114b5eb52fe70ae95818807478369c3e727cfcdebd392b8c95fdab35819a12",
+            "resource_envelope": {
+              "bounded": true,
+              "canonical_writes": 0,
+              "elapsed_seconds": 0.677
+            },
+            "schema_version": "DiscoveryDynamicsActivationReceipt/v1",
+            "status": "ACTIVE",
+            "unit_checks": "passed",
+            "validation_metric": {
+              "name": "derivative_rmse",
+              "threshold": 1e-08,
+              "value": 3.2934537262255428e-15
+            }
+          },
+          {
+            "automatic_scientific_promotion": false,
+            "backend": "pydmd",
+            "backend_versions": {
+              "python_package": "2025.8.1"
+            },
+            "candidate": {
+              "eigenvalues": [
+                2.0,
+                3.0
+              ],
+              "kind": "dmd_modes",
+              "modes_shape": [
+                2,
+                2
+              ]
+            },
+            "canonical_writes": 0,
+            "dataset": {
+              "kind": "synthetic",
+              "name": "rank2_exponential_snapshots",
+              "samples": 12
+            },
+            "family": "dynamical",
+            "grants_authority": false,
+            "holdout_policy": "bounded_retrospective_holdout_no_prospective_materialization",
+            "null_metric": {
+              "name": "time_reversal_surrogate_rmse",
+              "value": 54242.6140325421
+            },
+            "observed_above_null": true,
+            "pack_id": "pydmd",
+            "promotion_allowed": false,
+            "receipt_id": "sha256:1e3b7b83089f39879dd7fc24491744450e57cb624a0b9621c7e64c0b833b66d6",
+            "resource_envelope": {
+              "bounded": true,
+              "canonical_writes": 0,
+              "elapsed_seconds": 0.37
+            },
+            "schema_version": "DiscoveryDynamicsActivationReceipt/v1",
+            "status": "ACTIVE",
+            "unit_checks": "passed",
+            "validation_metric": {
+              "name": "reconstruction_rmse",
+              "threshold": 1e-06,
+              "value": 2.711226221463698e-09
+            }
+          }
+        ],
+        "promotion_allowed": false,
+        "public_benchmark_receipt": {
+          "canonical_writes": 0,
+          "dataset": {
+            "features": 3,
+            "kind": "public_sklearn_builtin",
+            "license_note": "scikit-learn bundled public benchmark dataset",
+            "name": "diabetes",
+            "samples": 80
+          },
+          "grants_authority": false,
+          "holdout_policy": "train_test_split_random_state_17_no_prospective_materialization",
+          "null_metric": {
+            "name": "permuted_train_rmse",
+            "seed": 17,
+            "value": 74.05776040318612
+          },
+          "observed_above_null": true,
+          "promotion_allowed": false,
+          "receipt_id": "sha256:e13a56a3570ab9d42a58cda1bcd5d38cfc30df490471150d3cedbe961354e5d2",
+          "schema_version": "PublicBenchmarkReceipt/v1",
+          "validation_metric": {
+            "name": "rmse",
+            "value": 68.25528008675137
+          }
+        },
+        "receipt_id": "sha256:be31f62922635521a703d04b58ca1efa41f726104282a0432cd1a0c7eda281d1",
+        "schema_version": "DiscoveryDynamicsActivationReceipt/v1",
+        "stage_id": "A12"
+      },
+      "check_id": "A12-01-real-discovery-dynamics-smoke",
+      "detail": "PySR, PySINDy and PyDMD executed real bounded discovery/dynamics tasks",
+      "julia_depot_role": "explicit_env",
+      "status": "PASS"
+    },
+    {
+      "check_id": "A12-02-no-automatic-scientific-promotion",
+      "detail": "candidate laws remain candidate-only and authority-negative",
+      "status": "PASS"
+    }
+  ],
+  "grants_authority": false,
+  "live_actions": 0,
+  "parked_packs": [],
+  "receipt_id": "sha256:8439424958a0c0d088447226d8a175457d74ad94f796b90aefd74ad1dcc0889b",
+  "remaining_external_waits": [],
+  "remaining_internal_waits": [],
+  "result": "PASS",
+  "schema_version": "StageCompletionReceipt/v1",
+  "stage_closure": "A12_ACTIVE",
+  "stage_id": "A12"
+}
