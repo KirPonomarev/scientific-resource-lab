@@ -1,0 +1,47 @@
+{
+  "schema_version": "LeanFormalCorpusPins/v1",
+  "pins": [
+    {
+      "corpus_id": "cslib-index",
+      "repository_url": "https://github.com/leanprover/cslib.git",
+      "repository_revision": "93aa05752a62ad3498e734d5b75fcbff965891ce",
+      "tag": "v4.32.2",
+      "license_id": "Apache-2.0",
+      "role": "Lean CSLib API index; not an independent oracle"
+    },
+    {
+      "corpus_id": "erdos-problems-metadata",
+      "repository_url": "https://github.com/teorth/erdosproblems.git",
+      "repository_revision": "3dbe8fc67b59da26f59f0fb42b006f4218fe206b",
+      "tag": null,
+      "license_id": "public_repository_metadata",
+      "role": "Erdos Problems public metadata source"
+    },
+    {
+      "corpus_id": "formal-conjectures",
+      "repository_url": "https://github.com/google-deepmind/formal-conjectures.git",
+      "repository_revision": "9e36e7c2c7777f8ac5a3bea283cc138f3f485b1a",
+      "tag": "v4.32.0",
+      "license_id": "Apache-2.0",
+      "role": "Lean formalized conjecture statements using mathlib"
+    }
+  ],
+  "statements": [
+    {
+      "statement_id": "formal-conjectures:erdos-12:parts-iii",
+      "corpus_id": "formal-conjectures",
+      "source_path": "FormalConjectures/ErdosProblems/12.lean",
+      "source_blob_sha1": "a8680192c46f4183e727e3c72ba0a940f4f07e91",
+      "source_sha256": "7b999f416f15608a603cdc35c906ec3a860161dd2f0615490e2f898786558fd4",
+      "theorem_label": "Erdos12.erdos_12.parts.iii",
+      "statement_kind": "erdos_open_statement",
+      "parser_markers": [
+        "theorem erdos_12.parts.iii",
+        "answer(sorry)",
+        "category research open"
+      ]
+    }
+  ],
+  "canonical_writes": 0,
+  "grants_authority": false
+}

@@ -1038,16 +1038,16 @@ terminal_result PASS запрещён, если remaining_internal_waits не п
 <!-- END_PLAN_CONTRACT_V3_7 -->
 
 <!-- BEGIN_MUTABLE_STATE_V3_7 -->
-STATE_REVISION: 10
-PREVIOUS_STATE_SHA256: 564e5e5b-a79cb42b-5b6e7ea4-d9c8be96-cb6d5a38-24c8b6ba-fba85242-0d25eb34
-CURRENT_STATE_SHA256: 2e67c7bc-b88800f3-06e7cdad-4ce4b37f-29058a2c-108f870e-e0662c04-f6461c05
+STATE_REVISION: 12
+PREVIOUS_STATE_SHA256: 6bde168d-e1467394-bbd26246-35d9f1b8-cae3bd07-e827184e-a8ae6659-238ef8e3
+CURRENT_STATE_SHA256: f9db73e0-eb34c0ac-cd2584c2-ef77abe3-83e388b8-a027dd42-f958df66-28e9c74d
 
 ## CURRENT_FACTS
 
 ~~~yaml
 current_facts:
   observed_at: 2026-07-29
-  repository_head: a19d0c38d8642296723a6e5d38afd5f831c6e9ba
+  repository_head: 677b17baf3c8d49b7dad05c39616e5d1e2df7bcc
   predecessor_release: v1.0.1
   predecessor_result: RELEASED_WITH_DECLARED_WAITS
   current_active_default_packs:
@@ -1076,6 +1076,26 @@ current_facts:
   a08_singular: ACTIVE
   a08_z3_native: ACTIVE
   a08_cvc5: ACTIVE
+  current_active_formal_toolchains:
+    - lean
+    - lake
+    - mathlib
+    - cslib-index
+    - erdos-problems-metadata
+    - formal-conjectures
+  a09_lean_kernel: ACTIVE
+  a09_lake: ACTIVE
+  a09_mathlib: ACTIVE
+  a09_cslib_index: ACTIVE
+  a09_erdos_problems_metadata: ACTIVE
+  a09_formal_conjectures_corpus: ACTIVE
+  a09_receipt_id: sha256:366c24395552933e3f758599b28e0e93ac136bd86a6ce0d5a7ff5ed61c0e2ca1
+  a09_truth_projection: OFFLINE_HASH_BOUND_RECEIPT
+  a09_verify_prepare_count: 1
+  a09_verify_fetch_count: 1
+  a09_warm_prepare_count: 0
+  a09_warm_fetch_count: 0
+  a09_t7_formal_toolchain_binding: WAIT_AUTHORITY
   production_signer: WAIT_AUTHORITY
   production_ed25519_transport_interface: ACTIVE
   fixture_hmac_production_path: REJECTED
@@ -1105,9 +1125,9 @@ current_facts:
 
 ~~~yaml
 execution_state:
-  status: A08_ACTIVE_READY_FOR_A09_WITH_PARKED_PROTECTED_LANES
-  current_stage: A09
-  next_stage: A09_activate_lean_and_mathematical_corpora
+  status: A09_ACTIVE_READY_FOR_A10_WITH_PARKED_PROTECTED_LANES
+  current_stage: A10
+  next_stage: A10_activate_independent_provers
   completed_stages:
     - A00
     - A01
@@ -1116,6 +1136,7 @@ execution_state:
     - A05
     - A06
     - A08
+    - A09
   completed_stage_lanes:
     - A07_sympy_mpmath_core
   parked_stages:
@@ -1124,16 +1145,18 @@ execution_state:
     - A05_native_t2_t3_compute_binding
     - A06_native_t7_persistence_binding
     - A07_python_flint_license
+    - A09_t7_formal_toolchain_binding
   parked_blockers:
     - WAIT_AUTHORITY:A02_BIND_T7_NATIVE_TARGET
     - WAIT_AUTHORITY:A04_BIND_PRODUCTION_ED25519_KEYRING
     - WAIT_COMPUTE_TARGET:A05_BIND_NATIVE_SANDBOX_COMPUTE_TARGET
     - WAIT_LICENSE:A07_PYTHON_FLINT_LGPL_CLOSURE
-  active_branch_or_null: codex/srf-a08-native-algebra-smt
+    - WAIT_AUTHORITY:A09_BIND_PINNED_LEAN_MATHLIB_PROJECT_TO_T7
+  active_branch_or_null: codex/srf-a09-lean-corpora
   active_pr_or_null: null
   writer_lease_or_null: null
   blocker_or_null: WAIT_LICENSE:A07_PYTHON_FLINT_LGPL_CLOSURE
-  next_executable_action: start A09 Lean and mathematical corpora activation while keeping T7-backed persistence, native compute binding, native production signing and FLINT license closure parked until exact authority/evidence exists
+  next_executable_action: start A10 independent prover activation while keeping T7-backed persistence, native compute binding, native production signing, FLINT license closure and A09 T7 formal toolchain binding parked until exact authority/evidence exists
   updated_at: 2026-07-29
 ~~~
 
@@ -1171,6 +1194,8 @@ decision_log:
     decision: A07 SymPy and mpmath default Python core packs are ACTIVE with real import probes, scientific smoke and independent crosschecks; python-flint/FLINT/Arb/Calcium remains WAIT_LICENSE because current package metadata declares an LGPL-family closure denied by SRL default dependency policy
   - id: V37-D015
     decision: A08 native algebra and SMT toolchains are ACTIVE with external PARI/GP, Maxima, GAP, Singular, native Z3 and cvc5 executable probes, bounded scientific smokes, Z3/cvc5 agreement and uv license-boundary enforcement
+  - id: V37-D016
+    decision: A09 Lean/lake/mathlib and mathematical corpora are ACTIVE with pinned Lean 4.32.2, real kernel accept/reject checks, pinned mathlib module import, axiom inventory, CSLib/Erdos/Formal Conjectures pins and remote corpus blob traversal; truth-ledger A09 projection is offline from hash-bound receipt sha256:366c24395552933e3f758599b28e0e93ac136bd86a6ce0d5a7ff5ed61c0e2ca1; full make verify uses one session-scoped A09 prepare with prepare_count=1 fetch_count=1 and warm prepare reuse reports prepare_count=0 fetch_count=0; physical T7 formal toolchain binding remains WAIT_AUTHORITY
 ~~~
 
 ## EVIDENCE_INDEX
@@ -1212,6 +1237,13 @@ evidence_index:
   - docs/architecture/native-algebra-smt.md
   - scripts/checks/srf-v37-a08-gate.py
   - docs/verification/srf-v3-7-a08-native-algebra-smt-receipt.json
+  - docs/architecture/lean-mathlib-corpora.md
+  - configs/packs/formal/lean/corpus-pins.json
+  - docs/target-binding/a09-lean-mathlib-t7-operator-action.json
+  - scripts/checks/srf-v37-a09-gate.py
+  - scripts/ci/prepare_a09_mathlib.py
+  - scripts/ci/verify-v37.py
+  - docs/verification/srf-v3-7-a09-lean-corpora-receipt.json
 ~~~
 
 <!-- END_MUTABLE_STATE_V3_7 -->

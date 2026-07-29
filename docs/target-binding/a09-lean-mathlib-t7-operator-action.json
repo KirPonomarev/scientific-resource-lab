@@ -1,0 +1,29 @@
+{
+  "schema_version": "OperatorAction/v1",
+  "action_id": "A09_BIND_PINNED_LEAN_MATHLIB_PROJECT_TO_T7",
+  "stage_id": "A09",
+  "authority_required": "explicit_target_scoped_t7_storage_authority",
+  "target": "physical T7 append-only toolchain/cache namespace",
+  "purpose": "Bind pinned Lean 4.32.2, lake and mathlib v4.32.2 project/cache evidence to the physical T7 namespace without making the Mac checkout a runtime dependency.",
+  "preconditions": [
+    "A02 physical T7 target is available and authorized",
+    "A09 software gate has PASS result",
+    "Lean toolchain is leanprover/lean4:v4.32.2",
+    "mathlib revision is 905b95818eb32af7874a58b427f50c1711a5e96c"
+  ],
+  "forbidden_without_authority": [
+    "write Lean toolchains to T7",
+    "sync .lake caches to T7",
+    "declare T7-backed formal toolchain ACTIVE",
+    "use T7 as an active database or WAL"
+  ],
+  "expected_evidence": [
+    "target volume identity receipt",
+    "quota/namespace receipt",
+    "toolchain path and hash receipt",
+    "mathlib manifest/cache receipt",
+    "restore/readback smoke receipt"
+  ],
+  "canonical_writes": 0,
+  "grants_authority": false
+}

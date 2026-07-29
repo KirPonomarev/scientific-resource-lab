@@ -10,13 +10,20 @@ from __future__ import annotations
 
 import importlib
 import importlib.metadata
+import json
 import shutil
 from collections.abc import Callable
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Final
 
 from srl.packs.adapters.native_algebra import run_a08_native_smoke
 from srl.packs.adapters.p0_python_core import FLINT_WAIT_REASON, run_p0_python_core_smoke
+from srl.packs.formal.lean import (
+    default_corpus_pins,
+    default_corpus_statements,
+    default_lean_pins,
+)
 
 TRUTH_STATES: Final[tuple[str, ...]] = (
     "DECLARED",
@@ -58,6 +65,18 @@ _Z3_UPPER_BOUND: Final[int] = 3
 _Z3_WITNESS: Final[int] = 2
 _MIN_RIPSER_DIAGRAMS: Final[int] = 2
 _CVXPY_OPTIMUM_TOLERANCE: Final[float] = 1e-5
+_REPO_ROOT: Final[Path] = Path(__file__).resolve().parents[3]
+_A09_RECEIPT_PATH: Final[Path] = (
+    _REPO_ROOT / "docs" / "verification" / "srf-v3-7-a09-lean-corpora-receipt.json"
+)
+_EXPECTED_A09_COMPONENTS: Final[tuple[str, ...]] = (
+    "lean",
+    "lake",
+    "mathlib",
+    "cslib-index",
+    "erdos-problems-metadata",
+    "formal-conjectures",
+)
 
 
 @dataclass(frozen=True)
@@ -201,6 +220,128 @@ def _smoke_z3_native() -> str:
 
 def _smoke_cvc5() -> str:
     return _smoke_a08_native("cvc5")
+
+
+def _load_a09_receipt() -> dict[str, Any]:
+    if not _A09_RECEIPT_PATH.exists():
+        raise RuntimeError(f"A09 receipt missing: {_A09_RECEIPT_PATH.relative_to(_REPO_ROOT)}")
+    receipt = json.loads(_A09_RECEIPT_PATH.read_text(encoding="utf-8"))
+    if not isinstance(receipt, dict):
+        raise RuntimeError("A09 receipt must be a JSON object")
+    return receipt
+
+
+def _check_a09_revision_bindings(proof_receipt: dict[str, Any], *, name: str) -> None:
+    pins = default_lean_pins().to_dict()
+    bindings = proof_receipt.get("revision_bindings")
+    if bindings != pins:
+        raise RuntimeError(f"{name} revision bindings do not match Lean/mathlib pins")
+
+
+def _check_a09_corpus_pins(corpus_receipt: dict[str, Any]) -> None:
+    expected_pins = [pin.to_dict() for pin in default_corpus_pins()]
+    expected_statements = [statement.to_dict() for statement in default_corpus_statements()]
+    if corpus_receipt.get("status") != "TRAVERSED":
+        raise RuntimeError("A09 corpus traversal receipt is not TRAVERSED")
+    if corpus_receipt.get("corpus_pins") != expected_pins:
+        raise RuntimeError("A09 corpus pins do not match configured pins")
+    checks = corpus_receipt.get("checks")
+    if not isinstance(checks, list) or len(checks) != len(expected_statements):
+        raise RuntimeError("A09 corpus checks do not match expected statement count")
+    observed_statements = [item.get("statement") for item in checks if isinstance(item, dict)]
+    if observed_statements != expected_statements:
+        raise RuntimeError("A09 corpus statements do not match configured statements")
+    if any(item.get("status") != "PASS" for item in checks if isinstance(item, dict)):
+        raise RuntimeError("A09 corpus traversal contains a non-PASS check")
+
+
+def _validated_a09_receipt(component_id: str) -> dict[str, Any]:  # noqa: C901, PLR0912
+    receipt = _load_a09_receipt()
+    if receipt.get("schema_version") != "StageCompletionReceipt/v1":
+        raise RuntimeError("A09 receipt schema drifted")
+    if receipt.get("stage_id") != "A09" or receipt.get("result") != "PASS":
+        raise RuntimeError("A09 receipt is not a PASS receipt for stage A09")
+    if receipt.get("stage_closure") != "A09_ACTIVE":
+        raise RuntimeError("A09 receipt does not close A09_ACTIVE")
+    if receipt.get("remaining_internal_waits") != []:
+        raise RuntimeError("A09 receipt contains internal waits")
+    active = receipt.get("active_packs")
+    if not isinstance(active, list) or set(active) != set(_EXPECTED_A09_COMPONENTS):
+        raise RuntimeError("A09 active_packs do not match expected components")
+    if component_id not in active:
+        raise RuntimeError(f"{component_id} is absent from A09 active_packs")
+
+    checks = {
+        str(item.get("check_id")): item
+        for item in receipt.get("checks", [])
+        if isinstance(item, dict)
+    }
+    if any(item.get("status") != "PASS" for item in checks.values()):
+        raise RuntimeError("A09 receipt contains a non-PASS check")
+
+    kernel = checks.get("A09-02-lean-kernel-accept-reject")
+    if not isinstance(kernel, dict):
+        raise RuntimeError("A09 kernel check missing")
+    valid = kernel.get("valid_receipt")
+    invalid = kernel.get("invalid_receipt")
+    if not isinstance(valid, dict) or not isinstance(invalid, dict):
+        raise RuntimeError("A09 kernel proof receipts missing")
+    if valid.get("status") != "CHECKED" or valid.get("axioms") is None:
+        raise RuntimeError("A09 valid theorem was not checked with axiom inventory")
+    if invalid.get("status") != "REJECTED":
+        raise RuntimeError("A09 invalid theorem was not rejected")
+    _check_a09_revision_bindings(valid, name="valid theorem")
+    _check_a09_revision_bindings(invalid, name="invalid theorem")
+
+    mathlib = checks.get("A09-03-mathlib-import")
+    if not isinstance(mathlib, dict) or not isinstance(mathlib.get("mathlib_receipt"), dict):
+        raise RuntimeError("A09 mathlib check missing")
+    mathlib_receipt = mathlib["mathlib_receipt"]
+    if mathlib_receipt.get("status") != "CHECKED":
+        raise RuntimeError("A09 mathlib theorem was not checked")
+    if mathlib_receipt.get("uses_mathlib") is not True:
+        raise RuntimeError("A09 mathlib receipt does not bind uses_mathlib=true")
+    if mathlib_receipt.get("axioms") is None:
+        raise RuntimeError("A09 mathlib receipt is missing axiom inventory")
+    _check_a09_revision_bindings(mathlib_receipt, name="mathlib theorem")
+
+    corpus = checks.get("A09-04-pinned-corpus-traversal")
+    if not isinstance(corpus, dict) or not isinstance(corpus.get("corpus_receipt"), dict):
+        raise RuntimeError("A09 corpus check missing")
+    _check_a09_corpus_pins(corpus["corpus_receipt"])
+    return receipt
+
+
+def _smoke_a09_receipt(component_id: str) -> str:
+    receipt = _validated_a09_receipt(component_id)
+    return (
+        f"A09 offline truth projection accepted {component_id} from "
+        f"{receipt['receipt_id']} with Lean/mathlib pins and corpus hashes"
+    )
+
+
+def _smoke_a09_lean_kernel() -> str:
+    return _smoke_a09_receipt("lean")
+
+
+def _smoke_a09_lake() -> str:
+    return _smoke_a09_receipt("lake")
+
+
+def _smoke_a09_mathlib() -> str:
+    return _smoke_a09_receipt("mathlib")
+
+
+def _smoke_a09_cslib_index() -> str:
+    return _smoke_a09_receipt("cslib-index")
+
+
+def _smoke_a09_erdos_corpus() -> str:
+    return _smoke_a09_receipt("erdos-problems-metadata")
+
+
+def _smoke_a09_formal_conjectures() -> str:
+    return _smoke_a09_receipt("formal-conjectures")
 
 
 _SPECS: Final[tuple[ComponentSpec, ...]] = (
@@ -377,17 +518,55 @@ _SPECS: Final[tuple[ComponentSpec, ...]] = (
         "lean",
         "a09_formal",
         "A09",
-        "native_executable",
-        executable_names=("lean",),
+        "stage_receipt",
         activation_wait_state="WAIT_TOOLCHAIN",
+        current_v101_active=True,
+        smoke=_smoke_a09_lean_kernel,
     ),
     ComponentSpec(
         "lake",
         "a09_formal",
         "A09",
-        "native_executable",
-        executable_names=("lake",),
+        "stage_receipt",
         activation_wait_state="WAIT_TOOLCHAIN",
+        current_v101_active=True,
+        smoke=_smoke_a09_lake,
+    ),
+    ComponentSpec(
+        "mathlib",
+        "a09_formal",
+        "A09",
+        "stage_receipt",
+        activation_wait_state="WAIT_TOOLCHAIN",
+        current_v101_active=True,
+        smoke=_smoke_a09_mathlib,
+    ),
+    ComponentSpec(
+        "cslib-index",
+        "a09_formal_corpus",
+        "A09",
+        "stage_receipt",
+        activation_wait_state="WAIT_TOOLCHAIN",
+        current_v101_active=True,
+        smoke=_smoke_a09_cslib_index,
+    ),
+    ComponentSpec(
+        "erdos-problems-metadata",
+        "a09_formal_corpus",
+        "A09",
+        "stage_receipt",
+        activation_wait_state="WAIT_TOOLCHAIN",
+        current_v101_active=True,
+        smoke=_smoke_a09_erdos_corpus,
+    ),
+    ComponentSpec(
+        "formal-conjectures",
+        "a09_formal_corpus",
+        "A09",
+        "stage_receipt",
+        activation_wait_state="WAIT_TOOLCHAIN",
+        current_v101_active=True,
+        smoke=_smoke_a09_formal_conjectures,
     ),
     ComponentSpec(
         "rocq",
@@ -463,11 +642,22 @@ def _executable_probe(spec: ComponentSpec) -> tuple[bool, str | None, str | None
     return False, None, f"not found: {', '.join(spec.executable_names)}"
 
 
+def _stage_receipt_probe(spec: ComponentSpec) -> tuple[bool, str | None, str | None]:
+    try:
+        receipt = _validated_a09_receipt(spec.component_id)
+    except Exception as exc:
+        return False, None, f"{type(exc).__name__}: {exc}"
+    receipt_path = _A09_RECEIPT_PATH.relative_to(_REPO_ROOT)
+    return True, f"{receipt_path}:{receipt['receipt_id']}", None
+
+
 def _probe(spec: ComponentSpec) -> dict[str, Any]:
     if spec.probe_kind == "python_import":
         ok, version_or_path, error = _python_probe(spec)
     elif spec.probe_kind == "native_executable":
         ok, version_or_path, error = _executable_probe(spec)
+    elif spec.probe_kind == "stage_receipt":
+        ok, version_or_path, error = _stage_receipt_probe(spec)
     else:
         ok, version_or_path, error = False, None, "protected or target-bound capability"
 
@@ -484,7 +674,11 @@ def _probe(spec: ComponentSpec) -> dict[str, Any]:
     active = bool(ok and smoke_ok and crosschecked and spec.current_v101_active)
     if active:
         state = "ACTIVE"
-        evidence_axis = "nonfixture_executable_probe_and_scientific_smoke"
+        evidence_axis = (
+            "hash_bound_stage_receipt_and_scientific_smoke"
+            if spec.probe_kind == "stage_receipt"
+            else "nonfixture_executable_probe_and_scientific_smoke"
+        )
     elif ok:
         state = "EXECUTABLE_PROBED"
         evidence_axis = "executable_probe_only"
@@ -543,6 +737,16 @@ def build_truth_ledger() -> dict[str, Any]:
             f"{item['state']}:{item['component_id']}"
             for item in components
             if item["activation_stage"] == "A08" and item["state"] != "ACTIVE"
+        ],
+        "a09_active_inventory_observed": [
+            item["component_id"]
+            for item in components
+            if item["activation_stage"] == "A09" and item["state"] == "ACTIVE"
+        ],
+        "a09_parked_blockers": [
+            f"{item['state']}:{item['component_id']}"
+            for item in components
+            if item["activation_stage"] == "A09" and item["state"] != "ACTIVE"
         ],
         "a07_parked_blockers": [f"WAIT_LICENSE:python-flint:{FLINT_WAIT_REASON}"],
         "production_versus_fixture_axis": [

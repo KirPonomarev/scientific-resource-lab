@@ -34,8 +34,12 @@ Current v1.0.1 active inventory reproduced by the ledger:
 | `singular` | `a08_native_algebra` | `A08` | `ACTIVE` | `nonfixture_executable_probe_and_scientific_smoke` |
 | `z3-native` | `a08_smt` | `A08` | `ACTIVE` | `nonfixture_executable_probe_and_scientific_smoke` |
 | `cvc5` | `a08_smt` | `A08` | `ACTIVE` | `nonfixture_executable_probe_and_scientific_smoke` |
-| `lean` | `a09_formal` | `A09` | `WAIT_TOOLCHAIN` | `missing_or_protected_capability` |
-| `lake` | `a09_formal` | `A09` | `WAIT_TOOLCHAIN` | `missing_or_protected_capability` |
+| `lean` | `a09_formal` | `A09` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
+| `lake` | `a09_formal` | `A09` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
+| `mathlib` | `a09_formal` | `A09` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
+| `cslib-index` | `a09_formal_corpus` | `A09` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
+| `erdos-problems-metadata` | `a09_formal_corpus` | `A09` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
+| `formal-conjectures` | `a09_formal_corpus` | `A09` | `ACTIVE` | `hash_bound_stage_receipt_and_scientific_smoke` |
 | `rocq` | `a10_formal` | `A10` | `WAIT_TOOLCHAIN` | `missing_or_protected_capability` |
 | `isabelle` | `a10_formal` | `A10` | `WAIT_TOOLCHAIN` | `missing_or_protected_capability` |
 | `hol4` | `a10_formal` | `A10` | `WAIT_TOOLCHAIN` | `missing_or_protected_capability` |
