@@ -1,0 +1,60 @@
+{
+  "schema_version": "MissionCloseoutReceipt/v1",
+  "mission_id": "build-scientific-reasoning-fabric-v1",
+  "plan_id": "SRF-MASTER-2026-07-29-V3.6",
+  "stage_id": "S28",
+  "result": "RELEASED_WITH_DECLARED_WAITS",
+  "plan_contract_sha256": "947d1858-c8cf110f-3c6bdb07-c70a8ff1-32459f9e-7b6448d1-afbf84d4-270c1ff0",
+  "pre_closeout_state_sha256": "d2bbc32b-ceb0a72b-b2226b4d-5865905d-9044f4a2-8b67b430-70fc0d99-50c8c26f",
+  "implementation_pr": {
+    "number": 47,
+    "url": "https://github.com/KirPonomarev/scientific-resource-lab/pull/47",
+    "merge_commit": "ce08dd0d389354ae94680c149eabe1fd80cb08a3"
+  },
+  "release_pr": {
+    "number": 48,
+    "url": "https://github.com/KirPonomarev/scientific-resource-lab/pull/48",
+    "merge_commit": "5fdd40598f729142b1106cacaa427085fd777bf7"
+  },
+  "release": {
+    "tag": "v1.0.1",
+    "url": "https://github.com/KirPonomarev/scientific-resource-lab/releases/tag/v1.0.1",
+    "target_commit": "5fdd40598f729142b1106cacaa427085fd777bf7",
+    "artifact_hashes": {
+      "srlab-1.0.1-py3-none-any.whl": "d2ea500701f8f90810c8244c9055107692dc741bfa188e202698219cbb9d0ec0",
+      "srlab-1.0.1.tar.gz": "c8cafee5e2db29717d639906fc036118ce8b1aabb8afca7d78a4b0b69585a874"
+    },
+    "sbom_sha256": "19806cb819de31a29918baff4f3de5e1a049be0c084f32babcf4c910b0f2d7e2",
+    "release_evidence_sha256": "3e8696aac899549861ac2d79c488a0847026db1096f24c638da5d246d763ebbc",
+    "sha256sums_sha256": "b4451ef8c824d79d9ae8ac5dbba8802e4518f7d8115fb8c69a215d714a3f26a9",
+    "license_bundle_sha256": "1e05adfd6aa18093e837402f7df444931d03877d537b1060eb85711d047f015c",
+    "asset_verification": "downloaded release assets matched local SHA-256 hashes"
+  },
+  "checks": {
+    "pr_48_checks": "PASS",
+    "main_post_merge_workflows": "PASS",
+    "make_verify": "PASS: 1924 passed, 1 skipped; build srlab-1.0.1",
+    "reproducible_wheel_manifest_sha256": "43270cdfc515bf1b36fc38738a54b5175585e6115536d6aef1fefac252beac83",
+    "install_smoke": "PASS: srlab version and doctor returned 1.0.1",
+    "public_boundary": "PASS",
+    "secret_scan": "PASS"
+  },
+  "declared_wait_states": [
+    "WAIT_T7_BINDING",
+    "WAIT_COMPUTE_NODE",
+    "WAIT_RUNTIME_HEALTH:MARKET_RED_F8",
+    "WAIT_SECURITY_HEALTH:BOOTSTRAP_UNAVAILABLE",
+    "WAIT_CAPABILITY:advanced_optional_science_packs",
+    "WAIT_NATIVE_CHILD_CLOSEOUT:DUAL_CONTOUR"
+  ],
+  "authority_negative": {
+    "canonical_writes": 0,
+    "grants_authority": false,
+    "live_actions": 0,
+    "protected_actions_performed": [],
+    "srf_results_authority": "proposal_only_C3_never_authority"
+  },
+  "terminal_blockers": [],
+  "next_gate": "mission_closed; residual WAIT states require native authority or external runtime health before activation",
+  "receipt_id": "3bfe9ebc-6e26c42c-6a8e257f-9f44ad0f-075a8cb9-fb52afdd-f4780907-3502a199"
+}
