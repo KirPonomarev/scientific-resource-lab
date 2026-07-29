@@ -28,7 +28,9 @@ REQUIRED_DOCS = (
     "RELEASE-RUNBOOK.md",
 )
 RECEIPT_PATH = Path("docs/verification/documentation-closure-receipt.json")
-_SYSTEM_ACCEPTANCE_RECEIPT = "f8f9398e27be37fa3266e74957d000db46aa2815f6be384c761ffdd862468ae5"
+_SYSTEM_ACCEPTANCE_RECEIPT = (
+    "f8f9398e-27be37fa-3266e749-57d000db-46aa2815-f6be384c-761ffdd8-62468ae5"
+)
 
 
 def _run(*args: str) -> subprocess.CompletedProcess[str]:
@@ -75,7 +77,7 @@ def test_documentation_closure_receipt_is_authority_negative() -> None:
     assert receipt["grants_authority"] is False
     assert receipt["live_actions"] == 0
     assert _normalize_digest(receipt["source_system_acceptance_receipt"]) == (
-        _SYSTEM_ACCEPTANCE_RECEIPT
+        _normalize_digest(_SYSTEM_ACCEPTANCE_RECEIPT)
     )
 
 
