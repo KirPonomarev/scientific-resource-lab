@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import shutil
 import subprocess
 from collections.abc import Callable
 from dataclasses import dataclass
 from enum import StrEnum
+from pathlib import Path
 from typing import Final
 
 from srl.contracts.canonical import dumps
@@ -15,6 +17,13 @@ from srl.contracts.errors import CONTRACT_INVALID_FAIL_REASON, ContractError
 
 CROSS_PROVER_ADMISSION_BUNDLE_SCHEMA_VERSION: Final[str] = "CrossProverAdmissionBundle/v1"
 THEOREM_TRANSLATION_MANIFEST_SCHEMA_VERSION: Final[str] = "TheoremTranslationManifest/v1"
+INDEPENDENT_PROVER_PINS_SCHEMA_VERSION: Final[str] = "IndependentProverPins/v1"
+SHARED_A10_CLAIM_ID: Final[str] = "nat-zero-add-right"
+SHARED_A10_THEOREM_LABEL: Final[str] = "srl_a10_zero_add"
+_REPO_ROOT: Final[Path] = Path(__file__).resolve().parents[4]
+_A10_PINS_PATH: Final[Path] = (
+    _REPO_ROOT / "configs" / "packs" / "formal" / "independent-prover-pins.json"
+)
 
 
 class CrossProverError(ContractError):
@@ -211,6 +220,66 @@ def build_cross_prover_admission_bundle(
     return body
 
 
+def load_independent_prover_pins(path: Path | None = None) -> dict[str, object]:
+    """Load the A10 prover pin manifest with authority-negative safety consts."""
+    source = path or _A10_PINS_PATH
+    pins = json.loads(source.read_text(encoding="utf-8"))
+    if not isinstance(pins, dict):
+        raise CrossProverError("independent prover pins must be a JSON object")
+    if pins.get("schema_version") != INDEPENDENT_PROVER_PINS_SCHEMA_VERSION:
+        raise CrossProverError("independent prover pins schema mismatch")
+    if pins.get("automatic_equivalence_claims") != 0:
+        raise CrossProverError("independent prover pins must not claim equivalence")
+    if pins.get("canonical_writes") != 0 or pins.get("grants_authority") is not False:
+        raise CrossProverError("independent prover pins must be authority-negative")
+    shared_claim = pins.get("shared_claim")
+    if not isinstance(shared_claim, dict) or shared_claim.get("claim_id") != SHARED_A10_CLAIM_ID:
+        raise CrossProverError("independent prover pins shared claim mismatch")
+    for key in ("rocq", "isabelle", "hol4"):
+        if not isinstance(pins.get(key), dict):
+            raise CrossProverError(f"independent prover pins missing {key}")
+    return pins
+
+
+def independent_prover_pin_manifest_hash(path: Path | None = None) -> str:
+    """Return the canonical SHA-256 of the A10 independent-prover pin manifest."""
+    return hashlib.sha256(dumps(load_independent_prover_pins(path))).hexdigest()
+
+
+def build_a10_translation_manifests(
+    *,
+    contours: tuple[FormalContour, ...],
+    theorem_label: str = SHARED_A10_THEOREM_LABEL,
+) -> tuple[dict[str, object], ...]:
+    """Build one semantic-gap manifest from Lean primary to each A10 contour."""
+    by_id = {contour.contour_id: contour for contour in contours}
+    source = by_id.get("lean.primary")
+    if source is None:
+        raise CrossProverError("lean.primary contour is required")
+    manifests: list[dict[str, object]] = []
+    for target_id in ("rocq.primary", "isabelle.hol", "hol4.primary"):
+        target = by_id.get(target_id)
+        if target is None:
+            raise CrossProverError(f"{target_id} contour is required")
+        manifests.append(
+            build_translation_manifest(
+                theorem_label=theorem_label,
+                source_contour_id=source.contour_id,
+                target_contour_id=target.contour_id,
+                source_logic=source.logic,
+                target_logic=target.logic,
+                source_assumptions=source.assumptions,
+                target_assumptions=target.assumptions,
+                translation_notes=(
+                    "same informal natural-number claim represented in target syntax",
+                    "logic and library semantics remain explicit per contour",
+                    "manifest forbids automatic theorem equivalence claims",
+                ),
+            )
+        )
+    return tuple(manifests)
+
+
 def _lean_contour(active: bool) -> FormalContour:
     return FormalContour(
         contour_id="lean.primary",
@@ -293,11 +362,17 @@ def _require_non_empty(value: object, field: str) -> None:
 
 __all__ = [
     "CROSS_PROVER_ADMISSION_BUNDLE_SCHEMA_VERSION",
+    "INDEPENDENT_PROVER_PINS_SCHEMA_VERSION",
+    "SHARED_A10_CLAIM_ID",
+    "SHARED_A10_THEOREM_LABEL",
     "THEOREM_TRANSLATION_MANIFEST_SCHEMA_VERSION",
     "CrossProverError",
     "FormalContour",
     "FormalContourStatus",
+    "build_a10_translation_manifests",
     "build_cross_prover_admission_bundle",
     "build_translation_manifest",
     "discover_cross_prover_contours",
+    "independent_prover_pin_manifest_hash",
+    "load_independent_prover_pins",
 ]

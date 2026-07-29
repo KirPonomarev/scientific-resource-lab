@@ -1038,9 +1038,9 @@ terminal_result PASS запрещён, если remaining_internal_waits не п
 <!-- END_PLAN_CONTRACT_V3_7 -->
 
 <!-- BEGIN_MUTABLE_STATE_V3_7 -->
-STATE_REVISION: 12
-PREVIOUS_STATE_SHA256: 6bde168d-e1467394-bbd26246-35d9f1b8-cae3bd07-e827184e-a8ae6659-238ef8e3
-CURRENT_STATE_SHA256: f9db73e0-eb34c0ac-cd2584c2-ef77abe3-83e388b8-a027dd42-f958df66-28e9c74d
+STATE_REVISION: 13
+PREVIOUS_STATE_SHA256: f9db73e0-eb34c0ac-cd2584c2-ef77abe3-83e388b8-a027dd42-f958df66-28e9c74d
+CURRENT_STATE_SHA256: f3a0e18b-94136d6b-22ade9d7-00afac15-4646903a-08eb3b19-9b1cd9ea-ca4e99bc
 
 ## CURRENT_FACTS
 
@@ -1096,6 +1096,18 @@ current_facts:
   a09_warm_prepare_count: 0
   a09_warm_fetch_count: 0
   a09_t7_formal_toolchain_binding: WAIT_AUTHORITY
+  current_active_independent_provers:
+    - rocq
+    - isabelle
+    - hol4
+  a10_rocq: ACTIVE
+  a10_isabelle_hol: ACTIVE
+  a10_hol4: ACTIVE
+  a10_receipt_id: sha256:25c51de9b712afc0f1fc961c26f5dae38ed2872cb054850bd7182374ad3cca7f
+  a10_truth_projection: OFFLINE_HASH_BOUND_RECEIPT
+  a10_hol4_cache_status: REUSED_ON_FULL_VERIFY
+  a10_hol4_prepare_count: 0
+  a10_hol4_fetch_count: 0
   production_signer: WAIT_AUTHORITY
   production_ed25519_transport_interface: ACTIVE
   fixture_hmac_production_path: REJECTED
@@ -1125,9 +1137,9 @@ current_facts:
 
 ~~~yaml
 execution_state:
-  status: A09_ACTIVE_READY_FOR_A10_WITH_PARKED_PROTECTED_LANES
-  current_stage: A10
-  next_stage: A10_activate_independent_provers
+  status: A10_ACTIVE_READY_FOR_A11_WITH_PARKED_PROTECTED_LANES
+  current_stage: A11
+  next_stage: A11_activate_knowledge_graph
   completed_stages:
     - A00
     - A01
@@ -1137,6 +1149,7 @@ execution_state:
     - A06
     - A08
     - A09
+    - A10
   completed_stage_lanes:
     - A07_sympy_mpmath_core
   parked_stages:
@@ -1152,11 +1165,11 @@ execution_state:
     - WAIT_COMPUTE_TARGET:A05_BIND_NATIVE_SANDBOX_COMPUTE_TARGET
     - WAIT_LICENSE:A07_PYTHON_FLINT_LGPL_CLOSURE
     - WAIT_AUTHORITY:A09_BIND_PINNED_LEAN_MATHLIB_PROJECT_TO_T7
-  active_branch_or_null: codex/srf-a09-lean-corpora
+  active_branch_or_null: codex/srf-a10-independent-provers
   active_pr_or_null: null
   writer_lease_or_null: null
   blocker_or_null: WAIT_LICENSE:A07_PYTHON_FLINT_LGPL_CLOSURE
-  next_executable_action: start A10 independent prover activation while keeping T7-backed persistence, native compute binding, native production signing, FLINT license closure and A09 T7 formal toolchain binding parked until exact authority/evidence exists
+  next_executable_action: start A11 knowledge graph activation while keeping T7-backed persistence, native compute binding, native production signing, FLINT license closure and A09 T7 formal toolchain binding parked until exact authority/evidence exists
   updated_at: 2026-07-29
 ~~~
 
@@ -1196,6 +1209,8 @@ decision_log:
     decision: A08 native algebra and SMT toolchains are ACTIVE with external PARI/GP, Maxima, GAP, Singular, native Z3 and cvc5 executable probes, bounded scientific smokes, Z3/cvc5 agreement and uv license-boundary enforcement
   - id: V37-D016
     decision: A09 Lean/lake/mathlib and mathematical corpora are ACTIVE with pinned Lean 4.32.2, real kernel accept/reject checks, pinned mathlib module import, axiom inventory, CSLib/Erdos/Formal Conjectures pins and remote corpus blob traversal; truth-ledger A09 projection is offline from hash-bound receipt sha256:366c24395552933e3f758599b28e0e93ac136bd86a6ce0d5a7ff5ed61c0e2ca1; full make verify uses one session-scoped A09 prepare with prepare_count=1 fetch_count=1 and warm prepare reuse reports prepare_count=0 fetch_count=0; physical T7 formal toolchain binding remains WAIT_AUTHORITY
+  - id: V37-D017
+    decision: A10 Rocq/Coq, Isabelle/HOL and HOL4 independent prover contours are ACTIVE with real executable probes and shared nat zero-add proof checks; semantic-gap manifests explicitly represent logic and assumption deltas and forbid automatic theorem equivalence claims; truth-ledger A10 projection is offline from hash-bound receipt sha256:25c51de9b712afc0f1fc961c26f5dae38ed2872cb054850bd7182374ad3cca7f; full verify reuses the pinned HOL4 cache with prepare_count=0 and fetch_count=0 after the cold T7-Secure preparation
 ~~~
 
 ## EVIDENCE_INDEX
@@ -1244,6 +1259,11 @@ evidence_index:
   - scripts/ci/prepare_a09_mathlib.py
   - scripts/ci/verify-v37.py
   - docs/verification/srf-v3-7-a09-lean-corpora-receipt.json
+  - configs/packs/formal/independent-prover-pins.json
+  - docs/verification/srf-v3-7-a10-independent-provers-receipt.json
+  - scripts/checks/srf-v37-a10-gate.py
+  - scripts/ci/prepare_a10_hol4.py
+  - src/srl/packs/formal/cross_prover.py
 ~~~
 
 <!-- END_MUTABLE_STATE_V3_7 -->

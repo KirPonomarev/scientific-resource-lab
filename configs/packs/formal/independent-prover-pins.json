@@ -1,0 +1,40 @@
+{
+  "schema_version": "IndependentProverPins/v1",
+  "shared_claim": {
+    "claim_id": "nat-zero-add-right",
+    "informal_statement": "For every natural number n, 0 + n = n.",
+    "authority_scope": "formal_statement_only",
+    "empirical_support": "not_applicable"
+  },
+  "rocq": {
+    "contour_id": "rocq.primary",
+    "docker_image": "rocq/rocq-prover:9.2.0",
+    "logic": "calculus_of_inductive_constructions",
+    "expected_executables": [
+      "rocq",
+      "coqc"
+    ]
+  },
+  "isabelle": {
+    "contour_id": "isabelle.hol",
+    "docker_image": "makarius/isabelle:Isabelle2025-2",
+    "docker_image_arm": "makarius/isabelle:Isabelle2025-2_ARM",
+    "distribution": "Isabelle2025-2",
+    "linux_tar_sha256": "a20a507bc7c1270d8be96a9f3fbec06345387789d2dc2c4d3df6260d47bfb33c",
+    "linux_arm_tar_sha256": "650a9669b4a087675afb34294d82ded2f0704d47d580dd9ed45cddc9f1764bdd",
+    "logic": "classical_higher_order_logic"
+  },
+  "hol4": {
+    "contour_id": "hol4.primary",
+    "release_tag": "trindemossen-2",
+    "release_asset": "hol-trindemossen-2.tar.gz",
+    "release_url": "https://github.com/HOL-Theorem-Prover/HOL/releases/download/trindemossen-2/hol-trindemossen-2.tar.gz",
+    "release_tar_sha256": "0a2cba21a07b2eac0a9593a7130d47d48715a122ff6df6d0c6858f7190f71f7c",
+    "logic": "classical_higher_order_logic",
+    "required_ml": "Poly/ML"
+  },
+  "semantic_policy": "represent_shared_claim_per_logic_never_assert_equivalence",
+  "automatic_equivalence_claims": 0,
+  "canonical_writes": 0,
+  "grants_authority": false
+}
