@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import os
 import subprocess
 from pathlib import Path
 from types import ModuleType
@@ -43,6 +44,12 @@ def test_rocq_docker_probe_uses_container_absolute_source_path(
     ) -> subprocess.CompletedProcess[bytes]:
         del cwd, timeout_seconds
         commands.append(command)
+        if "-v" in command:
+            volume = command[command.index("-v") + 1]
+            host_path = Path(volume.split(":", 1)[0])
+            source_path = host_path / "SRL_A10_ROCQ.v"
+            assert stat_mode(host_path) == 0o755
+            assert stat_mode(source_path) == 0o644
         return subprocess.CompletedProcess(command, 0, stdout=b"", stderr=b"")
 
     monkeypatch.setenv("SRL_A10_ROCQ_DOCKER_IMAGE", "rocq/rocq-prover:9.2.0")
@@ -58,3 +65,7 @@ def test_rocq_docker_probe_uses_container_absolute_source_path(
     assert f"{tmp_path}" not in proof_command[-1]
     assert "test -f /work/SRL_A10_ROCQ.v" in proof_command[-1]
     assert "coqc /work/SRL_A10_ROCQ.v" in proof_command[-1]
+
+
+def stat_mode(path: Path) -> int:
+    return os.stat(path).st_mode & 0o777

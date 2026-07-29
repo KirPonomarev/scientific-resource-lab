@@ -119,6 +119,14 @@ def _docker_command(
     return command
 
 
+def _prepare_docker_mount(root: Path) -> None:
+    """Make ephemeral public proof sources readable by non-root prover images."""
+    root.chmod(0o755)
+    for child in root.iterdir():
+        if child.is_file():
+            child.chmod(0o644)
+
+
 def _rocq_compile_shell(source_file: str) -> str:
     """Return a stable Rocq/Coq compile command for container probes."""
     return (
@@ -145,6 +153,7 @@ def _check_rocq() -> dict[str, Any]:
         source_path = root / "SRL_A10_ROCQ.v"
         source_path.write_text(source, encoding="utf-8")
         if image:
+            _prepare_docker_mount(root)
             version_command = _docker_command(
                 image,
                 ["sh", "-lc", "rocq -v || coqc -v"],
@@ -214,6 +223,7 @@ def _check_isabelle() -> dict[str, Any]:
         )
         (root / "SRL_A10.thy").write_text(theory, encoding="utf-8")
         if image:
+            _prepare_docker_mount(root)
             version_command = _docker_command(image, ["version"])
             proof_command = _docker_command(
                 image,
