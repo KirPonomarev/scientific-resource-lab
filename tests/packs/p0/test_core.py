@@ -41,7 +41,8 @@ def test_current_importable_core_is_active_and_missing_engines_wait() -> None:
         bundle, "active_component_ids"
     )
     assert "smt.cvc5" in _component_ids(bundle, "degraded_component_ids")
-    assert {"symbolic.sympy", "exact.flint", "exact.pari", "cas.maxima"} <= _component_ids(
+    assert {"symbolic.sympy", "numeric.mpmath"} <= _component_ids(bundle, "active_component_ids")
+    assert {"exact.flint", "exact.pari", "cas.maxima"} <= _component_ids(
         bundle, "wait_component_ids"
     )
 

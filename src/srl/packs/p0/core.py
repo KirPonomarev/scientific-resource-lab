@@ -22,6 +22,10 @@ P0_CORE_ADMISSION_BUNDLE_SCHEMA_VERSION: Final[str] = "P0CoreAdmissionBundle/v1"
 _ACTIVE_REASON: Final[str] = "importable_and_license_allowed"
 _WAIT_REASON: Final[str] = "runtime_or_license_evidence_missing"
 _CVC5_REASON: Final[str] = "WAIT_LICENSE: cvc5 wheel license closure not admitted"
+_FLINT_REASON: Final[str] = (
+    "WAIT_LICENSE: python-flint declares MIT AND LGPL-3.0-or-later; "
+    "SRL default dependency policy denies LGPL-family closure"
+)
 
 
 class P0AdmissionError(ContractError):
@@ -179,26 +183,26 @@ def default_p0_components() -> tuple[P0Component, ...]:
         P0Component(
             "symbolic.sympy",
             "symbolic",
-            wait,
+            active,
             ("sympy",),
             ("sympy",),
             ("BSD-3-Clause",),
             ("algebra_exact", "symbolic_law"),
             "SymPy symbolic manipulation",
             ("exact_vs_float", "unsupported_operator_reject"),
-            _WAIT_REASON,
+            _ACTIVE_REASON,
         ),
         P0Component(
             "numeric.mpmath",
             "numeric",
-            wait,
+            active,
             ("mpmath",),
             ("mpmath",),
             ("BSD-3-Clause",),
             ("numeric_high_precision",),
             "mpmath arbitrary precision numerics",
             ("precision_declared", "interval_or_residual_check"),
-            _WAIT_REASON,
+            _ACTIVE_REASON,
         ),
         P0Component(
             "exact.flint",
@@ -206,11 +210,11 @@ def default_p0_components() -> tuple[P0Component, ...]:
             wait,
             ("flint",),
             ("python-flint", "FLINT", "Arb", "Calcium"),
-            ("WAIT_CAPABILITY",),
+            ("WAIT_LICENSE",),
             ("algebra_exact",),
             "FLINT/Arb/Calcium exact algebra stack",
             ("exact_rational", "algebraic_number_cross_check"),
-            _WAIT_REASON,
+            _FLINT_REASON,
         ),
         P0Component(
             "exact.pari",

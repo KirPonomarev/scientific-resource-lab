@@ -1,0 +1,71 @@
+{
+  "active_packs": [
+    "sympy",
+    "mpmath"
+  ],
+  "canonical_writes": 0,
+  "checks": [
+    {
+      "check_id": "A07-01-sympy-mpmath-active",
+      "detail": "SymPy and mpmath reached ACTIVE through import, smoke and crosscheck",
+      "status": "PASS"
+    },
+    {
+      "check_id": "A07-02-scientific-smoke",
+      "detail": "exact factorization, high-precision eval, interval enclosure and units check passed",
+      "smoke": {
+        "canonical_writes": 0,
+        "dimensional_consistency": "parse_unit('kg*m/s^2') == parse_unit('N')",
+        "exact_factorization": "(x - 1)*(x + 1)*(x**2 + 1)",
+        "exact_factorization_crosscheck": "expand(factor(x^4 - 1)) == x^4 - 1",
+        "flint_reason": "WAIT_LICENSE: current python-flint metadata declares MIT AND LGPL-3.0-or-later; SRL default dependency policy denies LGPL-family closure",
+        "flint_status": "WAIT_LICENSE",
+        "grants_authority": false,
+        "high_precision_crosscheck": "sqrt(2)^2 residual < 1e-78 at 80 dps",
+        "high_precision_value": "1.41421356237309504880168872420969807856967187537694807317667973799073247846210704",
+        "interval_crosscheck": "mpmath sqrt(2) lies inside mpmath.iv.sqrt([2,2])",
+        "interval_enclosure": {
+          "lower": "1.4142135623730949234",
+          "upper": "1.4142135623730951455"
+        },
+        "mpmath_version": "1.3.0",
+        "schema_version": "P0PythonCoreSmoke/v1",
+        "sympy_version": "1.14.0"
+      },
+      "status": "PASS"
+    },
+    {
+      "bundle_id": "sha256:6afca8eca872d2475ce92b89e79b99d9b4726e93320b8623d2582e440b572be5",
+      "check_id": "A07-03-p0-bundle",
+      "detail": "P0 admission bundle activates SymPy/mpmath and parks FLINT at WAIT_LICENSE",
+      "status": "PASS"
+    },
+    {
+      "check_id": "A07-04-license-inventory-clean",
+      "detail": "default dependency license inventory admits SymPy/mpmath and excludes FLINT",
+      "exit_code": 0,
+      "status": "PASS"
+    },
+    {
+      "check_id": "A07-05-flint-wait-license",
+      "detail": "WAIT_LICENSE: current python-flint metadata declares MIT AND LGPL-3.0-or-later; SRL default dependency policy denies LGPL-family closure",
+      "evidence_path": "docs/target-binding/a07-python-flint-license-operator-action.json",
+      "license_expression": "MIT AND LGPL-3.0-or-later",
+      "observed_version": "0.9.0",
+      "status": "PASS"
+    }
+  ],
+  "grants_authority": false,
+  "live_actions": 0,
+  "parked_packs": [
+    "python-flint"
+  ],
+  "protected_blockers": [
+    "WAIT_LICENSE:A07_PYTHON_FLINT_LGPL_CLOSURE"
+  ],
+  "receipt_id": "sha256:96513e37c8d2e6ab4e19d018ee85368b902175752651d00f06ace3cdea93ca59",
+  "result": "PASS",
+  "schema_version": "StageCompletionReceipt/v1",
+  "stage_closure": "A07_PARTIAL_ACTIVE_WAIT_FLINT_LICENSE",
+  "stage_id": "A07"
+}

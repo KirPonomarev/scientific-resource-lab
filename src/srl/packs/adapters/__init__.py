@@ -14,6 +14,14 @@ without a verified certificate).
 
 from __future__ import annotations
 
+from srl.packs.adapters.p0_python_core import (
+    FLINT_WAIT_REASON,
+    P0_PYTHON_CORE_ACTIVE_PACKS,
+    P0_PYTHON_CORE_SCHEMA_VERSION,
+    P0_PYTHON_CORE_WAIT_PACKS,
+    P0PythonCoreSmoke,
+    run_p0_python_core_smoke,
+)
 from srl.packs.adapters.smt import (
     AVAILABLE_SOLVERS,
     FORMAL_CHECK_CEILING,
@@ -45,9 +53,13 @@ from srl.packs.adapters.units import (
 __all__ = [
     "AVAILABLE_SOLVERS",
     "CONVERSION_SIG_DIGITS",
+    "FLINT_WAIT_REASON",
     "FORMAL_CHECK_CEILING",
     "MAX_FORMULA_NODES",
     "MAX_WALL_SECONDS",
+    "P0_PYTHON_CORE_ACTIVE_PACKS",
+    "P0_PYTHON_CORE_SCHEMA_VERSION",
+    "P0_PYTHON_CORE_WAIT_PACKS",
     "PINNED_QUDT_SUBSET",
     "SI_BASE_DIMENSIONS",
     "SMT_FAIL_REASON",
@@ -55,6 +67,7 @@ __all__ = [
     "UNIT_FAIL_REASON",
     "WAIT_LICENSE_SOLVERS",
     "Dimension",
+    "P0PythonCoreSmoke",
     "SmtError",
     "SmtOutcome",
     "SmtResult",
@@ -64,6 +77,7 @@ __all__ = [
     "convert",
     "parse_unit",
     "pint_version",
+    "run_p0_python_core_smoke",
     "validate_dimensions",
     "z3_version",
 ]
