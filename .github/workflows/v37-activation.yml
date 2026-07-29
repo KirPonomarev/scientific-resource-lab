@@ -287,7 +287,7 @@ jobs:
   a12-discovery-dynamics:
     name: A12 discovery and dynamics gate
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    timeout-minutes: 45
     steps:
       - name: Checkout
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
@@ -303,7 +303,9 @@ jobs:
         with:
           path: .cache/srl-a12-julia-depot
           key: >-
-            a12-${{ runner.os }}-${{ runner.arch }}-julia-1.12.6-${{ hashFiles('pyproject.toml', 'uv.lock', 'src/srl/products/discovery_dynamics.py', 'scripts/checks/srf-v37-a12-gate.py') }}
+            a12-${{ runner.os }}-${{ runner.arch }}-julia-1.12.6-${{ hashFiles('pyproject.toml', 'uv.lock') }}
+          restore-keys: |
+            a12-${{ runner.os }}-${{ runner.arch }}-julia-1.12.6-
       - name: Setup uv
         uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9  # v9.0.0
         with:
@@ -312,7 +314,13 @@ jobs:
         run: uv python install 3.12
       - name: Install discovery dependencies (locked)
         run: uv sync --locked --extra discovery
+      - name: Prepare A12 Julia depot
+        timeout-minutes: 30
+        env:
+          JULIA_DEPOT_PATH: .cache/srl-a12-julia-depot
+        run: uv run --extra discovery python scripts/checks/srf-v37-a12-prepare-julia.py
       - name: V3.7 A12 discovery and dynamics gate
+        timeout-minutes: 10
         env:
           JULIA_DEPOT_PATH: .cache/srl-a12-julia-depot
         run: uv run --extra discovery python scripts/checks/srf-v37-a12-gate.py
@@ -322,4 +330,4 @@ jobs:
         with:
           path: .cache/srl-a12-julia-depot
           key: >-
-            a12-${{ runner.os }}-${{ runner.arch }}-julia-1.12.6-${{ hashFiles('pyproject.toml', 'uv.lock', 'src/srl/products/discovery_dynamics.py', 'scripts/checks/srf-v37-a12-gate.py') }}
+            a12-${{ runner.os }}-${{ runner.arch }}-julia-1.12.6-${{ hashFiles('pyproject.toml', 'uv.lock') }}

@@ -22,6 +22,12 @@ PySR requires an explicit Julia executable. The gate accepts Julia from
 JuliaCall environment for that smoke only. It must fail closed when Julia is
 absent; it must not silently provision Julia into the repository.
 
+PySR 1.5 resolves Julia packages through `juliapkg` at import time. CI therefore
+keeps provisioning separate from probing: `srf-v37-a12-prepare-julia.py` resolves
+the cacheable Julia depot and emits an authority-negative
+`A12JuliaDepotPrepareReceipt/v1`, while `srf-v37-a12-gate.py` performs the real
+PySR/PySINDy/PyDMD smoke and is the only source of A12 `ACTIVE` evidence.
+
 ## Ledger Boundary
 
 `CapabilityTruthLedger/v1` projects A12 truth only from the committed

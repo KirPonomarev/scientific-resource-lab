@@ -10,6 +10,7 @@ import os
 import random
 import shutil
 import subprocess
+import sys
 import time
 import warnings
 from collections.abc import Callable
@@ -23,6 +24,7 @@ from srl.contracts.errors import CONTRACT_INVALID_FAIL_REASON, ContractError
 A12_DISCOVERY_RECEIPT_SCHEMA_VERSION: Final[str] = "DiscoveryDynamicsActivationReceipt/v1"
 _PYTHON_JULIACALL_EXE: Final[str] = "PYTHON_JULIACALL_EXE"
 _PYTHON_JULIACALL_HANDLE_SIGNALS: Final[str] = "PYTHON_JULIACALL_HANDLE_SIGNALS"
+_PYTHON_JULIAPKG_EXE: Final[str] = "PYTHON_JULIAPKG_EXE"
 _JULIA_DEPOT_PATH: Final[str] = "JULIA_DEPOT_PATH"
 _ACTIVE_A12_PACKS: Final[tuple[str, ...]] = ("pysr", "pysindy", "pydmd")
 _A12_PACK_COUNT: Final[int] = len(_ACTIVE_A12_PACKS)
@@ -157,6 +159,7 @@ def resolve_a12_runtime(
     if proc.returncode != 0:
         raise DiscoveryDynamicsError(f"Julia version probe failed: {proc.stderr.strip()}")
     os.environ[_PYTHON_JULIACALL_EXE] = executable
+    os.environ[_PYTHON_JULIAPKG_EXE] = executable
     os.environ[_PYTHON_JULIACALL_HANDLE_SIGNALS] = "yes"
     if julia_depot_path:
         os.environ[_JULIA_DEPOT_PATH] = julia_depot_path
@@ -170,6 +173,59 @@ def resolve_a12_runtime(
         julia_version=proc.stdout.strip(),
         julia_depot_role=depot_role,
     )
+
+
+def prepare_a12_julia_depot(
+    *,
+    julia_executable: str | None = None,
+    julia_depot_path: str | None = None,
+    timeout_seconds: int = 1800,
+) -> dict[str, object]:
+    """Resolve PySR Julia packages before the A12 probe.
+
+    PySR 1.5 resolves Julia dependencies through juliapkg at import time.  CI
+    therefore needs a cacheable provisioning boundary before the bounded smoke
+    probe, otherwise the probe step spends its whole timeout precompiling
+    SymbolicRegression.jl instead of producing an activation receipt.
+    """
+
+    context = resolve_a12_runtime(
+        julia_executable=julia_executable,
+        julia_depot_path=julia_depot_path,
+    )
+    started = time.monotonic()
+    env = os.environ.copy()
+    proc = subprocess.run(
+        [sys.executable, "-m", "juliapkg", "resolve"],
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=timeout_seconds,
+        env=env,
+    )
+    elapsed = round(time.monotonic() - started, 3)
+    if proc.returncode != 0:
+        stderr = proc.stderr.strip() or proc.stdout.strip()
+        raise DiscoveryDynamicsError(f"A12 Julia dependency resolve failed: {stderr}")
+    receipt: dict[str, object] = {
+        "schema_version": "A12JuliaDepotPrepareReceipt/v1",
+        "stage_id": "A12",
+        "julia_version": context.julia_version,
+        "julia_depot_role": context.julia_depot_role,
+        "resolver": "python -m juliapkg resolve",
+        "resource_envelope": {
+            "elapsed_seconds": elapsed,
+            "timeout_seconds": timeout_seconds,
+            "bounded": True,
+            "canonical_writes": 0,
+        },
+        "prepared": True,
+        "promotion_allowed": False,
+        "canonical_writes": 0,
+        "grants_authority": False,
+    }
+    receipt["receipt_id"] = _object_id(receipt)
+    return receipt
 
 
 def run_a12_discovery_dynamics_smoke(
@@ -483,6 +539,7 @@ __all__ = [
     "A12RuntimeContext",
     "DiscoveryDynamicsError",
     "default_a12_pack_policy",
+    "prepare_a12_julia_depot",
     "resolve_a12_runtime",
     "run_a12_discovery_dynamics_smoke",
 ]

@@ -18,6 +18,7 @@ from srl.products.discovery_dynamics import (
     A12RuntimeContext,
     DiscoveryDynamicsError,
     default_a12_pack_policy,
+    prepare_a12_julia_depot,
     resolve_a12_runtime,
     run_a12_discovery_dynamics_smoke,
 )
@@ -54,6 +55,7 @@ __all__ = [
     "default_discovery_pack_cards",
     "fit_linear_dynamics",
     "fit_linear_law",
+    "prepare_a12_julia_depot",
     "resolve_a12_runtime",
     "run_a12_discovery_dynamics_smoke",
 ]
