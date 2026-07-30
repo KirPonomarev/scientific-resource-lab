@@ -1,0 +1,21 @@
+{
+  "autonomous_mode": "DEGRADED",
+  "canonical_mutation_allowed": false,
+  "command": "make operator-bootstrap && make operator-bootstrap-json",
+  "grants_authority": false,
+  "next_gate": "F5/refresh_adapter",
+  "operator_context_id": "operator_context_da65a7b122544abc244aa9b20df1241d4920c9554ef5f012893ddf4a9ea074f9",
+  "operator_required": true,
+  "organism_status": "RED",
+  "parent_direct_external_writes": 0,
+  "pulse_id": "organism_pulse_fd1e8c473d49c4cef8fc0c3f3ecb1db10fa78206146576c0c7cbe13a65297168",
+  "remote_write_performed": false,
+  "runtime_head": "448a47388ca31309e3dc2b263bf326ca90f234ae",
+  "schema_version": "MarketNativeBootstrapEvidence/v1",
+  "snapshot_id": "ups_8fa3e2e1d3edd603f52542a7d698a1018b13cd9573487ed5229c0db163ce2614",
+  "snapshot_status": "degraded",
+  "status": "pass_operator_bootstrap",
+  "target_project": "crypto-market-lab",
+  "trading_allowed": false,
+  "worktree_status": "clean"
+}

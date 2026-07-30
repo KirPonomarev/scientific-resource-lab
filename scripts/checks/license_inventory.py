@@ -67,6 +67,12 @@ _DENIED_FAMILIES: Final[frozenset[str]] = frozenset(
     }
 )
 
+_ALLOWED_EXCEPTIONS: Final[frozenset[str]] = frozenset(
+    {
+        "LLVM-EXCEPTION",
+    }
+)
+
 # Normalize common free-text license strings to SPDX identifiers.
 _LICENSE_NORMALIZATIONS: Final[dict[str, str]] = {
     "APACHE 2.0": "APACHE-2.0",
@@ -170,7 +176,7 @@ def _normalize_license(raw: str) -> str:
         return normalized
     # If the value already looks like an SPDX expression (contains dashes or
     # uppercase identifiers), keep it as-is for component parsing.
-    if re.match(r"^[A-Za-z0-9_.\-]+(\s+(OR|AND)\s+[A-Za-z0-9_.\-]+)*$", cleaned):
+    if _is_spdx_expression(cleaned):
         return cleaned.upper()
     # Free-text license bodies (e.g. scipy's full BSD-3-Clause text): match
     # canonical disclaimer patterns so a legitimate permissive dependency is
@@ -190,21 +196,43 @@ def _license_components(expression: str) -> list[str]:
     return [part.strip().strip("()") for part in parts if part.strip()]
 
 
+def _component_base_and_exception(component: str) -> tuple[str, str | None]:
+    """Return SPDX base license and optional exception for one component."""
+    parts = re.split(r"\s+WITH\s+", component, maxsplit=1, flags=re.IGNORECASE)
+    base = parts[0].strip().strip("()").upper()
+    if len(parts) == 1:
+        return base, None
+    exception = parts[1].strip().strip("()").upper()
+    return base, exception
+
+
+def _is_denied_family(component: str) -> bool:
+    """Return True when a component belongs to a GPL-family license."""
+    return any(
+        component == family or component.startswith(f"{family}-") for family in _DENIED_FAMILIES
+    )
+
+
 def _evaluate_license(expression: str) -> str:
     """Evaluate a normalized license expression and return 'allowed', 'denied', or 'unknown'."""
     components = _license_components(expression)
     if not components:
         return "unknown"
-    if any(component.upper() in _DENIED_FAMILIES for component in components):
+    parsed = [_component_base_and_exception(component) for component in components]
+    if any(_is_denied_family(base) for base, _exception in parsed):
         return "denied"
-    if all(component.upper() in _ALLOWED_LICENSES for component in components):
+    if all(
+        base in _ALLOWED_LICENSES and (exception is None or exception in _ALLOWED_EXCEPTIONS)
+        for base, exception in parsed
+    ):
         return "allowed"
     return "unknown"
 
 
 def _is_spdx_expression(value: str) -> bool:
     """Return True if ``value`` looks like an SPDX license expression."""
-    return bool(re.match(r"^[A-Za-z0-9_.\-]+(\s+(?:OR|AND)\s+[A-Za-z0-9_.\-]+)*$", value))
+    component = r"[A-Za-z0-9_.\-]+(?:\s+WITH\s+[A-Za-z0-9_.\-]+)?"
+    return bool(re.fullmatch(rf"{component}(\s+(?:OR|AND)\s+{component})*", value))
 
 
 def _extract_package_license(dist: Distribution) -> tuple[str, str]:
@@ -217,8 +245,7 @@ def _extract_package_license(dist: Distribution) -> tuple[str, str]:
     direct = metadata.get("License", "").strip()
     if direct and direct.upper() != "UNKNOWN":
         normalized_direct = _normalize_license(direct)
-        recognized = _evaluate_license(normalized_direct) != "unknown"
-        if _is_spdx_expression(direct) or recognized:
+        if _is_spdx_expression(direct) or normalized_direct in _ALLOWED_LICENSES:
             return direct, "License"
         # Full-text license strings are not self-describing. Prefer a recognised
         # Trove classifier when one is present.

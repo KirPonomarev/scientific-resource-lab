@@ -1,13 +1,13 @@
 {
   "canonical_writes": 0,
-  "child_request_id": "sha256:31d335b9e2f58c38c1121a9af1a7559b9f94afd08575f23c785d297f58c6814d",
+  "child_request_id": "sha256:64fd2b2104ec014953b8c21bed5ba1a368d548ea53684ae38415aff3acb0b3ec",
   "grants_authority": false,
   "live_actions": 0,
-  "next_native_gate": "F8/resume_interrupted_durable_job",
+  "next_native_gate": "F5/refresh_adapter",
   "parent_direct_external_writes": 0,
-  "receipt_id": "sha256:7d997e9fb54ab820a856cd0ecbcc650e13c58c3197aa01cbeecbcb76ec3e9817",
+  "receipt_id": "sha256:331c3630cdd54acea59d1a21ea28219c2bddc79f311405b630053dc2e10cb9ae",
   "schema_version": "NativeBridgeWaitReceipt/v1",
   "target_head": "448a47388ca31309e3dc2b263bf326ca90f234ae",
   "target_project": "crypto-market-lab",
-  "wait_state": "WAIT_RUNTIME_HEALTH:RED_F8"
+  "wait_state": "WAIT_RUNTIME_HEALTH:ORGANISM_RED"
 }
