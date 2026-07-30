@@ -1169,9 +1169,9 @@ current_facts:
 
 ~~~yaml
 execution_state:
-  status: A17_ACTIVE_READY_FOR_A18_WITH_PARKED_PROTECTED_LANES
-  current_stage: A18
-  next_stage: A18_dual_contour_native_child_closeout
+  status: A18_TRUTH_GATE_ACTIVE_WAIT_NATIVE_CHILD_CLOSEOUT_READY_FOR_A19
+  current_stage: A19
+  next_stage: A19_market_native_bridge
   completed_stages:
     - A00
     - A01
@@ -1196,6 +1196,7 @@ execution_state:
     - A05_native_t2_t3_compute_binding
     - A06_native_t7_persistence_binding
     - A07_python_flint_license
+    - A18_dual_contour_native_child_closeout
     - A09_t7_formal_toolchain_binding
   parked_blockers:
     - WAIT_AUTHORITY:A02_BIND_T7_NATIVE_TARGET
@@ -1204,12 +1205,15 @@ execution_state:
     - WAIT_LICENSE:A07_PYTHON_FLINT_LGPL_CLOSURE
     - WAIT_AUTHORITY:A09_BIND_PINNED_LEAN_MATHLIB_PROJECT_TO_T7
     - WAIT_COMPUTE_NODE:A15_PROVISION_HEAVY_COMPUTE_TARGET
-  active_branch_or_null: codex/srf-a17-solo-agent-entry
+    - WAIT_NATIVE_CHILD_CLOSEOUT:DUAL_CONTOUR_MAKE_CONTRACTS_FAIL
+  active_branch_or_null: codex/srf-a18-dual-contour-closeout
   active_pr_or_null: null
   writer_lease_or_null: null
-  blocker_or_null: null
-  next_executable_action: continue A18 DualContour native child closeout while compute-node, T7-backed persistence, native compute binding, native production signing, FLINT license closure and A09 T7 formal toolchain binding remain parked
-  updated_at: 2026-07-29
+  blocker_or_null: WAIT_NATIVE_CHILD_CLOSEOUT:DUAL_CONTOUR_MAKE_CONTRACTS_FAIL
+  latest_stage_receipts:
+    A18: sha256:d60e2fe35a732cbb29107b549ca4b6c89a280a0e5128b432a2b5cb1743896b50
+  next_executable_action: continue A19 Market native bridge while DualContour native closeout, compute-node, T7-backed persistence, native compute binding, native production signing, FLINT license closure and A09 T7 formal toolchain binding remain parked
+  updated_at: 2026-07-30
 ~~~
 
 ## DECISION_LOG

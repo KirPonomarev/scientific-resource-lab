@@ -1,0 +1,11 @@
+{
+  "command": "make contracts",
+  "grants_authority": false,
+  "parent_direct_external_writes": 0,
+  "result": "provider proof identity or currentness is invalid",
+  "schema_version": "DualContourNativeStartupEvidence/v1",
+  "status": "FAIL",
+  "target_head": "a3cc68227387954417931fe08f9d66b6212f3308",
+  "target_project": "dual-contour-research-os",
+  "worktree_status": "clean"
+}
