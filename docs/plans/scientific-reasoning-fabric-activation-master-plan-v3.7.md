@@ -1038,9 +1038,9 @@ terminal_result PASS запрещён, если remaining_internal_waits не п
 <!-- END_PLAN_CONTRACT_V3_7 -->
 
 <!-- BEGIN_MUTABLE_STATE_V3_7 -->
-STATE_REVISION: 15
-PREVIOUS_STATE_SHA256: 47514374-12be1b67-dcb5f88b-e83bd53b-0a1aef62-52ba89a5-8f4f4a1a-f851ab25
-CURRENT_STATE_SHA256: 375ea33f-55619fac-6e8c1955-8eaf6e01-01bf1cb7-9875246b-47ab4c3b-75a86f0e
+STATE_REVISION: 16
+PREVIOUS_STATE_SHA256: 375ea33f-55619fac-6e8c1955-8eaf6e01-01bf1cb7-9875246b-47ab4c3b-75a86f0e
+CURRENT_STATE_SHA256: ec3ab7b6-76034b9d-88a34886-b4efd5f4-982f5f4f-8e5ab0d6-89bea9f0-45cfe376
 
 ## CURRENT_FACTS
 
@@ -1048,7 +1048,9 @@ CURRENT_STATE_SHA256: 375ea33f-55619fac-6e8c1955-8eaf6e01-01bf1cb7-9875246b-47ab
 current_facts:
   observed_at: 2026-07-30
   repository_head: 907a6a357de1519080061fedabe919273c1fedb0
-  repository_head_role: accepted_main_after_a22
+  repository_head_role: committed_a22_evidence_head_at_generation
+  repository_head_is_current_checkout_truth: false
+  runtime_current_head_source: scripts/checks/srf-v37-plan-consistency.py git rev-parse HEAD
   source_git_head_semantics: generator/source checkout that emitted a receipt
   accepted_release_head_semantics: accepted mainline head being evaluated for release truth
   predecessor_release: v1.0.1
@@ -1348,6 +1350,8 @@ decision_log:
     decision: A22 final acceptance verifies A00-A21 public receipts, preserves any mandatory WAIT_CAPABILITY/WAIT_TOOLCHAIN ledger entries as release blockers rather than hiding or promoting them, rejects DONE/v2.0.0 through ReleaseTruthDecision/v1 while production signer, T2/T3 sandbox, T7 binding, python-flint license, heavy compute, native child closeouts and physical recovery target are unresolved, emits a single non-authorizing protected decision packet, and records MissionCloseoutReceipt/v2 as BLOCKED_EXTERNAL_AUTHORITY rather than DONE or RELEASED_WITH_DECLARED_WAITS; A22 stage receipt sha256:2efc21c690bd44754a0dbcf7123189b67ab820b7df8026ad832a3cf2cebef1ff
   - id: V37-D030
     decision: A22 post-merge integrity correction resolves local provenance from explicit git_head, GITHUB_SHA or local git rev-parse; separates source_git_head, generator_head, observed_main_head and accepted_release_head; treats docs/verification/mission-closeout-receipt.json as historical V3.6/v1.0.1 evidence only; and adds a plan-consistency gate so merged mutable state cannot advertise a stale active branch or stale pre-A22 repository head
+  - id: V37-D031
+    decision: V3.7 mutable-state repository_head is a committed A22 evidence-generation head, not a current-checkout claim; the plan-consistency gate resolves runtime_checkout_head and runtime_origin_main_head dynamically so squash merges cannot make committed receipts pretend to be self-referential current truth
 ~~~
 
 ## EVIDENCE_INDEX

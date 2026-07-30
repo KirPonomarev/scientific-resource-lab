@@ -6,6 +6,8 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import shutil
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any
@@ -23,6 +25,7 @@ BEGIN = "<!-- BEGIN_MUTABLE_STATE_V3_7 -->"
 END = "<!-- END_MUTABLE_STATE_V3_7 -->"
 STALE_A22_BRANCH = "codex/srf-a22-final-acceptance"
 STALE_PRE_A22_HEAD = "677b17baf3c8d49b7dad05c39616e5d1e2df7bcc"
+COMMITTED_EVIDENCE_HEAD_ROLE = "committed_a22_evidence_head_at_generation"
 
 
 def _grouped_sha256(data: bytes) -> str:
@@ -57,6 +60,22 @@ def _receipt_id(path: Path) -> str:
     return str(json.loads(path.read_text(encoding="utf-8"))["receipt_id"])
 
 
+def _git_rev_parse(revision: str) -> str | None:
+    git = shutil.which("git")
+    if git is None:
+        return None
+    proc = subprocess.run(  # noqa: S603 - bounded read-only git rev-parse over fixed repo root.
+        [git, "-C", str(REPO_ROOT), "rev-parse", "--verify", revision],
+        capture_output=True,
+        check=False,
+        text=True,
+    )
+    if proc.returncode != 0:
+        return None
+    value = proc.stdout.strip()
+    return value if re.fullmatch(r"[0-9a-f]{40}", value) else None
+
+
 def _check(check_id: str, passed: bool, detail: str) -> dict[str, str]:
     return {"check_id": check_id, "status": "PASS" if passed else "FAIL", "detail": detail}
 
@@ -68,8 +87,13 @@ def build_receipt() -> dict[str, Any]:
     active_branch = _field(block, "active_branch_or_null")
     repository_head = _field(block, "repository_head")
     repository_head_role = _field(block, "repository_head_role")
+    runtime_checkout_head = _git_rev_parse("HEAD")
+    runtime_origin_main_head = _git_rev_parse("origin/main")
     a22_receipt_id = _receipt_id(A22_RECEIPT_PATH)
     mission_closeout_id = _receipt_id(MISSION_CLOSEOUT_PATH)
+    repository_head_is_runtime_head = (
+        repository_head is not None and repository_head == runtime_checkout_head
+    )
 
     checks = [
         _check(
@@ -86,8 +110,8 @@ def build_receipt() -> dict[str, Any]:
             "V37-PLAN-03-repository-head-role-explicit",
             repository_head is not None
             and repository_head != STALE_PRE_A22_HEAD
-            and repository_head_role == "accepted_main_after_a22",
-            "repository_head is explicitly the accepted main after A22, not an in-flight head",
+            and repository_head_role == COMMITTED_EVIDENCE_HEAD_ROLE,
+            "repository_head is explicitly a committed evidence head, not current checkout truth",
         ),
         _check(
             "V37-PLAN-04-a22-receipt-ids-current",
@@ -100,6 +124,19 @@ def build_receipt() -> dict[str, Any]:
             f"active_branch_or_null: {STALE_A22_BRANCH}" not in block,
             "stale A22 implementation branch is not represented as the current active branch",
         ),
+        _check(
+            "V37-PLAN-06-runtime-checkout-head-resolved",
+            runtime_checkout_head is not None,
+            "plan consistency gate resolves the runtime checkout head dynamically",
+        ),
+        _check(
+            "V37-PLAN-07-no-stale-head-masked-as-current",
+            repository_head_is_runtime_head or repository_head_role == COMMITTED_EVIDENCE_HEAD_ROLE,
+            (
+                "a committed evidence head may differ from the runtime checkout "
+                "only with non-current semantics"
+            ),
+        ),
     ]
     result = "PASS" if all(item["status"] == "PASS" for item in checks) else "FAIL"
     receipt: dict[str, Any] = {
@@ -111,6 +148,9 @@ def build_receipt() -> dict[str, Any]:
         "active_branch_or_null": active_branch,
         "repository_head": repository_head,
         "repository_head_role": repository_head_role,
+        "runtime_checkout_head": runtime_checkout_head,
+        "runtime_origin_main_head": runtime_origin_main_head,
+        "repository_head_is_runtime_head": repository_head_is_runtime_head,
         "a22_receipt_id": a22_receipt_id,
         "mission_closeout_blocked_receipt_id": mission_closeout_id,
         "checks": checks,
