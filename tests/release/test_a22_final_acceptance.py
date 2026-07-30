@@ -56,6 +56,24 @@ def test_a22_preserves_mandatory_waits_as_release_blockers() -> None:
     )
 
 
+def test_a22_records_partial_native_attempt_without_removing_t7_blocker() -> None:
+    receipt = build_a22_final_acceptance_receipt(repo_root=REPO_ROOT, git_head="0" * 40)
+
+    attempts = receipt["protected_activation_attempts"]
+    assert attempts
+    assert attempts[0]["stage_id"] == "A02"
+    assert attempts[0]["status"] == "PASS"
+    assert attempts[0]["attempt_status"] == "PARTIAL_NATIVE_EVIDENCE"
+    assert "T7_NOT_ACTIVE" in receipt["release_truth_decision"]["blockers"]
+    assert any(
+        item["check_id"] == "A22-07-activation-attempts-do-not-mask-release-blockers"
+        and item["status"] == "PASS"
+        for item in receipt["checks"]
+    )
+    closeout_attempts = receipt["mission_closeout_receipt"]["protected_activation_attempts"]
+    assert closeout_attempts == attempts
+
+
 def test_a22_single_decision_packet_is_non_authorizing() -> None:
     action = build_a22_operator_action()
 

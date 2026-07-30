@@ -47,6 +47,10 @@ _STAGE_RECEIPTS: Final[tuple[tuple[str, str], ...]] = (
     ("A21", "docs/verification/srf-v3-7-a21-dr-chaos-receipt.json"),
 )
 
+_ACTIVATION_ATTEMPT_RECEIPTS: Final[tuple[tuple[str, str], ...]] = (
+    ("A02", "docs/verification/srf-v3-7-a02-t7-native-activation-attempt-receipt.json"),
+)
+
 _BLOCKED_OPERATOR_ACTIONS: Final[tuple[str, ...]] = (
     "WAIT_AUTHORITY:A02_BIND_T7_NATIVE_TARGET",
     "WAIT_AUTHORITY:A04_BIND_PRODUCTION_ED25519_KEYRING",
@@ -118,6 +122,11 @@ def build_a22_final_acceptance_receipt(
         }
     )
     stage_receipts = _stage_receipt_index(repo_root)
+    activation_attempts = _activation_attempt_receipt_index(repo_root)
+    evidence_receipts = {
+        "stage_receipts": stage_receipts,
+        "activation_attempts": activation_attempts,
+    }
     mandatory_waits = _mandatory_nonactive_components(ledger)
     mandatory_wait_capability_or_toolchain = [
         item for item in mandatory_waits if item["state"] in {"WAIT_CAPABILITY", "WAIT_TOOLCHAIN"}
@@ -128,7 +137,7 @@ def build_a22_final_acceptance_receipt(
         release_decision=release_decision,
         operator_action=operator_action,
         mandatory_waits=mandatory_waits,
-        stage_receipts=stage_receipts,
+        evidence_receipts=evidence_receipts,
     )
     checks = [
         _check(
@@ -169,6 +178,14 @@ def build_a22_final_acceptance_receipt(
             and head_provenance["accepted_release_head"] != "UNKNOWN",
             "A22 provenance resolves explicit/env/local git heads and never masks UNKNOWN",
         ),
+        _check(
+            "A22-07-activation-attempts-do-not-mask-release-blockers",
+            _activation_attempts_preserve_release_blockers(
+                activation_attempts=activation_attempts,
+                release_decision=release_decision,
+            ),
+            "partial native activation attempts are recorded but cannot hide release blockers",
+        ),
     ]
     result = "PASS" if all(item["status"] == "PASS" for item in checks) else "FAIL"
     receipt: dict[str, Any] = {
@@ -185,6 +202,7 @@ def build_a22_final_acceptance_receipt(
         "remaining_external_waits": list(_BLOCKED_OPERATOR_ACTIONS),
         "remaining_internal_waits": [],
         "protected_actions_performed": [],
+        "protected_activation_attempts": activation_attempts,
         "operator_action": operator_action,
         "head_provenance": head_provenance,
         "stage_receipts": stage_receipts,
@@ -250,8 +268,10 @@ def _build_blocked_mission_closeout(
     release_decision: dict[str, Any],
     operator_action: dict[str, Any],
     mandatory_waits: list[dict[str, str]],
-    stage_receipts: list[dict[str, Any]],
+    evidence_receipts: dict[str, list[dict[str, Any]]],
 ) -> dict[str, Any]:
+    stage_receipts = evidence_receipts["stage_receipts"]
+    activation_attempts = evidence_receipts["activation_attempts"]
     closeout: dict[str, Any] = {
         "schema_version": A22_MISSION_CLOSEOUT_RECEIPT_SCHEMA_VERSION,
         "mission_id": "activate-scientific-reasoning-fabric-v3.7",
@@ -277,6 +297,7 @@ def _build_blocked_mission_closeout(
             "action_hash_grouped_sha256": operator_action["action_hash_grouped_sha256"],
         },
         "remaining_external_waits": list(_BLOCKED_OPERATOR_ACTIONS),
+        "protected_activation_attempts": activation_attempts,
         "mandatory_nonactive_components": mandatory_waits,
         "stage_receipt_count": len(stage_receipts),
         "forbidden_terminal_states": ["DONE", "RELEASED_WITH_DECLARED_WAITS"],
@@ -286,6 +307,38 @@ def _build_blocked_mission_closeout(
     }
     closeout["receipt_id"] = _object_id(closeout)
     return closeout
+
+
+def _activation_attempt_receipt_index(repo_root: Path) -> list[dict[str, Any]]:
+    records: list[dict[str, Any]] = []
+    for stage_id, path_text in _ACTIVATION_ATTEMPT_RECEIPTS:
+        path = repo_root / path_text
+        exists = path.exists()
+        data: dict[str, Any] = {}
+        if exists:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        accepted = (
+            exists
+            and data.get("canonical_writes") == 0
+            and data.get("grants_authority") is False
+            and data.get("status") in {"PARTIAL_NATIVE_EVIDENCE", "BLOCKED_NATIVE_BRIDGE_ABSENT"}
+            and isinstance(data.get("remaining_external_waits"), list)
+            and bool(data.get("remaining_external_waits"))
+        )
+        records.append(
+            {
+                "stage_id": stage_id,
+                "path": path_text,
+                "status": "PASS" if accepted else "FAIL",
+                "attempt_status": data.get("status") if exists else None,
+                "receipt_id": data.get("receipt_id") if exists else None,
+                "remaining_external_waits": data.get("remaining_external_waits")
+                if exists
+                else None,
+                "sha256": "sha256:" + _file_sha256(path) if exists else None,
+            }
+        )
+    return records
 
 
 def _stage_receipt_index(repo_root: Path) -> list[dict[str, Any]]:
@@ -347,6 +400,21 @@ def _mandatory_waits_are_release_blockers(
         ):
             return False
     return True
+
+
+def _activation_attempts_preserve_release_blockers(
+    *,
+    activation_attempts: list[dict[str, Any]],
+    release_decision: dict[str, Any],
+) -> bool:
+    if not activation_attempts:
+        return False
+    if any(item["status"] != "PASS" for item in activation_attempts):
+        return False
+    blockers = set(release_decision.get("blockers", []))
+    return "T7_NOT_ACTIVE" in blockers and any(
+        item.get("attempt_status") == "PARTIAL_NATIVE_EVIDENCE" for item in activation_attempts
+    )
 
 
 def _is_stage_receipt_accepted(data: dict[str, Any]) -> bool:

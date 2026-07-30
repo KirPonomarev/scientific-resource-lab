@@ -7,9 +7,11 @@ from srl.cas import (
     DEFAULT_MIN_FREE_RESERVE_GIB,
     DEFAULT_SRF_ALLOCATION_GIB,
     T7_BINDING_ACTIVE_STATE,
+    T7_BINDING_PARTIAL_NATIVE_STATE,
     T7_BINDING_RECEIPT_SCHEMA_VERSION,
     T7_BINDING_WAIT_STATE,
     build_t7_binding_receipt,
+    build_t7_native_activation_attempt_receipt,
     namespace_manifest,
     protected_operator_action,
     quota_manifest,
@@ -48,6 +50,7 @@ def _binding_request(*, grants_authority: bool = False) -> dict[str, object]:
 def _complete_physical_evidence() -> dict[str, object]:
     return {
         "authority_receipt_id": "AuthorityReceipt/test",
+        "ownership_enabled": True,
         "namespace_created": True,
         "physical_object_roundtrip": True,
         "physical_corruption_rejected": True,
@@ -120,6 +123,47 @@ def test_missing_one_protected_field_keeps_wait() -> None:
     )
 
     assert receipt["status"] == T7_BINDING_WAIT_STATE
+    assert "unplug_wait_observed" in receipt["missing_protected_physical_evidence"]
+
+
+def test_native_attempt_partial_evidence_never_closes_a02_or_publishes_paths() -> None:
+    evidence = _complete_physical_evidence()
+    evidence["ownership_enabled"] = False
+    evidence["unplug_wait_observed"] = False
+    evidence["replug_resume_observed"] = False
+    attempt = build_t7_native_activation_attempt_receipt(
+        observed_identity_basis={
+            "volume_locator": "/" + "Volumes" + "/T7-Secure",
+            "volume_uuid": "D1F2E2C1-3210-4A39-A4E0-0AA0AD5110E2",
+            "filesystem": "APFS",
+            "encrypted": True,
+        },
+        physical_evidence=evidence,
+        capacity_check={
+            "status": "WAIT_T7_BINDING",
+            "reason": "capacity_accounting_ambiguous_until_native_quota_receipt",
+        },
+        authority_directive={
+            "schema_version": "OperatorDirective/v1",
+            "directive_id": "SRF_PHYSICAL_ACTIVATION_V2",
+            "target_scoped": True,
+        },
+        private_receipt_ref="sha256:private-local-proof",
+    )
+
+    rendered = json.dumps(attempt, sort_keys=True)
+    assert attempt["status"] == T7_BINDING_PARTIAL_NATIVE_STATE
+    assert attempt["grants_authority"] is False
+    assert attempt["protected_physical_evidence"]["physical_object_roundtrip"] is True
+    assert attempt["missing_protected_physical_evidence"] == [
+        "ownership_enabled",
+        "unplug_wait_observed",
+        "replug_resume_observed",
+    ]
+    assert "WAIT_T7_BINDING:A02_MISSING_OWNERSHIP_ENABLED" in attempt["remaining_external_waits"]
+    assert "/Volumes/" not in rendered
+    assert "/Users/" not in rendered
+    assert "D1F2E2C1" not in rendered
 
 
 def test_receipt_does_not_emit_raw_owner_paths_or_uuid() -> None:

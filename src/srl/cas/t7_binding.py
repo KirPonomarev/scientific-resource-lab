@@ -30,12 +30,15 @@ from srl.contracts import dumps
 from srl.contracts.ids import object_id
 
 T7_BINDING_RECEIPT_SCHEMA_VERSION: Final[str] = "T7BindingReceipt/v1"
+T7_NATIVE_ATTEMPT_RECEIPT_SCHEMA_VERSION: Final[str] = "T7NativeActivationAttemptReceipt/v1"
 T7_OPERATOR_ACTION_SCHEMA_VERSION: Final[str] = "ProtectedOperatorAction/v1"
 T7_BINDING_WAIT_STATE: Final[str] = "WAIT_T7_BINDING"
 T7_BINDING_ACTIVE_STATE: Final[str] = "ACTIVE"
+T7_BINDING_PARTIAL_NATIVE_STATE: Final[str] = "PARTIAL_NATIVE_EVIDENCE"
 
 _PROTECTED_EVIDENCE_FIELDS: Final[tuple[str, ...]] = (
     "authority_receipt_id",
+    "ownership_enabled",
     "namespace_created",
     "physical_object_roundtrip",
     "physical_corruption_rejected",
@@ -95,6 +98,7 @@ def protected_operator_action() -> dict[str, Any]:
         "target": "operator-owned external T7 volume mounted by label",
         "allowed_actions_after_authority": [
             "verify_exact_volume_identity_from_out_of_repo_expected_identity",
+            "verify_target_ownership_enabled",
             "create_srf_namespaces_under_target_root",
             "enforce_400_gib_allocation_and_100_gib_free_reserve",
             "bind_private_overlay_envs_caches_scratch_spool_to_target",
@@ -139,6 +143,11 @@ def _capacity_status(preflight: dict[str, Any]) -> dict[str, Any]:
 def _physical_evidence_complete(evidence: dict[str, Any]) -> bool:
     """Return True iff all protected A02 physical evidence fields are present."""
     return all(bool(evidence.get(field)) for field in _PROTECTED_EVIDENCE_FIELDS)
+
+
+def _missing_protected_evidence(evidence: dict[str, Any]) -> list[str]:
+    """Return the protected A02 evidence fields still missing or false."""
+    return [field for field in _PROTECTED_EVIDENCE_FIELDS if not bool(evidence.get(field))]
 
 
 def build_t7_binding_receipt(
@@ -197,6 +206,7 @@ def build_t7_binding_receipt(
         "protected_physical_evidence": {
             field: bool(evidence.get(field)) for field in _PROTECTED_EVIDENCE_FIELDS
         },
+        "missing_protected_physical_evidence": _missing_protected_evidence(evidence),
         "operator_action": protected_operator_action(),
         "canonical_writes": 0,
         "parent_direct_storage_writes": int(preflight.get("parent_direct_storage_writes", 0)),
@@ -209,12 +219,79 @@ def build_t7_binding_receipt(
     return receipt
 
 
+def build_t7_native_activation_attempt_receipt(
+    *,
+    observed_identity_basis: dict[str, Any],
+    physical_evidence: dict[str, Any],
+    capacity_check: dict[str, Any],
+    authority_directive: dict[str, Any],
+    private_receipt_ref: str | None = None,
+) -> dict[str, Any]:
+    """Summarize a real native T7 attempt without publishing private target data.
+
+    This receipt is intentionally weaker than :func:`build_t7_binding_receipt`.
+    It records non-secret physical progress made on a native target while
+    preserving every missing protected field as an external blocker. It can be
+    committed safely because the raw mount point, owner path and volume UUID are
+    replaced by canonical hashes and role labels.
+    """
+
+    missing = _missing_protected_evidence(physical_evidence)
+    blocked = [f"WAIT_T7_BINDING:A02_MISSING_{field.upper()}" for field in missing]
+    status = T7_BINDING_ACTIVE_STATE if not missing else T7_BINDING_PARTIAL_NATIVE_STATE
+    receipt: dict[str, Any] = {
+        "schema_version": T7_NATIVE_ATTEMPT_RECEIPT_SCHEMA_VERSION,
+        "stage_id": "A02",
+        "status": status,
+        "target_role": "operator_owned_encrypted_external_t7_srf_namespace",
+        "volume_identity_hash": manifest_hash(observed_identity_basis),
+        "namespace_hash": manifest_hash(namespace_manifest()),
+        "quota_hash": manifest_hash(quota_manifest()),
+        "capacity_check": capacity_check,
+        "protected_physical_evidence": {
+            field: bool(physical_evidence.get(field)) for field in _PROTECTED_EVIDENCE_FIELDS
+        },
+        "missing_protected_physical_evidence": missing,
+        "remaining_external_waits": blocked,
+        "authority_directive": {
+            "schema_version": str(
+                authority_directive.get("schema_version", "OperatorDirective/v1")
+            ),
+            "directive_id": str(
+                authority_directive.get("directive_id", "SRF_PHYSICAL_ACTIVATION_V2")
+            ),
+            "target_scoped": bool(authority_directive.get("target_scoped", True)),
+            "private_secret_authority_granted": False,
+            "destructive_storage_authority_granted": False,
+        },
+        "private_receipt_ref": private_receipt_ref,
+        "public_boundary": {
+            "raw_mount_path_published": False,
+            "raw_volume_uuid_published": False,
+            "owner_home_path_published": False,
+            "private_key_material_published": False,
+        },
+        "operator_action": protected_operator_action(),
+        "canonical_writes": 0,
+        "live_actions": 0,
+        "grants_authority": False,
+        "false_done_guard": "PARTIAL_NATIVE_EVIDENCE cannot close A02 or release v2.0.0",
+    }
+    receipt["receipt_id"] = object_id(
+        {key: value for key, value in receipt.items() if key != "receipt_id"}
+    )
+    return receipt
+
+
 __all__ = [
     "T7_BINDING_ACTIVE_STATE",
+    "T7_BINDING_PARTIAL_NATIVE_STATE",
     "T7_BINDING_RECEIPT_SCHEMA_VERSION",
     "T7_BINDING_WAIT_STATE",
+    "T7_NATIVE_ATTEMPT_RECEIPT_SCHEMA_VERSION",
     "T7_OPERATOR_ACTION_SCHEMA_VERSION",
     "build_t7_binding_receipt",
+    "build_t7_native_activation_attempt_receipt",
     "grouped_sha256",
     "manifest_hash",
     "namespace_manifest",

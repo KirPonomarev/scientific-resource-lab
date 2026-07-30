@@ -1,8 +1,9 @@
 {
-  "action_hash_grouped_sha256": "a3028eef-04e3f0f3-d0e8dac7-42237dc5-b2308119-0b18b687-5feadeba-798bc315",
+  "action_hash_grouped_sha256": "d1cfaa6d-710ee48b-a6dcf5b0-e7ef31f6-08464e80-8a65a75b-754ed8e7-8a8fae41",
   "action_id": "A02_BIND_T7_NATIVE_TARGET",
   "allowed_actions_after_authority": [
     "verify_exact_volume_identity_from_out_of_repo_expected_identity",
+    "verify_target_ownership_enabled",
     "create_srf_namespaces_under_target_root",
     "enforce_400_gib_allocation_and_100_gib_free_reserve",
     "bind_private_overlay_envs_caches_scratch_spool_to_target",

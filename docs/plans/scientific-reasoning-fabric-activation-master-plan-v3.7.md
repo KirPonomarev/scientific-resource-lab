@@ -1038,16 +1038,16 @@ terminal_result PASS запрещён, если remaining_internal_waits не п
 <!-- END_PLAN_CONTRACT_V3_7 -->
 
 <!-- BEGIN_MUTABLE_STATE_V3_7 -->
-STATE_REVISION: 16
-PREVIOUS_STATE_SHA256: 375ea33f-55619fac-6e8c1955-8eaf6e01-01bf1cb7-9875246b-47ab4c3b-75a86f0e
-CURRENT_STATE_SHA256: ec3ab7b6-76034b9d-88a34886-b4efd5f4-982f5f4f-8e5ab0d6-89bea9f0-45cfe376
+STATE_REVISION: 17
+PREVIOUS_STATE_SHA256: ec3ab7b6-76034b9d-88a34886-b4efd5f4-982f5f4f-8e5ab0d6-89bea9f0-45cfe376
+CURRENT_STATE_SHA256: 0d0d63e7-4a09842e-d95c6fe3-09508c58-0502af75-0225a187-4455b0a3-866455a1
 
 ## CURRENT_FACTS
 
 ~~~yaml
 current_facts:
   observed_at: 2026-07-30
-  repository_head: 907a6a357de1519080061fedabe919273c1fedb0
+  repository_head: 9a64fe8b2c79c48da3d2fd7ba3f10191f12949f1
   repository_head_role: committed_a22_evidence_head_at_generation
   repository_head_is_current_checkout_truth: false
   runtime_current_head_source: scripts/checks/srf-v37-plan-consistency.py git rev-parse HEAD
@@ -1181,10 +1181,10 @@ current_facts:
   a21_software_dr_chaos: ACTIVE
   a21_physical_restore_target: WAIT_T7_BINDING
   a22_final_acceptance: BLOCKED_EXTERNAL_AUTHORITY
-  a22_receipt_id: sha256:2efc21c690bd44754a0dbcf7123189b67ab820b7df8026ad832a3cf2cebef1ff
-  a22_mission_closeout_blocked_receipt_id: sha256:3946c90f7bfa7209433571ec8f02057551636b9cfc9a7ff7222a64b06cfc0862
-  a22_accepted_release_head: 907a6a357de1519080061fedabe919273c1fedb0
-  a22_source_git_head: 907a6a357de1519080061fedabe919273c1fedb0
+  a22_receipt_id: sha256:9aa75de58063520c38fa3e9d18bdf95e415772887a68b7e373e69b920030dbec
+  a22_mission_closeout_blocked_receipt_id: sha256:a9d0d747f29f91dca6992eb3b83bd822325961d99888c0614e375e2e93bf2d0d
+  a22_accepted_release_head: 9a64fe8b2c79c48da3d2fd7ba3f10191f12949f1
+  a22_source_git_head: 9a64fe8b2c79c48da3d2fd7ba3f10191f12949f1
   a22_legacy_git_head: alias_of_source_git_head_not_current_truth
   production_signer: WAIT_AUTHORITY
   production_ed25519_transport_interface: ACTIVE
@@ -1200,7 +1200,13 @@ current_facts:
   scheduler_t7_native_persistence: WAIT_T7_BINDING
   t7_binding: WAIT_T7_BINDING
   a02_t7_binding_gate: ACTIVE
-  a02_physical_binding: WAIT_AUTHORITY
+  a02_physical_binding: PARTIAL_NATIVE_EVIDENCE
+  a02_native_activation_attempt_receipt_id: sha256:7d6cf6df8394c5fc567b1e9b19da5b5ab88613235d62c938ce5c16e5217a316e
+  a02_native_activation_attempt_remaining:
+    - WAIT_T7_BINDING:A02_MISSING_AUTHORITY_RECEIPT_ID
+    - WAIT_T7_BINDING:A02_MISSING_OWNERSHIP_ENABLED
+    - WAIT_T7_BINDING:A02_MISSING_UNPLUG_WAIT_OBSERVED
+    - WAIT_T7_BINDING:A02_MISSING_REPLUG_RESUME_OBSERVED
   environment_factory: ACTIVE
   supply_chain_gate: ACTIVE
   compute_target: WAIT_COMPUTE_NODE
@@ -1280,9 +1286,11 @@ execution_state:
     A19: sha256:f2e1638e40150c2929f8bc27ae4de4e6d6919bf3eb85e1a24668f1b9bb73391a
     A20: sha256:327881c83976f1b600b0b7ec3b15ba3f1e8aa661695705e3f340bc7631827cfd
     A21: sha256:496745e2a6e7dfe57641319f6fbc4e6701f752190eb025f8ab1664acf8c4e388
-    A22: sha256:2efc21c690bd44754a0dbcf7123189b67ab820b7df8026ad832a3cf2cebef1ff
-    MissionCloseoutBlocked: sha256:3946c90f7bfa7209433571ec8f02057551636b9cfc9a7ff7222a64b06cfc0862
-  next_executable_action: wait for the single A22 protected operator decision packet to resolve native encrypted recovery target restore, Security, Market and DualContour native closeouts, Security and Market runtime health, compute-node, T7-backed persistence, native compute binding, native production signing, FLINT license closure and A09 T7 formal toolchain binding before rerunning A22 and publishing v2.0.0; do not publish RELEASED_WITH_DECLARED_WAITS
+    A22: sha256:9aa75de58063520c38fa3e9d18bdf95e415772887a68b7e373e69b920030dbec
+    MissionCloseoutBlocked: sha256:a9d0d747f29f91dca6992eb3b83bd822325961d99888c0614e375e2e93bf2d0d
+  latest_activation_attempts:
+    A02NativeT7Attempt: sha256:7d6cf6df8394c5fc567b1e9b19da5b5ab88613235d62c938ce5c16e5217a316e
+  next_executable_action: resolve the remaining A02 native evidence fields through a repo-native authority receipt plus ownership-enabled and unplug/replug proofs; then continue native production signing, native sandbox/compute, FLINT license closure, A09 T7 formal toolchain binding, heavy compute node, native encrypted recovery target restore, and Security, Market and DualContour native closeouts before rerunning A22 and publishing v2.0.0; do not publish RELEASED_WITH_DECLARED_WAITS
   updated_at: 2026-07-30
 ~~~
 
@@ -1352,6 +1360,8 @@ decision_log:
     decision: A22 post-merge integrity correction resolves local provenance from explicit git_head, GITHUB_SHA or local git rev-parse; separates source_git_head, generator_head, observed_main_head and accepted_release_head; treats docs/verification/mission-closeout-receipt.json as historical V3.6/v1.0.1 evidence only; and adds a plan-consistency gate so merged mutable state cannot advertise a stale active branch or stale pre-A22 repository head
   - id: V37-D031
     decision: V3.7 mutable-state repository_head is a committed A22 evidence-generation head, not a current-checkout claim; the plan-consistency gate resolves runtime_checkout_head and runtime_origin_main_head dynamically so squash merges cannot make committed receipts pretend to be self-referential current truth
+  - id: V37-D032
+    decision: The 2026-07-30 native T7-Secure activation attempt created the SRF namespace and proved nonsecret object roundtrip, corruption rejection and no internal Mac project-data dependency on the encrypted external target, but A02 remains blocked because no repo-native authority receipt is committed, target ownership is not enabled, and unplug/replug WAIT/resume evidence is absent; A22 records the partial attempt as protected_activation_attempts and still rejects DONE/v2.0.0 with T7_NOT_ACTIVE
 ~~~
 
 ## EVIDENCE_INDEX
@@ -1375,6 +1385,7 @@ evidence_index:
   - scripts/checks/srf-v37-a02-gate.py
   - docs/target-binding/t7-native-binding-operator-action.json
   - docs/verification/srf-v3-7-a02-t7-binding-wait-receipt.json
+  - docs/verification/srf-v3-7-a02-t7-native-activation-attempt-receipt.json
   - docs/architecture/environment-factory.md
   - scripts/checks/srf-v37-a03-gate.py
   - docs/verification/srf-v3-7-a03-env-factory-receipt.json
