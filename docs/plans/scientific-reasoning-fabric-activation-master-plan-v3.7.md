@@ -1169,9 +1169,9 @@ current_facts:
 
 ~~~yaml
 execution_state:
-  status: A19_TRUTH_GATE_ACTIVE_WAIT_NATIVE_CHILD_CLOSEOUT_READY_FOR_A20
-  current_stage: A20
-  next_stage: A20_security_native_bridge
+  status: A20_TRUTH_GATE_ACTIVE_WAIT_NATIVE_CHILD_CLOSEOUT_READY_FOR_A21
+  current_stage: A21
+  next_stage: A21_real_disaster_recovery_and_chaos
   completed_stages:
     - A00
     - A01
@@ -1198,6 +1198,7 @@ execution_state:
     - A07_python_flint_license
     - A18_dual_contour_native_child_closeout
     - A19_market_native_bridge_closeout
+    - A20_security_native_bridge_closeout
     - A09_t7_formal_toolchain_binding
   parked_blockers:
     - WAIT_AUTHORITY:A02_BIND_T7_NATIVE_TARGET
@@ -1209,14 +1210,17 @@ execution_state:
     - WAIT_NATIVE_CHILD_CLOSEOUT:DUAL_CONTOUR_MAKE_CONTRACTS_FAIL
     - WAIT_NATIVE_CHILD_CLOSEOUT:MARKET_NATIVE_BRIDGE_CLOSEOUT_ABSENT
     - WAIT_RUNTIME_HEALTH:MARKET_ORGANISM_NOT_GREEN
-  active_branch_or_null: codex/srf-a19-market-native-bridge
+    - WAIT_NATIVE_CHILD_CLOSEOUT:SECURITY_NATIVE_BRIDGE_CLOSEOUT_ABSENT
+    - WAIT_SECURITY_HEALTH:SECURITY_ORGANISM_NOT_GREEN
+  active_branch_or_null: codex/srf-a20-security-native-bridge
   active_pr_or_null: null
   writer_lease_or_null: null
-  blocker_or_null: WAIT_NATIVE_CHILD_CLOSEOUT:MARKET_NATIVE_BRIDGE_CLOSEOUT_ABSENT
+  blocker_or_null: WAIT_NATIVE_CHILD_CLOSEOUT:SECURITY_NATIVE_BRIDGE_CLOSEOUT_ABSENT
   latest_stage_receipts:
     A18: sha256:d60e2fe35a732cbb29107b549ca4b6c89a280a0e5128b432a2b5cb1743896b50
     A19: sha256:f2e1638e40150c2929f8bc27ae4de4e6d6919bf3eb85e1a24668f1b9bb73391a
-  next_executable_action: continue A20 Security native bridge while Market and DualContour native closeouts, Market runtime health, compute-node, T7-backed persistence, native compute binding, native production signing, FLINT license closure and A09 T7 formal toolchain binding remain parked
+    A20: sha256:327881c83976f1b600b0b7ec3b15ba3f1e8aa661695705e3f340bc7631827cfd
+  next_executable_action: continue A21 real disaster recovery and chaos while Security, Market and DualContour native closeouts, Security and Market runtime health, compute-node, T7-backed persistence, native compute binding, native production signing, FLINT license closure and A09 T7 formal toolchain binding remain parked
   updated_at: 2026-07-30
 ~~~
 
