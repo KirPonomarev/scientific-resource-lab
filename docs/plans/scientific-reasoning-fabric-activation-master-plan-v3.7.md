@@ -1038,18 +1038,23 @@ terminal_result PASS запрещён, если remaining_internal_waits не п
 <!-- END_PLAN_CONTRACT_V3_7 -->
 
 <!-- BEGIN_MUTABLE_STATE_V3_7 -->
-STATE_REVISION: 14
-PREVIOUS_STATE_SHA256: 9838f081-6b8610e1-4afb9c19-26ba605c-c902ee18-64715c82-c82085d7-988a8952
-CURRENT_STATE_SHA256: 47514374-12be1b67-dcb5f88b-e83bd53b-0a1aef62-52ba89a5-8f4f4a1a-f851ab25
+STATE_REVISION: 15
+PREVIOUS_STATE_SHA256: 47514374-12be1b67-dcb5f88b-e83bd53b-0a1aef62-52ba89a5-8f4f4a1a-f851ab25
+CURRENT_STATE_SHA256: 375ea33f-55619fac-6e8c1955-8eaf6e01-01bf1cb7-9875246b-47ab4c3b-75a86f0e
 
 ## CURRENT_FACTS
 
 ~~~yaml
 current_facts:
-  observed_at: 2026-07-29
-  repository_head: 677b17baf3c8d49b7dad05c39616e5d1e2df7bcc
+  observed_at: 2026-07-30
+  repository_head: 907a6a357de1519080061fedabe919273c1fedb0
+  repository_head_role: accepted_main_after_a22
+  source_git_head_semantics: generator/source checkout that emitted a receipt
+  accepted_release_head_semantics: accepted mainline head being evaluated for release truth
   predecessor_release: v1.0.1
   predecessor_result: RELEASED_WITH_DECLARED_WAITS
+  active_v37_mission_closeout: docs/verification/srf-v3-7-mission-closeout-blocked-v2-0-0.json
+  historical_v36_mission_closeout: docs/verification/mission-closeout-receipt.json
   current_active_default_packs:
     - numpy
     - scipy
@@ -1140,6 +1145,45 @@ current_facts:
     - ai_feynman
     - pykoopman
     - dysts
+  current_active_applied_science:
+    - ripser
+    - pyriemann
+    - cvxpy
+    - clarabel
+    - native_bayesian_diagnostics
+    - native_causal_identification
+  a13_applied_science: ACTIVE
+  a13_receipt_id: sha256:067abec4a2274b42e8e33122076045d9c67a6d1de6e51859505866adafdbca24
+  a13_truth_projection: OFFLINE_HASH_BOUND_RECEIPT
+  current_active_sciml_domain:
+    - julia_scimlbase_ordinarydiffeq
+    - diffrax
+    - qutip
+    - astropy
+    - cantera
+    - native_battery_rc
+    - quimb
+    - cotengra
+  a14_sciml_domain: ACTIVE
+  a14_receipt_id: sha256:2ab6c81a418700072a1330008290304cd24fe74993efd65c22b4fd43397080ae
+  a14_truth_projection: OFFLINE_HASH_BOUND_RECEIPT
+  a15_heavy_compute_software_readiness: PASS
+  a15_heavy_compute_target: WAIT_COMPUTE_NODE
+  a16_scientific_products: ACTIVE
+  a16_receipt_id: sha256:34c59a29aa7694d7540260eff392be3425eaab4846027d516d2bc0ae29864955
+  a17_solo_agent_entry: ACTIVE
+  a17_receipt_id: sha256:e4179946b07a8931b38ad900abd154e2acead3dfdaf5bc8cccb8c3e8e184a863
+  a18_dual_contour_bridge: PARKED_WAIT_NATIVE_CHILD_CLOSEOUT
+  a19_market_bridge: PARKED_WAIT_NATIVE_CHILD_CLOSEOUT_AND_RUNTIME_HEALTH
+  a20_security_bridge: PARKED_WAIT_NATIVE_CHILD_CLOSEOUT_AND_SECURITY_HEALTH
+  a21_software_dr_chaos: ACTIVE
+  a21_physical_restore_target: WAIT_T7_BINDING
+  a22_final_acceptance: BLOCKED_EXTERNAL_AUTHORITY
+  a22_receipt_id: sha256:2efc21c690bd44754a0dbcf7123189b67ab820b7df8026ad832a3cf2cebef1ff
+  a22_mission_closeout_blocked_receipt_id: sha256:3946c90f7bfa7209433571ec8f02057551636b9cfc9a7ff7222a64b06cfc0862
+  a22_accepted_release_head: 907a6a357de1519080061fedabe919273c1fedb0
+  a22_source_git_head: 907a6a357de1519080061fedabe919273c1fedb0
+  a22_legacy_git_head: alias_of_source_git_head_not_current_truth
   production_signer: WAIT_AUTHORITY
   production_ed25519_transport_interface: ACTIVE
   fixture_hmac_production_path: REJECTED
@@ -1225,7 +1269,7 @@ execution_state:
     - WAIT_SECURITY_HEALTH:SECURITY_ORGANISM_NOT_GREEN
     - WAIT_AUTHORITY:A21_CONFIGURE_SECOND_ENCRYPTED_RECOVERY_TARGET
     - WAIT_T7_BINDING:A21_EXECUTE_NATIVE_T7_RESTORE_DRILL
-  active_branch_or_null: codex/srf-a22-final-acceptance
+  active_branch_or_null: null
   active_pr_or_null: null
   writer_lease_or_null: null
   blocker_or_null: WAIT_AUTHORITY:A22_RESOLVE_V2_0_0_RELEASE_BLOCKERS
@@ -1234,8 +1278,8 @@ execution_state:
     A19: sha256:f2e1638e40150c2929f8bc27ae4de4e6d6919bf3eb85e1a24668f1b9bb73391a
     A20: sha256:327881c83976f1b600b0b7ec3b15ba3f1e8aa661695705e3f340bc7631827cfd
     A21: sha256:496745e2a6e7dfe57641319f6fbc4e6701f752190eb025f8ab1664acf8c4e388
-    A22: sha256:13f287c7cb970d695ce2654379a801884e2b90f21f6f3b3d6a5da5942a40792c
-    MissionCloseoutBlocked: sha256:6ba8172c19a59261375ad2841d8c7565126226075cfb955021410e29b2f49773
+    A22: sha256:2efc21c690bd44754a0dbcf7123189b67ab820b7df8026ad832a3cf2cebef1ff
+    MissionCloseoutBlocked: sha256:3946c90f7bfa7209433571ec8f02057551636b9cfc9a7ff7222a64b06cfc0862
   next_executable_action: wait for the single A22 protected operator decision packet to resolve native encrypted recovery target restore, Security, Market and DualContour native closeouts, Security and Market runtime health, compute-node, T7-backed persistence, native compute binding, native production signing, FLINT license closure and A09 T7 formal toolchain binding before rerunning A22 and publishing v2.0.0; do not publish RELEASED_WITH_DECLARED_WAITS
   updated_at: 2026-07-30
 ~~~
@@ -1301,7 +1345,9 @@ decision_log:
   - id: V37-D028
     decision: A21 software disaster-recovery and chaos lane is ACTIVE with synthetic unique receipt-chain restore, measured fixture RPO/RTO, lock-bound rebuildable environment manifest, executor interruption recovery, corrupt-object rejection, revoked-pack rejection, stale/cross-head WAIT_SRF projection and lost-index detection; no current VPS is used as sole backup, physical encrypted recovery-target restore remains WAIT_AUTHORITY/WAIT_T7_BINDING; A21 stage receipt sha256:496745e2a6e7dfe57641319f6fbc4e6701f752190eb025f8ab1664acf8c4e388
   - id: V37-D029
-    decision: A22 final acceptance verifies A00-A21 public receipts, preserves any mandatory WAIT_CAPABILITY/WAIT_TOOLCHAIN ledger entries as release blockers rather than hiding or promoting them, rejects DONE/v2.0.0 through ReleaseTruthDecision/v1 while production signer, T2/T3 sandbox, T7 binding, python-flint license, heavy compute, native child closeouts and physical recovery target are unresolved, emits a single non-authorizing protected decision packet, and records MissionCloseoutReceipt/v2 as BLOCKED_EXTERNAL_AUTHORITY rather than DONE or RELEASED_WITH_DECLARED_WAITS; A22 stage receipt sha256:13f287c7cb970d695ce2654379a801884e2b90f21f6f3b3d6a5da5942a40792c
+    decision: A22 final acceptance verifies A00-A21 public receipts, preserves any mandatory WAIT_CAPABILITY/WAIT_TOOLCHAIN ledger entries as release blockers rather than hiding or promoting them, rejects DONE/v2.0.0 through ReleaseTruthDecision/v1 while production signer, T2/T3 sandbox, T7 binding, python-flint license, heavy compute, native child closeouts and physical recovery target are unresolved, emits a single non-authorizing protected decision packet, and records MissionCloseoutReceipt/v2 as BLOCKED_EXTERNAL_AUTHORITY rather than DONE or RELEASED_WITH_DECLARED_WAITS; A22 stage receipt sha256:2efc21c690bd44754a0dbcf7123189b67ab820b7df8026ad832a3cf2cebef1ff
+  - id: V37-D030
+    decision: A22 post-merge integrity correction resolves local provenance from explicit git_head, GITHUB_SHA or local git rev-parse; separates source_git_head, generator_head, observed_main_head and accepted_release_head; treats docs/verification/mission-closeout-receipt.json as historical V3.6/v1.0.1 evidence only; and adds a plan-consistency gate so merged mutable state cannot advertise a stale active branch or stale pre-A22 repository head
 ~~~
 
 ## EVIDENCE_INDEX
@@ -1309,6 +1355,7 @@ decision_log:
 ~~~yaml
 evidence_index:
   - repository HEAD and clean status
+  - AGENTS.md
   - pyproject runtime dependency inventory
   - executable and import probes
   - configs/packs admission manifests
@@ -1394,6 +1441,7 @@ evidence_index:
   - docs/verification/srf-v3-7-a21-dr-chaos-receipt.json
   - docs/target-binding/a22-v2-release-blockers-operator-action.json
   - scripts/checks/srf-v37-a22-gate.py
+  - scripts/checks/srf-v37-plan-consistency.py
   - docs/verification/srf-v3-7-a22-final-acceptance-blocked-receipt.json
   - docs/verification/srf-v3-7-mission-closeout-blocked-v2-0-0.json
 ~~~

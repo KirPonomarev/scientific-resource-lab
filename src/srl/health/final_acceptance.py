@@ -5,6 +5,8 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import shutil
+import subprocess
 from pathlib import Path
 from typing import Any, Final
 
@@ -18,6 +20,7 @@ A22_TARGET_RESULT: Final[str] = "DONE"
 A22_TERMINAL_STATE: Final[str] = "BLOCKED_EXTERNAL_AUTHORITY"
 A22_STAGE_CLOSURE: Final[str] = "A22_FINAL_ACCEPTANCE_BLOCKED_EXTERNAL_AUTHORITY"
 A22_OPERATOR_ACTION_ID: Final[str] = "A22_RESOLVE_V2_0_0_RELEASE_BLOCKERS"
+_GIT_SHA_LENGTH: Final[int] = 40
 
 _STAGE_RECEIPTS: Final[tuple[tuple[str, str], ...]] = (
     ("A00", "docs/verification/srf-v3-7-a00-freeze-receipt.json"),
@@ -102,6 +105,7 @@ def build_a22_final_acceptance_receipt(
 ) -> dict[str, Any]:
     """Evaluate final V3.7 closure against current committed evidence."""
 
+    head_provenance = resolve_a22_head_provenance(repo_root=repo_root, git_head=git_head)
     ledger = build_truth_ledger()
     release_decision = evaluate_release_candidate(
         {
@@ -120,7 +124,7 @@ def build_a22_final_acceptance_receipt(
     ]
     operator_action = build_a22_operator_action()
     mission_closeout = _build_blocked_mission_closeout(
-        git_head=git_head or os.environ.get("GITHUB_SHA") or "UNKNOWN",
+        head_provenance=head_provenance,
         release_decision=release_decision,
         operator_action=operator_action,
         mandatory_waits=mandatory_waits,
@@ -157,6 +161,14 @@ def build_a22_final_acceptance_receipt(
             and mission_closeout["release"]["published"] is False,
             "mission closeout is blocked, not DONE and not RELEASED_WITH_DECLARED_WAITS",
         ),
+        _check(
+            "A22-06-head-provenance-resolved",
+            head_provenance["source_git_head"] != "UNKNOWN"
+            and head_provenance["generator_head"] != "UNKNOWN"
+            and head_provenance["observed_main_head"] != "UNKNOWN"
+            and head_provenance["accepted_release_head"] != "UNKNOWN",
+            "A22 provenance resolves explicit/env/local git heads and never masks UNKNOWN",
+        ),
     ]
     result = "PASS" if all(item["status"] == "PASS" for item in checks) else "FAIL"
     receipt: dict[str, Any] = {
@@ -174,6 +186,7 @@ def build_a22_final_acceptance_receipt(
         "remaining_internal_waits": [],
         "protected_actions_performed": [],
         "operator_action": operator_action,
+        "head_provenance": head_provenance,
         "stage_receipts": stage_receipts,
         "mission_closeout_receipt": mission_closeout,
         "checks": checks,
@@ -186,9 +199,54 @@ def build_a22_final_acceptance_receipt(
     return receipt
 
 
+def resolve_a22_head_provenance(
+    *,
+    repo_root: Path,
+    git_head: str | None = None,
+) -> dict[str, Any]:
+    """Resolve A22 head semantics without requiring an impossible self-reference.
+
+    ``source_git_head`` and ``generator_head`` name the checkout that generated
+    the receipt. ``accepted_release_head`` names the accepted mainline being
+    evaluated for the v2.0.0 release decision.
+    """
+
+    explicit_head = _normalized_head(git_head)
+    github_head = _normalized_head(os.environ.get("GITHUB_SHA"))
+    if explicit_head is not None:
+        source_git_head = explicit_head
+        source = "explicit_git_head"
+    elif github_head is not None:
+        source_git_head = github_head
+        source = "GITHUB_SHA"
+    else:
+        local_head = _git_rev_parse(repo_root, "HEAD")
+        source_git_head = local_head if local_head is not None else "UNKNOWN"
+        source = "git_rev_parse_HEAD" if local_head is not None else "unresolved"
+
+    observed_main_head = (
+        _git_rev_parse(repo_root, "origin/main")
+        or _git_rev_parse(repo_root, "main")
+        or source_git_head
+    )
+    return {
+        "schema_version": "A22HeadProvenance/v1",
+        "source_git_head": source_git_head,
+        "source_git_head_source": source,
+        "generator_head": source_git_head,
+        "observed_main_head": observed_main_head,
+        "accepted_release_head": observed_main_head,
+        "legacy_git_head_semantics": (
+            "legacy git_head aliases source_git_head; use accepted_release_head "
+            "for accepted-main release truth"
+        ),
+        "self_referential_commit_claimed": False,
+    }
+
+
 def _build_blocked_mission_closeout(
     *,
-    git_head: str,
+    head_provenance: dict[str, Any],
     release_decision: dict[str, Any],
     operator_action: dict[str, Any],
     mandatory_waits: list[dict[str, str]],
@@ -201,7 +259,13 @@ def _build_blocked_mission_closeout(
         "result": A22_TERMINAL_STATE,
         "target_release": A22_TARGET_RELEASE,
         "target_result": A22_TARGET_RESULT,
-        "git_head": git_head,
+        "git_head": head_provenance["source_git_head"],
+        "git_head_semantics": head_provenance["legacy_git_head_semantics"],
+        "source_git_head": head_provenance["source_git_head"],
+        "generator_head": head_provenance["generator_head"],
+        "observed_main_head": head_provenance["observed_main_head"],
+        "accepted_release_head": head_provenance["accepted_release_head"],
+        "head_provenance": head_provenance,
         "release": {
             "published": False,
             "tag": None,
@@ -314,6 +378,30 @@ def _grouped_sha256(data: bytes) -> str:
     return "-".join(digest[index : index + 8] for index in range(0, 64, 8))
 
 
+def _normalized_head(value: str | None) -> str | None:
+    if value is None:
+        return None
+    stripped = value.strip()
+    if len(stripped) == _GIT_SHA_LENGTH and all(char in "0123456789abcdef" for char in stripped):
+        return stripped
+    return None
+
+
+def _git_rev_parse(repo_root: Path, ref: str) -> str | None:
+    git = shutil.which("git")
+    if git is None:
+        return None
+    proc = subprocess.run(  # noqa: S603
+        [git, "-C", str(repo_root), "rev-parse", "--verify", ref],
+        capture_output=True,
+        check=False,
+        text=True,
+    )
+    if proc.returncode != 0:
+        return None
+    return _normalized_head(proc.stdout)
+
+
 def _object_id(payload: dict[str, Any]) -> str:
     return "sha256:" + hashlib.sha256(dumps(payload)).hexdigest()
 
@@ -328,4 +416,5 @@ __all__ = [
     "A22_TERMINAL_STATE",
     "build_a22_final_acceptance_receipt",
     "build_a22_operator_action",
+    "resolve_a22_head_provenance",
 ]

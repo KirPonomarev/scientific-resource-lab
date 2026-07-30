@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import shutil
+import subprocess
 from pathlib import Path
 
 from srl.health.final_acceptance import (
@@ -10,6 +12,7 @@ from srl.health.final_acceptance import (
     A22_TERMINAL_STATE,
     build_a22_final_acceptance_receipt,
     build_a22_operator_action,
+    resolve_a22_head_provenance,
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -29,6 +32,11 @@ def test_a22_blocks_done_and_v2_release_without_declared_wait_release() -> None:
     assert closeout["release"]["published"] is False
     assert "RELEASED_WITH_DECLARED_WAITS" in closeout["forbidden_terminal_states"]
     assert "DONE" in closeout["forbidden_terminal_states"]
+    assert closeout["source_git_head"] == "0" * 40
+    assert closeout["generator_head"] == "0" * 40
+    assert closeout["git_head"] == closeout["source_git_head"]
+    assert "accepted_release_head" in closeout
+    assert "accepted-main release truth" in closeout["git_head_semantics"]
 
 
 def test_a22_preserves_mandatory_waits_as_release_blockers() -> None:
@@ -58,6 +66,34 @@ def test_a22_single_decision_packet_is_non_authorizing() -> None:
     assert "publish_v2_0_0" in action["forbidden_without_authority"]
     assert "emit_MissionCloseoutReceipt_DONE" in action["forbidden_without_authority"]
     assert len(action["blocked_until"]) >= 10
+
+
+def test_a22_head_provenance_prefers_explicit_then_env_then_local_git(
+    monkeypatch,
+) -> None:
+    monkeypatch.setenv("GITHUB_SHA", "1" * 40)
+    provenance = resolve_a22_head_provenance(repo_root=REPO_ROOT, git_head="2" * 40)
+
+    assert provenance["source_git_head"] == "2" * 40
+    assert provenance["source_git_head_source"] == "explicit_git_head"
+    assert provenance["generator_head"] == "2" * 40
+    assert provenance["self_referential_commit_claimed"] is False
+
+    monkeypatch.delenv("GITHUB_SHA", raising=False)
+    git = shutil.which("git")
+    assert git is not None
+    expected = subprocess.run(  # noqa: S603
+        [git, "-C", str(REPO_ROOT), "rev-parse", "--verify", "HEAD"],
+        capture_output=True,
+        check=True,
+        text=True,
+    ).stdout.strip()
+    receipt = build_a22_final_acceptance_receipt(repo_root=REPO_ROOT)
+
+    assert receipt["head_provenance"]["source_git_head"] == expected
+    assert receipt["head_provenance"]["source_git_head_source"] == "git_rev_parse_HEAD"
+    assert receipt["mission_closeout_receipt"]["source_git_head"] == expected
+    assert "UNKNOWN" not in json.dumps(receipt["head_provenance"], sort_keys=True)
 
 
 def test_a22_receipt_covers_a00_through_a21_public_stage_receipts() -> None:
@@ -104,3 +140,8 @@ def test_a22_committed_artifacts_preserve_blocked_terminal_semantics() -> None:
     assert receipt["release_truth_decision"]["verdict"] == "REJECT"
     assert closeout["result"] == A22_TERMINAL_STATE
     assert closeout["release"]["published"] is False
+    assert receipt["head_provenance"]["schema_version"] == "A22HeadProvenance/v1"
+    assert receipt["head_provenance"]["source_git_head"] != "UNKNOWN"
+    assert closeout["source_git_head"] != "546d292731045aaaf0475341f947ce283480b6f6"
+    assert closeout["accepted_release_head"] != "UNKNOWN"
+    assert closeout["git_head_semantics"] == receipt["head_provenance"]["legacy_git_head_semantics"]

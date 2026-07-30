@@ -11,6 +11,11 @@ A successful entry emits `LabCtlEnterReport/v1` with a scope-only
 `LabAccessReceipt/v1`. The receipt never grants authority, never
 permits live trading, and never permits target-specific security action.
 
+Current V3.7 release truth is the blocked A22 closeout at
+`docs/verification/srf-v3-7-mission-closeout-blocked-v2-0-0.json`.
+`docs/verification/mission-closeout-receipt.json` is the historical
+V3.6/v1.0.1 predecessor and must not be read as current V3.7 truth.
+
 Minimum fresh-agent sequence:
 
 1. Run `srlab labctl enter`.

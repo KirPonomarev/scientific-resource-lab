@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 RECEIPT_PATH = Path("docs/verification/mission-closeout-receipt.json")
+V37_BLOCKED_CLOSEOUT_PATH = Path("docs/verification/srf-v3-7-mission-closeout-blocked-v2-0-0.json")
 _SHA40_RE = re.compile(r"^[0-9a-f]{40}$")
 
 
@@ -56,3 +57,15 @@ def test_mission_closeout_keeps_residual_waits_and_authority_negative() -> None:
     assert authority["grants_authority"] is False
     assert authority["live_actions"] == 0
     assert authority["protected_actions_performed"] == []
+
+
+def test_v36_closeout_is_not_current_v37_truth() -> None:
+    receipt = _receipt()
+    v37 = json.loads(V37_BLOCKED_CLOSEOUT_PATH.read_text(encoding="utf-8"))
+
+    assert receipt["release"]["tag"] == "v1.0.1"
+    assert receipt["result"] == "RELEASED_WITH_DECLARED_WAITS"
+    assert v37["schema_version"] == "MissionCloseoutReceipt/v2"
+    assert v37["target_release"] == "v2.0.0"
+    assert v37["result"] == "BLOCKED_EXTERNAL_AUTHORITY"
+    assert v37["release"]["published"] is False
