@@ -31,3 +31,21 @@ Failures are terminal evidence, not authority. A corrupt source CAS raises the
 CAS integrity error; a non-empty target raises a restore contract error. Live T7
 restore, destructive overwrite, remote reboot, or production backup movement
 remains `WAIT_AUTHORITY`.
+
+## V3.7 A21 DR/Chaos
+
+`scripts/checks/srf-v37-a21-gate.py` executes the bounded software drill:
+
+- classifies unique small artifacts separately from rebuildable env/cache/index
+  state;
+- restores a synthetic unique receipt chain into a fresh second-target fixture
+  and records measured RPO/RTO;
+- proves rebuildability is bound to `pyproject.toml`, `uv.lock` and formal pin
+  manifests;
+- exercises executor interruption/recovery, corrupt CAS objects, revoked packs,
+  stale/cross-head keys and lost descriptor indexes.
+
+The public gate never writes the operator's T7 volume and never uses the current
+VPS as a backup target. The protected native step is recorded in
+`docs/target-binding/a21-recovery-target-operator-action.json`; without that
+target-scoped authority the terminal state remains `WAIT_T7_BINDING`.
