@@ -1038,16 +1038,16 @@ terminal_result PASS запрещён, если remaining_internal_waits не п
 <!-- END_PLAN_CONTRACT_V3_7 -->
 
 <!-- BEGIN_MUTABLE_STATE_V3_7 -->
-STATE_REVISION: 17
-PREVIOUS_STATE_SHA256: ec3ab7b6-76034b9d-88a34886-b4efd5f4-982f5f4f-8e5ab0d6-89bea9f0-45cfe376
-CURRENT_STATE_SHA256: 0d0d63e7-4a09842e-d95c6fe3-09508c58-0502af75-0225a187-4455b0a3-866455a1
+STATE_REVISION: 18
+PREVIOUS_STATE_SHA256: 0d0d63e7-4a09842e-d95c6fe3-09508c58-0502af75-0225a187-4455b0a3-866455a1
+CURRENT_STATE_SHA256: 7589e9b6-03cd5be1-43d5eb24-323a215d-46a19bf3-e7fd5b38-8c451599-cebbfa54
 
 ## CURRENT_FACTS
 
 ~~~yaml
 current_facts:
   observed_at: 2026-07-30
-  repository_head: 9a64fe8b2c79c48da3d2fd7ba3f10191f12949f1
+  repository_head: ca449e5f5d708e69b05722976d1e94a9d2b8c301
   repository_head_role: committed_a22_evidence_head_at_generation
   repository_head_is_current_checkout_truth: false
   runtime_current_head_source: scripts/checks/srf-v37-plan-consistency.py git rev-parse HEAD
@@ -1181,12 +1181,13 @@ current_facts:
   a21_software_dr_chaos: ACTIVE
   a21_physical_restore_target: WAIT_T7_BINDING
   a22_final_acceptance: BLOCKED_EXTERNAL_AUTHORITY
-  a22_receipt_id: sha256:9aa75de58063520c38fa3e9d18bdf95e415772887a68b7e373e69b920030dbec
-  a22_mission_closeout_blocked_receipt_id: sha256:a9d0d747f29f91dca6992eb3b83bd822325961d99888c0614e375e2e93bf2d0d
-  a22_accepted_release_head: 9a64fe8b2c79c48da3d2fd7ba3f10191f12949f1
-  a22_source_git_head: 9a64fe8b2c79c48da3d2fd7ba3f10191f12949f1
+  a22_receipt_id: sha256:074dfd9c619ab4bdd88c5243b4355548d497c16b998525f1d984dc5118d01708
+  a22_mission_closeout_blocked_receipt_id: sha256:376264aaa6f411af9a2017a4193c8ef1d97d13fb54ab15c18184eab606c91c53
+  a22_accepted_release_head: ca449e5f5d708e69b05722976d1e94a9d2b8c301
+  a22_source_git_head: ca449e5f5d708e69b05722976d1e94a9d2b8c301
   a22_legacy_git_head: alias_of_source_git_head_not_current_truth
-  production_signer: WAIT_AUTHORITY
+  production_signer: ACTIVE
+  production_key_binding_receipt_id: sha256:6b711656102768486c25e1a1bc6eac7fad53f5903a5c23453ffdcabe8f851f52
   production_ed25519_transport_interface: ACTIVE
   fixture_hmac_production_path: REJECTED
   transport_crash_reconciliation: ACTIVE
@@ -1254,7 +1255,6 @@ execution_state:
     - A22_false_closure_and_blocked_mission_closeout
   parked_stages:
     - A02_non_destructive_t7_binding
-    - A04_native_production_key_binding
     - A05_native_t2_t3_compute_binding
     - A06_native_t7_persistence_binding
     - A07_python_flint_license
@@ -1265,7 +1265,6 @@ execution_state:
     - A09_t7_formal_toolchain_binding
   parked_blockers:
     - WAIT_AUTHORITY:A02_BIND_T7_NATIVE_TARGET
-    - WAIT_AUTHORITY:A04_BIND_PRODUCTION_ED25519_KEYRING
     - WAIT_COMPUTE_TARGET:A05_BIND_NATIVE_SANDBOX_COMPUTE_TARGET
     - WAIT_LICENSE:A07_PYTHON_FLINT_LGPL_CLOSURE
     - WAIT_AUTHORITY:A09_BIND_PINNED_LEAN_MATHLIB_PROJECT_TO_T7
@@ -1286,11 +1285,12 @@ execution_state:
     A19: sha256:f2e1638e40150c2929f8bc27ae4de4e6d6919bf3eb85e1a24668f1b9bb73391a
     A20: sha256:327881c83976f1b600b0b7ec3b15ba3f1e8aa661695705e3f340bc7631827cfd
     A21: sha256:496745e2a6e7dfe57641319f6fbc4e6701f752190eb025f8ab1664acf8c4e388
-    A22: sha256:9aa75de58063520c38fa3e9d18bdf95e415772887a68b7e373e69b920030dbec
-    MissionCloseoutBlocked: sha256:a9d0d747f29f91dca6992eb3b83bd822325961d99888c0614e375e2e93bf2d0d
+    A22: sha256:074dfd9c619ab4bdd88c5243b4355548d497c16b998525f1d984dc5118d01708
+    MissionCloseoutBlocked: sha256:376264aaa6f411af9a2017a4193c8ef1d97d13fb54ab15c18184eab606c91c53
   latest_activation_attempts:
     A02NativeT7Attempt: sha256:7d6cf6df8394c5fc567b1e9b19da5b5ab88613235d62c938ce5c16e5217a316e
-  next_executable_action: resolve the remaining A02 native evidence fields through a repo-native authority receipt plus ownership-enabled and unplug/replug proofs; then continue native production signing, native sandbox/compute, FLINT license closure, A09 T7 formal toolchain binding, heavy compute node, native encrypted recovery target restore, and Security, Market and DualContour native closeouts before rerunning A22 and publishing v2.0.0; do not publish RELEASED_WITH_DECLARED_WAITS
+    A04ProductionKeyBinding: sha256:6b711656102768486c25e1a1bc6eac7fad53f5903a5c23453ffdcabe8f851f52
+  next_executable_action: resolve the remaining A02 native evidence fields through a repo-native authority receipt plus ownership-enabled and unplug/replug proofs; then continue native sandbox/compute, FLINT license closure, A09 T7 formal toolchain binding, heavy compute node, native encrypted recovery target restore, and Security, Market and DualContour native closeouts before rerunning A22 and publishing v2.0.0; do not publish RELEASED_WITH_DECLARED_WAITS
   updated_at: 2026-07-30
 ~~~
 
@@ -1319,7 +1319,7 @@ decision_log:
   - id: V37-D010
     decision: A03 environment factory produces deterministic isolated profile manifests and rejects revoked dependencies, global depots and unknown-license ACTIVE claims
   - id: V37-D011
-    decision: A04 Ed25519 transport interface is active with fixture-HMAC production rejection, revoked-key/replay guards and crash reconciliation; native production key binding remains WAIT_AUTHORITY
+    decision: A04 Ed25519 transport is ACTIVE with an operator-controlled native private key outside git, receiver keyring private config, public key id/fingerprint receipt, nonfixture signed spool roundtrip, fixture-HMAC production rejection, revoked-key rejection, replay guards and crash reconciliation; private key material is not committed, logged or passed via argv/env
   - id: V37-D012
     decision: A05 local T0/T1 subprocess sandbox is enforced with adversarial, canary, output and scratch-limit evidence; native T2/T3 compute target remains WAIT_COMPUTE_TARGET
   - id: V37-D013
@@ -1355,13 +1355,15 @@ decision_log:
   - id: V37-D028
     decision: A21 software disaster-recovery and chaos lane is ACTIVE with synthetic unique receipt-chain restore, measured fixture RPO/RTO, lock-bound rebuildable environment manifest, executor interruption recovery, corrupt-object rejection, revoked-pack rejection, stale/cross-head WAIT_SRF projection and lost-index detection; no current VPS is used as sole backup, physical encrypted recovery-target restore remains WAIT_AUTHORITY/WAIT_T7_BINDING; A21 stage receipt sha256:496745e2a6e7dfe57641319f6fbc4e6701f752190eb025f8ab1664acf8c4e388
   - id: V37-D029
-    decision: A22 final acceptance verifies A00-A21 public receipts, preserves any mandatory WAIT_CAPABILITY/WAIT_TOOLCHAIN ledger entries as release blockers rather than hiding or promoting them, rejects DONE/v2.0.0 through ReleaseTruthDecision/v1 while production signer, T2/T3 sandbox, T7 binding, python-flint license, heavy compute, native child closeouts and physical recovery target are unresolved, emits a single non-authorizing protected decision packet, and records MissionCloseoutReceipt/v2 as BLOCKED_EXTERNAL_AUTHORITY rather than DONE or RELEASED_WITH_DECLARED_WAITS; A22 stage receipt sha256:2efc21c690bd44754a0dbcf7123189b67ab820b7df8026ad832a3cf2cebef1ff
+    decision: A22 final acceptance verifies A00-A21 public receipts, preserves any mandatory WAIT_CAPABILITY/WAIT_TOOLCHAIN ledger entries as release blockers rather than hiding or promoting them, rejects DONE/v2.0.0 through ReleaseTruthDecision/v1 while T2/T3 sandbox, T7 binding, python-flint license, heavy compute, native child closeouts and physical recovery target are unresolved, emits a single non-authorizing protected decision packet, and records MissionCloseoutReceipt/v2 as BLOCKED_EXTERNAL_AUTHORITY rather than DONE or RELEASED_WITH_DECLARED_WAITS; A22 stage receipt sha256:074dfd9c619ab4bdd88c5243b4355548d497c16b998525f1d984dc5118d01708
   - id: V37-D030
     decision: A22 post-merge integrity correction resolves local provenance from explicit git_head, GITHUB_SHA or local git rev-parse; separates source_git_head, generator_head, observed_main_head and accepted_release_head; treats docs/verification/mission-closeout-receipt.json as historical V3.6/v1.0.1 evidence only; and adds a plan-consistency gate so merged mutable state cannot advertise a stale active branch or stale pre-A22 repository head
   - id: V37-D031
     decision: V3.7 mutable-state repository_head is a committed A22 evidence-generation head, not a current-checkout claim; the plan-consistency gate resolves runtime_checkout_head and runtime_origin_main_head dynamically so squash merges cannot make committed receipts pretend to be self-referential current truth
   - id: V37-D032
     decision: The 2026-07-30 native T7-Secure activation attempt created the SRF namespace and proved nonsecret object roundtrip, corruption rejection and no internal Mac project-data dependency on the encrypted external target, but A02 remains blocked because no repo-native authority receipt is committed, target ownership is not enabled, and unplug/replug WAIT/resume evidence is absent; A22 records the partial attempt as protected_activation_attempts and still rejects DONE/v2.0.0 with T7_NOT_ACTIVE
+  - id: V37-D033
+    decision: The 2026-07-30 A04 protected activation created or reused an operator-controlled native private Ed25519 key outside git, installed the receiver keyring in private config, committed only a public ProductionTransportKeyBindingReceipt with key id/fingerprint and secret-store reference hashes, proved nonfixture signed spool roundtrip plus fixture-HMAC and revoked-key rejection, and removed A04 from A22 release blockers while preserving all remaining non-A04 blockers
 ~~~
 
 ## EVIDENCE_INDEX

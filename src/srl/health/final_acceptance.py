@@ -49,11 +49,11 @@ _STAGE_RECEIPTS: Final[tuple[tuple[str, str], ...]] = (
 
 _ACTIVATION_ATTEMPT_RECEIPTS: Final[tuple[tuple[str, str], ...]] = (
     ("A02", "docs/verification/srf-v3-7-a02-t7-native-activation-attempt-receipt.json"),
+    ("A04", "docs/verification/srf-v3-7-a04-production-key-binding-receipt.json"),
 )
 
 _BLOCKED_OPERATOR_ACTIONS: Final[tuple[str, ...]] = (
     "WAIT_AUTHORITY:A02_BIND_T7_NATIVE_TARGET",
-    "WAIT_AUTHORITY:A04_BIND_PRODUCTION_ED25519_KEYRING",
     "WAIT_COMPUTE_TARGET:A05_BIND_NATIVE_SANDBOX_COMPUTE_TARGET",
     "WAIT_LICENSE:A07_PYTHON_FLINT_LGPL_CLOSURE",
     "WAIT_AUTHORITY:A09_BIND_PINNED_LEAN_MATHLIB_PROJECT_TO_T7",
@@ -68,24 +68,32 @@ _BLOCKED_OPERATOR_ACTIONS: Final[tuple[str, ...]] = (
 )
 
 
-def build_a22_operator_action() -> dict[str, Any]:
+def build_a22_operator_action(
+    remaining_external_waits: list[str] | None = None,
+) -> dict[str, Any]:
     """Build the single decision packet required before v2.0.0 can close."""
 
+    blocked_until = list(remaining_external_waits or _BLOCKED_OPERATOR_ACTIONS)
+    allowed_actions = [
+        "bind native T7 target and T7-backed persistence receipts",
+        "bind production Ed25519 keyring and reject fixture signer in production",
+        "bind native T2/T3 compute sandbox and heavy Linux compute target",
+        "resolve python-flint license closure or formally replace it",
+        "import passing DualContour, Market and Security native child closeouts",
+        "execute native encrypted recovery-target restore drill",
+        "rerun A22, make verify, independent audit and release workflow from accepted SHA",
+    ]
+    if "WAIT_AUTHORITY:A04_BIND_PRODUCTION_ED25519_KEYRING" not in blocked_until:
+        allowed_actions.remove(
+            "bind production Ed25519 keyring and reject fixture signer in production"
+        )
     action: dict[str, Any] = {
         "schema_version": "ProtectedOperatorAction/v1",
         "action_id": A22_OPERATOR_ACTION_ID,
         "target": "v2.0.0 DONE release closure",
         "authority_required": True,
-        "blocked_until": list(_BLOCKED_OPERATOR_ACTIONS),
-        "allowed_actions_after_authority": [
-            "bind native T7 target and T7-backed persistence receipts",
-            "bind production Ed25519 keyring and reject fixture signer in production",
-            "bind native T2/T3 compute sandbox and heavy Linux compute target",
-            "resolve python-flint license closure or formally replace it",
-            "import passing DualContour, Market and Security native child closeouts",
-            "execute native encrypted recovery-target restore drill",
-            "rerun A22, make verify, independent audit and release workflow from accepted SHA",
-        ],
+        "blocked_until": blocked_until,
+        "allowed_actions_after_authority": allowed_actions,
         "forbidden_without_authority": [
             "publish_v2_0_0",
             "claim_DONE",
@@ -111,11 +119,14 @@ def build_a22_final_acceptance_receipt(
 
     head_provenance = resolve_a22_head_provenance(repo_root=repo_root, git_head=git_head)
     ledger = build_truth_ledger()
+    production_signer_state = _component_state(ledger, "production-ed25519-signer")
     release_decision = evaluate_release_candidate(
         {
             "target_release": A22_TARGET_RELEASE,
             "target_result": A22_TARGET_RESULT,
-            "production_signer": "WAIT_AUTHORITY:A04_BIND_PRODUCTION_ED25519_KEYRING",
+            "production_signer": "ed25519_native"
+            if production_signer_state == "ACTIVE"
+            else "WAIT_AUTHORITY:A04_BIND_PRODUCTION_ED25519_KEYRING",
             "sandbox": "t0_t1_enforced_t2_t3_wait",
             "t7_binding": "WAIT_T7_BINDING",
             "ledger": ledger,
@@ -131,13 +142,15 @@ def build_a22_final_acceptance_receipt(
     mandatory_wait_capability_or_toolchain = [
         item for item in mandatory_waits if item["state"] in {"WAIT_CAPABILITY", "WAIT_TOOLCHAIN"}
     ]
-    operator_action = build_a22_operator_action()
+    remaining_external_waits = _remaining_external_waits(ledger)
+    operator_action = build_a22_operator_action(remaining_external_waits=remaining_external_waits)
     mission_closeout = _build_blocked_mission_closeout(
         head_provenance=head_provenance,
         release_decision=release_decision,
         operator_action=operator_action,
         mandatory_waits=mandatory_waits,
         evidence_receipts=evidence_receipts,
+        remaining_external_waits=remaining_external_waits,
     )
     checks = [
         _check(
@@ -199,7 +212,7 @@ def build_a22_final_acceptance_receipt(
         "release_truth_decision": release_decision,
         "mandatory_nonactive_components": mandatory_waits,
         "mandatory_wait_capability_or_toolchain": mandatory_wait_capability_or_toolchain,
-        "remaining_external_waits": list(_BLOCKED_OPERATOR_ACTIONS),
+        "remaining_external_waits": remaining_external_waits,
         "remaining_internal_waits": [],
         "protected_actions_performed": [],
         "protected_activation_attempts": activation_attempts,
@@ -262,13 +275,14 @@ def resolve_a22_head_provenance(
     }
 
 
-def _build_blocked_mission_closeout(
+def _build_blocked_mission_closeout(  # noqa: PLR0913
     *,
     head_provenance: dict[str, Any],
     release_decision: dict[str, Any],
     operator_action: dict[str, Any],
     mandatory_waits: list[dict[str, str]],
     evidence_receipts: dict[str, list[dict[str, Any]]],
+    remaining_external_waits: list[str],
 ) -> dict[str, Any]:
     stage_receipts = evidence_receipts["stage_receipts"]
     activation_attempts = evidence_receipts["activation_attempts"]
@@ -296,7 +310,7 @@ def _build_blocked_mission_closeout(
             "action_id": operator_action["action_id"],
             "action_hash_grouped_sha256": operator_action["action_hash_grouped_sha256"],
         },
-        "remaining_external_waits": list(_BLOCKED_OPERATOR_ACTIONS),
+        "remaining_external_waits": remaining_external_waits,
         "protected_activation_attempts": activation_attempts,
         "mandatory_nonactive_components": mandatory_waits,
         "stage_receipt_count": len(stage_receipts),
@@ -321,9 +335,15 @@ def _activation_attempt_receipt_index(repo_root: Path) -> list[dict[str, Any]]:
             exists
             and data.get("canonical_writes") == 0
             and data.get("grants_authority") is False
-            and data.get("status") in {"PARTIAL_NATIVE_EVIDENCE", "BLOCKED_NATIVE_BRIDGE_ABSENT"}
+            and data.get("status")
+            in {
+                "ACTIVE",
+                "PARTIAL_NATIVE_EVIDENCE",
+                "BLOCKED_NATIVE_BRIDGE_ABSENT",
+                "BLOCKED_NATIVE_KEY_ABSENT",
+            }
             and isinstance(data.get("remaining_external_waits"), list)
-            and bool(data.get("remaining_external_waits"))
+            and (data.get("status") == "ACTIVE" or bool(data.get("remaining_external_waits")))
         )
         records.append(
             {
@@ -384,6 +404,20 @@ def _mandatory_nonactive_components(ledger: dict[str, Any]) -> list[dict[str, st
     return waits
 
 
+def _component_state(ledger: dict[str, Any], component_id: str) -> str | None:
+    for item in ledger["components"]:
+        if item.get("component_id") == component_id:
+            return str(item.get("state"))
+    return None
+
+
+def _remaining_external_waits(ledger: dict[str, Any]) -> list[str]:
+    waits = list(_BLOCKED_OPERATOR_ACTIONS)
+    if _component_state(ledger, "production-ed25519-signer") != "ACTIVE":
+        waits.insert(1, "WAIT_AUTHORITY:A04_BIND_PRODUCTION_ED25519_KEYRING")
+    return waits
+
+
 def _mandatory_waits_are_release_blockers(
     *,
     release_decision: dict[str, Any],
@@ -412,9 +446,15 @@ def _activation_attempts_preserve_release_blockers(
     if any(item["status"] != "PASS" for item in activation_attempts):
         return False
     blockers = set(release_decision.get("blockers", []))
-    return "T7_NOT_ACTIVE" in blockers and any(
-        item.get("attempt_status") == "PARTIAL_NATIVE_EVIDENCE" for item in activation_attempts
+    t7_preserved = "T7_NOT_ACTIVE" in blockers and any(
+        item.get("stage_id") == "A02" and item.get("attempt_status") == "PARTIAL_NATIVE_EVIDENCE"
+        for item in activation_attempts
     )
+    a04_preserved = "PRODUCTION_SIGNER_NOT_ED25519_NATIVE" in blockers or any(
+        item.get("stage_id") == "A04" and item.get("attempt_status") == "ACTIVE"
+        for item in activation_attempts
+    )
+    return t7_preserved and a04_preserved
 
 
 def _is_stage_receipt_accepted(data: dict[str, Any]) -> bool:

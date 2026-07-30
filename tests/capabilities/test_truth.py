@@ -62,6 +62,7 @@ def test_active_entries_have_full_nonfixture_evidence_chain() -> None:
         assert item["evidence_axis"] in {
             "hash_bound_stage_receipt_and_scientific_smoke",
             "nonfixture_executable_probe_and_scientific_smoke",
+            "production_native_evidence",
         }
 
 

@@ -31,11 +31,18 @@ from srl.transport import (  # noqa: E402
     build_spool_message,
 )
 from srl.transport import spool as spool_mod  # noqa: E402
+from srl.transport.native_keyring import (  # noqa: E402
+    PRODUCTION_KEY_BINDING_RECEIPT_SCHEMA_VERSION,
+    production_key_receipt_is_active,
+)
 from srl.transport.spool import SpoolState  # noqa: E402
 
 SCHEMA_VERSION: Final[str] = "StageCompletionReceipt/v1"
 STAGE_ID: Final[str] = "A04"
 OPERATOR_ACTION = REPO_ROOT / "docs" / "target-binding" / "ed25519-native-key-operator-action.json"
+PRODUCTION_KEY_RECEIPT = (
+    REPO_ROOT / "docs" / "verification" / "srf-v3-7-a04-production-key-binding-receipt.json"
+)
 
 
 def _payload_ref(name: str) -> str:
@@ -327,6 +334,32 @@ def _check_operator_action() -> dict[str, Any]:
     }
 
 
+def _check_production_key_binding_receipt() -> dict[str, Any]:
+    failures: list[str] = []
+    if not PRODUCTION_KEY_RECEIPT.exists():
+        failures.append("production key binding receipt is absent")
+        receipt: dict[str, Any] = {}
+    else:
+        receipt = json.loads(PRODUCTION_KEY_RECEIPT.read_text(encoding="utf-8"))
+        if receipt.get("schema_version") != PRODUCTION_KEY_BINDING_RECEIPT_SCHEMA_VERSION:
+            failures.append("production key binding receipt schema drifted")
+        if not production_key_receipt_is_active(receipt):
+            failures.append("production key binding receipt is not ACTIVE")
+        rendered = json.dumps(receipt, sort_keys=True)
+        if "/Users/" in rendered or "/Volumes/" in rendered:
+            failures.append("production key binding receipt publishes a machine path")
+        if "PRIVATE KEY" in rendered or "private_key_hex" in rendered:
+            failures.append("production key binding receipt publishes private key material marker")
+    return {
+        "check_id": "A04-06-production-key-binding-receipt",
+        "status": "FAIL" if failures else "PASS",
+        "detail": "; ".join(failures)
+        if failures
+        else "native production Ed25519 key binding receipt is ACTIVE and secret-free",
+        "production_key_binding_receipt_id": receipt.get("receipt_id"),
+    }
+
+
 def build_gate_receipt() -> dict[str, Any]:
     checks = (
         _check_ed25519_acceptance(),
@@ -334,17 +367,26 @@ def build_gate_receipt() -> dict[str, Any]:
         _check_revoked_replay_and_sequence_guards(),
         _check_crash_reconciliation(),
         _check_operator_action(),
+        _check_production_key_binding_receipt(),
     )
     failures = [check for check in checks if check["status"] != "PASS"]
+    production_receipt_id = next(
+        (
+            check.get("production_key_binding_receipt_id")
+            for check in checks
+            if check["check_id"] == "A04-06-production-key-binding-receipt"
+        ),
+        None,
+    )
     payload: dict[str, Any] = {
         "schema_version": SCHEMA_VERSION,
         "stage_id": STAGE_ID,
         "status": "FAIL" if failures else "PASS",
         "terminal_state": "A04_ACCEPTED" if not failures else "A04_BLOCKED",
-        "stage_closure": "SOFTWARE_ED25519_TRANSPORT_ACTIVE_WAIT_NATIVE_KEY_BINDING"
+        "stage_closure": "A04_ACTIVE" if not failures else "BLOCKED",
+        "protected_key_binding": f"ACTIVE:{production_receipt_id}"
         if not failures
-        else "BLOCKED",
-        "protected_key_binding": "WAIT_AUTHORITY:A04_BIND_PRODUCTION_ED25519_KEYRING",
+        else "WAIT_AUTHORITY:A04_BIND_PRODUCTION_ED25519_KEYRING",
         "checks": list(checks),
         "canonical_writes": 0,
         "grants_authority": False,

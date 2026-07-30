@@ -75,6 +75,6 @@ Current v1.0.1 active inventory reproduced by the ledger:
 | `scikit-fem` | `a15_heavy_compute` | `A15` | `WAIT_COMPUTE_NODE` | `missing_or_protected_capability` |
 | `dedalus` | `a15_heavy_compute` | `A15` | `WAIT_COMPUTE_NODE` | `missing_or_protected_capability` |
 | `sagemath` | `a15_heavy_compute` | `A15` | `WAIT_COMPUTE_NODE` | `missing_or_protected_capability` |
-| `production-ed25519-signer` | `a04_transport` | `A04` | `WAIT_AUTHORITY` | `missing_or_protected_capability` |
+| `production-ed25519-signer` | `a04_transport` | `A04` | `ACTIVE` | `production_native_evidence` |
 | `t2-t3-enforced-sandbox` | `a05_sandbox` | `A05` | `WAIT_COMPUTE_TARGET` | `missing_or_protected_capability` |
 | `t7-binding` | `a02_t7` | `A02` | `WAIT_T7_BINDING` | `missing_or_protected_capability` |

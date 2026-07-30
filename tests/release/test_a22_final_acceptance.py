@@ -47,7 +47,7 @@ def test_a22_preserves_mandatory_waits_as_release_blockers() -> None:
     for item in receipt["mandatory_wait_capability_or_toolchain"]:
         assert item["state"] in {"WAIT_CAPABILITY", "WAIT_TOOLCHAIN"}
         assert f"MANDATORY_NOT_ACTIVE:{item['component_id']}:{item['state']}" in blockers
-    assert "PRODUCTION_SIGNER_NOT_ED25519_NATIVE" in blockers
+    assert "PRODUCTION_SIGNER_NOT_ED25519_NATIVE" not in blockers
     assert "SANDBOX_NOT_ENFORCED_T2_T3" in blockers
     assert "T7_NOT_ACTIVE" in blockers
     assert any(blocker.startswith("MANDATORY_WAIT_LICENSE:python-flint") for blocker in blockers)
@@ -163,3 +163,20 @@ def test_a22_committed_artifacts_preserve_blocked_terminal_semantics() -> None:
     assert closeout["source_git_head"] != "546d292731045aaaf0475341f947ce283480b6f6"
     assert closeout["accepted_release_head"] != "UNKNOWN"
     assert closeout["git_head_semantics"] == receipt["head_provenance"]["legacy_git_head_semantics"]
+
+
+def test_a22_uses_active_a04_production_key_binding_receipt() -> None:
+    receipt = build_a22_final_acceptance_receipt(repo_root=REPO_ROOT, git_head="0" * 40)
+    blockers = set(receipt["release_truth_decision"]["blockers"])
+
+    assert "PRODUCTION_SIGNER_NOT_ED25519_NATIVE" not in blockers
+    assert (
+        "WAIT_AUTHORITY:A04_BIND_PRODUCTION_ED25519_KEYRING"
+        not in receipt["remaining_external_waits"]
+    )
+    assert any(
+        item["stage_id"] == "A04"
+        and item["attempt_status"] == "ACTIVE"
+        and item["status"] == "PASS"
+        for item in receipt["protected_activation_attempts"]
+    )
