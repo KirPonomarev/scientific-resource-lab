@@ -125,6 +125,7 @@ def main() -> int:
     steps.append(_run([sys.executable, "scripts/checks/srf-v37-a19-gate.py"], env=env))
     steps.append(_run([sys.executable, "scripts/checks/srf-v37-a20-gate.py"], env=env))
     steps.append(_run([sys.executable, "scripts/checks/srf-v37-a21-gate.py"], env=env))
+    steps.append(_run([sys.executable, "scripts/checks/srf-v37-a22-gate.py"], env=env))
     if (REPO_ROOT / "dist").exists():
         shutil.rmtree(REPO_ROOT / "dist")
     steps.append(_run(["uv", "build"], env=env))

@@ -549,3 +549,24 @@ jobs:
         run: uv sync --locked
       - name: V3.7 A21 disaster recovery and chaos gate
         run: uv run python scripts/checks/srf-v37-a21-gate.py
+
+  a22-final-acceptance:
+    name: A22 final acceptance and false-closure gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Setup uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9  # v9.0.0
+        with:
+          enable-cache: true
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+      - name: Install dependencies (locked)
+        run: uv sync --locked
+      - name: V3.7 A22 final acceptance and false-closure gate
+        run: uv run python scripts/checks/srf-v37-a22-gate.py

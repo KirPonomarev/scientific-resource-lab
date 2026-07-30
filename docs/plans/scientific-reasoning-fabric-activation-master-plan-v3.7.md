@@ -1038,9 +1038,9 @@ terminal_result PASS запрещён, если remaining_internal_waits не п
 <!-- END_PLAN_CONTRACT_V3_7 -->
 
 <!-- BEGIN_MUTABLE_STATE_V3_7 -->
-STATE_REVISION: 13
-PREVIOUS_STATE_SHA256: f9db73e0-eb34c0ac-cd2584c2-ef77abe3-83e388b8-a027dd42-f958df66-28e9c74d
-CURRENT_STATE_SHA256: 9838f081-6b8610e1-4afb9c19-26ba605c-c902ee18-64715c82-c82085d7-988a8952
+STATE_REVISION: 14
+PREVIOUS_STATE_SHA256: 9838f081-6b8610e1-4afb9c19-26ba605c-c902ee18-64715c82-c82085d7-988a8952
+CURRENT_STATE_SHA256: 47514374-12be1b67-dcb5f88b-e83bd53b-0a1aef62-52ba89a5-8f4f4a1a-f851ab25
 
 ## CURRENT_FACTS
 
@@ -1169,16 +1169,18 @@ current_facts:
 
 ~~~yaml
 execution_state:
-  status: A21_SOFTWARE_DR_CHAOS_ACTIVE_PHYSICAL_RESTORE_WAIT_READY_FOR_A22
+  status: A22_FINAL_ACCEPTANCE_BLOCKED_EXTERNAL_AUTHORITY
   current_stage: A22
-  next_stage: A22_final_system_acceptance_and_v2_0_0_false_closure_gate
+  next_stage: WAIT_OPERATOR_AUTHORITY_FOR_V2_0_0_BLOCKERS
   completed_stages:
     - A00
     - A01
+    - A02
     - A03
     - A04
     - A05
     - A06
+    - A07
     - A08
     - A09
     - A10
@@ -1186,12 +1188,18 @@ execution_state:
     - A12
     - A13
     - A14
+    - A15
     - A16
     - A17
+    - A18
+    - A19
+    - A20
     - A21
+    - A22
   completed_stage_lanes:
     - A07_sympy_mpmath_core
     - A21_software_disaster_recovery_and_chaos
+    - A22_false_closure_and_blocked_mission_closeout
   parked_stages:
     - A02_non_destructive_t7_binding
     - A04_native_production_key_binding
@@ -1217,16 +1225,18 @@ execution_state:
     - WAIT_SECURITY_HEALTH:SECURITY_ORGANISM_NOT_GREEN
     - WAIT_AUTHORITY:A21_CONFIGURE_SECOND_ENCRYPTED_RECOVERY_TARGET
     - WAIT_T7_BINDING:A21_EXECUTE_NATIVE_T7_RESTORE_DRILL
-  active_branch_or_null: codex/srf-a21-dr-chaos
+  active_branch_or_null: codex/srf-a22-final-acceptance
   active_pr_or_null: null
   writer_lease_or_null: null
-  blocker_or_null: WAIT_AUTHORITY:A21_CONFIGURE_SECOND_ENCRYPTED_RECOVERY_TARGET
+  blocker_or_null: WAIT_AUTHORITY:A22_RESOLVE_V2_0_0_RELEASE_BLOCKERS
   latest_stage_receipts:
     A18: sha256:d60e2fe35a732cbb29107b549ca4b6c89a280a0e5128b432a2b5cb1743896b50
     A19: sha256:f2e1638e40150c2929f8bc27ae4de4e6d6919bf3eb85e1a24668f1b9bb73391a
     A20: sha256:327881c83976f1b600b0b7ec3b15ba3f1e8aa661695705e3f340bc7631827cfd
     A21: sha256:496745e2a6e7dfe57641319f6fbc4e6701f752190eb025f8ab1664acf8c4e388
-  next_executable_action: continue A22 final acceptance and false-closure checks while native encrypted recovery target restore, Security, Market and DualContour native closeouts, Security and Market runtime health, compute-node, T7-backed persistence, native compute binding, native production signing, FLINT license closure and A09 T7 formal toolchain binding remain parked
+    A22: sha256:13f287c7cb970d695ce2654379a801884e2b90f21f6f3b3d6a5da5942a40792c
+    MissionCloseoutBlocked: sha256:6ba8172c19a59261375ad2841d8c7565126226075cfb955021410e29b2f49773
+  next_executable_action: wait for the single A22 protected operator decision packet to resolve native encrypted recovery target restore, Security, Market and DualContour native closeouts, Security and Market runtime health, compute-node, T7-backed persistence, native compute binding, native production signing, FLINT license closure and A09 T7 formal toolchain binding before rerunning A22 and publishing v2.0.0; do not publish RELEASED_WITH_DECLARED_WAITS
   updated_at: 2026-07-30
 ~~~
 
@@ -1290,6 +1300,8 @@ decision_log:
     decision: A20 Security native bridge remains inactive and authority-negative; sanitized D0/D1 child request is signed, ebashim remains the native executor boundary, D2/D3 target/exploit/credential/private-evidence transfer is rejected, SRF projects native Security RED to WAIT_SRF without scanner or security action, and native Security closeout plus Security GREEN health remain parked; A20 stage receipt sha256:327881c83976f1b600b0b7ec3b15ba3f1e8aa661695705e3f340bc7631827cfd
   - id: V37-D028
     decision: A21 software disaster-recovery and chaos lane is ACTIVE with synthetic unique receipt-chain restore, measured fixture RPO/RTO, lock-bound rebuildable environment manifest, executor interruption recovery, corrupt-object rejection, revoked-pack rejection, stale/cross-head WAIT_SRF projection and lost-index detection; no current VPS is used as sole backup, physical encrypted recovery-target restore remains WAIT_AUTHORITY/WAIT_T7_BINDING; A21 stage receipt sha256:496745e2a6e7dfe57641319f6fbc4e6701f752190eb025f8ab1664acf8c4e388
+  - id: V37-D029
+    decision: A22 final acceptance verifies A00-A21 public receipts, preserves any mandatory WAIT_CAPABILITY/WAIT_TOOLCHAIN ledger entries as release blockers rather than hiding or promoting them, rejects DONE/v2.0.0 through ReleaseTruthDecision/v1 while production signer, T2/T3 sandbox, T7 binding, python-flint license, heavy compute, native child closeouts and physical recovery target are unresolved, emits a single non-authorizing protected decision packet, and records MissionCloseoutReceipt/v2 as BLOCKED_EXTERNAL_AUTHORITY rather than DONE or RELEASED_WITH_DECLARED_WAITS; A22 stage receipt sha256:13f287c7cb970d695ce2654379a801884e2b90f21f6f3b3d6a5da5942a40792c
 ~~~
 
 ## EVIDENCE_INDEX
@@ -1367,6 +1379,23 @@ evidence_index:
   - src/srl/solo_agent.py
   - scripts/checks/srf-v37-a17-gate.py
   - docs/verification/srf-v3-7-a17-solo-agent-receipt.json
+  - docs/child-missions/dual-contour/shared-contract-child-mission-request.json
+  - scripts/checks/srf-v37-a18-gate.py
+  - docs/verification/srf-v3-7-a18-dual-contour-closeout-receipt.json
+  - docs/child-missions/market/market-bridge-child-request.json
+  - scripts/checks/srf-v37-a19-gate.py
+  - docs/verification/srf-v3-7-a19-market-native-bridge-receipt.json
+  - docs/child-missions/security/security-bridge-child-request.json
+  - scripts/checks/srf-v37-a20-gate.py
+  - docs/verification/srf-v3-7-a20-security-native-bridge-receipt.json
+  - docs/operations/RECOVERY-RUNBOOK.md
+  - docs/target-binding/a21-recovery-target-operator-action.json
+  - scripts/checks/srf-v37-a21-gate.py
+  - docs/verification/srf-v3-7-a21-dr-chaos-receipt.json
+  - docs/target-binding/a22-v2-release-blockers-operator-action.json
+  - scripts/checks/srf-v37-a22-gate.py
+  - docs/verification/srf-v3-7-a22-final-acceptance-blocked-receipt.json
+  - docs/verification/srf-v3-7-mission-closeout-blocked-v2-0-0.json
 ~~~
 
 <!-- END_MUTABLE_STATE_V3_7 -->
