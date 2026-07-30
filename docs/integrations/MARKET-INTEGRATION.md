@@ -15,6 +15,11 @@ Boundaries:
 
 The bridge rejects trading/order language, private paths, D2/D3 material,
 credentials, authority claims, duplicate observation imports and stale Market
-HEAD bindings. Current Market runtime health remains `WAIT_RUNTIME_HEALTH`
-under the previously observed RED_F8 state, which does not block standalone SRF
-release work.
+HEAD bindings.
+
+A19 adds the native closeout import projection. With no native Market closeout
+present, SRF records `WAIT_NATIVE_CHILD_CLOSEOUT` and `WAIT_SRF` rather than
+claiming global health. Current Market runtime health remains
+`WAIT_RUNTIME_HEALTH:ORGANISM_RED` at native gate `F5/refresh_adapter`; this
+parks Market activation and does not authorize trading, provider start, deploy,
+restart, or any parent write into Market.
