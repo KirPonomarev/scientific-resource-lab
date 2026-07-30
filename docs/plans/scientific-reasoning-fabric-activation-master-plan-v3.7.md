@@ -1169,9 +1169,9 @@ current_facts:
 
 ~~~yaml
 execution_state:
-  status: A20_TRUTH_GATE_ACTIVE_WAIT_NATIVE_CHILD_CLOSEOUT_READY_FOR_A21
-  current_stage: A21
-  next_stage: A21_real_disaster_recovery_and_chaos
+  status: A21_SOFTWARE_DR_CHAOS_ACTIVE_PHYSICAL_RESTORE_WAIT_READY_FOR_A22
+  current_stage: A22
+  next_stage: A22_final_system_acceptance_and_v2_0_0_false_closure_gate
   completed_stages:
     - A00
     - A01
@@ -1188,8 +1188,10 @@ execution_state:
     - A14
     - A16
     - A17
+    - A21
   completed_stage_lanes:
     - A07_sympy_mpmath_core
+    - A21_software_disaster_recovery_and_chaos
   parked_stages:
     - A02_non_destructive_t7_binding
     - A04_native_production_key_binding
@@ -1199,6 +1201,7 @@ execution_state:
     - A18_dual_contour_native_child_closeout
     - A19_market_native_bridge_closeout
     - A20_security_native_bridge_closeout
+    - A21_native_encrypted_recovery_target_restore
     - A09_t7_formal_toolchain_binding
   parked_blockers:
     - WAIT_AUTHORITY:A02_BIND_T7_NATIVE_TARGET
@@ -1212,15 +1215,18 @@ execution_state:
     - WAIT_RUNTIME_HEALTH:MARKET_ORGANISM_NOT_GREEN
     - WAIT_NATIVE_CHILD_CLOSEOUT:SECURITY_NATIVE_BRIDGE_CLOSEOUT_ABSENT
     - WAIT_SECURITY_HEALTH:SECURITY_ORGANISM_NOT_GREEN
-  active_branch_or_null: codex/srf-a20-security-native-bridge
+    - WAIT_AUTHORITY:A21_CONFIGURE_SECOND_ENCRYPTED_RECOVERY_TARGET
+    - WAIT_T7_BINDING:A21_EXECUTE_NATIVE_T7_RESTORE_DRILL
+  active_branch_or_null: codex/srf-a21-dr-chaos
   active_pr_or_null: null
   writer_lease_or_null: null
-  blocker_or_null: WAIT_NATIVE_CHILD_CLOSEOUT:SECURITY_NATIVE_BRIDGE_CLOSEOUT_ABSENT
+  blocker_or_null: WAIT_AUTHORITY:A21_CONFIGURE_SECOND_ENCRYPTED_RECOVERY_TARGET
   latest_stage_receipts:
     A18: sha256:d60e2fe35a732cbb29107b549ca4b6c89a280a0e5128b432a2b5cb1743896b50
     A19: sha256:f2e1638e40150c2929f8bc27ae4de4e6d6919bf3eb85e1a24668f1b9bb73391a
     A20: sha256:327881c83976f1b600b0b7ec3b15ba3f1e8aa661695705e3f340bc7631827cfd
-  next_executable_action: continue A21 real disaster recovery and chaos while Security, Market and DualContour native closeouts, Security and Market runtime health, compute-node, T7-backed persistence, native compute binding, native production signing, FLINT license closure and A09 T7 formal toolchain binding remain parked
+    A21: sha256:496745e2a6e7dfe57641319f6fbc4e6701f752190eb025f8ab1664acf8c4e388
+  next_executable_action: continue A22 final acceptance and false-closure checks while native encrypted recovery target restore, Security, Market and DualContour native closeouts, Security and Market runtime health, compute-node, T7-backed persistence, native compute binding, native production signing, FLINT license closure and A09 T7 formal toolchain binding remain parked
   updated_at: 2026-07-30
 ~~~
 
@@ -1276,6 +1282,14 @@ decision_log:
     decision: A16 scientific products are ACTIVE with five product-level request/result/receipt chains over hash-bound A09-A14 receipts; LawMiner binds PySR/PySINDy/PyDMD, Formal Verification Lab binds Lean/mathlib/Rocq/Isabelle/HOL4 with semantic-gap manifests, Geometry and Physics Compiler binds A13 geometry/topology/optimization plus A14 SciML/domain backends, Causal Economy Lab binds native causal/CVXPY/native Bayesian diagnostics, and Literature-to-Knowledge Graph binds ten source-grounded A11 sources; product layer creates no second ledger, grants no authority and preserves inconclusive/disagreement paths; A16 stage receipt sha256:34c59a29aa7694d7540260eff392be3425eaab4846027d516d2bc0ae29864955
   - id: V37-D024
     decision: A17 solo-agent entry is ACTIVE with JSON-first labctl enter/doctor/submit/status/result/export/replay/portal flow; standalone native bootstrap runs first, Market and Security entries remain proposal-only native-bootstrap WAITs, capability discovery is hash-bound to the offline truth ledger, stale or cross-head sessions fail closed, and the built-in fresh-agent task performs a real bounded units identity computation with sanitized export and deterministic replay; A17 stage receipt e4179946-b07a8931-b38ad900-abd154e2-acead3df-daf5bc8c-ccb8c3e8-e184a863
+  - id: V37-D025
+    decision: A18 DualContour bridge remains inactive and authority-negative; native closeout import is hash-bound and exact-identity checked, stale/mismatched/failed/authority-bearing closeouts are rejected, and native DualContour closeout remains parked; A18 stage receipt sha256:d60e2fe35a732cbb29107b549ca4b6c89a280a0e5128b432a2b5cb1743896b50
+  - id: V37-D026
+    decision: A19 Market native bridge remains inactive and authority-negative; sanitized D0/D1 proposal-only transport rejects trading/order/private/provider/authority material, SRF projects native Market RED to WAIT_SRF without false global health, and native Market closeout plus Market GREEN health remain parked; A19 stage receipt sha256:f2e1638e40150c2929f8bc27ae4de4e6d6919bf3eb85e1a24668f1b9bb73391a
+  - id: V37-D027
+    decision: A20 Security native bridge remains inactive and authority-negative; sanitized D0/D1 child request is signed, ebashim remains the native executor boundary, D2/D3 target/exploit/credential/private-evidence transfer is rejected, SRF projects native Security RED to WAIT_SRF without scanner or security action, and native Security closeout plus Security GREEN health remain parked; A20 stage receipt sha256:327881c83976f1b600b0b7ec3b15ba3f1e8aa661695705e3f340bc7631827cfd
+  - id: V37-D028
+    decision: A21 software disaster-recovery and chaos lane is ACTIVE with synthetic unique receipt-chain restore, measured fixture RPO/RTO, lock-bound rebuildable environment manifest, executor interruption recovery, corrupt-object rejection, revoked-pack rejection, stale/cross-head WAIT_SRF projection and lost-index detection; no current VPS is used as sole backup, physical encrypted recovery-target restore remains WAIT_AUTHORITY/WAIT_T7_BINDING; A21 stage receipt sha256:496745e2a6e7dfe57641319f6fbc4e6701f752190eb025f8ab1664acf8c4e388
 ~~~
 
 ## EVIDENCE_INDEX
