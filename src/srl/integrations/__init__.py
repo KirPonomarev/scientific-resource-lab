@@ -2,6 +2,17 @@
 
 from __future__ import annotations
 
+from srl.integrations.dual_contour import (
+    DUAL_CONTOUR_CLOSEOUT_SCHEMA_VERSION,
+    DUAL_CONTOUR_IMPORT_RECEIPT_SCHEMA_VERSION,
+    DUAL_CONTOUR_IMPORTED_STATUS,
+    DUAL_CONTOUR_REJECTED_STATUS,
+    DUAL_CONTOUR_WAIT_STATUS,
+    DualContourCloseoutError,
+    build_dual_contour_closeout_import_receipt,
+    closeout_payload_hash,
+    conformance_vectors_hash,
+)
 from srl.integrations.market import (
     MARKET_ADAPTER_INACTIVE_RECEIPT_SCHEMA_VERSION,
     MARKET_OBSERVATION_PACKET_SCHEMA_VERSION,
@@ -40,6 +51,11 @@ from srl.integrations.shared_contracts import (
 )
 
 __all__ = [
+    "DUAL_CONTOUR_CLOSEOUT_SCHEMA_VERSION",
+    "DUAL_CONTOUR_IMPORTED_STATUS",
+    "DUAL_CONTOUR_IMPORT_RECEIPT_SCHEMA_VERSION",
+    "DUAL_CONTOUR_REJECTED_STATUS",
+    "DUAL_CONTOUR_WAIT_STATUS",
     "MARKET_ADAPTER_INACTIVE_RECEIPT_SCHEMA_VERSION",
     "MARKET_OBSERVATION_PACKET_SCHEMA_VERSION",
     "NATIVE_BRIDGE_CHILD_REQUEST_SCHEMA_VERSION",
@@ -49,12 +65,14 @@ __all__ = [
     "SHARED_CONTRACT_CHILD_MISSION_REQUEST_SCHEMA_VERSION",
     "SHARED_CONTRACT_CONFORMANCE_RECEIPT_SCHEMA_VERSION",
     "ConformanceVector",
+    "DualContourCloseoutError",
     "MarketBridgeError",
     "MarketBridgeStatus",
     "NativeChildError",
     "SecurityBridgeError",
     "SecurityBridgeStatus",
     "SharedContractError",
+    "build_dual_contour_closeout_import_receipt",
     "build_market_bridge_health_projection",
     "build_market_science_request",
     "build_native_bridge_child_request",
@@ -63,6 +81,8 @@ __all__ = [
     "build_security_science_request",
     "build_shared_contract_child_mission_request",
     "build_shared_contract_conformance_receipt",
+    "closeout_payload_hash",
+    "conformance_vectors_hash",
     "default_shared_contract_vectors",
     "import_market_observation_packet",
     "import_security_observation_packet",
