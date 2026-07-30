@@ -68,6 +68,19 @@ governance change:
 Governance changes require the heavier review path described below. All other
 changes follow the ordinary pull-request workflow in `CONTRIBUTING.md`.
 
+## Release Truth Map
+
+`docs/verification/mission-closeout-receipt.json` is a historical V3.6/v1.0.1
+foundation release receipt with result `RELEASED_WITH_DECLARED_WAITS`. It is
+not the current V3.7/A22 closeout.
+
+For V3.7, use
+`docs/verification/srf-v3-7-mission-closeout-blocked-v2-0-0.json` and
+`docs/verification/srf-v3-7-a22-final-acceptance-blocked-receipt.json`.
+Those receipts preserve the blocked external-authority state and forbid
+`DONE`, `v2.0.0` publication and `RELEASED_WITH_DECLARED_WAITS` until the
+protected operator action packet is actually satisfied.
+
 ## Ordinary change workflow
 
 For any change that does not touch a protected governance path and does not
