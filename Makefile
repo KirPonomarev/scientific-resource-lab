@@ -2,7 +2,7 @@
 # Portable: no absolute paths or usernames. Uses uv for everything.
 # Targets run via `uv run` so contributors only need uv installed.
 
-.PHONY: bootstrap lint format typecheck test build verify repro-check gate-a01 gate-a02 gate-a03 gate-a04 gate-a05 gate-a06 gate-a07 gate-a08 gate-a09 gate-a10 gate-a11 gate-a12 gate-a13 gate-a14 gate-a15 gate-a16 gate-a17 gate-a18 gate-a19 gate-wp03 gate-wp10 gate-wp11 gate-wp12 gate-wp13 gate-wp14 gate-wp45 corpus router-determinism clean help
+.PHONY: bootstrap lint format typecheck test build verify repro-check gate-a01 gate-a02 gate-a03 gate-a04 gate-a05 gate-a06 gate-a07 gate-a08 gate-a09 gate-a10 gate-a11 gate-a12 gate-a13 gate-a14 gate-a15 gate-a16 gate-a17 gate-a18 gate-a19 gate-a20 gate-wp03 gate-wp10 gate-wp11 gate-wp12 gate-wp13 gate-wp14 gate-wp45 corpus router-determinism clean help
 
 help: ## Show this help.
 	@awk 'BEGIN {FS = ":.*##"; printf "Usage:\n  make <target>\n\nTargets:\n"} \
@@ -94,6 +94,9 @@ gate-a18: ## Run the V3.7 A18 DualContour native child closeout gate.
 
 gate-a19: ## Run the V3.7 A19 Market native bridge closeout gate.
 	uv run python scripts/checks/srf-v37-a19-gate.py
+
+gate-a20: ## Run the V3.7 A20 Security native bridge closeout gate.
+	uv run python scripts/checks/srf-v37-a20-gate.py
 
 # WP-A03 autonomy-contracts gate. Runs the five acceptance checks and prints a
 # GateReceipt/v1 JSON receipt; non-zero exit on any FAIL. Pure stdlib + the

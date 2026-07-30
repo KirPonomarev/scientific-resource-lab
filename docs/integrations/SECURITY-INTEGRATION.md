@@ -1,6 +1,7 @@
 # Security Integration
 
-S21 implements only the SRF-side inactive Security bridge. It maps sanitized
+S21 implements only the SRF-side inactive Security bridge. A20 adds the native
+closeout import projection. It maps sanitized
 scientific service requests and observations through shared SRF envelopes while
 leaving native execution, policy and evidence handling inside the Security
 repository.
@@ -18,3 +19,10 @@ The adapter accepts only D0/D1 public-safe advisory material. It rejects
 target identifiers, exploit or payload material, credentials, private paths,
 D2/D3 labels, prompt-injection text, authority claims, non-ebashim executor
 claims, duplicate observations and stale Security HEAD bindings.
+
+With no native Security closeout present, SRF emits
+`WAIT_NATIVE_CHILD_CLOSEOUT` plus `WAIT_SECURITY_HEALTH` rather than treating
+the bridge as active. A native closeout, when supplied later, must be
+hash-bound to the child request, preserve `ebashim`, pass native/SRF/
+containment suites, keep all action and transfer counters at zero, and grant no
+scientific or Security authority.
