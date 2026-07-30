@@ -35,7 +35,9 @@ from srl.cas import (  # noqa: E402
     DEFAULT_MIN_FREE_RESERVE_GIB,
     DEFAULT_SRF_ALLOCATION_GIB,
     T7_BINDING_ACTIVE_STATE,
+    T7_BINDING_PARTIAL_NATIVE_STATE,
     T7_BINDING_WAIT_STATE,
+    T7_NATIVE_ATTEMPT_RECEIPT_SCHEMA_VERSION,
     SrfStorageLayout,
     StorageLayoutError,
     StoreIntegrityError,
@@ -56,6 +58,9 @@ A02_MIN_FREE_RESERVE_GIB: Final[int] = 100
 PREFLIGHT = REPO_ROOT / "docs" / "target-binding" / "t7-readonly-preflight.json"
 BINDING_REQUEST = REPO_ROOT / "docs" / "target-binding" / "t7-physical-binding-request.json"
 OPERATOR_ACTION = REPO_ROOT / "docs" / "target-binding" / "t7-native-binding-operator-action.json"
+NATIVE_ATTEMPT = (
+    REPO_ROOT / "docs" / "verification" / "srf-v3-7-a02-t7-native-activation-attempt-receipt.json"
+)
 
 
 def _load_json(path: Path) -> dict[str, Any]:
@@ -192,6 +197,7 @@ def _check_false_active_guard(
 ) -> dict[str, Any]:
     complete_evidence = {
         "authority_receipt_id": "AuthorityReceipt/test",
+        "ownership_enabled": True,
         "namespace_created": True,
         "physical_object_roundtrip": True,
         "physical_corruption_rejected": True,
@@ -278,6 +284,7 @@ def _check_operator_action_doc() -> dict[str, Any]:
     if actual.get("grants_authority") is not False:
         failures.append("operator action must not grant authority")
     required = {
+        "verify_target_ownership_enabled",
         "write_read_and_hashcheck_one_nonsecret_probe_object",
         "unplug_target_and_record_WAIT_T7_BINDING_without_corruption",
         "replug_target_and_record_safe_resume",
@@ -295,6 +302,45 @@ def _check_operator_action_doc() -> dict[str, Any]:
     }
 
 
+def _check_native_activation_attempt_doc() -> dict[str, Any]:
+    actual = _load_json(NATIVE_ATTEMPT)
+    failures: list[str] = []
+    if actual.get("schema_version") != T7_NATIVE_ATTEMPT_RECEIPT_SCHEMA_VERSION:
+        failures.append("native attempt schema drifted")
+    if actual.get("status") != T7_BINDING_PARTIAL_NATIVE_STATE:
+        failures.append("native attempt must remain PARTIAL_NATIVE_EVIDENCE")
+    if actual.get("canonical_writes") != 0 or actual.get("grants_authority") is not False:
+        failures.append("native attempt must not grant authority or report canonical writes")
+    if actual.get("operator_action") != protected_operator_action():
+        failures.append("native attempt operator action drifted")
+    missing = set(actual.get("missing_protected_physical_evidence", []))
+    required_missing = {
+        "authority_receipt_id",
+        "ownership_enabled",
+        "unplug_wait_observed",
+        "replug_resume_observed",
+    }
+    if missing != required_missing:
+        failures.append(f"native attempt missing fields drifted: {sorted(missing)!r}")
+    protected = actual.get("protected_physical_evidence", {})
+    for field in ("namespace_created", "physical_object_roundtrip", "physical_corruption_rejected"):
+        if protected.get(field) is not True:
+            failures.append(f"native attempt lost successful evidence field {field}")
+    rendered = json.dumps(actual, sort_keys=True)
+    for leak in ("/Volumes/", "/Users/", "D1F2E2C1-3210-4A39-A4E0-0AA0AD5110E2"):
+        if leak in rendered:
+            failures.append(f"native attempt leaks private target marker {leak}")
+    return {
+        "check_id": "A02-06-native-activation-attempt",
+        "status": "FAIL" if failures else "PASS",
+        "detail": "; ".join(failures)
+        if failures
+        else "native T7 attempt records partial physical evidence without false ACTIVE",
+        "attempt_receipt_id": actual.get("receipt_id"),
+        "remaining_external_waits": actual.get("remaining_external_waits"),
+    }
+
+
 def main() -> int:
     preflight = _load_json(PREFLIGHT)
     binding_request = _load_json(BINDING_REQUEST)
@@ -304,6 +350,7 @@ def main() -> int:
         _check_current_wait_receipt(preflight, binding_request),
         _check_false_active_guard(preflight, binding_request),
         _check_operator_action_doc(),
+        _check_native_activation_attempt_doc(),
     ]
     status = "PASS" if all(item["status"] == "PASS" for item in checks) else "FAIL"
     receipt: dict[str, Any] = {
