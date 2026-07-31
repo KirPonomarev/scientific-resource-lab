@@ -23,8 +23,8 @@ _ACTIVE_REASON: Final[str] = "importable_and_license_allowed"
 _WAIT_REASON: Final[str] = "runtime_or_license_evidence_missing"
 _CVC5_REASON: Final[str] = "WAIT_LICENSE: cvc5 wheel license closure not admitted"
 _FLINT_REASON: Final[str] = (
-    "WAIT_LICENSE: python-flint declares MIT AND LGPL-3.0-or-later; "
-    "SRL default dependency policy denies LGPL-family closure"
+    "A07_LICENSE_CLOSED: python-flint 0.9.0 declares MIT AND LGPL-3.0-or-later; "
+    "admitted by package-specific ADR-0010 obligations"
 )
 
 
@@ -207,10 +207,10 @@ def default_p0_components() -> tuple[P0Component, ...]:
         P0Component(
             "exact.flint",
             "exact",
-            wait,
+            active,
             ("flint",),
             ("python-flint", "FLINT", "Arb", "Calcium"),
-            ("WAIT_LICENSE",),
+            ("MIT AND LGPL-3.0-or-later",),
             ("algebra_exact",),
             "FLINT/Arb/Calcium exact algebra stack",
             ("exact_rational", "algebraic_number_cross_check"),

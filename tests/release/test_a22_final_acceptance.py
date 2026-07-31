@@ -50,7 +50,10 @@ def test_a22_preserves_mandatory_waits_as_release_blockers() -> None:
     assert "PRODUCTION_SIGNER_NOT_ED25519_NATIVE" not in blockers
     assert "SANDBOX_NOT_ENFORCED_T2_T3" in blockers
     assert "T7_NOT_ACTIVE" in blockers
-    assert any(blocker.startswith("MANDATORY_WAIT_LICENSE:python-flint") for blocker in blockers)
+    assert not any(
+        blocker.startswith("MANDATORY_WAIT_LICENSE:python-flint") for blocker in blockers
+    )
+    assert "WAIT_LICENSE:A07_PYTHON_FLINT_LGPL_CLOSURE" not in receipt["remaining_external_waits"]
     assert any(
         blocker.startswith("MANDATORY_NOT_ACTIVE:petsc:WAIT_COMPUTE_NODE") for blocker in blockers
     )
@@ -83,6 +86,8 @@ def test_a22_single_decision_packet_is_non_authorizing() -> None:
     assert action["grants_authority"] is False
     assert "publish_v2_0_0" in action["forbidden_without_authority"]
     assert "emit_MissionCloseoutReceipt_DONE" in action["forbidden_without_authority"]
+    assert "WAIT_LICENSE:A07_PYTHON_FLINT_LGPL_CLOSURE" not in action["blocked_until"]
+    assert not any("python-flint" in item for item in action["allowed_actions_after_authority"])
     assert len(action["blocked_until"]) >= 10
 
 

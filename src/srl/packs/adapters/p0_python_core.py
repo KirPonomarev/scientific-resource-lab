@@ -1,10 +1,10 @@
 """A07 P0 Python core adapter.
 
 This module owns the V3.7 A07 Python-native scientific core surface:
-SymPy for exact symbolic algebra and mpmath for high-precision/interval
-numerics. ``python-flint`` is intentionally not imported here: its current
-published package metadata declares an LGPL-family closure, which the SRL
-default dependency policy cannot admit without an explicit license decision.
+SymPy for exact symbolic algebra, mpmath for high-precision/interval numerics,
+and python-flint for FLINT/Arb/Calcium exact arithmetic. python-flint is
+admitted only through the A07 package-specific LGPL-family license closure
+receipt; the bounded smoke below is still required before truth-ledger ACTIVE.
 
 The adapter exposes bounded smoke tasks, not a general expression evaluator.
 Callers cannot pass raw Python/SymPy text into this module.
@@ -20,11 +20,12 @@ from typing import Any, Final
 from srl.packs.adapters.units import parse_unit
 
 P0_PYTHON_CORE_SCHEMA_VERSION: Final[str] = "P0PythonCoreSmoke/v1"
-P0_PYTHON_CORE_ACTIVE_PACKS: Final[tuple[str, ...]] = ("sympy", "mpmath")
-P0_PYTHON_CORE_WAIT_PACKS: Final[tuple[str, ...]] = ("python-flint",)
+P0_PYTHON_CORE_ACTIVE_PACKS: Final[tuple[str, ...]] = ("sympy", "mpmath", "python-flint")
+P0_PYTHON_CORE_WAIT_PACKS: Final[tuple[str, ...]] = ()
 FLINT_WAIT_REASON: Final[str] = (
-    "WAIT_LICENSE: current python-flint metadata declares MIT AND LGPL-3.0-or-later; "
-    "SRL default dependency policy denies LGPL-family closure"
+    "A07_LICENSE_CLOSED: python-flint 0.9.0 declares MIT AND LGPL-3.0-or-later; "
+    "SRL admits this exact package through ADR-0010 obligations without broadening "
+    "the general GPL/LGPL denial policy"
 )
 
 
@@ -35,6 +36,7 @@ class P0PythonCoreSmoke:
     schema_version: str
     sympy_version: str
     mpmath_version: str
+    flint_version: str
     exact_factorization: str
     exact_factorization_crosscheck: str
     high_precision_value: str
@@ -43,7 +45,12 @@ class P0PythonCoreSmoke:
     interval_crosscheck: str
     dimensional_consistency: str
     flint_status: str
-    flint_reason: str
+    flint_integer_partition: str
+    flint_rational_identity: str
+    flint_matrix_entry: str
+    flint_polynomial_factorization: str
+    flint_crosscheck: str
+    flint_license_closure: str
     canonical_writes: int = 0
     grants_authority: bool = False
 
@@ -53,6 +60,7 @@ class P0PythonCoreSmoke:
             "schema_version": self.schema_version,
             "sympy_version": self.sympy_version,
             "mpmath_version": self.mpmath_version,
+            "flint_version": self.flint_version,
             "exact_factorization": self.exact_factorization,
             "exact_factorization_crosscheck": self.exact_factorization_crosscheck,
             "high_precision_value": self.high_precision_value,
@@ -61,7 +69,12 @@ class P0PythonCoreSmoke:
             "interval_crosscheck": self.interval_crosscheck,
             "dimensional_consistency": self.dimensional_consistency,
             "flint_status": self.flint_status,
-            "flint_reason": self.flint_reason,
+            "flint_integer_partition": self.flint_integer_partition,
+            "flint_rational_identity": self.flint_rational_identity,
+            "flint_matrix_entry": self.flint_matrix_entry,
+            "flint_polynomial_factorization": self.flint_polynomial_factorization,
+            "flint_crosscheck": self.flint_crosscheck,
+            "flint_license_closure": self.flint_license_closure,
             "canonical_writes": self.canonical_writes,
             "grants_authority": self.grants_authority,
         }
@@ -79,6 +92,10 @@ def _mpmath() -> Any:
     return importlib.import_module("mpmath")
 
 
+def _flint() -> Any:
+    return importlib.import_module("flint")
+
+
 def _interval_endpoint_text(endpoint: Any) -> str:
     rendered = str(endpoint).strip()
     if rendered.startswith("[") and "," in rendered:
@@ -90,6 +107,7 @@ def run_p0_python_core_smoke() -> P0PythonCoreSmoke:
     """Run the bounded A07 smoke suite and return stable evidence."""
     sympy = _sympy()
     mpmath = _mpmath()
+    flint = _flint()
 
     x = sympy.symbols("x")
     polynomial = x**4 - 1
@@ -118,10 +136,24 @@ def run_p0_python_core_smoke() -> P0PythonCoreSmoke:
     if parse_unit("kg*m/s^2") != parse_unit("N"):
         raise RuntimeError("dimensional identity kg*m/s^2 == N failed")
 
+    partition_20 = flint.fmpz(20).partitions_p()
+    if str(partition_20) != "627":
+        raise RuntimeError(f"python-flint partition smoke failed: {partition_20}")
+    rational_sum = flint.fmpq(1, 3) + flint.fmpq(1, 6)
+    if rational_sum != flint.fmpq(1, 2):
+        raise RuntimeError(f"python-flint rational identity failed: {rational_sum}")
+    fib_matrix = flint.fmpz_mat([[1, 1], [1, 0]]) ** 10
+    if str(fib_matrix[0, 0]) != "89":
+        raise RuntimeError(f"python-flint matrix power failed: {fib_matrix}")
+    factorization = flint.fmpz_poly([1, 0, -1]).factor()
+    if "x + (-1)" not in str(factorization) or "x + 1" not in str(factorization):
+        raise RuntimeError(f"python-flint polynomial factorization failed: {factorization}")
+
     return P0PythonCoreSmoke(
         schema_version=P0_PYTHON_CORE_SCHEMA_VERSION,
         sympy_version=_distribution_version("sympy"),
         mpmath_version=_distribution_version("mpmath"),
+        flint_version=_distribution_version("python-flint"),
         exact_factorization=str(factorized),
         exact_factorization_crosscheck="expand(factor(x^4 - 1)) == x^4 - 1",
         high_precision_value=high_precision_value,
@@ -129,8 +161,15 @@ def run_p0_python_core_smoke() -> P0PythonCoreSmoke:
         interval_enclosure={"lower": str(lower), "upper": str(upper)},
         interval_crosscheck="mpmath sqrt(2) lies inside mpmath.iv.sqrt([2,2])",
         dimensional_consistency="parse_unit('kg*m/s^2') == parse_unit('N')",
-        flint_status="WAIT_LICENSE",
-        flint_reason=FLINT_WAIT_REASON,
+        flint_status="ACTIVE",
+        flint_integer_partition=str(partition_20),
+        flint_rational_identity=str(rational_sum),
+        flint_matrix_entry=str(fib_matrix[0, 0]),
+        flint_polynomial_factorization=str(factorization),
+        flint_crosscheck=(
+            "p(20)=627, 1/3+1/6=1/2, Fibonacci matrix M^10[0,0]=89, and factor(1-x^2)=-(x-1)(x+1)"
+        ),
+        flint_license_closure=FLINT_WAIT_REASON,
     )
 
 

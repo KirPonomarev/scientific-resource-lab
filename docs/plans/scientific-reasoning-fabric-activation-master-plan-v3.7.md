@@ -1038,16 +1038,16 @@ terminal_result PASS запрещён, если remaining_internal_waits не п
 <!-- END_PLAN_CONTRACT_V3_7 -->
 
 <!-- BEGIN_MUTABLE_STATE_V3_7 -->
-STATE_REVISION: 18
-PREVIOUS_STATE_SHA256: 0d0d63e7-4a09842e-d95c6fe3-09508c58-0502af75-0225a187-4455b0a3-866455a1
-CURRENT_STATE_SHA256: 7589e9b6-03cd5be1-43d5eb24-323a215d-46a19bf3-e7fd5b38-8c451599-cebbfa54
+STATE_REVISION: 19
+PREVIOUS_STATE_SHA256: 7589e9b6-03cd5be1-43d5eb24-323a215d-46a19bf3-e7fd5b38-8c451599-cebbfa54
+CURRENT_STATE_SHA256: 19f7372a-b7f83004-f5e66a25-df08ad1f-834fa894-520ab8b5-a141b539-d820b501
 
 ## CURRENT_FACTS
 
 ~~~yaml
 current_facts:
-  observed_at: 2026-07-30
-  repository_head: ca449e5f5d708e69b05722976d1e94a9d2b8c301
+  observed_at: 2026-07-31
+  repository_head: eeb9cfce27b60b3099f09dd0012849df99d245ed
   repository_head_role: committed_a22_evidence_head_at_generation
   repository_head_is_current_checkout_truth: false
   runtime_current_head_source: scripts/checks/srf-v37-plan-consistency.py git rev-parse HEAD
@@ -1068,8 +1068,14 @@ current_facts:
     - clarabel
     - sympy
     - mpmath
-  a07_sympy_mpmath_core: ACTIVE
-  a07_python_flint: WAIT_LICENSE
+    - python-flint
+  a07_sympy_mpmath_python_flint_core: ACTIVE
+  a07_receipt_id: sha256:5eded41eca3aa8ad7aa13f065a8f6c2f2019ddc859577f0de8a117ae3e0dade4
+  a07_python_flint: ACTIVE
+  a07_python_flint_version: 0.9.0
+  a07_python_flint_license_expression: MIT AND LGPL-3.0-or-later
+  a07_python_flint_policy_exception: A07_PYTHON_FLINT_LGPL_CLOSURE_ADR_0010
+  a07_python_flint_license_closure_receipt_id: sha256:ca9353272c2acadaaef1a2c01d85a6114fcd1f7cc6d1276a2a99c8a8674f56d2
   current_active_native_toolchains:
     - pari-gp
     - maxima
@@ -1181,10 +1187,10 @@ current_facts:
   a21_software_dr_chaos: ACTIVE
   a21_physical_restore_target: WAIT_T7_BINDING
   a22_final_acceptance: BLOCKED_EXTERNAL_AUTHORITY
-  a22_receipt_id: sha256:074dfd9c619ab4bdd88c5243b4355548d497c16b998525f1d984dc5118d01708
-  a22_mission_closeout_blocked_receipt_id: sha256:376264aaa6f411af9a2017a4193c8ef1d97d13fb54ab15c18184eab606c91c53
-  a22_accepted_release_head: ca449e5f5d708e69b05722976d1e94a9d2b8c301
-  a22_source_git_head: ca449e5f5d708e69b05722976d1e94a9d2b8c301
+  a22_receipt_id: sha256:eaa86a6a04bc6ff007bdc8bb08dee4be53a2113addbe1ebd7389cd011ac4a0b4
+  a22_mission_closeout_blocked_receipt_id: sha256:7ac06786a66680b9df0d5beccccd6358bdc4df1cffe671a2b5a0c804f6dda6d7
+  a22_accepted_release_head: eeb9cfce27b60b3099f09dd0012849df99d245ed
+  a22_source_git_head: eeb9cfce27b60b3099f09dd0012849df99d245ed
   a22_legacy_git_head: alias_of_source_git_head_not_current_truth
   production_signer: ACTIVE
   production_key_binding_receipt_id: sha256:6b711656102768486c25e1a1bc6eac7fad53f5903a5c23453ffdcabe8f851f52
@@ -1250,14 +1256,13 @@ execution_state:
     - A21
     - A22
   completed_stage_lanes:
-    - A07_sympy_mpmath_core
+    - A07_sympy_mpmath_python_flint_core
     - A21_software_disaster_recovery_and_chaos
     - A22_false_closure_and_blocked_mission_closeout
   parked_stages:
     - A02_non_destructive_t7_binding
     - A05_native_t2_t3_compute_binding
     - A06_native_t7_persistence_binding
-    - A07_python_flint_license
     - A18_dual_contour_native_child_closeout
     - A19_market_native_bridge_closeout
     - A20_security_native_bridge_closeout
@@ -1266,7 +1271,6 @@ execution_state:
   parked_blockers:
     - WAIT_AUTHORITY:A02_BIND_T7_NATIVE_TARGET
     - WAIT_COMPUTE_TARGET:A05_BIND_NATIVE_SANDBOX_COMPUTE_TARGET
-    - WAIT_LICENSE:A07_PYTHON_FLINT_LGPL_CLOSURE
     - WAIT_AUTHORITY:A09_BIND_PINNED_LEAN_MATHLIB_PROJECT_TO_T7
     - WAIT_COMPUTE_NODE:A15_PROVISION_HEAVY_COMPUTE_TARGET
     - WAIT_NATIVE_CHILD_CLOSEOUT:DUAL_CONTOUR_MAKE_CONTRACTS_FAIL
@@ -1281,17 +1285,18 @@ execution_state:
   writer_lease_or_null: null
   blocker_or_null: WAIT_AUTHORITY:A22_RESOLVE_V2_0_0_RELEASE_BLOCKERS
   latest_stage_receipts:
+    A07: sha256:5eded41eca3aa8ad7aa13f065a8f6c2f2019ddc859577f0de8a117ae3e0dade4
     A18: sha256:d60e2fe35a732cbb29107b549ca4b6c89a280a0e5128b432a2b5cb1743896b50
     A19: sha256:f2e1638e40150c2929f8bc27ae4de4e6d6919bf3eb85e1a24668f1b9bb73391a
     A20: sha256:327881c83976f1b600b0b7ec3b15ba3f1e8aa661695705e3f340bc7631827cfd
     A21: sha256:496745e2a6e7dfe57641319f6fbc4e6701f752190eb025f8ab1664acf8c4e388
-    A22: sha256:074dfd9c619ab4bdd88c5243b4355548d497c16b998525f1d984dc5118d01708
-    MissionCloseoutBlocked: sha256:376264aaa6f411af9a2017a4193c8ef1d97d13fb54ab15c18184eab606c91c53
+    A22: sha256:eaa86a6a04bc6ff007bdc8bb08dee4be53a2113addbe1ebd7389cd011ac4a0b4
+    MissionCloseoutBlocked: sha256:7ac06786a66680b9df0d5beccccd6358bdc4df1cffe671a2b5a0c804f6dda6d7
   latest_activation_attempts:
     A02NativeT7Attempt: sha256:7d6cf6df8394c5fc567b1e9b19da5b5ab88613235d62c938ce5c16e5217a316e
     A04ProductionKeyBinding: sha256:6b711656102768486c25e1a1bc6eac7fad53f5903a5c23453ffdcabe8f851f52
-  next_executable_action: resolve the remaining A02 native evidence fields through a repo-native authority receipt plus ownership-enabled and unplug/replug proofs; then continue native sandbox/compute, FLINT license closure, A09 T7 formal toolchain binding, heavy compute node, native encrypted recovery target restore, and Security, Market and DualContour native closeouts before rerunning A22 and publishing v2.0.0; do not publish RELEASED_WITH_DECLARED_WAITS
-  updated_at: 2026-07-30
+  next_executable_action: resolve the remaining A02 native evidence fields through a repo-native authority receipt plus ownership-enabled and unplug/replug proofs; then continue native sandbox/compute, A09 T7 formal toolchain binding, heavy compute node, native encrypted recovery target restore, and Security, Market and DualContour native closeouts before rerunning A22 and publishing v2.0.0; do not publish RELEASED_WITH_DECLARED_WAITS
+  updated_at: 2026-07-31
 ~~~
 
 ## DECISION_LOG
@@ -1325,7 +1330,7 @@ decision_log:
   - id: V37-D013
     decision: A06 durable scheduler software lane is active with T7-work namespace contract, crash/restart exact-once recovery, pool/backpressure controls and bound terminal receipts; native T7 persistence remains WAIT_T7_BINDING
   - id: V37-D014
-    decision: A07 SymPy and mpmath default Python core packs are ACTIVE with real import probes, scientific smoke and independent crosschecks; python-flint/FLINT/Arb/Calcium remains WAIT_LICENSE because current package metadata declares an LGPL-family closure denied by SRL default dependency policy
+    decision: A07 SymPy, mpmath and python-flint 0.9.0 default Python core packs are ACTIVE with real import probes, scientific smoke and independent crosschecks; python-flint closes its package-specific LGPL-family boundary through ADR-0010 and receipt sha256:ca9353272c2acadaaef1a2c01d85a6114fcd1f7cc6d1276a2a99c8a8674f56d2 without broadening the default LGPL/GPL dependency policy
   - id: V37-D015
     decision: A08 native algebra and SMT toolchains are ACTIVE with external PARI/GP, Maxima, GAP, Singular, native Z3 and cvc5 executable probes, bounded scientific smokes, Z3/cvc5 agreement and uv license-boundary enforcement
   - id: V37-D016
@@ -1355,7 +1360,7 @@ decision_log:
   - id: V37-D028
     decision: A21 software disaster-recovery and chaos lane is ACTIVE with synthetic unique receipt-chain restore, measured fixture RPO/RTO, lock-bound rebuildable environment manifest, executor interruption recovery, corrupt-object rejection, revoked-pack rejection, stale/cross-head WAIT_SRF projection and lost-index detection; no current VPS is used as sole backup, physical encrypted recovery-target restore remains WAIT_AUTHORITY/WAIT_T7_BINDING; A21 stage receipt sha256:496745e2a6e7dfe57641319f6fbc4e6701f752190eb025f8ab1664acf8c4e388
   - id: V37-D029
-    decision: A22 final acceptance verifies A00-A21 public receipts, preserves any mandatory WAIT_CAPABILITY/WAIT_TOOLCHAIN ledger entries as release blockers rather than hiding or promoting them, rejects DONE/v2.0.0 through ReleaseTruthDecision/v1 while T2/T3 sandbox, T7 binding, python-flint license, heavy compute, native child closeouts and physical recovery target are unresolved, emits a single non-authorizing protected decision packet, and records MissionCloseoutReceipt/v2 as BLOCKED_EXTERNAL_AUTHORITY rather than DONE or RELEASED_WITH_DECLARED_WAITS; A22 stage receipt sha256:074dfd9c619ab4bdd88c5243b4355548d497c16b998525f1d984dc5118d01708
+    decision: A22 final acceptance verifies A00-A21 public receipts, preserves any mandatory WAIT_CAPABILITY/WAIT_TOOLCHAIN ledger entries as release blockers rather than hiding or promoting them, rejects DONE/v2.0.0 through ReleaseTruthDecision/v1 while T2/T3 sandbox, T7 binding, heavy compute, native child closeouts and physical recovery target are unresolved, emits a single non-authorizing protected decision packet, and records MissionCloseoutReceipt/v2 as BLOCKED_EXTERNAL_AUTHORITY rather than DONE or RELEASED_WITH_DECLARED_WAITS; A22 stage receipt sha256:eaa86a6a04bc6ff007bdc8bb08dee4be53a2113addbe1ebd7389cd011ac4a0b4
   - id: V37-D030
     decision: A22 post-merge integrity correction resolves local provenance from explicit git_head, GITHUB_SHA or local git rev-parse; separates source_git_head, generator_head, observed_main_head and accepted_release_head; treats docs/verification/mission-closeout-receipt.json as historical V3.6/v1.0.1 evidence only; and adds a plan-consistency gate so merged mutable state cannot advertise a stale active branch or stale pre-A22 repository head
   - id: V37-D031
@@ -1403,8 +1408,10 @@ evidence_index:
   - scripts/checks/srf-v37-a06-gate.py
   - docs/verification/srf-v3-7-a06-durable-executor-receipt.json
   - docs/architecture/p0-python-core.md
+  - docs/adr/0010-python-flint-lgpl-closure.md
   - scripts/checks/srf-v37-a07-gate.py
   - docs/target-binding/a07-python-flint-license-operator-action.json
+  - docs/verification/srf-v3-7-a07-python-flint-license-closure-receipt.json
   - docs/verification/srf-v3-7-a07-p0-python-core-receipt.json
   - docs/architecture/native-algebra-smt.md
   - scripts/checks/srf-v37-a08-gate.py

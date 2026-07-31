@@ -27,7 +27,7 @@ Current v1.0.1 active inventory reproduced by the ledger:
 | `clarabel` | `p1_optimization_solver` | `v1.0.1` | `ACTIVE` | `nonfixture_executable_probe_and_scientific_smoke` |
 | `sympy` | `a07_p0_python_core` | `A07` | `ACTIVE` | `nonfixture_executable_probe_and_scientific_smoke` |
 | `mpmath` | `a07_p0_python_core` | `A07` | `ACTIVE` | `nonfixture_executable_probe_and_scientific_smoke` |
-| `python-flint` | `a07_p0_python_core` | `A07` | `WAIT_LICENSE` | `missing_or_protected_capability` |
+| `python-flint` | `a07_p0_python_core` | `A07` | `ACTIVE` | `nonfixture_executable_probe_and_scientific_smoke` |
 | `pari-gp` | `a08_native_algebra` | `A08` | `ACTIVE` | `nonfixture_executable_probe_and_scientific_smoke` |
 | `maxima` | `a08_native_algebra` | `A08` | `ACTIVE` | `nonfixture_executable_probe_and_scientific_smoke` |
 | `gap` | `a08_native_algebra` | `A08` | `ACTIVE` | `nonfixture_executable_probe_and_scientific_smoke` |

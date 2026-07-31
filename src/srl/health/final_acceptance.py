@@ -55,7 +55,6 @@ _ACTIVATION_ATTEMPT_RECEIPTS: Final[tuple[tuple[str, str], ...]] = (
 _BLOCKED_OPERATOR_ACTIONS: Final[tuple[str, ...]] = (
     "WAIT_AUTHORITY:A02_BIND_T7_NATIVE_TARGET",
     "WAIT_COMPUTE_TARGET:A05_BIND_NATIVE_SANDBOX_COMPUTE_TARGET",
-    "WAIT_LICENSE:A07_PYTHON_FLINT_LGPL_CLOSURE",
     "WAIT_AUTHORITY:A09_BIND_PINNED_LEAN_MATHLIB_PROJECT_TO_T7",
     "WAIT_COMPUTE_NODE:A15_PROVISION_HEAVY_COMPUTE_TARGET",
     "WAIT_NATIVE_CHILD_CLOSEOUT:DUAL_CONTOUR_MAKE_CONTRACTS_FAIL",
@@ -87,6 +86,8 @@ def build_a22_operator_action(
         allowed_actions.remove(
             "bind production Ed25519 keyring and reject fixture signer in production"
         )
+    if "WAIT_LICENSE:A07_PYTHON_FLINT_LGPL_CLOSURE" not in blocked_until:
+        allowed_actions.remove("resolve python-flint license closure or formally replace it")
     action: dict[str, Any] = {
         "schema_version": "ProtectedOperatorAction/v1",
         "action_id": A22_OPERATOR_ACTION_ID,

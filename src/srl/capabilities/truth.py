@@ -81,6 +81,9 @@ _A10_RECEIPT_PATH: Final[Path] = (
 _A04_PRODUCTION_KEY_RECEIPT_PATH: Final[Path] = (
     _REPO_ROOT / "docs" / "verification" / "srf-v3-7-a04-production-key-binding-receipt.json"
 )
+_A07_FLINT_LICENSE_RECEIPT_PATH: Final[Path] = (
+    _REPO_ROOT / "docs" / "verification" / "srf-v3-7-a07-python-flint-license-closure-receipt.json"
+)
 _A11_RECEIPT_PATH: Final[Path] = (
     _REPO_ROOT / "docs" / "verification" / "srf-v3-7-a11-knowledge-graph-receipt.json"
 )
@@ -281,6 +284,37 @@ def _smoke_sympy() -> str:
 def _smoke_mpmath() -> str:
     smoke = run_p0_python_core_smoke()
     return "; ".join((smoke.high_precision_crosscheck, smoke.interval_crosscheck))
+
+
+def _smoke_python_flint() -> str:
+    smoke = run_p0_python_core_smoke()
+    if smoke.flint_status != "ACTIVE":
+        raise RuntimeError(f"python-flint smoke did not reach ACTIVE: {smoke.flint_status}")
+    if not _a07_flint_license_receipt_is_active():
+        raise RuntimeError("A07 python-flint LGPL-family closure receipt is not ACTIVE")
+    return "; ".join((smoke.flint_crosscheck, smoke.flint_license_closure))
+
+
+def _a07_flint_license_receipt_is_active() -> bool:
+    try:
+        receipt = json.loads(_A07_FLINT_LICENSE_RECEIPT_PATH.read_text(encoding="utf-8"))
+    except Exception:
+        return False
+    return (
+        isinstance(receipt, dict)
+        and receipt.get("schema_version") == "A07PythonFlintLicenseClosureReceipt/v1"
+        and receipt.get("stage_id") == "A07"
+        and receipt.get("component_id") == "python-flint"
+        and receipt.get("status") == "ACTIVE"
+        and receipt.get("observed_version") == "0.9.0"
+        and receipt.get("observed_license_expression") == "MIT AND LGPL-3.0-or-later"
+        and receipt.get("lgpl_family_exception_scope") == "package_specific_python_flint_0_9_x"
+        and receipt.get("default_lgpl_policy_broadened") is False
+        and receipt.get("private_fork_or_static_relink") is False
+        and receipt.get("license_texts_recorded") is True
+        and receipt.get("obligations_accepted") is True
+        and receipt.get("grants_authority") is False
+    )
 
 
 def _smoke_a08_native(component_id: str) -> str:
@@ -1129,6 +1163,8 @@ _SPECS: Final[tuple[ComponentSpec, ...]] = (
         "flint",
         "python-flint",
         activation_wait_state="WAIT_LICENSE",
+        current_v101_active=True,
+        smoke=_smoke_python_flint,
     ),
     ComponentSpec(
         "pari-gp",
