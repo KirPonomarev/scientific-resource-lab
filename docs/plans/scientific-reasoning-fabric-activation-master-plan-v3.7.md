@@ -1038,16 +1038,16 @@ terminal_result PASS запрещён, если remaining_internal_waits не п
 <!-- END_PLAN_CONTRACT_V3_7 -->
 
 <!-- BEGIN_MUTABLE_STATE_V3_7 -->
-STATE_REVISION: 19
-PREVIOUS_STATE_SHA256: 7589e9b6-03cd5be1-43d5eb24-323a215d-46a19bf3-e7fd5b38-8c451599-cebbfa54
-CURRENT_STATE_SHA256: 2ff29d84-11aba561-e36599c0-43b283d8-ce5ab78d-7bd274ca-665d86b2-7c722098
+STATE_REVISION: 20
+PREVIOUS_STATE_SHA256: 2ff29d84-11aba561-e36599c0-43b283d8-ce5ab78d-7bd274ca-665d86b2-7c722098
+CURRENT_STATE_SHA256: aef21d83-e11a0df7-4aa0e20b-d54193ba-8fb58bc4-f025fbc7-2a963196-a44fc5e9
 
 ## CURRENT_FACTS
 
 ~~~yaml
 current_facts:
   observed_at: 2026-07-31
-  repository_head: 418aa9673b814871405e92a4a1ea13290efb3fae
+  repository_head: c1df741767cd466cf40687282f4fdbdb21f6cc73
   repository_head_role: committed_a22_evidence_head_at_generation
   repository_head_is_current_checkout_truth: false
   runtime_current_head_source: scripts/checks/srf-v37-plan-consistency.py git rev-parse HEAD
@@ -1056,6 +1056,8 @@ current_facts:
   predecessor_release: v1.0.1
   predecessor_result: RELEASED_WITH_DECLARED_WAITS
   active_v37_mission_closeout: docs/verification/srf-v3-7-mission-closeout-blocked-v2-0-0.json
+  active_external_activation_audit: docs/verification/srf-v3-7-external-activation-audit-2026-07-31.json
+  active_external_activation_audit_receipt: sha256:0a08a33f9d1896e0be331a737a5c5cc811438c6263bb36c979c5e62c1c6c1f48
   historical_v36_mission_closeout: docs/verification/mission-closeout-receipt.json
   current_active_default_packs:
     - numpy
@@ -1295,7 +1297,8 @@ execution_state:
   latest_activation_attempts:
     A02NativeT7Attempt: sha256:7d6cf6df8394c5fc567b1e9b19da5b5ab88613235d62c938ce5c16e5217a316e
     A04ProductionKeyBinding: sha256:6b711656102768486c25e1a1bc6eac7fad53f5903a5c23453ffdcabe8f851f52
-  next_executable_action: resolve the remaining A02 native evidence fields through a repo-native authority receipt plus ownership-enabled and unplug/replug proofs; then continue native sandbox/compute, A09 T7 formal toolchain binding, heavy compute node, native encrypted recovery target restore, and Security, Market and DualContour native closeouts before rerunning A22 and publishing v2.0.0; do not publish RELEASED_WITH_DECLARED_WAITS
+    ExternalActivationAudit20260731: sha256:0a08a33f9d1896e0be331a737a5c5cc811438c6263bb36c979c5e62c1c6c1f48
+  next_executable_action: no remaining safe local activation lane can remove release blockers without native target evidence; resolve A02 through a repo-native authority receipt plus ownership-enabled and unplug/replug proofs, then bind A09, provision A05/A15 compute targets, import Security/Market/DualContour native GREEN closeouts, configure A21 second encrypted recovery target and rerun A22 before publishing v2.0.0; do not publish RELEASED_WITH_DECLARED_WAITS
   updated_at: 2026-07-31
 ~~~
 
@@ -1369,6 +1372,8 @@ decision_log:
     decision: The 2026-07-30 native T7-Secure activation attempt created the SRF namespace and proved nonsecret object roundtrip, corruption rejection and no internal Mac project-data dependency on the encrypted external target, but A02 remains blocked because no repo-native authority receipt is committed, target ownership is not enabled, and unplug/replug WAIT/resume evidence is absent; A22 records the partial attempt as protected_activation_attempts and still rejects DONE/v2.0.0 with T7_NOT_ACTIVE
   - id: V37-D033
     decision: The 2026-07-30 A04 protected activation created or reused an operator-controlled native private Ed25519 key outside git, installed the receiver keyring in private config, committed only a public ProductionTransportKeyBindingReceipt with key id/fingerprint and secret-store reference hashes, proved nonfixture signed spool roundtrip plus fixture-HMAC and revoked-key rejection, and removed A04 from A22 release blockers while preserving all remaining non-A04 blockers
+  - id: V37-D034
+    decision: The 2026-07-31 external activation audit on main c1df741767cd466cf40687282f4fdbdb21f6cc73 found post-merge CI green and no remaining safe local activation lane that can honestly remove release blockers: T7 is encrypted/read-write but ownership and unplug/replug evidence remain absent, A09 remains dependent on A02, A05/A15 lack compatible native compute targets, DualContour requires a refreshed native provider proof, Market is YELLOW/DEGRADED without a native closeout, Security is DEGRADED/RED with runtime path hygiene root cause, and A21 still requires a second encrypted recovery target plus native restore drill; receipt sha256:0a08a33f9d1896e0be331a737a5c5cc811438c6263bb36c979c5e62c1c6c1f48 preserves release truth REJECT and forbids v2.0.0/DONE publication
 ~~~
 
 ## EVIDENCE_INDEX
@@ -1468,6 +1473,7 @@ evidence_index:
   - scripts/checks/srf-v37-plan-consistency.py
   - docs/verification/srf-v3-7-a22-final-acceptance-blocked-receipt.json
   - docs/verification/srf-v3-7-mission-closeout-blocked-v2-0-0.json
+  - docs/verification/srf-v3-7-external-activation-audit-2026-07-31.json
 ~~~
 
 <!-- END_MUTABLE_STATE_V3_7 -->
