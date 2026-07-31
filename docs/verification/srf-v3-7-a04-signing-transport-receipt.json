@@ -1,13 +1,1 @@
-{
-  "canonical_writes": 0,
-  "gate_command": "uv run python scripts/checks/srf-v37-a04-gate.py",
-  "grants_authority": false,
-  "operator_action_hash": "b61b1150-bcc6c322-36dfd347-78e29492-13858bdf-059b6e0f-a7a681eb-edd7b680",
-  "protected_key_binding": "WAIT_AUTHORITY:A04_BIND_PRODUCTION_ED25519_KEYRING",
-  "receipt_id_grouped_sha256": "32ecd7dd-93602c78-fdda1c35-14d64aa4-80245d96-8888c31d-b6643800-28a5457b",
-  "release_claim": "A04_SOFTWARE_TRANSPORT_ONLY",
-  "schema_version": "StageCompletionReceipt/v1",
-  "stage_closure": "SOFTWARE_ED25519_TRANSPORT_ACTIVE_WAIT_NATIVE_KEY_BINDING",
-  "stage_id": "A04",
-  "terminal_state": "A04_ACCEPTED"
-}
+{"canonical_writes":0,"checks":[{"check_id":"A04-01-ed25519-real-signature","detail":"real Ed25519 signed message accepted; tamper and wrong public key rejected","status":"PASS"},{"check_id":"A04-02-fixture-hmac-production-rejected","detail":"production Ed25519 verifier rejects test-hmac-sha256 signatures","status":"PASS"},{"check_id":"A04-03-revoked-replay-sequence-guards","detail":"revoked keys, out-of-order replay, rollback and stale predecessor are rejected","status":"PASS"},{"check_id":"A04-04-crash-transition-reconciliation","detail":"queue/import/ack crash injections preserve no false ack and reconcile imported ACK","status":"PASS"},{"check_id":"A04-05-native-key-operator-action","detail":"native Ed25519 key binding action is exact and non-authorizing","operator_action_hash":"b61b1150-bcc6c322-36dfd347-78e29492-13858bdf-059b6e0f-a7a681eb-edd7b680","status":"PASS"},{"check_id":"A04-06-production-key-binding-receipt","detail":"native production Ed25519 key binding receipt is ACTIVE and secret-free","production_key_binding_receipt_id":"sha256:6b711656102768486c25e1a1bc6eac7fad53f5903a5c23453ffdcabe8f851f52","status":"PASS"}],"grants_authority":false,"protected_key_binding":"ACTIVE:sha256:6b711656102768486c25e1a1bc6eac7fad53f5903a5c23453ffdcabe8f851f52","receipt_id":"sha256:362cce3299e4fc91fece99b608515866d2e805b9caf6f6173a8e1af77d3a92d4","schema_version":"StageCompletionReceipt/v1","stage_closure":"A04_ACTIVE","stage_id":"A04","status":"PASS","terminal_state":"A04_ACCEPTED"}

@@ -25,6 +25,7 @@ from srl.packs.formal.lean import (
     default_corpus_statements,
     default_lean_pins,
 )
+from srl.transport.native_keyring import production_key_receipt_is_active
 
 TRUTH_STATES: Final[tuple[str, ...]] = (
     "DECLARED",
@@ -76,6 +77,9 @@ _A09_RECEIPT_PATH: Final[Path] = (
 )
 _A10_RECEIPT_PATH: Final[Path] = (
     _REPO_ROOT / "docs" / "verification" / "srf-v3-7-a10-independent-provers-receipt.json"
+)
+_A04_PRODUCTION_KEY_RECEIPT_PATH: Final[Path] = (
+    _REPO_ROOT / "docs" / "verification" / "srf-v3-7-a04-production-key-binding-receipt.json"
 )
 _A11_RECEIPT_PATH: Final[Path] = (
     _REPO_ROOT / "docs" / "verification" / "srf-v3-7-a11-knowledge-graph-receipt.json"
@@ -1329,7 +1333,7 @@ _SPECS: Final[tuple[ComponentSpec, ...]] = (
         "production-ed25519-signer",
         "a04_transport",
         "A04",
-        "native_private_config",
+        "production_key_receipt",
         activation_wait_state="WAIT_AUTHORITY",
     ),
     ComponentSpec(
@@ -1402,6 +1406,22 @@ def _stage_receipt_probe(spec: ComponentSpec) -> tuple[bool, str | None, str | N
     return True, f"{receipt_path}:{receipt['receipt_id']}", None
 
 
+def _production_key_receipt_probe() -> tuple[bool, str | None, str | None]:
+    try:
+        if not _A04_PRODUCTION_KEY_RECEIPT_PATH.exists():
+            return False, None, "A04 production key binding receipt missing"
+        receipt = json.loads(_A04_PRODUCTION_KEY_RECEIPT_PATH.read_text(encoding="utf-8"))
+        if not production_key_receipt_is_active(receipt):
+            return False, None, "A04 production key binding receipt is not ACTIVE"
+    except Exception as exc:
+        return False, None, f"{type(exc).__name__}: {exc}"
+    return (
+        True,
+        f"{_receipt_display_path(_A04_PRODUCTION_KEY_RECEIPT_PATH)}:{receipt['receipt_id']}",
+        None,
+    )
+
+
 def _receipt_display_path(path: Path) -> str:
     try:
         return str(path.relative_to(_REPO_ROOT))
@@ -1409,18 +1429,25 @@ def _receipt_display_path(path: Path) -> str:
         return path.name
 
 
-def _probe(spec: ComponentSpec) -> dict[str, Any]:
+def _probe(spec: ComponentSpec) -> dict[str, Any]:  # noqa: C901, PLR0912
     if spec.probe_kind == "python_import":
         ok, version_or_path, error = _python_probe(spec)
     elif spec.probe_kind == "native_executable":
         ok, version_or_path, error = _executable_probe(spec)
     elif spec.probe_kind == "stage_receipt":
         ok, version_or_path, error = _stage_receipt_probe(spec)
+    elif spec.probe_kind == "production_key_receipt":
+        ok, version_or_path, error = _production_key_receipt_probe()
     else:
         ok, version_or_path, error = False, None, "protected or target-bound capability"
 
     smoke_ok = False
     smoke_detail = "not attempted before its V3.7 activation stage"
+    if ok and spec.probe_kind == "production_key_receipt":
+        smoke_ok = True
+        smoke_detail = (
+            "production Ed25519 key binding receipt proves native roundtrip and fixture rejection"
+        )
     if ok and spec.current_v101_active and spec.smoke is not None:
         try:
             smoke_detail = spec.smoke()
@@ -1428,15 +1455,23 @@ def _probe(spec: ComponentSpec) -> dict[str, Any]:
         except Exception as exc:
             smoke_detail = f"{type(exc).__name__}: {exc}"
 
-    crosschecked = bool(smoke_ok and spec.current_v101_active)
-    active = bool(ok and smoke_ok and crosschecked and spec.current_v101_active)
+    crosschecked = bool(
+        smoke_ok and (spec.current_v101_active or spec.probe_kind == "production_key_receipt")
+    )
+    active = bool(
+        ok
+        and smoke_ok
+        and crosschecked
+        and (spec.current_v101_active or spec.probe_kind == "production_key_receipt")
+    )
     if active:
         state = "ACTIVE"
-        evidence_axis = (
-            "hash_bound_stage_receipt_and_scientific_smoke"
-            if spec.probe_kind == "stage_receipt"
-            else "nonfixture_executable_probe_and_scientific_smoke"
-        )
+        if spec.probe_kind == "stage_receipt":
+            evidence_axis = "hash_bound_stage_receipt_and_scientific_smoke"
+        elif spec.probe_kind == "production_key_receipt":
+            evidence_axis = "production_native_evidence"
+        else:
+            evidence_axis = "nonfixture_executable_probe_and_scientific_smoke"
     elif ok:
         state = "EXECUTABLE_PROBED"
         evidence_axis = "executable_probe_only"

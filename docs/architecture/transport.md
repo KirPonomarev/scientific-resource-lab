@@ -66,10 +66,13 @@ signature. Replays, sequence rollback, stale predecessors and revoked keys are
 quarantined. A signature proves transport authenticity only; it never grants
 canonical write permission.
 
-Native production key binding is a protected operator action:
-`docs/target-binding/ed25519-native-key-operator-action.json`. Until that
-authority-backed receipt exists, release closure must keep
-`production-ed25519-signer` parked at `WAIT_AUTHORITY`.
+Native production key binding is recorded by
+`docs/verification/srf-v3-7-a04-production-key-binding-receipt.json`. The
+private Ed25519 key remains in the operator-controlled native secret store
+outside git; the public receipt commits only the key id, public-key fingerprint,
+secret-store reference hashes, receiver-keyring binding, and nonfixture
+roundtrip evidence. Fixture HMAC and revoked-key signatures remain rejected in
+production mode.
 
 ## Replay and Retry
 
