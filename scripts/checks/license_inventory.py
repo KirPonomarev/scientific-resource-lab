@@ -18,7 +18,8 @@ in compound ``License-Expression`` values for widely-used packages (e.g. numpy's
 with the project's Apache-2.0 license.
 
 Anything in the GPL/LGPL/AGPL family or otherwise unidentifiable is treated
-as a failure.
+as a failure, except for exact package-specific exceptions backed by committed
+license-closure receipts. Those exceptions do not broaden the general allowlist.
 
 The script is intended to run inside the uv-managed venv (``uv run python3
 scripts/checks/license_inventory.py``) so that ``importlib.metadata`` sees the
@@ -142,6 +143,7 @@ class PackageLicense:
     license: str
     source: str  # 'License-Expression', 'License', or 'Classifier'
     status: str  # 'allowed', 'denied', or 'unknown'
+    policy_exception: str | None = None
 
 
 @dataclass(frozen=True)
@@ -227,6 +229,22 @@ def _evaluate_license(expression: str) -> str:
     ):
         return "allowed"
     return "unknown"
+
+
+def _policy_exception_for_package(
+    *,
+    name: str,
+    version: str,
+    normalized_license: str,
+) -> str | None:
+    """Return a package-specific exception id for a denied license, if any."""
+    if (
+        _normalise_name(name) == "python-flint"
+        and version.startswith("0.9.")
+        and normalized_license == "MIT AND LGPL-3.0-OR-LATER"
+    ):
+        return "A07_PYTHON_FLINT_LGPL_CLOSURE_ADR_0010"
+    return None
 
 
 def _is_spdx_expression(value: str) -> bool:
@@ -318,6 +336,15 @@ def scan() -> Report:
         raw_license, source = _extract_package_license(dist)
         normalized = _normalize_license(raw_license)
         status = _evaluate_license(normalized)
+        policy_exception = None
+        if status == "denied":
+            policy_exception = _policy_exception_for_package(
+                name=name,
+                version=dist.version,
+                normalized_license=normalized,
+            )
+            if policy_exception is not None:
+                status = "allowed"
 
         packages.append(
             PackageLicense(
@@ -326,6 +353,7 @@ def scan() -> Report:
                 license=normalized,
                 source=source,
                 status=status,
+                policy_exception=policy_exception,
             )
         )
 

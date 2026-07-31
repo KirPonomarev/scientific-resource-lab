@@ -17,14 +17,18 @@ def test_p0_python_core_runs_real_smoke_and_crosschecks() -> None:
     assert data["schema_version"] == "P0PythonCoreSmoke/v1"
     assert data["sympy_version"]
     assert data["mpmath_version"]
+    assert data["flint_version"] == "0.9.0"
     assert data["exact_factorization"] == "(x - 1)*(x + 1)*(x**2 + 1)"
     assert data["high_precision_value"].startswith("1.414213562373095048801688724209698")
     interval = data["interval_enclosure"]
     assert isinstance(interval, dict)
     assert interval["lower"] <= data["high_precision_value"] <= interval["upper"]
     assert data["dimensional_consistency"] == "parse_unit('kg*m/s^2') == parse_unit('N')"
-    assert data["flint_status"] == "WAIT_LICENSE"
-    assert data["flint_reason"] == FLINT_WAIT_REASON
+    assert data["flint_status"] == "ACTIVE"
+    assert data["flint_integer_partition"] == "627"
+    assert data["flint_rational_identity"] == "1/2"
+    assert data["flint_matrix_entry"] == "89"
+    assert data["flint_license_closure"] == FLINT_WAIT_REASON
     assert data["canonical_writes"] == 0
     assert data["grants_authority"] is False
 

@@ -42,9 +42,8 @@ def test_current_importable_core_is_active_and_missing_engines_wait() -> None:
     )
     assert "smt.cvc5" in _component_ids(bundle, "degraded_component_ids")
     assert {"symbolic.sympy", "numeric.mpmath"} <= _component_ids(bundle, "active_component_ids")
-    assert {"exact.flint", "exact.pari", "cas.maxima"} <= _component_ids(
-        bundle, "wait_component_ids"
-    )
+    assert "exact.flint" in _component_ids(bundle, "active_component_ids")
+    assert {"exact.pari", "cas.maxima"} <= _component_ids(bundle, "wait_component_ids")
 
 
 def test_cvc5_is_not_silently_replaced_by_z3() -> None:

@@ -33,6 +33,27 @@ def test_license_inventory_denies_gpl_family_even_with_exception() -> None:
     assert module._evaluate_license("LGPL-3.0-OR-LATER WITH LLVM-EXCEPTION") == "denied"
 
 
+def test_license_inventory_allows_only_exact_python_flint_exception() -> None:
+    module = _license_inventory_module()
+
+    assert (
+        module._policy_exception_for_package(
+            name="python-flint",
+            version="0.9.0",
+            normalized_license="MIT AND LGPL-3.0-OR-LATER",
+        )
+        == "A07_PYTHON_FLINT_LGPL_CLOSURE_ADR_0010"
+    )
+    assert (
+        module._policy_exception_for_package(
+            name="cons",
+            version="0.4.7",
+            normalized_license="LGPL-3.0-ONLY",
+        )
+        is None
+    )
+
+
 def test_license_inventory_rejects_unknown_spdx_exception() -> None:
     module = _license_inventory_module()
 
