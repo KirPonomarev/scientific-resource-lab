@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -17,6 +18,16 @@ from srl.health.disaster_recovery import (
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+_DETERMINISTIC_FREE_DISK_BYTES = 64 * 1024**3
+
+
+@pytest.fixture(autouse=True)
+def deterministic_disk_capacity(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Exercise A21 chaos semantics without inheriting host disk pressure."""
+    monkeypatch.setattr(
+        "srl.runtime.scheduler.shutil.disk_usage",
+        lambda _path: SimpleNamespace(free=_DETERMINISTIC_FREE_DISK_BYTES),
+    )
 
 
 def test_a21_drill_restores_chain_and_records_waits(tmp_path: Path) -> None:

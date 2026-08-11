@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 
 import pytest
@@ -23,6 +24,16 @@ from srl.runtime import (
 )
 
 _POLICY_PATH = Path("policies/resource-policy-m1.json")
+_DETERMINISTIC_FREE_DISK_BYTES = 64 * 1024**3
+
+
+@pytest.fixture(autouse=True)
+def deterministic_disk_capacity(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Keep scheduler behavior independent of the developer host's free space."""
+    monkeypatch.setattr(
+        "srl.runtime.scheduler.shutil.disk_usage",
+        lambda _path: SimpleNamespace(free=_DETERMINISTIC_FREE_DISK_BYTES),
+    )
 
 
 @pytest.fixture
