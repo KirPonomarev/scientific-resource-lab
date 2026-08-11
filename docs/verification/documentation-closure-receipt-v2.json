@@ -41,14 +41,14 @@
   ],
   "generated_source_sha256": {
     "docs/verification/system-acceptance-receipt.json": "55f7295e-4d25cd66-24ac24db-0769f234-6ef69e46-64648377-8c29e228-19344fbe",
-    "policies/federation-ownership-policy-v1.json": "2a2b9472-f9f7a56c-ee1f0f69-83cc684a-9f9a6a38-a58058ef-db071ebc-5d3d6342",
-    "scripts/checks/federation-doctrine-consistency.py": "5e9f6134-d01cd306-a3354f4a-0f7a110b-8138c871-54efe622-84e31705-4503f8e0",
+    "policies/federation-ownership-policy-v1.json": "5350507a-0e0e34a7-32e94ca7-9826c62b-320e0b55-48896ce3-94ba9c17-49164f6b",
+    "scripts/checks/federation-doctrine-consistency.py": "77c8e765-cd5231ab-acd3e959-5b8973ff-2e3759f7-837637b1-135a4d83-527be2e5",
     "scripts/checks/markdown_structure.py": "99fdf1a0-4a5a0fc0-bd5e0eff-3692561b-297d30cc-63ba3e69-6798ace3-e49a8448",
     "scripts/docs/generate_solo_agent_docs.py": "7176dbd3-82eb06a7-6a666048-be5e4847-dc21592a-f5e80edc-0961c00d-de749d16",
     "scripts/docs/generate_system_docs.py": "83279d19-d2890909-6ccbf867-d7ff3548-a36980e5-5496d419-01b42c1d-0404e9af",
     "tests/adversarial/test_system_acceptance_failure_routes.py": "d37a2774-eea73ca2-0b6bb6f5-a8d6b76b-76446bee-4ab24160-6df17751-45b76083",
     "tests/docs/test_documentation_closure.py": "c440bd81-1e0ea518-aabca02b-91daba7e-e2f04f40-46c25404-c892c12c-9787e99b",
-    "tests/docs/test_federation_doctrine.py": "8a35fd59-da57812d-73d52286-48c87f68-2c60d377-be1ac2eb-61475089-3037a653",
+    "tests/docs/test_federation_doctrine.py": "eaeffc63-e1197e53-11567b7c-9178e94f-7707b5a3-dc23ef7a-b8bec950-9c2f7154",
     "tests/e2e/test_system_acceptance_receipt.py": "a091e05d-5729848a-7ece8a1e-315e1af8-62f300d0-89ec05be-e87c7d77-a8f4832e"
   },
   "grants_authority": false,
@@ -66,7 +66,7 @@
       "WAIT_COMPUTE_NODE"
     ]
   },
-  "receipt_id": "d4c963fb-4cf8eaf7-12da3a50-138bff8d-1236664f-9cafc005-19fcee0f-610beb7e",
+  "receipt_id": "9dd2f9f9-ff98e16f-dbd8c175-ada19ba3-9f82f3f1-f057afc4-10b03413-d7a60e24",
   "required_doc_sha256": {
     "AUTHORITY-MATRIX.md": "69006f6e-dc179f92-8f7677b2-35f5d0dd-2bfaaa10-feb25480-bab962df-eecf6add",
     "CAPABILITY-CATALOG.md": "58228411-adc12e5b-217b0542-13b0a59f-ac3e6947-2a724d06-c7ab790f-bbeac55e",
@@ -113,7 +113,7 @@
   "source_head": "7adf5cd2c2d4af888c27126e01094981f821c98a",
   "source_head_role": "base_head_for_frozen_staged_candidate",
   "source_system_acceptance_receipt": "sha256:32e0f109-bd211578-83370768-64aef057-4b812814-a2f81593-18d7b4ac-96fffedc",
-  "staged_candidate_diff_sha256": "sha256:474ca713-bffaa3b9-7509d5e9-7a40090a-155feb18-35de8adf-4664e631-e845e3c9",
+  "staged_candidate_diff_sha256": "sha256:e4afbbde-3559bd66-b4d35a1e-6c2e7bcb-32b98677-db1059dc-6a94e454-c312088c",
   "supersedes_receipt_id": "8e61dc5d-25084df8-254f8ca8-66a51bb6-a9a28210-56932d9b-78823945-21b97c3f",
   "work_package": "GOV-FED-01"
 }

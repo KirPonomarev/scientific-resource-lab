@@ -191,6 +191,7 @@
     "unsupported_evidence_import_state": "WAIT_UNSUPPORTED"
   },
   "source_bindings": {
+    ".github/workflows/ci.yml": "sha256:bbc77c50-baac4782-33bb6d0f-81fbcc66-5c1bfdbb-9918bc6a-b07f34e1-c4f3515a",
     ".github/workflows/docs.yml": "sha256:b84f339d-2bd7a55c-1b6d57ac-860262e2-410b7a44-453bd514-833b635a-423445d3",
     "Makefile": "sha256:cc457cc4-a8af3f4a-3366c881-cf3cb663-c14882c7-12cf969b-547b4fca-02fc5cfe",
     "automation/policy.json": "sha256:b7bdcaf3-748fa2bc-f6139564-d95d0b05-6229a424-175c7acd-06ad2959-6ff9e5cc",

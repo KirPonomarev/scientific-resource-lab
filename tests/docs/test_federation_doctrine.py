@@ -50,6 +50,7 @@ BOUND_DOCUMENT_PATHS = (
     "src/srl/contracts/schemas/v1/README.md",
 )
 BOUND_SOURCE_PATHS = (
+    ".github/workflows/ci.yml",
     ".github/workflows/docs.yml",
     "Makefile",
     "automation/policy.json",
@@ -936,6 +937,16 @@ def test_rebound_spool_ack_execution_status_is_rejected(tmp_path: Path) -> None:
             "        continue-on-error: true",
             "github_federation_gate_job",
         ),
+        (
+            ".github/workflows/ci.yml",
+            "          fetch-depth: 1",
+            "github_unit_full_history_checkout",
+        ),
+        (
+            ".github/workflows/ci.yml",
+            "          # fetch-depth: 0\n          fetch-depth: 1",
+            "github_unit_full_history_checkout",
+        ),
     ),
 )
 def test_governance_gate_entrypoint_cannot_be_rebound_to_noop(
@@ -954,18 +965,49 @@ def test_governance_gate_entrypoint_cannot_be_rebound_to_noop(
             hostile_text,
             1,
         )
-    else:
+    elif relative_path == ".github/workflows/docs.yml":
         text = text.replace(
             "      - name: Federation doctrine consistency",
             f"{hostile_text}\n      - name: Federation doctrine consistency",
             1,
         )
+    else:
+        text = text.replace("          fetch-depth: 0", hostile_text, 1)
     path.write_text(text, encoding="utf-8")
 
     check = gate._critical_source_semantics_check(repo_root)
 
     assert check["status"] == "FAIL"
     assert failure in check["detail"]
+
+
+def test_unit_full_history_setting_cannot_be_relocated_to_another_action(
+    tmp_path: Path,
+) -> None:
+    gate = _gate_module()
+    repo_root = _synthetic_repo(tmp_path)
+    path = repo_root / ".github/workflows/ci.yml"
+    text = path.read_text(encoding="utf-8")
+    before_unit, unit_and_after = text.split("  unit:\n", 1)
+    unit_job, after_unit = unit_and_after.split("\n  package:\n", 1)
+    unit_job = unit_job.replace("          fetch-depth: 0\n", "", 1)
+    setup_uv = """      - name: Setup uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9  # v9.0.0
+        with:
+          enable-cache: true
+"""
+    unit_job = unit_job.replace(
+        setup_uv,
+        f"{setup_uv.rstrip()}\n          fetch-depth: 0\n",
+        1,
+    )
+    text = f"{before_unit}  unit:\n{unit_job}\n  package:\n{after_unit}"
+    path.write_text(text, encoding="utf-8")
+
+    check = gate._critical_source_semantics_check(repo_root)
+
+    assert check["status"] == "FAIL"
+    assert "github_unit_full_history_checkout" in check["detail"]
 
 
 @pytest.mark.parametrize(

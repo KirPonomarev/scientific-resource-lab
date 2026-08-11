@@ -182,6 +182,7 @@ BOUND_DOCUMENT_PATHS: Final[tuple[str, ...]] = (
 )
 
 BOUND_SOURCE_PATHS: Final[tuple[str, ...]] = (
+    ".github/workflows/ci.yml",
     ".github/workflows/docs.yml",
     "Makefile",
     "automation/policy.json",
@@ -1467,6 +1468,37 @@ def _critical_source_semantics_check(  # noqa: C901, PLR0912, PLR0915
                 or exact_job not in workflow_text
             ):
                 failures.append("github_federation_gate_job")
+
+        ci_path = _repo_file(repo_root, ".github/workflows/ci.yml")
+        if ci_path is None:
+            failures.append("unsafe_or_missing:.github/workflows/ci.yml")
+        else:
+            ci_text = ci_path.read_text(encoding="utf-8")
+            unit_marker = "  unit:\n"
+            package_marker = "\n  package:\n"
+            if unit_marker not in ci_text or package_marker not in ci_text:
+                failures.append("github_unit_full_history_checkout")
+            else:
+                unit_job = ci_text.split(unit_marker, 1)[1].split(package_marker, 1)[0]
+                exact_checkout = """      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+"""
+                active_fetch_depth_lines = re.findall(
+                    r"(?m)^[ \t]*fetch-depth[ \t]*:[^\r\n]*$",
+                    unit_job,
+                )
+                if (
+                    unit_job.count(exact_checkout) != 1
+                    or unit_job.count("uses: actions/checkout@") != 1
+                    or active_fetch_depth_lines != ["          fetch-depth: 0"]
+                    or unit_job.count("persist-credentials: false") != 1
+                    or "run: uv run --locked --python ${{ matrix.python-version }} pytest"
+                    not in unit_job
+                ):
+                    failures.append("github_unit_full_history_checkout")
 
         spool_path = _repo_file(repo_root, "src/srl/transport/spool.py")
         if spool_path is None:
