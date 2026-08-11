@@ -2,7 +2,7 @@
   "activates_federation": false,
   "author": "codex-root",
   "base_head": "7adf5cd2c2d4af888c27126e01094981f821c98a",
-  "candidate_diff_sha256": "sha256:6208bd1b016da102b8633bfa5191bebb5c95815fed48ef3fa6ee92a84a09e67b",
+  "candidate_diff_sha256": "sha256:778cea776ecb1388420a51308978a2d3aa9f5b73aa2387b9b8097bdb16ae74d9",
   "canonical_writes": 0,
   "checks": [
     {
@@ -17,12 +17,12 @@
     },
     {
       "check_id": "generated_docs_and_machine_source",
-      "detail": "Both documentation generators reproduce exactly; the independent closure test reconstructs the verifier's same 75 governed paths from REQUIRED_DOCS plus exact policy and DCR bindings, excludes both evidence receipts, remains stable across unrelated descendants and changes across governed descendants; document, source and documentation-closure hashes bind candidate 6208bd1b016da102b8633bfa5191bebb5c95815fed48ef3fa6ee92a84a09e67b; schema meta-validation, compatibility, links and public-boundary scans pass.",
+      "detail": "Both documentation generators reproduce exactly; the independent closure test reconstructs the verifier's same 77 governed paths from REQUIRED_DOCS plus exact policy and DCR bindings, excludes both evidence receipts, remains stable across unrelated descendants and changes across governed descendants; all 36 source bindings match raw bytes, and bridge, ci and portal workflows are additionally bound by an exact three-path grouped SHA-256 map normalized before raw read_bytes comparison; document, source and documentation-closure hashes bind candidate 778cea776ecb1388420a51308978a2d3aa9f5b73aa2387b9b8097bdb16ae74d9; schema meta-validation, compatibility, links, public-boundary and secret scans pass with zero secret findings.",
       "status": "PASS"
     },
     {
       "check_id": "hostile_consistency_tests",
-      "detail": "All 70 receipt-independent hostile doctrine tests pass; the suite collects 71 cases including one receipt-dependent top-level gate. Coverage includes rebound semantics, duplicate-key, symlink, gate-noop, authority-smuggling, second-bus, candidate-digest, shallow-checkout, commented-key, relocated-key and conflicting-key attacks; canonical receipt shape and digest validate against the frozen candidate.",
+      "detail": "All 111 receipt-independent hostile doctrine tests pass; the doctrine suite collects 112 cases including one receipt-dependent top-level gate, and the 8 documentation-closure tests bring the bounded receipt-independent total to 119. Coverage includes rebound semantics, duplicate-key, symlink, gate-noop, authority-smuggling, second-bus, candidate-digest, shallow/commented/relocated/conflicting checkout settings, LF/CRLF boundaries, scalar and sibling-list relocation, disabled steps, quoted or duplicate job keys, aliases, trigger drift, top-level env/defaults and whole-workflow raw-byte mutation; an independent 36-case raw mutation replay across all three critical workflows fails closed; canonical receipt shape and digest validate against the frozen candidate.",
       "status": "PASS"
     },
     {
@@ -48,7 +48,7 @@
   ],
   "grants_authority": false,
   "live_actions": 0,
-  "receipt_id": "sha256:7af63d203714c75e524cf2664305ce179bffb78820c43ca02986cc785ec09734",
+  "receipt_id": "sha256:51ed8903133911748637229e4c5fafb704a825f69a5436cde758b034a7a8268b",
   "residual_risks": [
     "This receipt approves only the static GOV-FED-01 candidate; it neither admits nor activates the federation.",
     "Current SRL, Market, Security, Dual and federation runtime remain NOT_CHARACTERIZED until exact current native receipts exist.",

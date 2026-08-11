@@ -182,8 +182,10 @@ BOUND_DOCUMENT_PATHS: Final[tuple[str, ...]] = (
 )
 
 BOUND_SOURCE_PATHS: Final[tuple[str, ...]] = (
+    ".github/workflows/bridge.yml",
     ".github/workflows/ci.yml",
     ".github/workflows/docs.yml",
+    ".github/workflows/portal.yml",
     "Makefile",
     "automation/policy.json",
     "automation/state.schema.json",
@@ -217,6 +219,18 @@ BOUND_SOURCE_PATHS: Final[tuple[str, ...]] = (
     "tests/contracts/test_srf_federation_schemas.py",
     "tests/unit/test_labctl.py",
 )
+
+CRITICAL_FULL_SUITE_WORKFLOW_SHA256: Final[dict[str, str]] = {
+    ".github/workflows/bridge.yml": (
+        "sha256:b1289236-c4e150fb-db9a5e93-819b9a0d-e3ed3050-6fd80daf-c745999f-fb02d20c"
+    ),
+    ".github/workflows/ci.yml": (
+        "sha256:bbc77c50-baac4782-33bb6d0f-81fbcc66-5c1bfdbb-9918bc6a-b07f34e1-c4f3515a"
+    ),
+    ".github/workflows/portal.yml": (
+        "sha256:d954175a-0a447f2d-056da7de-0a997160-d6fb9281-fca1b845-a51257c2-9dcb0dbe"
+    ),
+}
 
 INDEPENDENT_REVIEW_RECEIPT_PATH: Final[str] = (
     "docs/verification/federation-doctrine-independent-review-v1.json"
@@ -1469,36 +1483,124 @@ def _critical_source_semantics_check(  # noqa: C901, PLR0912, PLR0915
             ):
                 failures.append("github_federation_gate_job")
 
-        ci_path = _repo_file(repo_root, ".github/workflows/ci.yml")
-        if ci_path is None:
-            failures.append("unsafe_or_missing:.github/workflows/ci.yml")
-        else:
-            ci_text = ci_path.read_text(encoding="utf-8")
-            unit_marker = "  unit:\n"
-            package_marker = "\n  package:\n"
-            if unit_marker not in ci_text or package_marker not in ci_text:
-                failures.append("github_unit_full_history_checkout")
-            else:
-                unit_job = ci_text.split(unit_marker, 1)[1].split(package_marker, 1)[0]
-                exact_checkout = """      - name: Checkout
+        exact_checkout_step = """      - name: Checkout
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
         with:
           fetch-depth: 0
           persist-credentials: false
 """
-                active_fetch_depth_lines = re.findall(
-                    r"(?m)^[ \t]*fetch-depth[ \t]*:[^\r\n]*$",
-                    unit_job,
+        full_suite_jobs = (
+            (
+                ".github/workflows/ci.yml",
+                "unit",
+                """    name: unit (python ${{ matrix.python-version }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+""",
+                "run: uv run --locked --python ${{ matrix.python-version }} pytest",
+                "github_unit_full_history_checkout",
+            ),
+            (
+                ".github/workflows/portal.yml",
+                "portal-gate",
+                """    name: portal-gate (WP-F52)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+""",
+                "run: uv run pytest -q",
+                "github_portal_full_history_checkout",
+            ),
+            (
+                ".github/workflows/bridge.yml",
+                "exporter-gate",
+                """    name: exporter-gate (WP-I80)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+""",
+                "run: uv run pytest -q",
+                "github_exporter_full_history_checkout",
+            ),
+        )
+        full_suite_paths = {item[0] for item in full_suite_jobs}
+        if full_suite_paths != set(CRITICAL_FULL_SUITE_WORKFLOW_SHA256):
+            failures.append("github_full_suite_workflow_set")
+        for relative_path, job_id, job_prelude, pytest_command, failure in full_suite_jobs:
+            workflow_path = _repo_file(repo_root, relative_path)
+            if workflow_path is None:
+                failures.append(f"unsafe_or_missing:{relative_path}")
+                continue
+            if _sha256_file(workflow_path) != _normalized_sha256(
+                CRITICAL_FULL_SUITE_WORKFLOW_SHA256[relative_path]
+            ):
+                failures.append(failure)
+                continue
+            workflow_text = workflow_path.read_text(encoding="utf-8")
+            job_marker = f"  {job_id}:\n"
+            if workflow_text.count(job_marker) != 1:
+                failures.append(failure)
+                continue
+            job = workflow_text.split(job_marker, 1)[1]
+            next_job = re.search(
+                r"(?m)^  [^ \t\r\n#][^:\r\n]*:[^\r\n]*\r?$",
+                job,
+            )
+            if next_job is not None:
+                job = job[: next_job.start()]
+            steps_marker = "    steps:\n"
+            steps_tail = job.split(steps_marker, 1)[1] if steps_marker in job else ""
+            step_starts = list(
+                re.finditer(
+                    r"(?m)^      - [^ \t\r\n#][^\r\n]*\r?$",
+                    steps_tail,
                 )
-                if (
-                    unit_job.count(exact_checkout) != 1
-                    or unit_job.count("uses: actions/checkout@") != 1
-                    or active_fetch_depth_lines != ["          fetch-depth: 0"]
-                    or unit_job.count("persist-credentials: false") != 1
-                    or "run: uv run --locked --python ${{ matrix.python-version }} pytest"
-                    not in unit_job
-                ):
-                    failures.append("github_unit_full_history_checkout")
+            )
+            first_step = ""
+            if step_starts and step_starts[0].start() == 0:
+                first_step_end = step_starts[1].start() if len(step_starts) > 1 else len(steps_tail)
+                first_step = steps_tail[:first_step_end].rstrip("\r\n") + "\n"
+            active_fetch_depth_lines = re.findall(
+                r"(?m)^[ \t]*fetch-depth[ \t]*:[^\r\n]*$",
+                job,
+            )
+            pytest_step = f"      - name: Pytest\n        {pytest_command}\n"
+            pytest_starts = [
+                match
+                for match in step_starts
+                if steps_tail[match.start() :].startswith("      - name: Pytest\n")
+            ]
+            exact_pytest_step = ""
+            if len(pytest_starts) == 1:
+                pytest_start = pytest_starts[0].start()
+                pytest_end = next(
+                    (match.start() for match in step_starts if match.start() > pytest_start),
+                    len(steps_tail),
+                )
+                exact_pytest_step = steps_tail[pytest_start:pytest_end].rstrip("\r\n") + "\n"
+            if (
+                not job.startswith(job_prelude)
+                or job.count(steps_marker) != 1
+                or first_step != exact_checkout_step
+                or job.count(exact_checkout_step) != 1
+                or job.count("uses: actions/checkout@") != 1
+                or active_fetch_depth_lines != ["          fetch-depth: 0"]
+                or job.count("persist-credentials: false") != 1
+                or job.count(pytest_step) != 1
+                or steps_tail.count(pytest_step) != 1
+                or exact_pytest_step != pytest_step
+                or re.search(
+                    r"(?m)^    [^ \t\r\n#][^:\r\n]*:[^\r\n]*\r?$",
+                    steps_tail,
+                )
+                is not None
+            ):
+                failures.append(failure)
 
         spool_path = _repo_file(repo_root, "src/srl/transport/spool.py")
         if spool_path is None:

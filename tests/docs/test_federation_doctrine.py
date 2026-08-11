@@ -50,8 +50,10 @@ BOUND_DOCUMENT_PATHS = (
     "src/srl/contracts/schemas/v1/README.md",
 )
 BOUND_SOURCE_PATHS = (
+    ".github/workflows/bridge.yml",
     ".github/workflows/ci.yml",
     ".github/workflows/docs.yml",
+    ".github/workflows/portal.yml",
     "Makefile",
     "automation/policy.json",
     "automation/state.schema.json",
@@ -947,6 +949,16 @@ def test_rebound_spool_ack_execution_status_is_rejected(tmp_path: Path) -> None:
             "          # fetch-depth: 0\n          fetch-depth: 1",
             "github_unit_full_history_checkout",
         ),
+        (
+            ".github/workflows/portal.yml",
+            "          fetch-depth: 1",
+            "github_portal_full_history_checkout",
+        ),
+        (
+            ".github/workflows/bridge.yml",
+            "          fetch-depth: 1",
+            "github_exporter_full_history_checkout",
+        ),
     ),
 )
 def test_governance_gate_entrypoint_cannot_be_rebound_to_noop(
@@ -1008,6 +1020,303 @@ def test_unit_full_history_setting_cannot_be_relocated_to_another_action(
 
     assert check["status"] == "FAIL"
     assert "github_unit_full_history_checkout" in check["detail"]
+
+
+@pytest.mark.parametrize("job_line_ending", ("\n", "\r\n"))
+def test_portal_checkout_cannot_be_supplied_by_a_second_job(
+    tmp_path: Path,
+    job_line_ending: str,
+) -> None:
+    gate = _gate_module()
+    repo_root = _synthetic_repo(tmp_path)
+    path = repo_root / ".github/workflows/portal.yml"
+    text = path.read_text(encoding="utf-8")
+    checkout = """      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+"""
+    text = text.replace(checkout, "", 1)
+    text += f"""
+  decoy-job:{job_line_ending}    runs-on: ubuntu-24.04
+    steps:
+{checkout}"""
+    path.write_text(text, encoding="utf-8")
+
+    check = gate._critical_source_semantics_check(repo_root)
+
+    assert check["status"] == "FAIL"
+    assert "github_portal_full_history_checkout" in check["detail"]
+
+
+@pytest.mark.parametrize(
+    ("relative_path", "job_id", "failure"),
+    (
+        (
+            ".github/workflows/ci.yml",
+            "unit",
+            "github_unit_full_history_checkout",
+        ),
+        (
+            ".github/workflows/portal.yml",
+            "portal-gate",
+            "github_portal_full_history_checkout",
+        ),
+        (
+            ".github/workflows/bridge.yml",
+            "exporter-gate",
+            "github_exporter_full_history_checkout",
+        ),
+    ),
+)
+def test_full_suite_job_cannot_be_rebound_to_a_yaml_scalar(
+    tmp_path: Path,
+    relative_path: str,
+    job_id: str,
+    failure: str,
+) -> None:
+    gate = _gate_module()
+    repo_root = _synthetic_repo(tmp_path)
+    path = repo_root / relative_path
+    text = path.read_text(encoding="utf-8")
+    marker = f"  {job_id}:\n"
+    text = text.replace(marker, f"{marker}    |\n", 1)
+    path.write_text(text, encoding="utf-8")
+
+    check = gate._critical_source_semantics_check(repo_root)
+
+    assert check["status"] == "FAIL"
+    assert failure in check["detail"]
+
+
+@pytest.mark.parametrize(
+    "case",
+    (
+        (
+            ".github/workflows/ci.yml",
+            "unit",
+            "    name: unit (python ${{ matrix.python-version }})\n",
+            "run: uv run --locked --python ${{ matrix.python-version }} pytest",
+            "github_unit_full_history_checkout",
+        ),
+        (
+            ".github/workflows/portal.yml",
+            "portal-gate",
+            "    name: portal-gate (WP-F52)\n",
+            "run: uv run pytest -q",
+            "github_portal_full_history_checkout",
+        ),
+        (
+            ".github/workflows/bridge.yml",
+            "exporter-gate",
+            "    name: exporter-gate (WP-I80)\n",
+            "run: uv run pytest -q",
+            "github_exporter_full_history_checkout",
+        ),
+    ),
+)
+def test_full_suite_pytest_step_cannot_be_moved_to_a_sibling_list(
+    tmp_path: Path,
+    case: tuple[str, str, str, str, str],
+) -> None:
+    relative_path, job_id, job_name, pytest_command, failure = case
+    gate = _gate_module()
+    repo_root = _synthetic_repo(tmp_path)
+    path = repo_root / relative_path
+    text = path.read_text(encoding="utf-8")
+    pytest_step = f"      - name: Pytest\n        {pytest_command}\n"
+    text = text.replace(pytest_step, "", 1)
+    job_prefix = f"  {job_id}:\n{job_name}"
+    text = text.replace(
+        job_prefix,
+        f"{job_prefix}    decoy-list:\n{pytest_step}",
+        1,
+    )
+    path.write_text(text, encoding="utf-8")
+
+    check = gate._critical_source_semantics_check(repo_root)
+
+    assert check["status"] == "FAIL"
+    assert failure in check["detail"]
+
+
+@pytest.mark.parametrize(
+    "case",
+    (
+        (
+            ".github/workflows/ci.yml",
+            "    name: unit (python ${{ matrix.python-version }})\n",
+            "run: uv run --locked --python ${{ matrix.python-version }} pytest",
+            "github_unit_full_history_checkout",
+        ),
+        (
+            ".github/workflows/portal.yml",
+            "    name: portal-gate (WP-F52)\n",
+            "run: uv run pytest -q",
+            "github_portal_full_history_checkout",
+        ),
+        (
+            ".github/workflows/bridge.yml",
+            "    name: exporter-gate (WP-I80)\n",
+            "run: uv run pytest -q",
+            "github_exporter_full_history_checkout",
+        ),
+    ),
+)
+@pytest.mark.parametrize(
+    "attack",
+    (
+        "job_if_false",
+        "job_continue_on_error",
+        "checkout_if_false",
+        "checkout_continue_on_error",
+        "pytest_if_false",
+        "pytest_continue_on_error",
+    ),
+)
+def test_full_suite_job_and_pytest_step_cannot_be_disabled(
+    tmp_path: Path,
+    case: tuple[str, str, str, str],
+    attack: str,
+) -> None:
+    relative_path, job_name, pytest_command, failure = case
+    gate = _gate_module()
+    repo_root = _synthetic_repo(tmp_path)
+    path = repo_root / relative_path
+    text = path.read_text(encoding="utf-8")
+    if attack.startswith("job_"):
+        hostile_line = (
+            "    if: ${{ false }}\n"
+            if attack == "job_if_false"
+            else "    continue-on-error: true\n"
+        )
+        text = text.replace(
+            job_name,
+            f"{job_name}{hostile_line}",
+            1,
+        )
+    elif attack.startswith("checkout_"):
+        checkout_step = """      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+"""
+        hostile_line = (
+            "        if: ${{ false }}\n"
+            if attack == "checkout_if_false"
+            else "        continue-on-error: true\n"
+        )
+        text = text.replace(checkout_step, f"{checkout_step}{hostile_line}", 1)
+    else:
+        pytest_step = f"      - name: Pytest\n        {pytest_command}\n"
+        hostile_line = (
+            "        if: ${{ false }}\n"
+            if attack == "pytest_if_false"
+            else "        continue-on-error: true\n"
+        )
+        text = text.replace(pytest_step, f"{pytest_step}{hostile_line}", 1)
+    path.write_text(text, encoding="utf-8")
+
+    check = gate._critical_source_semantics_check(repo_root)
+
+    assert check["status"] == "FAIL"
+    assert failure in check["detail"]
+
+
+@pytest.mark.parametrize(
+    "case",
+    (
+        (
+            ".github/workflows/ci.yml",
+            "unit",
+            "github_unit_full_history_checkout",
+        ),
+        (
+            ".github/workflows/portal.yml",
+            "portal-gate",
+            "github_portal_full_history_checkout",
+        ),
+        (
+            ".github/workflows/bridge.yml",
+            "exporter-gate",
+            "github_exporter_full_history_checkout",
+        ),
+    ),
+)
+@pytest.mark.parametrize(
+    "attack",
+    (
+        "quoted_duplicate_target_job",
+        "quoted_duplicate_top_level_jobs",
+        "top_level_pytest_env",
+        "top_level_run_defaults",
+    ),
+)
+def test_full_suite_workflow_cannot_be_semantically_overridden(
+    tmp_path: Path,
+    case: tuple[str, str, str],
+    attack: str,
+) -> None:
+    relative_path, job_id, failure = case
+    gate = _gate_module()
+    repo_root = _synthetic_repo(tmp_path)
+    path = repo_root / relative_path
+    text = path.read_text(encoding="utf-8")
+    if attack == "quoted_duplicate_target_job":
+        text += f"""
+  "{job_id}":
+    runs-on: ubuntu-24.04
+    steps:
+      - run: "true"
+"""
+    elif attack == "quoted_duplicate_top_level_jobs":
+        text += """
+"jobs":
+  decoy:
+    runs-on: ubuntu-24.04
+    steps:
+      - run: "true"
+"""
+    elif attack == "top_level_pytest_env":
+        text = text.replace(
+            "jobs:\n",
+            "env:\n  PYTEST_ADDOPTS: --ignore=tests/docs/test_federation_doctrine.py\n\njobs:\n",
+            1,
+        )
+    else:
+        text = text.replace(
+            "jobs:\n",
+            "defaults:\n  run:\n    shell: bash -c 'true' {0}\n\njobs:\n",
+            1,
+        )
+    path.write_text(text, encoding="utf-8")
+
+    check = gate._critical_source_semantics_check(repo_root)
+
+    assert check["status"] == "FAIL"
+    assert failure in check["detail"]
+
+
+def test_critical_full_suite_workflows_are_exact_raw_byte_bound() -> None:
+    gate = _gate_module()
+    expected = {
+        ".github/workflows/bridge.yml": (
+            "sha256:b1289236-c4e150fb-db9a5e93-819b9a0d-e3ed3050-6fd80daf-c745999f-fb02d20c"
+        ),
+        ".github/workflows/ci.yml": (
+            "sha256:bbc77c50-baac4782-33bb6d0f-81fbcc66-5c1bfdbb-9918bc6a-b07f34e1-c4f3515a"
+        ),
+        ".github/workflows/portal.yml": (
+            "sha256:d954175a-0a447f2d-056da7de-0a997160-d6fb9281-fca1b845-a51257c2-9dcb0dbe"
+        ),
+    }
+
+    assert gate.CRITICAL_FULL_SUITE_WORKFLOW_SHA256 == expected
+    for relative_path, digest in expected.items():
+        raw_digest = hashlib.sha256(Path(relative_path).read_bytes()).hexdigest()
+        assert f"sha256:{raw_digest}" == digest.replace("-", "")
 
 
 @pytest.mark.parametrize(
