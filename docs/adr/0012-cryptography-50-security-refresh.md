@@ -28,7 +28,7 @@ and generated SBOM hashes are verified by a focused test.
 
 ## Sources
 
-- Upstream changelog: <https://cryptography.io/en/latest/changelog/#v50-0-0>
+- Upstream changelog: <https://github.com/pyca/cryptography/blob/50.0.0/CHANGELOG.rst>
 - PyPI release metadata: <https://pypi.org/project/cryptography/50.0.0/>
 - Advisory: <https://github.com/advisories/GHSA-g6cj-pr64-35w5>
 
