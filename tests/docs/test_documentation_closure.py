@@ -31,6 +31,7 @@ REQUIRED_DOCS = (
 RECEIPT_PATH = Path("docs/verification/documentation-closure-receipt-v2.json")
 HISTORICAL_RECEIPT_PATH = Path("docs/verification/documentation-closure-receipt.json")
 SYSTEM_RECEIPT_PATH = Path("docs/verification/system-acceptance-receipt.json")
+POLICY_PATH = Path("policies/federation-ownership-policy-v1.json")
 INDEPENDENT_REVIEW_RECEIPT_PATH = Path(
     "docs/verification/federation-doctrine-independent-review-v1.json"
 )
@@ -88,6 +89,18 @@ def _receipt_id(receipt: dict[str, Any]) -> str:
 
 
 def _candidate_diff_sha256() -> str:
+    policy = _load_json(POLICY_PATH)
+    receipt = _receipt()
+    governed_paths = sorted(
+        {
+            *REQUIRED_DOCS,
+            *policy["document_bindings"],
+            *policy["source_bindings"],
+            *receipt["generated_source_sha256"],
+            str(POLICY_PATH),
+        }
+        - {str(RECEIPT_PATH), str(INDEPENDENT_REVIEW_RECEIPT_PATH)}
+    )
     environment = {
         "GIT_CONFIG_COUNT": "0",
         "GIT_CONFIG_GLOBAL": os.devnull,
@@ -120,10 +133,6 @@ def _candidate_diff_sha256() -> str:
         env=environment,
     )
     assert ancestor.returncode == 0
-    exclusions = (
-        f":(top,exclude,literal){RECEIPT_PATH}",
-        f":(top,exclude,literal){INDEPENDENT_REVIEW_RECEIPT_PATH}",
-    )
     process = subprocess.run(  # noqa: S603
         [
             "/usr/bin/git",
@@ -137,8 +146,7 @@ def _candidate_diff_sha256() -> str:
             "--no-textconv",
             EXPECTED_CANDIDATE_BASE_HEAD,
             "--",
-            ".",
-            *exclusions,
+            *(f":(top,literal){path}" for path in governed_paths),
         ],
         capture_output=True,
         check=False,

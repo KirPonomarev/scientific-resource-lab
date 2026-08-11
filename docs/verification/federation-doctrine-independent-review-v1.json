@@ -2,7 +2,7 @@
   "activates_federation": false,
   "author": "codex-root",
   "base_head": "7adf5cd2c2d4af888c27126e01094981f821c98a",
-  "candidate_diff_sha256": "sha256:474ca713bffaa3b97509d5e97a40090a155feb1835de8adf4664e631e845e3c9",
+  "candidate_diff_sha256": "sha256:6208bd1b016da102b8633bfa5191bebb5c95815fed48ef3fa6ee92a84a09e67b",
   "canonical_writes": 0,
   "checks": [
     {
@@ -17,12 +17,12 @@
     },
     {
       "check_id": "generated_docs_and_machine_source",
-      "detail": "Both documentation generators reproduce exactly; document, source and documentation-closure hashes bind the frozen candidate; schema meta-validation, compatibility, links and public-boundary scans pass.",
+      "detail": "Both documentation generators reproduce exactly; the independent closure test reconstructs the verifier's same 75 governed paths from REQUIRED_DOCS plus exact policy and DCR bindings, excludes both evidence receipts, remains stable across unrelated descendants and changes across governed descendants; document, source and documentation-closure hashes bind candidate 6208bd1b016da102b8633bfa5191bebb5c95815fed48ef3fa6ee92a84a09e67b; schema meta-validation, compatibility, links and public-boundary scans pass.",
       "status": "PASS"
     },
     {
       "check_id": "hostile_consistency_tests",
-      "detail": "All 67 receipt-independent hostile doctrine tests pass, including rebound semantics, duplicate-key, symlink, gate-noop, authority-smuggling, second-bus and candidate-digest attacks; canonical receipt shape and digest validate against the frozen candidate.",
+      "detail": "All 70 receipt-independent hostile doctrine tests pass; the suite collects 71 cases including one receipt-dependent top-level gate. Coverage includes rebound semantics, duplicate-key, symlink, gate-noop, authority-smuggling, second-bus, candidate-digest, shallow-checkout, commented-key, relocated-key and conflicting-key attacks; canonical receipt shape and digest validate against the frozen candidate.",
       "status": "PASS"
     },
     {
@@ -48,7 +48,7 @@
   ],
   "grants_authority": false,
   "live_actions": 0,
-  "receipt_id": "sha256:4c2dea279e72823872cc8403d9540ac9817e23c636f145b05ff2246c02aef8ce",
+  "receipt_id": "sha256:7af63d203714c75e524cf2664305ce179bffb78820c43ca02986cc785ec09734",
   "residual_risks": [
     "This receipt approves only the static GOV-FED-01 candidate; it neither admits nor activates the federation.",
     "Current SRL, Market, Security, Dual and federation runtime remain NOT_CHARACTERIZED until exact current native receipts exist.",
