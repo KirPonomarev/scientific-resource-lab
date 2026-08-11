@@ -72,11 +72,16 @@ def _contract_matrix() -> str:
         rows.append(f"| `{path.name}` | `{title}` |")
     lines = [
         *_h1("CONTRACT-MATRIX"),
+        "Ownership and authority boundaries are defined by",
+        "`docs/architecture/federated-research-organism-doctrine-v1.md`.",
         "Machine source: `src/srl/contracts/schemas/v1/`.",
         "Compatibility checks: `scripts/checks/schema-meta-validate.py` and",
         "`scripts/checks/schema-compat.py`.",
         "",
         *rows,
+        "",
+        "`SpoolMessage/v1` and `SpoolAck/v1` are SRL-internal transport contracts;",
+        "they are not the target Dual Wire and grant no cross-domain authority.",
         "",
         "Contract changes that break published consumers require an explicit",
         "schema version bump and cannot be hidden inside documentation updates.",
@@ -90,7 +95,10 @@ def _data_classification() -> str:
         "| Class | Public repo handling |",
         "|---|---|",
         "| `D0` | Public docs, schemas, fixtures and proposal-safe examples. |",
-        "| `D1` | Sanitized metadata and C3 proposal envelopes only. |",
+        (
+            "| `D1` | Sanitized metadata and typed boundary objects. Proposal "
+            "envelopes may be C3; evidence and receipts retain their semantic kind. |"
+        ),
         "| `D2` | Not committed; replace with public digest or typed WAIT. |",
         "| `D3` | Not committed, logged or exported. |",
     ]
@@ -104,6 +112,9 @@ def _data_classification() -> str:
         "Public export packets are review-only. They carry no credentials, no raw",
         "private paths, no private datasets, no trading strategy and no exploit",
         "material.",
+        "A natively permitted public digest derived from D2 is a new sanitized D1",
+        "metadata projection; raw D2 must never be relabelled D1. D3 produces no",
+        "cross-boundary hash, reference, identifier or log entry.",
         "",
     ]
     return "\n".join(lines)
@@ -187,12 +198,16 @@ def _market_integration() -> str:
         "`docs/integrations/MARKET-CHILD-MISSION.md`, and",
         "`docs/child-missions/market/`.",
         "",
-        "The Market bridge is inactive and proposal-only. It imports sanitized C3",
-        "observations only after native health is green and native policy admits the",
-        "child lane. It rejects trading actions, orders, credentials, authority",
-        "claims, duplicate imports and stale native HEAD bindings.",
+        "The Market bridge is inactive and proposal-only. It accepts C3 proposal",
+        "envelopes containing sanitized, unadmitted observation claims only after",
+        "native health is green and native policy admits the child lane. Native",
+        "evidence remains evidence and is never reclassified as C3. The bridge",
+        "rejects trading actions, orders, credentials, authority claims, duplicate",
+        "imports and stale native HEAD bindings.",
         "",
-        "Current state: `WAIT_RUNTIME_HEALTH:MARKET_RED_F8`.",
+        "Recorded V3.7 evidence at its bound generation:",
+        "`WAIT_RUNTIME_HEALTH:MARKET_RED_F8`. This is historical receipt state,",
+        "not current Market runtime truth; current truth requires native bootstrap.",
         "",
     ]
     return "\n".join(lines)
@@ -205,12 +220,17 @@ def _security_integration() -> str:
         "`docs/integrations/SECURITY-CHILD-MISSION.md`, and",
         "`docs/child-missions/security/`.",
         "",
-        "The Security bridge is inactive and proposal-only. It accepts only",
-        "sanitized D0/D1 C3 findings inside the declared boundary. It rejects target",
-        "identifiers, exploit material, payloads, credentials, target actions,",
-        "authority claims, duplicate imports and stale native HEAD bindings.",
+        "The Security bridge is inactive and proposal-only. It accepts only C3",
+        "proposal envelopes containing sanitized D0/D1 unadmitted finding claims",
+        "inside the declared boundary. Native evidence remains evidence and is",
+        "never reclassified as C3. The bridge rejects target identifiers, exploit",
+        "material, payloads, credentials, target actions, authority claims, duplicate",
+        "imports and stale native HEAD bindings.",
         "",
-        "Current state: `WAIT_SECURITY_HEALTH:BOOTSTRAP_UNAVAILABLE`.",
+        "Recorded V3.7 evidence at its bound generation:",
+        "`WAIT_SECURITY_HEALTH:BOOTSTRAP_UNAVAILABLE`. This is historical receipt",
+        "state, not current Security runtime truth; current truth requires native",
+        "bootstrap.",
         "",
     ]
     return "\n".join(lines)
@@ -219,10 +239,15 @@ def _security_integration() -> str:
 def _trading_boundary() -> str:
     lines = [
         *_h1("TRADING-EXECUTION-BOUNDARY"),
-        "SRF is not a trading executor. SRF receipts, model outputs, validation",
-        "runs, export packets and bridge messages are C3/proposal-only. They never",
-        "authorize orders, live trading, portfolio mutation, credential use, paid",
-        "API spend or Market runtime control.",
+        "SRF is not a trading executor. Requests, intents, export packets and bridge",
+        "messages remain C3 proposals. Receipts retain receipt semantics; validation",
+        "runs retain evidence semantics. Both remain authority-negative and are not",
+        "reclassified as C3. Neither semantic class can authorize orders, live",
+        "trading, portfolio mutation, credential use, paid API spend or Market",
+        "runtime control.",
+        "",
+        "Semantic kind and authority are independent axes. Any requested effect",
+        "derived from evidence is a separate C3 proposal with its own identity.",
         "",
         "Market actions require the Market repository's native authority chain.",
         "SRF may prepare sanitized child mission packets and exact WAIT receipts;",

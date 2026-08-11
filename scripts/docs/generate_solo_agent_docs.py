@@ -31,9 +31,12 @@ def _cell_rows() -> list[str]:
         "|---|---|---|---|",
     ]
     for cell in manifest["cells"]:
+        transport = cell["allowed_transport"]
+        if transport == "D0_D1_spool_packet":
+            transport = "D0_D1_spool_packet (legacy/inactive SRL adapter; not target Dual Wire)"
         rows.append(
-            "| {display_name} | `{native_bootstrap}` | `{allowed_transport}` | `{status}` |".format(
-                **cell
+            "| {display_name} | `{native_bootstrap}` | `{transport}` | `{status}` |".format(
+                transport=transport, **cell
             )
         )
     return rows
@@ -54,6 +57,24 @@ def _start_here() -> str:
         "# START-HERE",
         "",
         _front_matter().rstrip(),
+        "Before using a bridge or describing cross-repository ownership, read",
+        "`docs/architecture/federated-research-organism-doctrine-v1.md`.",
+        "It defines SRL as the primary scientific cortex without granting global",
+        "authority, and declares Dual Wire as a target role whose runtime is unproven.",
+        "Semantic kind and authority are independent: requests and intents are C3",
+        "proposals; results, evidence and receipts retain their semantic kind.",
+        "Before any cross-repository description or change, run:",
+        "",
+        "```bash",
+        "make gate-federation-doctrine",
+        "srlab labctl federation-orient NONE",
+        "```",
+        "",
+        "Report the exact orientation block. SRL V3.7 release truth is separate",
+        "from runtime truth; without exact current native receipts, SRL, Market,",
+        "Security, Dual and federation runtime are all `NOT_CHARACTERIZED`.",
+        "The caller-declared scope is context only and grants no authority.",
+        "",
         "Scientific Reasoning Fabric starts from one JSON-first entrypoint:",
         "",
         "```bash",
@@ -71,15 +92,18 @@ def _start_here() -> str:
         "",
         "Minimum fresh-agent sequence:",
         "",
-        "1. Run `srlab labctl enter`.",
-        "2. Run `srlab labctl doctor`.",
-        "3. Submit one bounded local session with `srlab labctl submit <session-dir>`.",
+        "1. Read the federation doctrine and ownership policy.",
+        "2. Run `make gate-federation-doctrine`.",
+        "3. Run `srlab labctl federation-orient NONE` and report its exact block.",
+        "4. Run `srlab labctl enter`.",
+        "5. Run `srlab labctl doctor`.",
+        "6. Submit one bounded local session with `srlab labctl submit <session-dir>`.",
         (
-            "4. Inspect it with `srlab labctl status <session-dir>` and "
+            "7. Inspect it with `srlab labctl status <session-dir>` and "
             "`srlab labctl result <session-dir>`."
         ),
         (
-            "5. Export and replay it with `srlab labctl export <session-dir>` and "
+            "8. Export and replay it with `srlab labctl export <session-dir>` and "
             "`srlab labctl replay <session-dir>`."
         ),
         "",
@@ -92,6 +116,11 @@ def _system_atlas() -> str:
         "# SYSTEM-ATLAS",
         "",
         _front_matter().rstrip(),
+        "Static federation ownership is defined by",
+        "`docs/architecture/federated-research-organism-doctrine-v1.md`.",
+        "This generated atlas is an SRL-local entry model, not current federation",
+        "runtime evidence and not proof that any target bridge or Dual Wire is active.",
+        "",
         "SRF is a contract-first scientific computation fabric. It owns",
         "scientific computation, receipts, bounded execution, safe export packets",
         "and standalone documentation. It does not own Market authority, Security",
@@ -108,6 +137,11 @@ def _system_atlas() -> str:
         "- Receipt: `ScientificRunReceipt/v1` and import receipts.",
         "- Health: `SRFPulse/v1` plus read-only federation status.",
         "",
+        "Requests, intents and proposal envelopes are C3 proposals. Results,",
+        "evidence, validation artifacts and receipts retain their semantic kind.",
+        "All remain authority-negative at this boundary; authority-negative does",
+        "not mean C3.",
+        "",
     ]
     return "\n".join(lines)
 
@@ -118,6 +152,11 @@ def _runbook() -> str:
         "",
         _front_matter().rstrip(),
         "A solo agent uses SRF by following receipts, not chat history.",
+        "Before cross-repository work, read the federation doctrine, run",
+        "`make gate-federation-doctrine`, then run",
+        "`srlab labctl federation-orient NONE` and report its exact block.",
+        "Without exact current native receipts every runtime stays",
+        "`NOT_CHARACTERIZED`; a caller-declared scope grants no authority.",
         "",
         "For V3.7, use `accepted_release_head` in the A22 blocked closeout as",
         "the accepted-main release truth. The legacy `git_head` field aliases",
@@ -170,8 +209,8 @@ def _cell_matrix() -> str:
         _front_matter().rstrip(),
         *_cell_rows(),
         "",
-        "Cross-lab cells are proposal-only until their native bootstrap and owner",
-        "policy admit the corresponding child mission.",
+        "Market and Security adapter cells are proposal-only until their native",
+        "bootstrap and owner policy admit the corresponding child mission.",
         "",
     ]
     return "\n".join(lines)
@@ -184,10 +223,13 @@ def _authority_matrix() -> str:
         _front_matter().rstrip(),
         *_authority_rows(),
         "",
-        "SRF results are evidence packets and proposals. They are never authority",
-        "to trade, execute target-specific security actions, install credentials,",
-        "spend paid budget, deploy services, reboot systems, or perform destructive",
-        "storage operations.",
+        "SRF requests and intents remain C3 proposals. Receipts retain receipt",
+        "semantics; validation artifacts retain evidence semantics. Both remain",
+        "authority-negative and are never reclassified as C3. Semantic kind and",
+        "authority are independent axes. Neither category",
+        "authorizes trading, target-specific security actions, credential installation,",
+        "paid-budget spend, service deployment, system reboot or destructive storage",
+        "operations.",
         "",
     ]
     return "\n".join(lines)

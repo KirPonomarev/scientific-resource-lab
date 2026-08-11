@@ -1,0 +1,242 @@
+{
+  "activates_federation": false,
+  "canonical_writes": 0,
+  "current_state": {
+    "accepted_release_head": "418aa9673b814871405e92a4a1ea13290efb3fae",
+    "federation_state_source": "exact_current_native_receipts_only",
+    "federation_runtime_state": "NOT_CHARACTERIZED_BY_THIS_POLICY",
+    "release_truth_path": "docs/verification/srf-v3-7-mission-closeout-blocked-v2-0-0.json",
+    "release_truth_receipt_id": "sha256:a1876671c4e039285e366ae047c56bde9f565e2e9d52083a4063c6cf7bf58dcd",
+    "release_truth_result": "BLOCKED_EXTERNAL_AUTHORITY",
+    "role_allocation_is_runtime_evidence": false,
+    "target_release": "v2.0.0",
+    "target_release_published": false
+  },
+  "document_bindings": {
+    "AGENTS.md": "sha256:55f31d38-ad3c6f56-8caddfd2-e263a61b-fc7e4544-7a97f71a-af78512e-356c60a3",
+    "AUTHORITY-MATRIX.md": "sha256:69006f6e-dc179f92-8f7677b2-35f5d0dd-2bfaaa10-feb25480-bab962df-eecf6add",
+    "CELL-MATRIX.md": "sha256:0e9071cc-5891b50b-6f64d70b-fbd087ae-01d74a8e-c576c705-fb1781e4-d7b6b7fe",
+    "CONTRACT-MATRIX.md": "sha256:a3f6bea8-ab2e55a3-3e558244-79ab2c48-c24ee56d-4b0b6d03-135aef9b-d87578fc",
+    "CONTRIBUTING.md": "sha256:370f1fc4-0c3a2885-77a1bb30-9145892f-cd0652ac-ca8c63d0-fdd4cf5a-1b489522",
+    "DATA-CLASSIFICATION.md": "sha256:7090674d-2700fba2-1c97b3cf-b061de78-e9c79acd-523e736a-bac01302-2d2f97a5",
+    "GOVERNANCE.md": "sha256:69927b0e-08e780ae-a15d1b8b-6de54eb8-d0bd5afa-b86daae9-3cc35d69-a6cd17fc",
+    "MARKET-INTEGRATION.md": "sha256:e3fb8746-4f285b26-a95a9f5b-460d08b3-eeb2a76e-c60db608-5ffc1ec8-f9d0dfd9",
+    "README.md": "sha256:a2ebe0a1-e9fc98ba-d88ae18b-d7bc78a3-95ff7cec-a37bc6ea-e74c8798-284e091a",
+    "SECURITY-INTEGRATION.md": "sha256:63416ba4-ddb3c74e-1e504366-03149c62-208bd04e-72628320-b2c14b3c-d8b88c38",
+    "SOLO-AGENT-RUNBOOK.md": "sha256:89626497-7915abfb-ff6c2f20-e33087be-a738d30f-c6e9da8f-e45f0701-e28b63e0",
+    "START-HERE.md": "sha256:3e66b219-47193eb8-5685069a-2367b159-84bfb828-473ee8f7-baf2e8d8-4cecdbb6",
+    "SYSTEM-ATLAS.md": "sha256:55a2193f-1a4d34f2-5ca9abf1-8eb70a17-25255dd5-d0bf897e-dee38076-de219c5f",
+    "TRADING-EXECUTION-BOUNDARY.md": "sha256:5950997f-e242861c-ea4869d2-911f2fdb-82dd0198-e45d0ba9-fed6a400-8d44d78a",
+    "docs/adr/0011-federated-research-organism-ownership.md": "sha256:d7a1c34d-b2f3240e-3bdc6f6a-0f417d0d-b23e2d82-335ce6b0-61982b2b-6e5a2101",
+    "docs/architecture/README.md": "sha256:08321cb9-01f744cf-73f9c0ba-8ebf52ea-f2992214-0a2b60a0-a16bff72-9c36f030",
+    "docs/architecture/federated-research-organism-doctrine-v1.md": "sha256:89a2b725-4c88d5c5-59b20248-9df5431a-1a67f865-3da4b525-7041f796-49c04e63",
+    "docs/architecture/transport.md": "sha256:dec69350-47b5d82f-df30a0d3-d7767e03-7c02080a-d5ce26a4-90684c09-b7f4ca62",
+    "docs/integrations/MARKET-CHILD-MISSION.md": "sha256:3584a542-7f329e59-a643085c-d874a8e1-9b8c52dd-7da1360c-64293367-3d613bce",
+    "docs/integrations/MARKET-INTEGRATION.md": "sha256:9ede0707-241e4db1-2f6acc64-a2cc5c08-dca70ab2-f642ef0c-150b6c9c-3d944d64",
+    "docs/integrations/SECURITY-CHILD-MISSION.md": "sha256:18996deb-3036e987-f0c52c96-bd449b12-a2ec83d0-5961ae8e-ea34e7c8-ae98538b",
+    "docs/integrations/SECURITY-INTEGRATION.md": "sha256:52459fcb-31bc826b-696b7811-5223b42e-9d8a9d96-1d9f9756-9ad3aa93-5b4f2fe2",
+    "docs/integrations/shared-contracts.md": "sha256:48475fa3-613c20eb-b5b06723-18bfcbdf-236eb9a8-b4ce7afe-d8d7d3ad-205d48f7",
+    "docs/plans/federated-research-organism-successor-plan-v1.md": "sha256:b0901596-c5308e5b-61bbdfea-83bcc30c-94974cf0-d83305bb-147757ad-25a62d1c",
+    "src/srl/contracts/schemas/v1/README.md": "sha256:3bd5f781-d31e799d-26e0fe52-abdbc919-defc0134-78790f43-7f4f05b6-126c553e"
+  },
+  "formal_invariants": {
+    "cross_domain_a2_allowed": false,
+    "cross_domain_effect_owner": "target_native_domain_only",
+    "global_a2": "FORBIDDEN",
+    "global_a2_authority": null,
+    "global_sovereign_controller": null,
+    "global_sovereign_writer": null,
+    "primary_scientific_cortex": "scientific-resource-lab",
+    "shared_srl_scientific_contract_semantics_owner": "scientific-resource-lab",
+    "target_wire_order_owner": "dual-contour-research-os"
+  },
+  "grants_authority": false,
+  "human_metaphor": {
+    "meaning": "shared scientific cognition, computation, proof, knowledge, planning and scientific provenance",
+    "never_means": [
+      "global authority",
+      "native domain truth",
+      "native domain admission",
+      "permission to trade",
+      "permission to execute target-specific security actions",
+      "permission to deploy or mutate protected state",
+      "automatic promotion of a scientific result"
+    ],
+    "primary_scientific_cortex": "scientific-resource-lab"
+  },
+  "participants": {
+    "crosslab": {
+      "does_not_own": [
+        "authority",
+        "evidence",
+        "execution",
+        "queue_semantics",
+        "transport_truth"
+      ],
+      "owns": [
+        "wake_notification_of_immutable_reference"
+      ],
+      "registered_peer_scope": [
+        "bridge",
+        "market",
+        "security"
+      ],
+      "repository_id": "crosslab-shadow-link-v0",
+      "role_code": "PAGER_ONLY",
+      "srl_endpoint_allowed": false
+    },
+    "dual": {
+      "does_not_own": [
+        "global_authority",
+        "market_truth",
+        "native_domain_effects",
+        "scientific_payload_meaning",
+        "scientific_validation",
+        "security_truth"
+      ],
+      "owns": [
+        "wire_acknowledgements",
+        "wire_backpressure",
+        "wire_deduplication",
+        "wire_delivery_order",
+        "wire_epoch_and_sequence",
+        "wire_ledger_watermark"
+      ],
+      "payload_reinterpretation_allowed": false,
+      "repository_id": "dual-contour-research-os",
+      "role_activation": "TARGET_DECLARED_NOT_RUNTIME_PROVEN",
+      "role_code": "MECHANICAL_TRANSPORT_ORDER_FABRIC"
+    },
+    "market": {
+      "does_not_own": [
+        "global_transport_order",
+        "security_truth",
+        "srl_capability_truth"
+      ],
+      "owns": [
+        "market_domain_truth",
+        "market_gates_and_admission",
+        "market_material_event_projection",
+        "market_native_writers"
+      ],
+      "repository_id": "crypto-market-lab",
+      "role_code": "NATIVE_MARKET_TRUTH_AND_EFFECT_OWNER"
+    },
+    "security": {
+      "does_not_own": [
+        "general_scientific_planning",
+        "global_transport_order",
+        "market_truth",
+        "srl_scientific_contract_semantics"
+      ],
+      "owns": [
+        "safety_attention_and_verdicts",
+        "security_domain_truth",
+        "security_native_admission",
+        "security_native_executor_boundary",
+        "security_native_writers"
+      ],
+      "repository_id": "security-research-os",
+      "role_code": "NATIVE_SECURITY_TRUTH_SAFETY_AND_EFFECT_OWNER"
+    },
+    "srl": {
+      "does_not_own": [
+        "cross_domain_delivery_order",
+        "global_authority",
+        "market_truth",
+        "native_domain_admission",
+        "native_domain_writers",
+        "security_truth"
+      ],
+      "owns": [
+        "bounded_scientific_execution",
+        "formal_and_numerical_reasoning",
+        "scientific_capability_catalog",
+        "srl_scientific_contract_semantics",
+        "scientific_knowledge_and_provenance",
+        "scientific_planner_and_router",
+        "scientific_receipts",
+        "shared_read_only_scientific_interface"
+      ],
+      "repository_id": "scientific-resource-lab",
+      "role_code": "SCIENTIFIC_REASONING_COMPUTE_FABRIC"
+    }
+  },
+  "policy_id": "FEDERATION_OWNERSHIP_POLICY_V1",
+  "runtime_truth": false,
+  "schema_version": "FederationOwnershipPolicy/v1",
+  "semantic_invariants": {
+    "authority_negative_implies_proposal": false,
+    "c3_semantic_kinds": [
+      "request",
+      "intent",
+      "proposal_envelope"
+    ],
+    "d2_cross_boundary_rule": "native_sanitized_d1_metadata_projection_only",
+    "d3_cross_boundary_hash_reference_identifier_or_log_allowed": false,
+    "effect_request_derived_from_evidence_requires_new_c3_proposal": true,
+    "evidence_semantic_kinds": [
+      "scientific_result",
+      "evidence",
+      "validation_artifact"
+    ],
+    "evidence_reclassified_as_proposal": false,
+    "evidence_import_requires_versioned_successor": true,
+    "imported_as_c3_scope": "proposal_payloads_only",
+    "receipt_semantic_kinds": [
+      "receipt"
+    ],
+    "semantic_kind_and_authority_are_independent_axes": true,
+    "simultaneous_srl_spool_and_dual_wire_order_authority": false,
+    "unsupported_evidence_import_state": "WAIT_UNSUPPORTED"
+  },
+  "source_bindings": {
+    ".github/workflows/docs.yml": "sha256:b84f339d-2bd7a55c-1b6d57ac-860262e2-410b7a44-453bd514-833b635a-423445d3",
+    "Makefile": "sha256:cc457cc4-a8af3f4a-3366c881-cf3cb663-c14882c7-12cf969b-547b4fca-02fc5cfe",
+    "automation/policy.json": "sha256:b7bdcaf3-748fa2bc-f6139564-d95d0b05-6229a424-175c7acd-06ad2959-6ff9e5cc",
+    "automation/state.schema.json": "sha256:74efc1c9-9200df97-38072448-2d364f37-d13587f0-ee2f7efa-53a837ea-32da93c4",
+    "configs/integrations/market-bridge.json": "sha256:c7d9423b-af1a6498-0ad19fd7-bf08cfd6-42ee49d3-aee31042-2bdd40ba-c02a57dd",
+    "configs/integrations/security-bridge.json": "sha256:c45fe3da-a2e5abfe-4d4ce444-b4ab0522-439a18a8-e924b8e7-5954002f-abf155eb",
+    "scripts/docs/generate_solo_agent_docs.py": "sha256:7176dbd3-82eb06a7-6a666048-be5e4847-dc21592a-f5e80edc-0961c00d-de749d16",
+    "scripts/docs/generate_system_docs.py": "sha256:83279d19-d2890909-6ccbf867-d7ff3548-a36980e5-5496d419-01b42c1d-0404e9af",
+    "src/srl/autonomy/policy.py": "sha256:708c162a-8bd8df96-36d8628d-172c770c-53e16423-8ee6039a-a7a9b678-6bf4a42f",
+    "src/srl/contracts/schema.py": "sha256:66126352-cae88298-059944d1-97a92f22-b6bf806c-e8a72729-e25f6ac1-514b12d5",
+    "src/srl/contracts/schemas/v1/evidence-assessment.json": "sha256:b9089310-92c55e81-930cae0c-3009b05e-89f9999d-129ae0f0-8127faff-913983cc",
+    "src/srl/contracts/schemas/v1/federation-orientation-report.json": "sha256:f3b93f3a-ae453f72-8f5359ba-09c61492-c370b4d1-8b3c58c4-ccf1d4e7-cc7bebe1",
+    "src/srl/contracts/schemas/v1/federation-status.json": "sha256:e2f990c4-7503750b-fa269173-bd3ea215-0a569b89-80e7f6de-33557df3-437ba9c6",
+    "src/srl/contracts/schemas/v1/lab-cell-manifest.json": "sha256:50c74bdb-a4fd43f3-358f8d8b-c038e984-c54ad640-95bbe32c-8c0bfdf1-52bd8a07",
+    "src/srl/contracts/schemas/v1/lab-export-packet.json": "sha256:e0779abe-09b83144-64fec99a-7d77a6d3-e6b20980-a14b5b35-2e36b7e1-7a6d891a",
+    "src/srl/contracts/schemas/v1/lab-federation-manifest.json": "sha256:83b5481f-94b474c4-4d3c4996-218754b0-c4329581-a984af57-b140c2e9-eabea482",
+    "src/srl/contracts/schemas/v1/science-lab-run-receipt.json": "sha256:512990f4-bb97ab77-95f547fc-b8637709-2481017e-b96c3f57-fb615deb-7be3d9bb",
+    "src/srl/contracts/schemas/v1/scientific-request-envelope.json": "sha256:7e19bf2a-0920212c-b5a2e594-b68f33c7-2f12a964-5033ddfe-a0b13534-64586964",
+    "src/srl/contracts/schemas/v1/scientific-result-envelope.json": "sha256:aabc243c-3ffe0d7f-6f3bbdae-5fb1e570-5c7e1663-445ef28b-bbe2623b-65bb3698",
+    "src/srl/contracts/schemas/v1/scientific-import-receipt.json": "sha256:0f6ac362-3aa6f0d6-8a87a6d6-02bb74d6-1b7909eb-15e67243-113401bd-33113b87",
+    "src/srl/contracts/schemas/v1/scientific-object-envelope.json": "sha256:4f349b15-bad675ff-b23c6a10-fbf2d6f3-c57f5272-41296e4d-f028a771-564c733d",
+    "src/srl/contracts/schemas/v1/scientific-run-receipt.json": "sha256:27ac6378-423dbd37-681a21ac-2f8a89d2-7b4883a2-21dfdd8f-c3c5ca7e-f03bdc38",
+    "src/srl/contracts/schemas/v1/spool-ack.json": "sha256:b63b4a85-96e6e355-a4fdf8b5-2e33be2d-0ec93758-a9d48d87-72664d15-3a883ccc",
+    "src/srl/contracts/schemas/v1/spool-message.json": "sha256:5f6eae71-493209dc-15ee42ec-afb1e31f-f5cbd1eb-40917515-813ec404-b0e18fa1",
+    "src/srl/contracts/schemas/v1/srf-pulse.json": "sha256:3229a48b-80ac2622-f179b3cb-fe847847-d8bdce77-b563b24e-f194b476-244d036e",
+    "src/srl/contracts/schemas/v1/transformation-receipt.json": "sha256:39f0bff3-b19bde75-831b75e0-44e8688a-ccfb5f2d-f2457567-81bfd3b8-5002e200",
+    "src/srl/cli.py": "sha256:0cb8764e-af8d4725-e7a48a50-f9cc5f8a-2eb13cff-671815d6-759cb935-aec447db",
+    "src/srl/integrations/market/bridge.py": "sha256:8b665399-345b00d0-01ed5980-680ca73f-e34a1f9c-37e6ceb7-55c1f442-d1ae2a48",
+    "src/srl/integrations/security/bridge.py": "sha256:167907ed-acbc3bda-9e1e3d05-456c9b29-63dcbe89-efcc8f71-dc42cb53-3b78d0f3",
+    "src/srl/labctl.py": "sha256:a9ad0485-d38ef3fe-d3210671-f4933c3f-0220e456-68e2b7b4-28474978-e6933b4d",
+    "src/srl/transport/spool.py": "sha256:e2dcb786-11175c83-9fe4e062-652706d7-633e429b-ce6a1d67-05735b4e-914f7fd3",
+    "tests/contracts/test_srf_federation_schemas.py": "sha256:4346dd4c-a26d5324-25239e89-f7256910-7f551671-d918fb1b-5ea1b670-8b63506a",
+    "tests/unit/test_labctl.py": "sha256:a26acefe-e88382d9-5891bef7-7964d305-b8e59c31-d585f67f-68d2984c-14a2e313"
+  },
+  "status": "DRAFT_PROPOSED",
+  "transport_transition": {
+    "active_cross_domain_wire": "NONE_PROVEN_BY_THIS_POLICY",
+    "current": "srl_internal_spool_with_inactive_proposal_only_market_security_adapters",
+    "cutover": "never_two_cross_domain_delivery_order_authorities",
+    "target": "dual_wire_after_exact_native_closeout_conformance_and_cutover_receipts"
+  },
+  "wire_semantic_boundary": {
+    "dual_may_reinterpret_scientific_payload": false,
+    "dual_wraps": "exact_scientific_payload_bytes_or_immutable_reference",
+    "scientific_object_id_equals_wire_document_id": false,
+    "srl_internal_spool_is_global_wire": false,
+    "transport_ack_grants_application_acceptance": false
+  }
+}

@@ -17,6 +17,19 @@ permissions:
   contents: read
 
 jobs:
+  federation-doctrine:
+    name: federation doctrine
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout full governance history
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5.1.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Federation doctrine consistency
+        run: python3 scripts/checks/federation-doctrine-consistency.py
+
   link-check:
     name: link check
     runs-on: ubuntu-24.04

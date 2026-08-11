@@ -62,6 +62,7 @@ from srl.knowledge.retriever import (
     RetrievalTimeoutError,
     TransportResponse,
 )
+from srl.labctl import FederationOrientationError, federation_orientation_report
 from srl.planning import build_plan, default_policy, load_default_catalog, route
 from srl.semantic.claims import ClaimInvariantError
 from srl.semantic.claims import validate as claim_validate
@@ -704,6 +705,21 @@ def _cmd_labctl_enter(args: list[str], options: dict[str, str | None]) -> int:
     return EXIT_OK
 
 
+def _cmd_labctl_federation_orient(args: list[str], options: dict[str, str | None]) -> int:
+    """``labctl federation-orient [write-scope]`` emits receipt-bound roles."""
+    del options
+    if len(args) > 1:
+        _emit_err(_error_report("labctl federation-orient", "expected [write-scope]"))
+        return EXIT_USAGE
+    try:
+        report = federation_orientation_report(write_scope=args[0] if args else "NONE")
+    except FederationOrientationError as exc:
+        _emit_err(_error_report("labctl federation-orient", str(exc)))
+        return EXIT_ERROR
+    _emit(report)
+    return EXIT_OK
+
+
 def _cmd_labctl_doctor(args: list[str], options: dict[str, str | None]) -> int:
     """``labctl doctor`` emits the A17 solo-agent doctor report."""
     del args, options
@@ -819,6 +835,7 @@ _SUBCOMMANDS: Final[dict[str, dict[str, _Handler]]] = {
     },
     "labctl": {
         "enter": _cmd_labctl_enter,
+        "federation-orient": _cmd_labctl_federation_orient,
         "doctor": _cmd_labctl_doctor,
         "submit": _cmd_labctl_submit,
         "status": _labctl_session_handler("status"),

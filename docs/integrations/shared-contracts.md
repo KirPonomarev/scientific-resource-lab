@@ -9,7 +9,8 @@ Committed artifact:
 - `docs/child-missions/dual-contour/dual-contour-native-startup-evidence.json`
 - `docs/verification/srf-v3-7-a18-dual-contour-closeout-receipt.json`
 
-Current target evidence:
+Historical V3.7 A18 target evidence at the recorded generation (not current
+Dual runtime truth):
 
 - DualContour read-only HEAD: `a3cc68227387954417931fe08f9d66b6212f3308`
 - DualContour worktree status observed clean
@@ -31,3 +32,7 @@ passes only as a truthful `WAIT_NATIVE_CHILD_CLOSEOUT` projection. A future
 native closeout must match the child request id, source and target heads,
 schema hashes, conformance-vector hash, producer and consumer `PASS` suites, and
 authority-negative fields before SRF can import it as active evidence.
+
+Current Dual state must be obtained from an exact current native receipt. If it
+is unavailable, report `NOT_CHARACTERIZED`; never promote the recorded A18
+observation to current runtime truth.

@@ -6,9 +6,14 @@ Detailed sources: `docs/integrations/SECURITY-INTEGRATION.md`,
 `docs/integrations/SECURITY-CHILD-MISSION.md`, and
 `docs/child-missions/security/`.
 
-The Security bridge is inactive and proposal-only. It accepts only
-sanitized D0/D1 C3 findings inside the declared boundary. It rejects target
-identifiers, exploit material, payloads, credentials, target actions,
-authority claims, duplicate imports and stale native HEAD bindings.
+The Security bridge is inactive and proposal-only. It accepts only C3
+proposal envelopes containing sanitized D0/D1 unadmitted finding claims
+inside the declared boundary. Native evidence remains evidence and is
+never reclassified as C3. The bridge rejects target identifiers, exploit
+material, payloads, credentials, target actions, authority claims, duplicate
+imports and stale native HEAD bindings.
 
-Current state: `WAIT_SECURITY_HEALTH:BOOTSTRAP_UNAVAILABLE`.
+Recorded V3.7 evidence at its bound generation:
+`WAIT_SECURITY_HEALTH:BOOTSTRAP_UNAVAILABLE`. This is historical receipt
+state, not current Security runtime truth; current truth requires native
+bootstrap.

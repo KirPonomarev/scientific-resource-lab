@@ -6,9 +6,13 @@ Detailed sources: `docs/integrations/MARKET-INTEGRATION.md`,
 `docs/integrations/MARKET-CHILD-MISSION.md`, and
 `docs/child-missions/market/`.
 
-The Market bridge is inactive and proposal-only. It imports sanitized C3
-observations only after native health is green and native policy admits the
-child lane. It rejects trading actions, orders, credentials, authority
-claims, duplicate imports and stale native HEAD bindings.
+The Market bridge is inactive and proposal-only. It accepts C3 proposal
+envelopes containing sanitized, unadmitted observation claims only after
+native health is green and native policy admits the child lane. Native
+evidence remains evidence and is never reclassified as C3. The bridge
+rejects trading actions, orders, credentials, authority claims, duplicate
+imports and stale native HEAD bindings.
 
-Current state: `WAIT_RUNTIME_HEALTH:MARKET_RED_F8`.
+Recorded V3.7 evidence at its bound generation:
+`WAIT_RUNTIME_HEALTH:MARKET_RED_F8`. This is historical receipt state,
+not current Market runtime truth; current truth requires native bootstrap.

@@ -63,9 +63,10 @@ HTTP today, but it must be unique and must not change for a given shape.
 | `scientific-request-envelope.json` | `ScientificRequestEnvelope/v1` | Request nerve envelope carrying D0/D1 payloads and authority-negative consts. |
 | `scientific-result-envelope.json` | `ScientificResultEnvelope/v1` | Result nerve envelope with explicit terminal / WAIT status. |
 | `scientific-run-receipt.json`     | `ScientificRunReceipt/v1`     | Receipt nerve envelope for terminal SRF run outcomes. |
-| `scientific-import-receipt.json`  | `ScientificImportReceipt/v1`  | Proposal-only import receipt; imports as C3 rather than authority. |
+| `scientific-import-receipt.json`  | `ScientificImportReceipt/v1`  | Records proposal-payload import as C3; it cannot represent evidence or receipt import, which remain `WAIT_UNSUPPORTED` until a versioned successor is admitted. |
 | `srf-pulse.json`                  | `SRFPulse/v1`                 | SRF-local health pulse, independent of external cell health. |
 | `federation-status.json`          | `FederationStatus/v1`         | Read-only aggregation of cell status projections. |
+| `federation-orientation-report.json` | `FederationOrientationReport/v1` | Checkout-bound, gate-verified static federation orientation; historical V3.7 evidence is never current runtime health. |
 | `spool-message.json`              | `SpoolMessage/v1`             | At-least-once D0/D1 spool message envelope with idempotency key. |
 | `spool-ack.json`                  | `SpoolAck/v1`                 | Explicit acknowledgement / rejection envelope for spool messages. |
 | `dead-letter-record.json`         | `DeadLetterRecord/v1`         | Terminal delivery-failure record. |

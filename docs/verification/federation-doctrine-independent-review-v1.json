@@ -1,0 +1,62 @@
+{
+  "activates_federation": false,
+  "author": "codex-root",
+  "base_head": "7adf5cd2c2d4af888c27126e01094981f821c98a",
+  "candidate_diff_sha256": "sha256:474ca713bffaa3b97509d5e97a40090a155feb1835de8adf4664e631e845e3c9",
+  "canonical_writes": 0,
+  "checks": [
+    {
+      "check_id": "authority_and_native_sovereignty",
+      "detail": "SRL is cognition-only; Market and Security retain native truth, admission, writers and effects; Dual owns only the unproven target wire role; global controller, writer and A2 are absent.",
+      "status": "PASS"
+    },
+    {
+      "check_id": "current_vs_target_truth",
+      "detail": "The policy binds the exact BLOCKED_EXTERNAL_AUTHORITY V3.7 release receipt and labels static roles as non-runtime evidence; SRL, Market, Security, Dual and federation runtime remain NOT_CHARACTERIZED.",
+      "status": "PASS"
+    },
+    {
+      "check_id": "generated_docs_and_machine_source",
+      "detail": "Both documentation generators reproduce exactly; document, source and documentation-closure hashes bind the frozen candidate; schema meta-validation, compatibility, links and public-boundary scans pass.",
+      "status": "PASS"
+    },
+    {
+      "check_id": "hostile_consistency_tests",
+      "detail": "All 67 receipt-independent hostile doctrine tests pass, including rebound semantics, duplicate-key, symlink, gate-noop, authority-smuggling, second-bus and candidate-digest attacks; canonical receipt shape and digest validate against the frozen candidate.",
+      "status": "PASS"
+    },
+    {
+      "check_id": "ownership_raci",
+      "detail": "The target RACI has one accountable owner per concern: SRL scientific cognition, Dual post-cutover wire order, Market market truth and effects, Security safety/security truth and effects, and CrossLab wake notification only.",
+      "status": "PASS"
+    },
+    {
+      "check_id": "reuse_delta_no_duplication",
+      "detail": "The exact reuse/delta matrix reuses LabCellManifest, LabFederationManifest, ScientificRequest/Result/Run, FederationStatus, LabExportPacket and native receipts; only a versioned evidence-import successor and Dual wire mechanics remain explicit deltas.",
+      "status": "PASS"
+    },
+    {
+      "check_id": "semantic_wire_boundary",
+      "detail": "Scientific and wire identities remain separate; Dual wraps exact payload bytes or immutable references; ACK grants no application or native acceptance; SRL spool stays internal; D2 and D3 routes fail closed as specified.",
+      "status": "PASS"
+    },
+    {
+      "check_id": "v37_history_immutability",
+      "detail": "The V3.7 master plan and all srf-v3-7 receipts are byte-identical to base 7adf5cd2c2d4af888c27126e01094981f821c98a, and the legacy V3.7 consistency verifier passes unchanged.",
+      "status": "PASS"
+    }
+  ],
+  "grants_authority": false,
+  "live_actions": 0,
+  "receipt_id": "sha256:4c2dea279e72823872cc8403d9540ac9817e23c636f145b05ff2246c02aef8ce",
+  "residual_risks": [
+    "This receipt approves only the static GOV-FED-01 candidate; it neither admits nor activates the federation.",
+    "Current SRL, Market, Security, Dual and federation runtime remain NOT_CHARACTERIZED until exact current native receipts exist.",
+    "Dual wire, native adapters, native closeouts and governed cutover remain successor work parked at WAIT_GOVERNANCE_ADMISSION.",
+    "The candidate digest covers the explicit governed path set; unrelated paths and operational state remain subject to normal PR, CI and native governance."
+  ],
+  "reviewer": "codex-srl-independent-reviewer",
+  "schema_version": "FederationDoctrineIndependentReviewReceipt/v1",
+  "verdict": "APPROVE",
+  "work_package": "GOV-FED-01"
+}
