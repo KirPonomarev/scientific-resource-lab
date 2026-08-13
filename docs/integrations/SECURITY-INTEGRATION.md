@@ -20,9 +20,12 @@ target identifiers, exploit or payload material, credentials, private paths,
 D2/D3 labels, prompt-injection text, authority claims, non-ebashim executor
 claims, duplicate observations and stale Security HEAD bindings.
 
-With no native Security closeout present, SRF emits
-`WAIT_NATIVE_CHILD_CLOSEOUT` plus `WAIT_SECURITY_HEALTH` rather than treating
-the bridge as active. A native closeout, when supplied later, must be
+At the recorded V3.7 evidence generation, no native Security closeout was
+present, so SRF emitted `WAIT_NATIVE_CHILD_CLOSEOUT` plus
+`WAIT_SECURITY_HEALTH` rather than treating the bridge as active. These are
+historical bound observations, not current Security runtime truth. Current
+state requires exact native bootstrap evidence; without it, report
+`NOT_CHARACTERIZED`. A native closeout, when supplied later, must be
 hash-bound to the child request, preserve `ebashim`, pass native/SRF/
 containment suites, keep all action and transfer counters at zero, and grant no
 scientific or Security authority.

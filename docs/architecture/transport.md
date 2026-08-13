@@ -1,5 +1,17 @@
 # Reliable Spool Transport
 
+```text
+SCOPE: SRL_INTERNAL_FILE_BACKED_SPOOL
+NOT: TARGET_DUAL_WIRE
+TARGET_DUAL_WIRE_RUNTIME_PROVEN: false
+GRANTS_AUTHORITY: false
+```
+
+This document describes SRL's internal spool only. Existing Market and
+Security adapter labels are inactive legacy transport assumptions. They do not
+define the target cross-domain wire, prove Dual deployed, or authorize a
+second global bus.
+
 SRF transport V1 is a local, file-backed at-least-once spool. It does not add a
 broker, daemon, shared database, SFTP channel, polling loop, or canonical writer.
 Every state transition is a canonical JSON file written through `tmp`, flushed,
@@ -35,8 +47,10 @@ Receiver acceptance is fail-closed:
 - receiver-side dedup by message identity or idempotency key plus payload hash
   must not find a prior import.
 
-Success writes the message to `inbox/imported/` and returns `SpoolAck/v1` with
-`ACKNOWLEDGED`. Duplicate delivery returns `DUPLICATE` without another import.
+Transport success writes the message to `inbox/imported/` and returns
+`SpoolAck/v1` with `ACKNOWLEDGED`. That step proves transport acceptance only;
+it does not determine whether the referenced payload is a proposal, evidence or
+receipt. Duplicate delivery returns `DUPLICATE` without another import.
 Malformed messages, missing signatures, signature failures, corrupt partial
 files, and rejected hash-chain transitions go to `quarantine/`. Expired or
 terminal delivery failures go to `dlq/` with `DeadLetterRecord/v1`.
@@ -88,6 +102,9 @@ overwriting the original persisted `ACKNOWLEDGED` receipt.
 
 ## State Model
 
+The following legacy terminal label is valid only for proposal payloads. This
+V1 spool has no typed evidence-import state.
+
 ```text
 CREATED
   -> SEALED
@@ -100,6 +117,11 @@ Terminal alternatives:
 REJECTED | EXPIRED | DUPLICATE | QUARANTINED | DEAD_LETTERED
 ```
 
-All imports remain C3 proposal evidence. SRF transport receipts do not perform
-protected actions, execute child missions, mutate Market/Security authority, or
-dispatch paid/live workloads.
+For proposal payloads only, `IMPORTED_AS_C3` records a legacy proposal-import
+disposition. It is neither an authority class nor a universal import-success
+state and grants no authority. Receipts, results and evidence retain their
+semantic kind and remain authority-negative; transport never reclassifies them
+as proposals. Because V1 cannot represent a typed evidence import, an evidence
+route remains `WAIT_UNSUPPORTED` until an admitted versioned successor exists.
+SRF transport receipts do not perform protected actions, execute child
+missions, mutate Market/Security authority, or dispatch paid/live workloads.

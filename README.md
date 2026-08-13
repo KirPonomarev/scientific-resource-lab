@@ -5,13 +5,31 @@ autonomous research agents.
 
 Scientific Resource Lab (SRL) provides:
 
-- typed scientific contracts over canonical JSON (schema set `schemas/v1`);
+- typed scientific contracts over canonical JSON (schema set
+  `src/srl/contracts/schemas/v1`);
 - an immutable content-addressed artifact store with verified ingest;
 - reviewed, hash-locked capability packs with safe materialization;
 - a bounded fixed-entrypoint local runner with hard resource limits;
 - a deterministic claim router and planner with explicit `WAIT_CAPABILITY`;
 - a JSON-first CLI, a read-only MCP interface and a static evidence portal;
 - a disclosure-sanitized `LabExportPacket/v1` proposal-only bridge.
+
+## Role in the federation
+
+SRL is the primary scientific cortex and formal
+`SCIENTIFIC_REASONING_COMPUTE_FABRIC`; it is never a global writer.
+Global A2 is forbidden. Read the
+[`federated organism doctrine`](docs/architecture/federated-research-organism-doctrine-v1.md).
+Before any cross-repository description or change, run
+`make gate-federation-doctrine` and `srlab labctl federation-orient NONE`.
+The orientation separates SRL V3.7 release truth from runtime truth: without
+exact current native receipts, SRL, Market, Security, Dual and federation
+runtime are all `NOT_CHARACTERIZED`. A declared scope grants no authority.
+
+C3 is a proposal semantic kind, not a synonym for authority-negative. Results,
+evidence, receipts and validation artifacts retain their semantic kind when
+they cross a boundary; any requested effect derived from them is a separate C3
+proposal admitted only by the target native domain.
 
 ## Scientific honesty
 

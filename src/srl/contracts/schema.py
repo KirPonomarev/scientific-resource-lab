@@ -78,6 +78,7 @@ _SCHEMA_NAME_TO_FILE: Final[dict[str, str]] = {
     "ScientificImportReceipt": "scientific-import-receipt.json",
     "SRFPulse": "srf-pulse.json",
     "FederationStatus": "federation-status.json",
+    "FederationOrientationReport": "federation-orientation-report.json",
     "SpoolMessage": "spool-message.json",
     "SpoolAck": "spool-ack.json",
     "DeadLetterRecord": "dead-letter-record.json",

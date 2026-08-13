@@ -9,7 +9,10 @@
 | `orders_allowed` | `false` |
 | `security_actions_allowed` | `false` |
 
-SRF results are evidence packets and proposals. They are never authority
-to trade, execute target-specific security actions, install credentials,
-spend paid budget, deploy services, reboot systems, or perform destructive
-storage operations.
+SRF requests and intents remain C3 proposals. Receipts retain receipt
+semantics; validation artifacts retain evidence semantics. Both remain
+authority-negative and are never reclassified as C3. Semantic kind and
+authority are independent axes. Neither category
+authorizes trading, target-specific security actions, credential installation,
+paid-budget spend, service deployment, system reboot or destructive storage
+operations.

@@ -8,10 +8,13 @@ Detailed sources: `docs/tutorials/boundaries.md`,
 | Class | Public repo handling |
 |---|---|
 | `D0` | Public docs, schemas, fixtures and proposal-safe examples. |
-| `D1` | Sanitized metadata and C3 proposal envelopes only. |
+| `D1` | Sanitized metadata and typed boundary objects. Proposal envelopes may be C3; evidence and receipts retain their semantic kind. |
 | `D2` | Not committed; replace with public digest or typed WAIT. |
 | `D3` | Not committed, logged or exported. |
 
 Public export packets are review-only. They carry no credentials, no raw
 private paths, no private datasets, no trading strategy and no exploit
 material.
+A natively permitted public digest derived from D2 is a new sanitized D1
+metadata projection; raw D2 must never be relabelled D1. D3 produces no
+cross-boundary hash, reference, identifier or log entry.

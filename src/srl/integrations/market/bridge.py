@@ -43,7 +43,11 @@ class MarketBridgeStatus(StrEnum):
 
 @dataclass(frozen=True)
 class MarketObservationPacket:
-    """Validated Market-origin observation packet."""
+    """Validated Market-origin C3 proposal wrapper around an unadmitted claim.
+
+    ``observation`` is a historical API name. This packet is not native Market
+    evidence, an EvidenceAssessment, a receipt, admission or authority.
+    """
 
     observation_id: str
     request_id: str
@@ -132,7 +136,11 @@ def import_market_observation_packet(
     expected_market_head: str,
     seen_observation_ids: frozenset[str] = frozenset(),
 ) -> dict[str, object]:
-    """Validate a Market C3 observation and map it to a ScientificResultEnvelope."""
+    """Map a Market C3 proposal packet to a proposal-class result envelope.
+
+    The mapping preserves the packet's proposal semantic kind. It does not
+    import native evidence or reclassify evidence as C3.
+    """
     _require_git_head(expected_market_head, "expected_market_head")
     observation = _coerce_packet(packet)
     if observation.market_head != expected_market_head:

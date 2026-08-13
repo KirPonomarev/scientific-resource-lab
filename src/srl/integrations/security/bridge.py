@@ -44,7 +44,12 @@ class SecurityBridgeStatus(StrEnum):
 
 @dataclass(frozen=True)
 class SecurityObservationPacket:
-    """Validated Security-origin advisory packet."""
+    """Validated Security-origin C3 proposal wrapper around an unadmitted claim.
+
+    ``observation`` is a historical API name. This packet is not native
+    Security evidence, an EvidenceAssessment, a receipt, admission or
+    authority.
+    """
 
     observation_id: str
     request_id: str
@@ -120,7 +125,11 @@ def import_security_observation_packet(
     expected_security_head: str,
     seen_observation_ids: frozenset[str] = frozenset(),
 ) -> dict[str, object]:
-    """Validate a Security C3 observation and map it to a result envelope."""
+    """Map a Security C3 proposal packet to a proposal-class result envelope.
+
+    The mapping preserves the packet's proposal semantic kind. It does not
+    import native evidence or reclassify evidence as C3.
+    """
     _require_git_head(expected_security_head, "expected_security_head")
     observation = _coerce_packet(packet)
     if observation.security_head != expected_security_head:

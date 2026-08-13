@@ -1,0 +1,425 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.srlab.dev/v1/FederationOrientationReport.json",
+  "title": "FederationOrientationReport/v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "status",
+    "policy_status",
+    "admission_state",
+    "orientation",
+    "orientation_block",
+    "target_role_activation",
+    "recorded_v37_evidence",
+    "bindings",
+    "source_identity",
+    "runtime_truth",
+    "activates_federation",
+    "canonical_writes",
+    "live_actions",
+    "grants_authority",
+    "declared_scope_grants_authority"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "FederationOrientationReport/v1"
+    },
+    "status": {
+      "type": "string",
+      "const": "ORIENTED_READ_ONLY"
+    },
+    "policy_status": {
+      "type": "string",
+      "const": "DRAFT_PROPOSED"
+    },
+    "admission_state": {
+      "type": "string",
+      "const": "WAIT_GOVERNANCE_ADMISSION"
+    },
+    "orientation": {
+      "$ref": "#/$defs/orientation"
+    },
+    "orientation_block": {
+      "type": "string",
+      "pattern": "^PRIMARY_SCIENTIFIC_CORTEX: SCIENTIFIC_RESOURCE_LAB\\nSRL_FORMAL_ROLE: SCIENTIFIC_REASONING_COMPUTE_FABRIC\\nTARGET_WIRE_ORDER_OWNER: DUAL_CONTOUR\\nTARGET_WIRE_ORDER_ROLE_STATE: TARGET_DECLARED_NOT_RUNTIME_PROVEN\\nSAFETY_CORTEX: SECURITY_RESEARCH_OS\\nMARKET_TRUTH_OWNER: CRYPTO_MARKET_LAB\\nSECURITY_TRUTH_OWNER: SECURITY_RESEARCH_OS\\nGLOBAL_SOVEREIGN_CONTROLLER: NONE\\nGLOBAL_SOVEREIGN_WRITER: NONE\\nGLOBAL_A2: FORBIDDEN\\nCROSS_DOMAIN_EFFECT_OWNER: TARGET_NATIVE_DOMAIN_ONLY\\nCROSSLAB_ROLE: PAGER_ONLY\\nCROSSLAB_SRL_ENDPOINT: NONE\\nCURRENT_SRL_RELEASE_TRUTH: BLOCKED_EXTERNAL_AUTHORITY\\nCURRENT_FEDERATION_RUNTIME: NOT_CHARACTERIZED\\nCURRENT_SRL_RUNTIME: NOT_CHARACTERIZED\\nCURRENT_MARKET_RUNTIME: NOT_CHARACTERIZED\\nCURRENT_SECURITY_RUNTIME: NOT_CHARACTERIZED\\nCURRENT_DUAL_RUNTIME: NOT_CHARACTERIZED\\nFEDERATION_RUNTIME_STATE_SOURCE: EXACT_CURRENT_NATIVE_RECEIPTS_ONLY\\nDECLARED_WRITE_SCOPE: [A-Za-z0-9][A-Za-z0-9._:-]*(/[A-Za-z0-9][A-Za-z0-9._:-]*)*\\nDECLARED_WRITE_SCOPE_GRANTS_AUTHORITY: FALSE$"
+    },
+    "target_role_activation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dual_wire_order"],
+      "properties": {
+        "dual_wire_order": {
+          "type": "string",
+          "const": "TARGET_DECLARED_NOT_RUNTIME_PROVEN"
+        }
+      }
+    },
+    "recorded_v37_evidence": {
+      "$ref": "#/$defs/recordedV37Evidence"
+    },
+    "bindings": {
+      "$ref": "#/$defs/bindings"
+    },
+    "source_identity": {
+      "$ref": "#/$defs/sourceIdentity"
+    },
+    "runtime_truth": {
+      "type": "boolean",
+      "const": false
+    },
+    "activates_federation": {
+      "type": "boolean",
+      "const": false
+    },
+    "canonical_writes": {
+      "type": "integer",
+      "const": 0
+    },
+    "live_actions": {
+      "type": "integer",
+      "const": 0
+    },
+    "grants_authority": {
+      "type": "boolean",
+      "const": false
+    },
+    "declared_scope_grants_authority": {
+      "type": "boolean",
+      "const": false
+    }
+  },
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "head": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "writeScope": {
+      "type": "string",
+      "maxLength": 256,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*(/[A-Za-z0-9][A-Za-z0-9._:-]*)*$"
+    },
+    "orientation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "PRIMARY_SCIENTIFIC_CORTEX",
+        "SRL_FORMAL_ROLE",
+        "TARGET_WIRE_ORDER_OWNER",
+        "TARGET_WIRE_ORDER_ROLE_STATE",
+        "SAFETY_CORTEX",
+        "MARKET_TRUTH_OWNER",
+        "SECURITY_TRUTH_OWNER",
+        "GLOBAL_SOVEREIGN_CONTROLLER",
+        "GLOBAL_SOVEREIGN_WRITER",
+        "GLOBAL_A2",
+        "CROSS_DOMAIN_EFFECT_OWNER",
+        "CROSSLAB_ROLE",
+        "CROSSLAB_SRL_ENDPOINT",
+        "CURRENT_SRL_RELEASE_TRUTH",
+        "CURRENT_FEDERATION_RUNTIME",
+        "CURRENT_SRL_RUNTIME",
+        "CURRENT_MARKET_RUNTIME",
+        "CURRENT_SECURITY_RUNTIME",
+        "CURRENT_DUAL_RUNTIME",
+        "FEDERATION_RUNTIME_STATE_SOURCE",
+        "DECLARED_WRITE_SCOPE",
+        "DECLARED_WRITE_SCOPE_GRANTS_AUTHORITY"
+      ],
+      "properties": {
+        "PRIMARY_SCIENTIFIC_CORTEX": {
+          "type": "string",
+          "const": "SCIENTIFIC_RESOURCE_LAB"
+        },
+        "SRL_FORMAL_ROLE": {
+          "type": "string",
+          "const": "SCIENTIFIC_REASONING_COMPUTE_FABRIC"
+        },
+        "TARGET_WIRE_ORDER_OWNER": {
+          "type": "string",
+          "const": "DUAL_CONTOUR"
+        },
+        "TARGET_WIRE_ORDER_ROLE_STATE": {
+          "type": "string",
+          "const": "TARGET_DECLARED_NOT_RUNTIME_PROVEN"
+        },
+        "SAFETY_CORTEX": {
+          "type": "string",
+          "const": "SECURITY_RESEARCH_OS"
+        },
+        "MARKET_TRUTH_OWNER": {
+          "type": "string",
+          "const": "CRYPTO_MARKET_LAB"
+        },
+        "SECURITY_TRUTH_OWNER": {
+          "type": "string",
+          "const": "SECURITY_RESEARCH_OS"
+        },
+        "GLOBAL_SOVEREIGN_CONTROLLER": {
+          "type": "string",
+          "const": "NONE"
+        },
+        "GLOBAL_SOVEREIGN_WRITER": {
+          "type": "string",
+          "const": "NONE"
+        },
+        "GLOBAL_A2": {
+          "type": "string",
+          "const": "FORBIDDEN"
+        },
+        "CROSS_DOMAIN_EFFECT_OWNER": {
+          "type": "string",
+          "const": "TARGET_NATIVE_DOMAIN_ONLY"
+        },
+        "CROSSLAB_ROLE": {
+          "type": "string",
+          "const": "PAGER_ONLY"
+        },
+        "CROSSLAB_SRL_ENDPOINT": {
+          "type": "string",
+          "const": "NONE"
+        },
+        "CURRENT_SRL_RELEASE_TRUTH": {
+          "type": "string",
+          "const": "BLOCKED_EXTERNAL_AUTHORITY"
+        },
+        "CURRENT_FEDERATION_RUNTIME": {
+          "type": "string",
+          "const": "NOT_CHARACTERIZED"
+        },
+        "CURRENT_SRL_RUNTIME": {
+          "type": "string",
+          "const": "NOT_CHARACTERIZED"
+        },
+        "CURRENT_MARKET_RUNTIME": {
+          "type": "string",
+          "const": "NOT_CHARACTERIZED"
+        },
+        "CURRENT_SECURITY_RUNTIME": {
+          "type": "string",
+          "const": "NOT_CHARACTERIZED"
+        },
+        "CURRENT_DUAL_RUNTIME": {
+          "type": "string",
+          "const": "NOT_CHARACTERIZED"
+        },
+        "FEDERATION_RUNTIME_STATE_SOURCE": {
+          "type": "string",
+          "const": "EXACT_CURRENT_NATIVE_RECEIPTS_ONLY"
+        },
+        "DECLARED_WRITE_SCOPE": {
+          "$ref": "#/$defs/writeScope"
+        },
+        "DECLARED_WRITE_SCOPE_GRANTS_AUTHORITY": {
+          "type": "boolean",
+          "const": false
+        }
+      }
+    },
+    "recordedStage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["receipt_id", "stage_id", "terminal_state", "evidence_role"],
+      "properties": {
+        "receipt_id": {
+          "$ref": "#/$defs/digest"
+        },
+        "stage_id": {
+          "type": "string",
+          "enum": ["A18", "A19", "A20"]
+        },
+        "terminal_state": {
+          "type": "string",
+          "const": "WAIT_NATIVE_CHILD_CLOSEOUT"
+        },
+        "evidence_role": {
+          "type": "string",
+          "const": "RECORDED_V3_7_NOT_CURRENT_HEALTH"
+        }
+      }
+    },
+    "recordedV37Evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence_role", "release", "stages"],
+      "properties": {
+        "evidence_role": {
+          "type": "string",
+          "const": "RECORDED_V3_7_NOT_CURRENT_RUNTIME_HEALTH"
+        },
+        "release": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "accepted_release_head",
+            "receipt_id",
+            "result",
+            "target_release",
+            "target_release_published"
+          ],
+          "properties": {
+            "accepted_release_head": {
+              "type": "string",
+              "const": "418aa9673b814871405e92a4a1ea13290efb3fae"
+            },
+            "receipt_id": {
+              "type": "string",
+              "const": "sha256:a1876671c4e039285e366ae047c56bde9f565e2e9d52083a4063c6cf7bf58dcd"
+            },
+            "result": {
+              "type": "string",
+              "const": "BLOCKED_EXTERNAL_AUTHORITY"
+            },
+            "target_release": {
+              "type": "string",
+              "const": "v2.0.0"
+            },
+            "target_release_published": {
+              "type": "boolean",
+              "const": false
+            }
+          }
+        },
+        "stages": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["dual", "market", "security"],
+          "properties": {
+            "dual": {
+              "allOf": [
+                {"$ref": "#/$defs/recordedStage"},
+                {
+                  "type": "object",
+                  "properties": {
+                    "receipt_id": {
+                      "const": "sha256:d60e2fe35a732cbb29107b549ca4b6c89a280a0e5128b432a2b5cb1743896b50"
+                    },
+                    "stage_id": {"const": "A18"}
+                  }
+                }
+              ]
+            },
+            "market": {
+              "allOf": [
+                {"$ref": "#/$defs/recordedStage"},
+                {
+                  "type": "object",
+                  "properties": {
+                    "receipt_id": {
+                      "const": "sha256:f2e1638e40150c2929f8bc27ae4de4e6d6919bf3eb85e1a24668f1b9bb73391a"
+                    },
+                    "stage_id": {"const": "A19"}
+                  }
+                }
+              ]
+            },
+            "security": {
+              "allOf": [
+                {"$ref": "#/$defs/recordedStage"},
+                {
+                  "type": "object",
+                  "properties": {
+                    "receipt_id": {
+                      "const": "sha256:327881c83976f1b600b0b7ec3b15ba3f1e8aa661695705e3f340bc7631827cfd"
+                    },
+                    "stage_id": {"const": "A20"}
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "fileBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9._/-]+$"
+        },
+        "sha256": {
+          "$ref": "#/$defs/digest"
+        }
+      }
+    },
+    "bindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy", "successor_plan", "release_receipt", "doctrine_gate"],
+      "properties": {
+        "policy": {
+          "allOf": [
+            {"$ref": "#/$defs/fileBinding"},
+            {
+              "type": "object",
+              "properties": {
+                "path": {"const": "policies/federation-ownership-policy-v1.json"}
+              }
+            }
+          ]
+        },
+        "successor_plan": {
+          "allOf": [
+            {"$ref": "#/$defs/fileBinding"},
+            {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "const": "docs/plans/federated-research-organism-successor-plan-v1.md"
+                }
+              }
+            }
+          ]
+        },
+        "release_receipt": {
+          "allOf": [
+            {"$ref": "#/$defs/fileBinding"},
+            {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "const": "docs/verification/srf-v3-7-mission-closeout-blocked-v2-0-0.json"
+                }
+              }
+            }
+          ]
+        },
+        "doctrine_gate": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["input_manifest_sha256", "receipt_id", "verifier_sha256"],
+          "properties": {
+            "input_manifest_sha256": {"$ref": "#/$defs/digest"},
+            "receipt_id": {"$ref": "#/$defs/digest"},
+            "verifier_sha256": {"$ref": "#/$defs/digest"}
+          }
+        }
+      }
+    },
+    "sourceIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_base_head",
+        "current_head",
+        "candidate_diff_sha256",
+        "worktree_matches_index"
+      ],
+      "properties": {
+        "candidate_base_head": {"$ref": "#/$defs/head"},
+        "current_head": {"$ref": "#/$defs/head"},
+        "candidate_diff_sha256": {"$ref": "#/$defs/digest"},
+        "worktree_matches_index": {"type": "boolean", "const": true}
+      }
+    }
+  }
+}

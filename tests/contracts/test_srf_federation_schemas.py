@@ -13,6 +13,116 @@ _UTC = "2026-07-29T00:00:00Z"
 _HEAD = "947cbb4515307b54fe3eb9b6366cdb392361c867"
 
 
+def _orientation_doc() -> dict[str, object]:
+    orientation = {
+        "PRIMARY_SCIENTIFIC_CORTEX": "SCIENTIFIC_RESOURCE_LAB",
+        "SRL_FORMAL_ROLE": "SCIENTIFIC_REASONING_COMPUTE_FABRIC",
+        "TARGET_WIRE_ORDER_OWNER": "DUAL_CONTOUR",
+        "TARGET_WIRE_ORDER_ROLE_STATE": "TARGET_DECLARED_NOT_RUNTIME_PROVEN",
+        "SAFETY_CORTEX": "SECURITY_RESEARCH_OS",
+        "MARKET_TRUTH_OWNER": "CRYPTO_MARKET_LAB",
+        "SECURITY_TRUTH_OWNER": "SECURITY_RESEARCH_OS",
+        "GLOBAL_SOVEREIGN_CONTROLLER": "NONE",
+        "GLOBAL_SOVEREIGN_WRITER": "NONE",
+        "GLOBAL_A2": "FORBIDDEN",
+        "CROSS_DOMAIN_EFFECT_OWNER": "TARGET_NATIVE_DOMAIN_ONLY",
+        "CROSSLAB_ROLE": "PAGER_ONLY",
+        "CROSSLAB_SRL_ENDPOINT": "NONE",
+        "CURRENT_SRL_RELEASE_TRUTH": "BLOCKED_EXTERNAL_AUTHORITY",
+        "CURRENT_FEDERATION_RUNTIME": "NOT_CHARACTERIZED",
+        "CURRENT_SRL_RUNTIME": "NOT_CHARACTERIZED",
+        "CURRENT_MARKET_RUNTIME": "NOT_CHARACTERIZED",
+        "CURRENT_SECURITY_RUNTIME": "NOT_CHARACTERIZED",
+        "CURRENT_DUAL_RUNTIME": "NOT_CHARACTERIZED",
+        "FEDERATION_RUNTIME_STATE_SOURCE": "EXACT_CURRENT_NATIVE_RECEIPTS_ONLY",
+        "DECLARED_WRITE_SCOPE": "NONE",
+        "DECLARED_WRITE_SCOPE_GRANTS_AUTHORITY": False,
+    }
+    orientation_block = "\n".join(
+        f"{key}: {'FALSE' if value is False else value}" for key, value in orientation.items()
+    )
+    return {
+        "schema_version": "FederationOrientationReport/v1",
+        "status": "ORIENTED_READ_ONLY",
+        "policy_status": "DRAFT_PROPOSED",
+        "admission_state": "WAIT_GOVERNANCE_ADMISSION",
+        "orientation": orientation,
+        "orientation_block": orientation_block,
+        "target_role_activation": {
+            "dual_wire_order": "TARGET_DECLARED_NOT_RUNTIME_PROVEN",
+        },
+        "recorded_v37_evidence": {
+            "evidence_role": "RECORDED_V3_7_NOT_CURRENT_RUNTIME_HEALTH",
+            "release": {
+                "accepted_release_head": "418aa9673b814871405e92a4a1ea13290efb3fae",
+                "receipt_id": (
+                    "sha256:a1876671c4e039285e366ae047c56bde9f565e2e9d52083a4063c6cf7bf58dcd"
+                ),
+                "result": "BLOCKED_EXTERNAL_AUTHORITY",
+                "target_release": "v2.0.0",
+                "target_release_published": False,
+            },
+            "stages": {
+                "dual": {
+                    "receipt_id": (
+                        "sha256:d60e2fe35a732cbb29107b549ca4b6c89a280a0e5128b432a2b5cb1743896b50"
+                    ),
+                    "stage_id": "A18",
+                    "terminal_state": "WAIT_NATIVE_CHILD_CLOSEOUT",
+                    "evidence_role": "RECORDED_V3_7_NOT_CURRENT_HEALTH",
+                },
+                "market": {
+                    "receipt_id": (
+                        "sha256:f2e1638e40150c2929f8bc27ae4de4e6d6919bf3eb85e1a24668f1b9bb73391a"
+                    ),
+                    "stage_id": "A19",
+                    "terminal_state": "WAIT_NATIVE_CHILD_CLOSEOUT",
+                    "evidence_role": "RECORDED_V3_7_NOT_CURRENT_HEALTH",
+                },
+                "security": {
+                    "receipt_id": (
+                        "sha256:327881c83976f1b600b0b7ec3b15ba3f1e8aa661695705e3f340bc7631827cfd"
+                    ),
+                    "stage_id": "A20",
+                    "terminal_state": "WAIT_NATIVE_CHILD_CLOSEOUT",
+                    "evidence_role": "RECORDED_V3_7_NOT_CURRENT_HEALTH",
+                },
+            },
+        },
+        "bindings": {
+            "policy": {
+                "path": "policies/federation-ownership-policy-v1.json",
+                "sha256": _DIGEST,
+            },
+            "successor_plan": {
+                "path": "docs/plans/federated-research-organism-successor-plan-v1.md",
+                "sha256": _DIGEST,
+            },
+            "release_receipt": {
+                "path": "docs/verification/srf-v3-7-mission-closeout-blocked-v2-0-0.json",
+                "sha256": _DIGEST,
+            },
+            "doctrine_gate": {
+                "input_manifest_sha256": _DIGEST,
+                "receipt_id": _DIGEST,
+                "verifier_sha256": _DIGEST,
+            },
+        },
+        "source_identity": {
+            "candidate_base_head": _HEAD,
+            "current_head": _HEAD,
+            "candidate_diff_sha256": _DIGEST,
+            "worktree_matches_index": True,
+        },
+        "runtime_truth": False,
+        "activates_federation": False,
+        "canonical_writes": 0,
+        "live_actions": 0,
+        "grants_authority": False,
+        "declared_scope_grants_authority": False,
+    }
+
+
 def _base_docs() -> dict[str, dict[str, object]]:
     return {
         "LabCellManifest": {
@@ -115,6 +225,7 @@ def _base_docs() -> dict[str, dict[str, object]]:
             "canonical_writes": 0,
             "grants_authority": False,
         },
+        "FederationOrientationReport": _orientation_doc(),
         "SpoolMessage": {
             "schema_version": "SpoolMessage/v1",
             "message_id": _DIGEST,
@@ -201,3 +312,41 @@ def test_s03_additional_properties_rejected(schema_name: str) -> None:
     doc["orders_allowed"] = True
     with pytest.raises(ContractValidationError):
         validate(doc, schema_name)
+
+
+def test_federation_orientation_schema_rejects_nested_authority_field() -> None:
+    doc = _orientation_doc()
+    orientation = doc["orientation"]
+    assert isinstance(orientation, dict)
+    orientation["SRL_GLOBAL_CONTROLLER"] = True
+    with pytest.raises(ContractValidationError):
+        validate(doc, "FederationOrientationReport")
+
+
+@pytest.mark.parametrize(
+    ("participant", "stage_id"),
+    [("dual", "A19"), ("market", "A20"), ("security", "A18")],
+)
+def test_federation_orientation_schema_rejects_swapped_stages(
+    participant: str,
+    stage_id: str,
+) -> None:
+    doc = _orientation_doc()
+    evidence = doc["recorded_v37_evidence"]
+    assert isinstance(evidence, dict)
+    stages = evidence["stages"]
+    assert isinstance(stages, dict)
+    stage = stages[participant]
+    assert isinstance(stage, dict)
+    stage["stage_id"] = stage_id
+    with pytest.raises(ContractValidationError):
+        validate(doc, "FederationOrientationReport")
+
+
+def test_federation_orientation_schema_rejects_unicode_scope() -> None:
+    doc = _orientation_doc()
+    orientation = doc["orientation"]
+    assert isinstance(orientation, dict)
+    orientation["DECLARED_WRITE_SCOPE"] = "bad\u2028scope"
+    with pytest.raises(ContractValidationError):
+        validate(doc, "FederationOrientationReport")
